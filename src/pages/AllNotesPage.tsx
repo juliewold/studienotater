@@ -1,26 +1,43 @@
 import { Link } from "react-router-dom";
 import { notes } from "../data/notes";
 import { subjects } from "../data/subjects";
+import { useState } from "react";
 
 export const AllNotesPage = () => {
-  const allNotes = Object.entries(notes).flatMap(([subjectId, subjectNotes]) => {
-    const subject = subjects.find((subject) => subject.id === subjectId);
+  const [searchTerm, setSearchTerm] = useState("");
+  const allNotes = Object.entries(notes).flatMap(
+    ([subjectId, subjectNotes]) => {
+      const subject = subjects.find((subject) => subject.id === subjectId);
 
-    return subjectNotes.map((note) => ({
-      ...note,
-      subjectId,
-      subjectCode: subject?.code ?? subjectId.toUpperCase(),
-    }));
-  });
+      return subjectNotes.map((note) => ({
+        ...note,
+        subjectId,
+        subjectCode: subject?.code ?? subjectId.toUpperCase(),
+      }));
+    },
+  );
+
+  const filteredNotes = allNotes.filter((note) =>
+    `${note.title} ${note.description} ${note.subjectCode}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <main className="page-container">
       <p className="page-label">Notater</p>
       <h1>Notater</h1>
       <p>Alle notater samlet på ett sted.</p>
+      <input
+        className="notes-search"
+        type="text"
+        placeholder="Søk i notater..."
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+      />
 
       <div className="all-notes-grid">
-        {allNotes.map((note) => (
+        {filteredNotes.map((note) => (
           <Link
             key={`${note.subjectId}-${note.id}`}
             to={`/fag/${note.subjectId}/notater/${note.id}`}

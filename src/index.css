@@ -656,3 +656,15 @@ body {
   font-size: 0.9rem;
   font-weight: 700;
 }
+
+.notes-search {
+  width: 100%;
+  margin-top: 32px;
+  padding: 16px 20px;
+
+  border: 1px solid #e2d8f0;
+  border-radius: 18px;
+
+  font-size: 1rem;
+  background: white;
+}
