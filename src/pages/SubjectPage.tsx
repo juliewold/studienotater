@@ -36,19 +36,19 @@ export const SubjectPage = () => {
         <SubjectFeatureCard
           title="Flashcards"
           description="Repeter med flashcards"
-          link="#"
+          link={`/fag/${subject.id}/flashcards`}
         />
 
         <SubjectFeatureCard
           title="Videoer"
           description="Se forelesninger og videoer"
-          link="#"
+          link={`/fag/${subject.id}/videoer`}
         />
 
         <SubjectFeatureCard
           title="Eksamen"
           description="Tidligere eksamener og løsninger"
-          link="#"
+          link={`/fag/${subject.id}/eksamen`}
         />
       </div>
 

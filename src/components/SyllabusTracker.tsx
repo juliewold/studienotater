@@ -37,10 +37,26 @@ export const SyllabusTracker = ({
       setCompletedTopics([...completedTopics, topicId]);
     }
   };
+  const completedCount = completedTopics.length;
 
+  const progress =
+    topics.length === 0
+      ? 0
+      : Math.round((completedCount / topics.length) * 100);
   return (
     <section className="syllabus-tracker">
       <h2>Pensumtracker</h2>
+      <div className="progress-info">
+        <span>
+          {completedCount} / {topics.length} temaer fullført
+        </span>
+
+        <span>{progress}%</span>
+      </div>
+
+      <div className="progress-bar">
+        <div className="progress-fill" style={{ width: `${progress}%` }} />
+      </div>
 
       <div className="syllabus-list">
         {topics.map((topic) => (
