@@ -8,6 +8,8 @@ import { subjects } from "../data/subjects";
 const years = [1, 2, 3, 4, 5];
 
 export const HomePage = () => {
+  const firstYearSubjects = subjects.filter((subject) => subject.year === 1);
+  const secondYearSubjects = subjects.filter((subject) => subject.year === 2);
   return (
     <>
       <Hero />
@@ -34,8 +36,21 @@ export const HomePage = () => {
       <section className="subjects-section">
         <h2>Fag</h2>
 
+        <h3>1. år</h3>
         <div className="subjects-grid">
-          {subjects.map((subject) => (
+          {firstYearSubjects.map((subject) => (
+            <SubjectCard
+              key={subject.code}
+              code={subject.code}
+              name={subject.name}
+              year={subject.year}
+            />
+          ))}
+        </div>
+
+        <h3>2. år</h3>
+        <div className="subjects-grid">
+          {secondYearSubjects.map((subject) => (
             <SubjectCard
               key={subject.code}
               code={subject.code}
