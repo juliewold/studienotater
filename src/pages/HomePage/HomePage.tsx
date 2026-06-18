@@ -9,6 +9,7 @@ import { notes } from "../../data/notes";
 import { flashcards } from "../../data/flashcards";
 import { pdfs } from "../../data/pdfs";
 import { Footer } from "../../components/Footer/Footer";
+// import { HomeProgress } from "../../components/HomeProgress/HomeProgress";
 
 const years = [1, 2, 3, 4, 5];
 
@@ -30,6 +31,8 @@ export const HomePage = () => {
       </section>
 
       <ContinueLearning />
+
+      {/* <HomeProgress /> */}
 
       <section className="year-section">
         <h2>Klassetrinn</h2>

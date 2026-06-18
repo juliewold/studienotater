@@ -90,7 +90,7 @@ export const Navbar = () => {
 
             <div className="menu-column">
               <h3>MINE STUDIER</h3>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              <Link to="/semesterstart" onClick={() => setMenuOpen(false)}>
                 Semesterstart
               </Link>
               <Link to="/" onClick={() => setMenuOpen(false)}>
