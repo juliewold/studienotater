@@ -1,10 +1,10 @@
 import "./Hero.css";
+import { Link } from "react-router-dom";
 
 export const Hero = () => {
   return (
     <section className="hero">
       <div className="hero-card">
-
         <h1>Studienotater for datateknologi</h1>
 
         <p className="hero-text">
@@ -13,16 +13,14 @@ export const Hero = () => {
         </p>
 
         <div className="hero-actions">
-          <button>Bla i notater</button>
-          <button>Start repetisjon</button>
-          <button>Studieplanlegger</button>
-        </div>
+          <Link to="/notater" className="hero-button">
+            Se notater
+          </Link>
 
-        <input
-          className="hero-search"
-          type="text"
-          placeholder="Søk etter fag, kode eller emne..."
-        />
+          <Link to="/pdfs" className="hero-button secondary">
+            Utforsk PDF-er
+          </Link>
+        </div>
       </div>
     </section>
   );
