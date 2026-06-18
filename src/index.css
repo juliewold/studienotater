@@ -176,3 +176,49 @@ body {
   color: #6b647c;
   font-weight: 600;
 }
+
+.subjects-section {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+.subjects-section h2 {
+  margin-bottom: 16px;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.subject-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+
+  transition: transform 0.2s ease;
+}
+
+.subject-card:hover {
+  transform: translateY(-4px);
+}
+
+.subject-code {
+  color: #8b5cf6;
+  font-weight: 700;
+  margin: 0;
+}
+
+.subject-card h3 {
+  margin: 8px 0;
+}
+
+.subject-year {
+  color: #6b647c;
+  margin: 0;
+}
