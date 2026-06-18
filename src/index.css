@@ -141,3 +141,38 @@ body {
 .continue-learning button:hover {
   background: #9568da;
 }
+
+.year-section {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+.year-section h2 {
+  margin-bottom: 16px;
+}
+
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.year-card {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.year-card h3 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.year-card p {
+  margin: 4px 0 0;  
+  color: #6b647c;
+  font-weight: 600;
+}
