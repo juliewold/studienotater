@@ -1,14 +1,11 @@
 import { Navbar } from "./components/Navbar";
+import { Hero } from "./components/Hero";
 
 function App() {
   return (
     <>
       <Navbar />
-
-      <main>
-        <h2>Velkommen til Studienotater</h2>
-        <p>Din personlige læringsplattform.</p>
-      </main>
+      <Hero />
     </>
   );
 }
