@@ -1,18 +1,15 @@
-import "./Hero.css"
+import "./Hero.css";
 
 export const Hero = () => {
   return (
     <section className="hero">
       <div className="hero-card">
-        <p className="hero-label">NTNU DATATEKNOLOGI</p>
 
-        <h1>
-          Ditt personlige <span>læringsbibliotek</span>
-        </h1>
+        <h1>Studienotater for datateknologi</h1>
 
         <p className="hero-text">
-          Samle notater, øv med flashcards, se videoer, les PDF-er og planlegg
-          uka — alt på ett sted.
+          Samle notater, øv med flashcards, se videoer og følg pensum gjennom
+          hele studiet.
         </p>
 
         <div className="hero-actions">
