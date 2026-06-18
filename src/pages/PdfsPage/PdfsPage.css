@@ -1,19 +1,54 @@
 .pdf-grid {
   display: grid;
-  gap: 20px;
-  margin-top: 32px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .pdf-card {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
   background: white;
   border-radius: 20px;
-  padding: 24px;
+  padding: 16px 20px;
+
   text-decoration: none;
   color: inherit;
+
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.pdf-card:hover {
+  transform: translateY(-4px);
+}
+
+.pdf-icon {
+  font-size: 2rem;
 }
 
 .pdf-card h3 {
   margin: 0;
+}
+
+.pdf-arrow {
+  margin-left: auto;
+  font-size: 1.2rem;
+  color: #8b5cf6;
+}
+
+.pdf-category-section {
+  margin-top: 40px;
+}
+
+.pdf-category-section h2 {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .pdf-grid {
+    grid-template-columns: 1fr;
+  }
 }
