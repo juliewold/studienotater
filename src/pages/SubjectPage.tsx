@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { subjects } from "../data/subjects";
 import { SubjectFeatureCard } from "../components/SubjectFeatureCard";
 
@@ -17,6 +17,9 @@ export const SubjectPage = () => {
 
   return (
     <main className="subject-page">
+      <Link to="/" className="back-link">
+        ← Tilbake til forsiden
+      </Link>
       <p className="subject-page-label">Fag</p>
       <h1>{subject.code}</h1>
       <p>{subject.name}</p>

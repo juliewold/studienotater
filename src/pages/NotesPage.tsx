@@ -20,6 +20,9 @@ export const NotesPage = () => {
 
   return (
     <main className="notes-page">
+      <Link to={`/fag/${subject.id}`} className="back-link">
+        ← Tilbake til faget
+      </Link>
       <p className="notes-label">Notater</p>
       <h1>{subject.code}</h1>
       <p>{subject.name}</p>
