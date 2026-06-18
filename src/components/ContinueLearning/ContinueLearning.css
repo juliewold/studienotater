@@ -1,0 +1,32 @@
+.continue-learning {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 24px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: white;
+  border-radius: 24px;
+}
+
+.continue-label {
+  margin: 0;
+  color: #666;
+}
+
+.continue-learning button {
+  border: none;
+  background: #a77be8;
+  color: white;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.continue-learning button:hover {
+  background: #9568da;
+}

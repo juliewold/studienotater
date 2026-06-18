@@ -1,0 +1,23 @@
+.subject-page {
+  max-width: 1200px;
+  margin: 48px auto;
+  padding: 0 24px;
+}
+
+.subject-page-label {
+  color: #8b5cf6;
+  font-weight: 700;
+  margin: 0;
+}
+
+.subject-page h1 {
+  font-size: 3rem;
+  margin: 8px 0;
+}
+
+.subject-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 32px;
+}

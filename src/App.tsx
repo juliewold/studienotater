@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Navbar } from "./components/Navbar";
-import { HomePage } from "./pages/HomePage";
-import { SubjectPage } from "./pages/SubjectPage";
-import { NotesPage } from "./pages/NotesPage";
-import { NotePage } from "./pages/NotePage";
-import { FlashcardsPage } from "./pages/FlashcardsPage";
-import { VideosPage } from "./pages/VideosPage";
-import { ExamsPage } from "./pages/ExamsPage";
-import { AllNotesPage } from "./pages/AllNotesPage";
-import { AllFlashcardsPage } from "./pages/AllFlashCardsPage";
-import { AllVideosPage } from "./pages/AllVideosPage";
+import { Navbar } from "./components/Navbar/Navbar";
+import { HomePage } from "./pages/HomePage/HomePage";
+import { SubjectPage } from "./pages/SubjectPage/SubjectPage";
+import { NotesPage } from "./pages/NotesPage/NotesPage";
+import { NotePage } from "./pages/NotePage/NotePage";
+import { FlashcardsPage } from "./pages/FlashcardsPage/FlashcardsPage";
+import { VideosPage } from "./pages/VideosPage/VideosPage";
+import { ExamsPage } from "./pages/ExamsPage/ExamsPage";
+import { AllNotesPage } from "./pages/AllNotesPage/AllNotesPage";
+import { AllFlashcardsPage } from "./pages/AllFlashcardsPage/AllFlashcardsPage";
+import { AllVideosPage } from "./pages/AllVideosPage/AllVideosPage";
 
 function App() {
   return (
