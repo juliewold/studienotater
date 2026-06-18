@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 type SubjectCardProps = {
   code: string;
   name: string;
@@ -6,10 +8,10 @@ type SubjectCardProps = {
 
 export const SubjectCard = ({ code, name, year }: SubjectCardProps) => {
   return (
-    <a href={`/fag/${code.toLowerCase()}`} className="subject-card">
+    <Link to={`/fag/${code.toLowerCase()}`} className="subject-card">
       <p className="subject-code">{code}</p>
       <h3>{name}</h3>
       <p className="subject-year">{year}. år</p>
-    </a>
+    </Link>
   );
 };
