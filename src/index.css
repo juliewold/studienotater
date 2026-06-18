@@ -469,3 +469,38 @@ body {
 .back-link:hover {
   text-decoration: underline;
 }
+
+.syllabus-tracker {
+  margin-top: 40px;
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.syllabus-tracker h2 {
+  margin: 0 0 20px;
+}
+
+.syllabus-list {
+  display: grid;
+  gap: 14px;
+}
+
+.syllabus-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #fbf7ff;
+
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.syllabus-item input {
+  width: 18px;
+  height: 18px;
+}

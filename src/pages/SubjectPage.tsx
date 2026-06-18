@@ -1,11 +1,14 @@
 import { Link, useParams } from "react-router-dom";
 import { subjects } from "../data/subjects";
 import { SubjectFeatureCard } from "../components/SubjectFeatureCard";
+import { SyllabusTracker } from "../components/SyllabusTracker";
+import { notes } from "../data/notes";
 
 export const SubjectPage = () => {
   const { subjectId } = useParams();
 
   const subject = subjects.find((subject) => subject.id === subjectId);
+  const subjectNotes = notes[subjectId as keyof typeof notes] || [];
 
   if (!subject) {
     return (
@@ -48,6 +51,8 @@ export const SubjectPage = () => {
           link="#"
         />
       </div>
+
+      <SyllabusTracker subjectId={subject.id} topics={subjectNotes} />
     </main>
   );
 };
