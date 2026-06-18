@@ -1,25 +1,31 @@
-import "./HomePage.css"
+import "./HomePage.css";
 import { Hero } from "../../components/Hero/Hero";
 import { StatsCard } from "../../components/StatsCard/StatsCard";
 import { ContinueLearning } from "../../components/ContinueLearning/ContinueLearning";
 import { YearCard } from "../../components/YearCard/YearCard";
 import { SubjectCard } from "../../components/SubjectCard/SubjectCard";
 import { subjects } from "../../data/subjects";
+import { notes } from "../../data/notes";
+import { flashcards } from "../../data/flashcards";
+import { pdfs } from "../../data/pdfs";
 
 const years = [1, 2, 3, 4, 5];
 
 export const HomePage = () => {
   const firstYearSubjects = subjects.filter((subject) => subject.year === 1);
   const secondYearSubjects = subjects.filter((subject) => subject.year === 2);
+  const totalNotes = Object.values(notes).flat().length;
+  const totalFlashcards = Object.values(flashcards).flat().length;
+  const totalPdfs = Object.values(pdfs).flat().length;
   return (
     <>
       <Hero />
 
       <section className="stats-grid">
-        <StatsCard title="Fag" value="20" />
-        <StatsCard title="Notater" value="8" />
-        <StatsCard title="Flashcards" value="5" />
-        <StatsCard title="Due i dag" value="22" />
+        <StatsCard title="Fag" value={String(subjects.length)} />
+        <StatsCard title="Notater" value={String(totalNotes)} />
+        <StatsCard title="Flashcards" value={String(totalFlashcards)} />
+        <StatsCard title="PDF-er" value={String(totalPdfs)} />
       </section>
 
       <ContinueLearning />
