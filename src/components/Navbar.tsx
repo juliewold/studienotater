@@ -80,7 +80,7 @@ export const Navbar = () => {
               <Link to="/notater" onClick={() => setMenuOpen(false)}>
                 Notater
               </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              <Link to="flashcards" onClick={() => setMenuOpen(false)}>
                 Flashcards
               </Link>
               <Link to="/" onClick={() => setMenuOpen(false)}>

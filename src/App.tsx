@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import { Navbar } from "./components/Navbar";
 import { HomePage } from "./pages/HomePage";
 import { SubjectPage } from "./pages/SubjectPage";
@@ -9,6 +8,7 @@ import { FlashcardsPage } from "./pages/FlashcardsPage";
 import { VideosPage } from "./pages/VideosPage";
 import { ExamsPage } from "./pages/ExamsPage";
 import { AllNotesPage } from "./pages/AllNotesPage";
+import { AllFlashcardsPage } from "./pages/AllFlashCardsPage";
 
 function App() {
   return (
@@ -31,6 +31,8 @@ function App() {
         <Route path="/fag/:subjectId/eksamen" element={<ExamsPage />} />
 
         <Route path="/notater" element={<AllNotesPage />} />
+
+        <Route path="/flashcards" element={<AllFlashcardsPage />} />
       </Routes>
     </BrowserRouter>
   );

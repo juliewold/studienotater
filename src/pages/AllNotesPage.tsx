@@ -27,7 +27,6 @@ export const AllNotesPage = () => {
     <main className="page-container">
       <p className="page-label">Notater</p>
       <h1>Notater</h1>
-      <p>Alle notater samlet på ett sted.</p>
       <input
         className="notes-search"
         type="text"
