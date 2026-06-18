@@ -24,7 +24,7 @@ export const SubjectPage = () => {
         <SubjectFeatureCard
           title="Notater"
           description="Les og organiser notater"
-          link="#"
+          link={`/fag/${subject.id}/notater`}
         />
 
         <SubjectFeatureCard

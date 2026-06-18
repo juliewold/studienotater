@@ -389,3 +389,42 @@ body {
   margin: 0;
   color: #6b647c;
 }
+
+.notes-page {
+  max-width: 1200px;
+  margin: 48px auto;
+  padding: 0 24px;
+}
+
+.notes-label {
+  color: #8b5cf6;
+  font-weight: 700;
+  margin: 0;
+}
+
+.notes-page h1 {
+  font-size: 3rem;
+  margin: 8px 0;
+}
+
+.notes-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.note-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.note-card h3 {
+  margin: 0 0 8px;
+}
+
+.note-card p {
+  margin: 0;
+  color: #6b647c;
+}
