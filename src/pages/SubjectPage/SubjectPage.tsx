@@ -1,4 +1,4 @@
-import "./SubjectPage.css"
+import "./SubjectPage.css";
 import { Link, useParams } from "react-router-dom";
 import { subjects } from "../../data/subjects";
 import { SubjectFeatureCard } from "../../components/SubjectFeatureCard/SubjectFeatureCard";
@@ -50,6 +50,12 @@ export const SubjectPage = () => {
           title="Eksamen"
           description="Tidligere eksamener og løsninger"
           link={`/fag/${subject.id}/eksamen`}
+        />
+
+        <SubjectFeatureCard
+          title="PDF-er"
+          description="Forelesninger og egne notater"
+          link={`/fag/${subject.id}/pdfs`}
         />
       </div>
 

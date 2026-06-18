@@ -10,6 +10,8 @@ import { ExamsPage } from "./pages/ExamsPage/ExamsPage";
 import { AllNotesPage } from "./pages/AllNotesPage/AllNotesPage";
 import { AllFlashcardsPage } from "./pages/AllFlashcardsPage/AllFlashcardsPage";
 import { AllVideosPage } from "./pages/AllVideosPage/AllVideosPage";
+import { PdfsPage } from "./pages/PdfsPage/PdfsPage";
+import { PdfViewerPage } from "./pages/PdfViewerPage/PdfViewerPage";
 
 function App() {
   return (
@@ -36,6 +38,10 @@ function App() {
         <Route path="/flashcards" element={<AllFlashcardsPage />} />
 
         <Route path="/videoer" element={<AllVideosPage />} />
+
+        <Route path="/fag/:subjectId/pdfs" element={<PdfsPage />} />
+
+        <Route path="/fag/:subjectId/pdfs/:pdfId" element={<PdfViewerPage />} />
       </Routes>
     </BrowserRouter>
   );
