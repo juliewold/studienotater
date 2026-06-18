@@ -1,9 +1,15 @@
+import { Navbar } from "./components/Navbar";
+
 function App() {
   return (
-    <main>
-      <h1>Studienotater</h1>
-      <p>Ditt personlige læringsbibliotek.</p>
-    </main>
+    <>
+      <Navbar />
+
+      <main>
+        <h2>Velkommen til Studienotater</h2>
+        <p>Din personlige læringsplattform.</p>
+      </main>
+    </>
   );
 }
 
