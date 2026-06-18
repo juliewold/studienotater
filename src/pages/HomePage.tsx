@@ -3,31 +3,9 @@ import { StatsCard } from "../components/StatsCard";
 import { ContinueLearning } from "../components/ContinueLearning";
 import { YearCard } from "../components/YearCard";
 import { SubjectCard } from "../components/SubjectCard";
+import { subjects } from "../data/subjects";
 
 const years = [1, 2, 3, 4, 5];
-
-const subjects = [
-  {
-    code: "TDT4100",
-    name: "Objektorientert programmering",
-    year: 1,
-  },
-  {
-    code: "TTT4203",
-    name: "Analog og digital elektronikk",
-    year: 1,
-  },
-  {
-    code: "TMA4100",
-    name: "Matematikk 1",
-    year: 1,
-  },
-  {
-    code: "ITGK",
-    name: "Introduksjon til programmering",
-    year: 1,
-  },
-];
 
 export const HomePage = () => {
   return (
