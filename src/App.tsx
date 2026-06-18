@@ -8,6 +8,7 @@ import { NotePage } from "./pages/NotePage";
 import { FlashcardsPage } from "./pages/FlashcardsPage";
 import { VideosPage } from "./pages/VideosPage";
 import { ExamsPage } from "./pages/ExamsPage";
+import { AllNotesPage } from "./pages/AllNotesPage";
 
 function App() {
   return (
@@ -28,6 +29,8 @@ function App() {
         <Route path="/fag/:subjectId/videoer" element={<VideosPage />} />
 
         <Route path="/fag/:subjectId/eksamen" element={<ExamsPage />} />
+
+        <Route path="/notater" element={<AllNotesPage />} />
       </Routes>
     </BrowserRouter>
   );

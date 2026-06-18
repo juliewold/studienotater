@@ -15,7 +15,7 @@ export const Navbar = () => {
         <Link className="active-link" to="/">
           Hjem
         </Link>
-        <Link to="/">Notater</Link>
+        <Link to="/notater">Notater</Link>
         <Link to="/">Flashcards</Link>
         <Link to="/">Studieplanlegger</Link>
       </nav>
