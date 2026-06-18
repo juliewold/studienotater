@@ -13,6 +13,45 @@ export const pdfs = {
     category: "forelesninger",
   })),
 
+  exph0300: [
+    {
+      id: "argumentasjonsteori",
+      title: "Argumentasjonsteori",
+      file: "/pdfs/exph0300/1) Argumentasjonsteori.pdf",
+      category: "presentasjoner",
+    },
+    {
+      id: "vitenskapsfilosofi",
+      title: "Vitenskapsfilosofi",
+      file: "/pdfs/exph0300/2) Vitenskapsfilosofi.pdf",
+      category: "presentasjoner",
+    },
+    {
+      id: "natursyn, menneskesyn og teknologi",
+      title: "Natursyn, menneskesyn og teknologi",
+      file: "/pdfs/exph0300/3) Natursyn, menneskesyn og teknologi.pdf",
+      category: "presentasjoner",
+    },
+    {
+      id: "etikk",
+      title: "Etikk",
+      file: "/pdfs/exph0300/4) Etikk.pdf",
+      category: "presentasjoner",
+    },
+    {
+      id: "politisk filosofi",
+      title: "Politisk filosofi",
+      file: "/pdfs/exph0300/5) Politisk filosofi.pdf",
+      category: "presentasjoner",
+    },
+    {
+      id: "tilleggspensum",
+      title: "Tilleggspensum",
+      file: "/pdfs/exph0300/6) Tilleggspensum.pdf",
+      category: "presentasjoner",
+    },
+  ],
+
   ttt4203: [
     {
       id: "notater",
@@ -145,45 +184,6 @@ export const pdfs = {
       title: "TMA4130_35 K25",
       file: "/pdfs/tma4422/eksamener/TMA4130_35 K25.pdf",
       category: "eksamener",
-    },
-  ],
-
-  exph0300: [
-    {
-      id: "argumentasjonsteori",
-      title: "Argumentasjonsteori",
-      file: "/pdfs/exph0300/1) Argumentasjonsteori.pdf",
-      category: "presentasjoner",
-    },
-    {
-      id: "vitenskapsfilosofi",
-      title: "Vitenskapsfilosofi",
-      file: "/pdfs/exph0300/2) Vitenskapsfilosofi.pdf",
-      category: "presentasjoner",
-    },
-    {
-      id: "natursyn, menneskesyn og teknologi",
-      title: "Natursyn, menneskesyn og teknologi",
-      file: "/pdfs/exph0300/3) Natursyn, menneskesyn og teknologi.pdf",
-      category: "presentasjoner",
-    },
-    {
-      id: "etikk",
-      title: "Etikk",
-      file: "/pdfs/exph0300/4) Etikk.pdf",
-      category: "presentasjoner",
-    },
-    {
-      id: "politisk filosofi",
-      title: "Politisk filosofi",
-      file: "/pdfs/exph0300/5) Politisk filosofi.pdf",
-      category: "presentasjoner",
-    },
-    {
-      id: "tilleggspensum",
-      title: "Tilleggspensum",
-      file: "/pdfs/exph0300/6) Tilleggspensum.pdf",
-      category: "presentasjoner",
     },
   ],
 };
