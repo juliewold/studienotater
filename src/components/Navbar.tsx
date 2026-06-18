@@ -40,12 +40,12 @@ export const Navbar = () => {
         </NavLink>
 
         <NavLink
-          to="/studieplanlegger"
+          to="/videoer"
           className={({ isActive }) =>
             isActive ? "nav-link active-nav-link" : "nav-link"
           }
         >
-          Studieplanlegger
+          Videoer
         </NavLink>
       </nav>
 
@@ -83,7 +83,7 @@ export const Navbar = () => {
               <Link to="flashcards" onClick={() => setMenuOpen(false)}>
                 Flashcards
               </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              <Link to="/videoer" onClick={() => setMenuOpen(false)}>
                 Videoer
               </Link>
               <Link to="/" onClick={() => setMenuOpen(false)}>

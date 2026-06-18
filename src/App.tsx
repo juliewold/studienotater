@@ -9,6 +9,7 @@ import { VideosPage } from "./pages/VideosPage";
 import { ExamsPage } from "./pages/ExamsPage";
 import { AllNotesPage } from "./pages/AllNotesPage";
 import { AllFlashcardsPage } from "./pages/AllFlashCardsPage";
+import { AllVideosPage } from "./pages/AllVideosPage";
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
         <Route path="/notater" element={<AllNotesPage />} />
 
         <Route path="/flashcards" element={<AllFlashcardsPage />} />
+
+        <Route path="/videoer" element={<AllVideosPage />} />
       </Routes>
     </BrowserRouter>
   );

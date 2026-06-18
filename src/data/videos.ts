@@ -1,22 +1,29 @@
 export const videos = {
   tma4412: [
     {
-      id: "uke-1",
-      title: "Uke 1 - Mengdelære",
-      description: "Videoer om mengder, delmengder og operasjoner",
-      url: "#",
+      id: "mengdelaere",
+      topic: "Mengdelære",
+      videos: [
+        {
+          title: "Mengder og delmengder",
+          youtubeId: "wbBY2tTqXDA",
+        },
+        {
+          title: "Union og snitt",
+          youtubeId: "xZELQc11ACY",
+        },
+      ],
     },
+
     {
-      id: "uke-2",
-      title: "Uke 2 - Logikk",
-      description: "Videoer om utsagn, sannhetstabeller og logiske operatorer",
-      url: "#",
-    },
-    {
-      id: "uke-3",
-      title: "Uke 3 - Induksjon",
-      description: "Videoer om matematisk induksjon",
-      url: "#",
+      id: "logikk",
+      topic: "Logikk",
+      videos: [
+        {
+          title: "Introduksjon til logikk",
+          youtubeId: "itrXYg41-V0",
+        },
+      ],
     },
   ],
 };
