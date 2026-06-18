@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { subjects } from "../data/subjects";
+import { SubjectFeatureCard } from "../components/SubjectFeatureCard";
 
 export const SubjectPage = () => {
   const { subjectId } = useParams();
@@ -19,12 +20,30 @@ export const SubjectPage = () => {
       <p className="subject-page-label">Fag</p>
       <h1>{subject.code}</h1>
       <p>{subject.name}</p>
+      <div className="subject-features-grid">
+        <SubjectFeatureCard
+          title="Notater"
+          description="Les og organiser notater"
+          link="#"
+        />
 
-      <div className="subject-actions">
-        <button>Notater</button>
-        <button>Flashcards</button>
-        <button>Videoer</button>
-        <button>Eksamen</button>
+        <SubjectFeatureCard
+          title="Flashcards"
+          description="Repeter med flashcards"
+          link="#"
+        />
+
+        <SubjectFeatureCard
+          title="Videoer"
+          description="Se forelesninger og videoer"
+          link="#"
+        />
+
+        <SubjectFeatureCard
+          title="Eksamen"
+          description="Tidligere eksamener og løsninger"
+          link="#"
+        />
       </div>
     </main>
   );
