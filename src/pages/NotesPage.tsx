@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { subjects } from "../data/subjects";
 import { notes } from "../data/notes";
+import { Link } from "react-router-dom";
 
 export const NotesPage = () => {
   const { subjectId } = useParams();
@@ -25,10 +26,14 @@ export const NotesPage = () => {
 
       <div className="notes-list">
         {subjectNotes.map((note) => (
-          <article key={note.id} className="note-card">
+          <Link
+            key={note.id}
+            to={`/fag/${subject.id}/notater/${note.id}`}
+            className="note-card"
+          >
             <h3>{note.title}</h3>
             <p>{note.description}</p>
-          </article>
+          </Link>
         ))}
       </div>
     </main>

@@ -4,6 +4,25 @@ export const notes = {
       id: "mengdelaere",
       title: "Mengdelære",
       description: "Mengder, delmengder og operasjoner",
+      content: `
+Mengdelære handler om samlinger av objekter.
+
+Viktige begreper:
+
+• Mengde
+• Delmengde
+• Union
+• Snitt
+• Komplement
+
+Eksempel:
+
+A = {1, 2, 3}
+B = {2, 3, 4}
+
+A ∪ B = {1, 2, 3, 4}
+A ∩ B = {2, 3}
+`,
     },
     {
       id: "logikk",
