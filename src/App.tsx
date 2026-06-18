@@ -1,6 +1,7 @@
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { StatsCard } from "./components/StatsCard";
+import { ContinueLearning } from "./components/ContinueLearning";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <StatsCard title="Flashcards" value="5" />
         <StatsCard title="Due i dag" value="22" />
       </section>
+      <ContinueLearning />
     </>
   );
 }
