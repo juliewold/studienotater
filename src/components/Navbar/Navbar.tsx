@@ -87,7 +87,7 @@ export const Navbar = () => {
               <Link to="/videoer" onClick={() => setMenuOpen(false)}>
                 Videoer
               </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              <Link to="/pdfs" onClick={() => setMenuOpen(false)}>
                 PDF-er
               </Link>
               <Link to="/" onClick={() => setMenuOpen(false)}>

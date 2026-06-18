@@ -1,0 +1,39 @@
+.all-pdfs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  margin-top: 32px;
+}
+
+.pdf-subject-card {
+  display: block;
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+
+  text-decoration: none;
+  color: inherit;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.pdf-subject-card:hover {
+  transform: translateY(-4px);
+}
+
+.pdf-subject-card h3 {
+  margin: 8px 0;
+}
+
+.pdf-subject-card p:last-child {
+  margin: 0;
+  color: #6b647c;
+}
+
+@media (max-width: 768px) {
+  .all-pdfs-grid {
+    grid-template-columns: 1fr;
+  }
+}

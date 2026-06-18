@@ -12,6 +12,7 @@ import { AllFlashcardsPage } from "./pages/AllFlashcardsPage/AllFlashcardsPage";
 import { AllVideosPage } from "./pages/AllVideosPage/AllVideosPage";
 import { PdfsPage } from "./pages/PdfsPage/PdfsPage";
 import { PdfViewerPage } from "./pages/PdfViewerPage/PdfViewerPage";
+import { AllPdfsPage } from "./pages/AllPdfsPage/AllPdfsPage";
 
 function App() {
   return (
@@ -42,6 +43,8 @@ function App() {
         <Route path="/fag/:subjectId/pdfs" element={<PdfsPage />} />
 
         <Route path="/fag/:subjectId/pdfs/:pdfId" element={<PdfViewerPage />} />
+
+        <Route path="/pdfs" element={<AllPdfsPage />} />
       </Routes>
     </BrowserRouter>
   );
