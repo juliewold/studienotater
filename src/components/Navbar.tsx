@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -12,12 +12,41 @@ export const Navbar = () => {
       </Link>
 
       <nav className="nav-links">
-        <Link className="active-link" to="/">
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            isActive ? "nav-link active-nav-link" : "nav-link"
+          }
+        >
           Hjem
-        </Link>
-        <Link to="/notater">Notater</Link>
-        <Link to="/">Flashcards</Link>
-        <Link to="/">Studieplanlegger</Link>
+        </NavLink>
+
+        <NavLink
+          to="/notater"
+          className={({ isActive }) =>
+            isActive ? "nav-link active-nav-link" : "nav-link"
+          }
+        >
+          Notater
+        </NavLink>
+
+        <NavLink
+          to="/flashcards"
+          className={({ isActive }) =>
+            isActive ? "nav-link active-nav-link" : "nav-link"
+          }
+        >
+          Flashcards
+        </NavLink>
+
+        <NavLink
+          to="/studieplanlegger"
+          className={({ isActive }) =>
+            isActive ? "nav-link active-nav-link" : "nav-link"
+          }
+        >
+          Studieplanlegger
+        </NavLink>
       </nav>
 
       <div className="nav-actions">
@@ -45,35 +74,69 @@ export const Navbar = () => {
           <div className="menu-grid">
             <div className="menu-column">
               <h3>SIDER</h3>
-              <Link to="/">Hjem</Link>
-              <Link to="/">Notater</Link>
-              <Link to="/">Flashcards</Link>
-              <Link to="/">Videoer</Link>
-              <Link to="/">PDF-er</Link>
-              <Link to="/">Eksamen</Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Hjem
+              </Link>
+              <Link to="/notater" onClick={() => setMenuOpen(false)}>
+                Notater
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Flashcards
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Videoer
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                PDF-er
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Eksamen
+              </Link>
             </div>
 
             <div className="menu-column">
               <h3>MINE STUDIER</h3>
-              <Link to="/">Semesterstart</Link>
-              <Link to="/">Mine fag</Link>
-              <Link to="/">Klassetrinn</Link>
-              <Link to="/">Favoritter</Link>
-              <Link to="/">Dashboard</Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Semesterstart
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Mine fag
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Klassetrinn
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Favoritter
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Dashboard
+              </Link>
             </div>
 
             <div className="menu-column">
               <h3>PLANLEGGING</h3>
-              <Link to="/">Studieplanlegger</Link>
-              <Link to="/">Semesterplan / Fagplan</Link>
-              <Link to="/">Eksamensnedtelling</Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Studieplanlegger
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Semesterplan / Fagplan
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Eksamensnedtelling
+              </Link>
             </div>
 
             <div className="menu-column">
               <h3>ANNET</h3>
-              <Link to="/">Om nettsiden</Link>
-              <Link to="/">Innstillinger</Link>
-              <Link to="/">Logg inn</Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Om nettsiden
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Innstillinger
+              </Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Logg inn
+              </Link>
             </div>
           </div>
         </div>
