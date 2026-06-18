@@ -1,8 +1,8 @@
 .navbar {
   position: sticky;
-  top: 0px;
+  top: 16px;
   max-width: 1400px;
-  margin: 0px auto;
+  margin: 16px auto 0;
   padding: 16px 24px;
 
   display: flex;
@@ -13,7 +13,7 @@
   backdrop-filter: blur(12px);
 
   border-radius: 24px;
-  z-index: 900;
+  z-index: 10000;
 }
 
 .logo {
@@ -102,7 +102,7 @@
   inset: 0;
 
   background: #fbf7ff;
-  z-index: 9999;
+  z-index: 999;
 
   padding: 80px 12%;
 
@@ -133,13 +133,6 @@
   font-size: 1.1rem;
 }
 
-.close-menu-button {
-  border: none;
-  background: transparent;
-  font-size: 2rem;
-  cursor: pointer;
-}
-
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -161,4 +154,23 @@
   color: #17142a;
   font-weight: 700;
   margin-bottom: 24px;
+}
+
+.menu-button {
+  position: relative;
+  z-index: 10002;
+}
+
+.menu-overlay {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }

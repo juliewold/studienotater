@@ -1,4 +1,4 @@
-import "./Navbar.css"
+import "./Navbar.css";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
@@ -55,7 +55,7 @@ export const Navbar = () => {
         <button className="profile-button">Julie</button>
 
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)}>
-          ☰
+          {menuOpen ? "×" : "☰"}
         </button>
       </div>
 
@@ -63,13 +63,6 @@ export const Navbar = () => {
         <div className="menu-overlay">
           <div className="menu-top">
             <input type="text" placeholder="Hva leter du etter?" />
-
-            <button
-              className="close-menu-button"
-              onClick={() => setMenuOpen(false)}
-            >
-              ×
-            </button>
           </div>
 
           <div className="menu-grid">
