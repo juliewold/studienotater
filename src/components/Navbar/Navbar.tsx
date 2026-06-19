@@ -117,16 +117,6 @@ export const Navbar = () => {
               >
                 PDF-er
               </NavLink>
-
-              <NavLink
-                to="/eksamen"
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
-                }
-              >
-                Eksamen
-              </NavLink>
             </div>
 
             <div className="menu-column">
