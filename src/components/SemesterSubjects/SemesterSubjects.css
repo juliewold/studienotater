@@ -1,0 +1,69 @@
+.semester-subjects {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+.semester-subjects-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+}
+
+.semester-subjects-header a {
+  text-decoration: none;
+
+  background: #b38bf3;
+  color: white;
+
+  padding: 10px 18px;
+  border-radius: 999px;
+
+  font-weight: 600;
+
+  transition: transform 0.2s ease;
+}
+
+.semester-subjects-header a:hover {
+  transform: translateY(-2px);
+}
+
+.semester-subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.semester-subject-card {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+
+  text-decoration: none;
+  color: inherit;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.semester-subject-card:hover {
+  transform: translateY(-4px);
+}
+
+.semester-subject-card h3 {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 1024px) {
+  .semester-subjects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .semester-subjects-grid {
+    grid-template-columns: 1fr;
+  }
+}
