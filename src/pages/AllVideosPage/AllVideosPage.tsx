@@ -1,14 +1,11 @@
-import "./AllVideosPage.css"
-import { useState } from "react";
+import "./AllVideosPage.css";
 import { Link } from "react-router-dom";
 import { videos } from "../../data/videos";
 import { subjects } from "../../data/subjects";
 
 export const AllVideosPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const videoSubjects = Object.entries(videos)
-    .map(([subjectId, subjectVideos]) => {
+  const videoSubjects = Object.entries(videos).map(
+    ([subjectId, subjectVideos]) => {
       const subject = subjects.find((subject) => subject.id === subjectId);
 
       return {
@@ -17,12 +14,8 @@ export const AllVideosPage = () => {
         name: subject?.name ?? "",
         count: subjectVideos.length,
       };
-    })
-    .filter((subject) =>
-      `${subject.code} ${subject.name}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    );
+    },
+  );
 
   return (
     <main className="page-container">
