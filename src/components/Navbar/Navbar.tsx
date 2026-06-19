@@ -68,69 +68,169 @@ export const Navbar = () => {
           <div className="menu-grid">
             <div className="menu-column">
               <h3>SIDER</h3>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
                 Hjem
-              </Link>
-              <Link to="/notater" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/notater"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
                 Notater
-              </Link>
-              <Link to="flashcards" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/flashcards"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
                 Flashcards
-              </Link>
-              <Link to="/videoer" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/videoer"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
                 Videoer
-              </Link>
-              <Link to="/pdfs" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/pdfs"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
                 PDF-er
-              </Link>
-              <Link to="/eksamen" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/eksamen"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
                 Eksamen
-              </Link>
+              </NavLink>
             </div>
 
             <div className="menu-column">
               <h3>MINE STUDIER</h3>
-              <Link to="/semesterstart" onClick={() => setMenuOpen(false)}>
+
+              <NavLink
+                to="/semesterstart"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
                 Semesterstart
-              </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Mine fag
-              </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Klassetrinn
-              </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Favoritter
-              </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Dashboard
-              </Link>
+              </NavLink>
             </div>
 
             <div className="menu-column">
               <h3>PLANLEGGING</h3>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Studieplanlegger
-              </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Semesterplan / Fagplan
-              </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/eksamen"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
                 Eksamensnedtelling
-              </Link>
+              </NavLink>
             </div>
 
             <div className="menu-column">
               <h3>ANNET</h3>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Om nettsiden
-              </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Innstillinger
-              </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              </NavLink>
+
+              <NavLink
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className="menu-link"
+              >
                 Logg inn
-              </Link>
+              </NavLink>
             </div>
           </div>
         </div>
