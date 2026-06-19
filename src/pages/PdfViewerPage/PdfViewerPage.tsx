@@ -1,12 +1,11 @@
-import "./PdfViewerPage.css"
+import "./PdfViewerPage.css";
 import { Link, useParams } from "react-router-dom";
 import { pdfs } from "../../data/pdfs";
 
 export const PdfViewerPage = () => {
   const { subjectId, pdfId } = useParams();
 
-  const subjectPdfs =
-    pdfs[subjectId as keyof typeof pdfs] || [];
+  const subjectPdfs = pdfs[subjectId as keyof typeof pdfs] || [];
 
   const pdf = subjectPdfs.find((pdf) => pdf.id === pdfId);
 
@@ -29,7 +28,7 @@ export const PdfViewerPage = () => {
 
       <iframe
         className="pdf-viewer"
-        src={pdf.file}
+        src={`${import.meta.env.BASE_URL}${pdf.file}`}
         title={pdf.title}
       />
     </main>
