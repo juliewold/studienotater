@@ -15,6 +15,7 @@ import { PdfViewerPage } from "./pages/PdfViewerPage/PdfViewerPage";
 import { AllPdfsPage } from "./pages/AllPdfsPage/AllPdfsPage";
 import { SemesterStartPage } from "./pages/SemesterStartPage/SemesterStartPage";
 import { YearPage } from "./pages/YearPage/YearPage";
+import { ExamOverviewPage } from "./pages/ExamOverviewPage/ExamOverviewPage";
 
 function App() {
   return (
@@ -51,6 +52,8 @@ function App() {
         <Route path="/semesterstart" element={<SemesterStartPage />} />
 
         <Route path="/klassetrinn/:year" element={<YearPage />} />
+
+        <Route path="/eksamen" element={<ExamOverviewPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -83,7 +83,7 @@ export const Navbar = () => {
               <Link to="/pdfs" onClick={() => setMenuOpen(false)}>
                 PDF-er
               </Link>
-              <Link to="/" onClick={() => setMenuOpen(false)}>
+              <Link to="/eksamen" onClick={() => setMenuOpen(false)}>
                 Eksamen
               </Link>
             </div>

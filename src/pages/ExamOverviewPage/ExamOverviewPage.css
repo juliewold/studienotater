@@ -1,0 +1,61 @@
+.exam-page-section {
+  margin-top: 40px;
+}
+
+.exam-page-section h2 {
+  margin-bottom: 20px;
+}
+
+.exam-page-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.exam-page-card {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.exam-page-code {
+  margin: 0 0 8px;
+
+  color: #8b5cf6;
+  font-weight: 700;
+}
+
+.exam-page-card h3 {
+  margin: 0 0 16px;
+}
+
+.exam-page-card p {
+  margin: 0 0 12px;
+  color: #6b647c;
+}
+
+.exam-page-card span {
+  display: inline-block;
+
+  background: #eee7fb;
+  color: #8b5cf6;
+
+  padding: 8px 14px;
+  border-radius: 999px;
+
+  font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+  .exam-page-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .exam-page-grid {
+    grid-template-columns: 1fr;
+  }
+}
