@@ -17,7 +17,7 @@ import { SemesterStartPage } from "./pages/SemesterStartPage/SemesterStartPage";
 
 function App() {
   return (
-    <BrowserRouter>
+   <BrowserRouter basename="/studienotater">
       <Navbar />
 
       <Routes>
