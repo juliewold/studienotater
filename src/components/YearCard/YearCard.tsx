@@ -1,4 +1,5 @@
-import "./YearCard.css"
+import "./YearCard.css";
+import { Link } from "react-router-dom";
 
 type YearCardProps = {
   year: number;
@@ -6,9 +7,9 @@ type YearCardProps = {
 
 export const YearCard = ({ year }: YearCardProps) => {
   return (
-    <div className="year-card">
+    <Link to={`/klassetrinn/${year}`} className="year-card">
       <h3>{year}.</h3>
       <p>år</p>
-    </div>
+    </Link>
   );
 };
