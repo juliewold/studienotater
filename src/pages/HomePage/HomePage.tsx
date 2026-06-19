@@ -10,6 +10,7 @@ import { pdfs } from "../../data/pdfs";
 import { Footer } from "../../components/Footer/Footer";
 import { HomeProgress } from "../../components/HomeProgress/HomeProgress";
 import { SemesterSubjects } from "../../components/SemesterSubjects/SemesterSubjects";
+import { ExamOverview } from "../../components/ExamOverview/ExamOverview";
 
 const years = [1, 2, 3, 4, 5];
 
@@ -42,6 +43,8 @@ export const HomePage = () => {
       <ContinueLearning />
 
       <SemesterSubjects />
+
+      <ExamOverview />
 
       <HomeProgress />
       <Footer />
