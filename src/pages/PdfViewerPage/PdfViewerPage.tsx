@@ -1,6 +1,7 @@
 import "./PdfViewerPage.css";
 import { Link, useParams } from "react-router-dom";
 import { pdfs } from "../../data/pdfs";
+import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
 
 export const PdfViewerPage = () => {
   const { subjectId, pdfId } = useParams();
@@ -25,6 +26,8 @@ export const PdfViewerPage = () => {
 
       <p className="page-label">PDF</p>
       <h1>{pdf.title}</h1>
+
+      <ResourceProgress resourceId={`pdf-${subjectId}-${pdf.id}`} />
 
       <iframe
         className="pdf-viewer"

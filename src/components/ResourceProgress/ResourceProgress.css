@@ -1,0 +1,70 @@
+.resource-progress {
+  margin-top: 24px;
+
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.resource-completed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 24px;
+
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.resource-completed input {
+  width: 18px;
+  height: 18px;
+}
+
+.resource-rating p {
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.stars {
+  display: flex;
+  gap: 8px;
+}
+
+.stars button {
+  border: none;
+  background: transparent;
+
+  font-size: 2rem;
+  cursor: pointer;
+
+  color: #d1d5db;
+  transition: color 0.2s ease;
+}
+
+.stars button:hover {
+  color: #b38bf3;
+}
+
+.stars button.star-1 {
+  color: #ef4444;
+}
+
+.stars button.star-2 {
+  color: #f97316;
+}
+
+.stars button.star-3 {
+  color: #eab308;
+}
+
+.stars button.star-4 {
+  color: #84cc16;
+}
+
+.stars button.star-5 {
+  color: #22c55e;
+}

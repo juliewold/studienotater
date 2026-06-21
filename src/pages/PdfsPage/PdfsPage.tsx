@@ -51,19 +51,43 @@ export const PdfsPage = () => {
             </h2>
 
             <div className="pdf-grid">
-              {categoryPdfs.map((pdf) => (
-                <Link
-                  key={pdf.id}
-                  to={`/fag/${subjectId}/pdfs/${pdf.id}`}
-                  className="pdf-card"
-                >
-                  <span className="pdf-icon">📄</span>
+              {categoryPdfs.map((pdf) => {
+                const rating =
+                  Number(
+                    localStorage.getItem(
+                      `resource-progress-pdf-${subjectId}-${pdf.id}-rating`,
+                    ),
+                  ) || 0;
 
-                  <h3>{pdf.title}</h3>
+                const completed =
+                  localStorage.getItem(
+                    `resource-progress-pdf-${subjectId}-${pdf.id}-completed`,
+                  ) === "true";
 
-                  <span className="pdf-arrow">→</span>
-                </Link>
-              ))}
+                return (
+                  <Link
+                    key={pdf.id}
+                    to={`/fag/${subjectId}/pdfs/${pdf.id}`}
+                    className="pdf-card"
+                  >
+                    <span className="pdf-icon">📄</span>
+
+                    <div className="pdf-card-content">
+                      <h3>{pdf.title}</h3>
+
+                      <div className="pdf-progress-preview">
+                        <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
+
+                        <span className={`pdf-rating rating-${rating}`}>
+                          {"★".repeat(rating)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span className="pdf-arrow">→</span>
+                  </Link>
+                );
+              })}
             </div>
           </section>
         );

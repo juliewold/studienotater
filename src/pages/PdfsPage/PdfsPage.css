@@ -52,3 +52,38 @@
     grid-template-columns: 1fr;
   }
 }
+
+.pdf-card-content {
+  display: grid;
+  gap: 8px;
+}
+
+.pdf-progress-preview {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  color: #8b5cf6;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.pdf-rating.rating-1 {
+  color: #ef4444;
+}
+
+.pdf-rating.rating-2 {
+  color: #f97316;
+}
+
+.pdf-rating.rating-3 {
+  color: #eab308;
+}
+
+.pdf-rating.rating-4 {
+  color: #84cc16;
+}
+
+.pdf-rating.rating-5 {
+  color: #22c55e;
+}
