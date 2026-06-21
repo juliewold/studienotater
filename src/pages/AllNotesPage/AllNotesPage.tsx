@@ -1,4 +1,4 @@
-import "./AllNotesPage.css"
+import "./AllNotesPage.css";
 import { Link } from "react-router-dom";
 import { notes } from "../../data/notes";
 import { subjects } from "../../data/subjects";
@@ -46,6 +46,25 @@ export const AllNotesPage = () => {
             <p className="subject-code">{note.subjectCode}</p>
             <h3>{note.title}</h3>
             <p>{note.description}</p>
+            <div className="note-progress-preview">
+              <span>
+                {localStorage.getItem(
+                  `resource-progress-note-${note.subjectId}-${note.id}-completed`,
+                ) === "true"
+                  ? "✓ Lest"
+                  : "Ikke lest"}
+              </span>
+
+              <span>
+                {"★".repeat(
+                  Number(
+                    localStorage.getItem(
+                      `resource-progress-note-${note.subjectId}-${note.id}-rating`,
+                    ),
+                  ) || 0,
+                )}
+              </span>
+            </div>
           </Link>
         ))}
       </div>
