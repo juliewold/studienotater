@@ -8,11 +8,30 @@ export const AllVideosPage = () => {
     ([subjectId, subjectVideos]) => {
       const subject = subjects.find((subject) => subject.id === subjectId);
 
+      const totalVideos = subjectVideos.reduce(
+        (total, topic) => total + topic.videos.length,
+        0,
+      );
+
+      const completedVideos = subjectVideos.reduce((total, topic) => {
+        return (
+          total +
+          topic.videos.filter((video) => {
+            return (
+              localStorage.getItem(
+                `resource-progress-video-${video.youtubeId}-completed`,
+              ) === "true"
+            );
+          }).length
+        );
+      }, 0);
+
       return {
         id: subjectId,
         code: subject?.code ?? subjectId.toUpperCase(),
         name: subject?.name ?? "",
-        count: subjectVideos.length,
+        totalVideos,
+        completedVideos,
       };
     },
   );
@@ -32,7 +51,9 @@ export const AllVideosPage = () => {
           >
             <p className="subject-code">{subject.code}</p>
             <h3>{subject.name}</h3>
-            <p>{subject.count} videoer</p>
+            <p>
+              {subject.completedVideos} / {subject.totalVideos} videoer sett
+            </p>
           </Link>
         ))}
       </div>

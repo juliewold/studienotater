@@ -1,14 +1,14 @@
-import "./VideosPage.css"
+import "./VideosPage.css";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { videos } from "../../data/videos";
+import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
 
 export const VideosPage = () => {
   const { subjectId } = useParams();
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
-  const subjectVideoTopics =
-    videos[subjectId as keyof typeof videos] || [];
+  const subjectVideoTopics = videos[subjectId as keyof typeof videos] || [];
 
   return (
     <main className="page-container">
@@ -47,6 +47,10 @@ export const VideosPage = () => {
                   )}
 
                   <h3>{video.title}</h3>
+                  <ResourceProgress
+                    resourceId={`video-${subjectId}-${video.youtubeId}`}
+                    resourceType="sett"
+                  />
                 </div>
               ))}
             </div>

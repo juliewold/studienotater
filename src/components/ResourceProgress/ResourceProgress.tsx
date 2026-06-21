@@ -3,9 +3,13 @@ import { useEffect, useState } from "react";
 
 type ResourceProgressProps = {
   resourceId: string;
+  resourceType?: "lest" | "sett";
 };
 
-export const ResourceProgress = ({ resourceId }: ResourceProgressProps) => {
+export const ResourceProgress = ({
+  resourceId,
+  resourceType = "lest",
+}: ResourceProgressProps) => {
   const storageKey = `resource-progress-${resourceId}`;
 
   const [completed, setCompleted] = useState(() => {
@@ -32,7 +36,7 @@ export const ResourceProgress = ({ resourceId }: ResourceProgressProps) => {
           checked={completed}
           onChange={(event) => setCompleted(event.target.checked)}
         />
-        <span>Marker som lest</span>
+        <span>Marker som {resourceType === "sett" ? "sett" : "lest"}</span>
       </label>
 
       <div className="resource-rating">
