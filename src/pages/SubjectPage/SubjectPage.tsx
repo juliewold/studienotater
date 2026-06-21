@@ -57,6 +57,12 @@ export const SubjectPage = () => {
           description="Forelesninger og egne notater"
           link={`/fag/${subject.id}/pdfs`}
         />
+
+        <SubjectFeatureCard
+          title="Studieplan"
+          description="Pensum, oppgaver og fremdrift"
+          link={`/fag/${subject.id}/studieplan`}
+        />
       </div>
 
       <SyllabusTracker subjectId={subject.id} topics={subjectNotes} />

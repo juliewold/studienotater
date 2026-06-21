@@ -16,6 +16,7 @@ import { AllPdfsPage } from "./pages/AllPdfsPage/AllPdfsPage";
 import { SemesterStartPage } from "./pages/SemesterStartPage/SemesterStartPage";
 import { YearPage } from "./pages/YearPage/YearPage";
 import { ExamOverviewPage } from "./pages/ExamOverviewPage/ExamOverviewPage";
+import { StudyPlanPage } from "./pages/StudyPlanPage/StudyPlanPage";
 
 function App() {
   return (
@@ -54,6 +55,8 @@ function App() {
         <Route path="/klassetrinn/:year" element={<YearPage />} />
 
         <Route path="/eksamen" element={<ExamOverviewPage />} />
+
+        <Route path="/fag/:subjectId/studieplan" element={<StudyPlanPage />} />
       </Routes>
     </BrowserRouter>
   );
