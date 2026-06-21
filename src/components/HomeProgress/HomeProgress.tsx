@@ -1,6 +1,6 @@
 import "./HomeProgress.css";
 import { Link } from "react-router-dom";
-import { notes } from "../../data/notes";
+import { pdfs } from "../../data/pdfs";
 import { subjects } from "../../data/subjects";
 
 export const HomeProgress = () => {
@@ -12,26 +12,45 @@ export const HomeProgress = () => {
 
   const progressSubjects = selectedSubjects.map((subjectId) => {
     const subject = subjects.find((subject) => subject.id === subjectId);
-    const subjectNotes = notes[subjectId as keyof typeof notes] || [];
+    const subjectPdfs = pdfs[subjectId as keyof typeof pdfs] || [];
 
-    const savedCompletedTopics = localStorage.getItem(`syllabus-${subjectId}`);
+    const completedPdfs = subjectPdfs.filter(
+      (pdf) =>
+        localStorage.getItem(
+          `resource-progress-pdf-${subjectId}-${pdf.id}-completed`,
+        ) === "true",
+    );
 
-    const completedTopics: string[] = savedCompletedTopics
-      ? JSON.parse(savedCompletedTopics)
-      : [];
+    const ratings = subjectPdfs
+      .map((pdf) =>
+        Number(
+          localStorage.getItem(
+            `resource-progress-pdf-${subjectId}-${pdf.id}-rating`,
+          ),
+        ),
+      )
+      .filter((rating) => rating > 0);
+
+    const averageRating =
+      ratings.length === 0
+        ? 0
+        : Math.round(
+            ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length,
+          );
 
     const progress =
-      subjectNotes.length === 0
+      subjectPdfs.length === 0
         ? 0
-        : Math.round((completedTopics.length / subjectNotes.length) * 100);
+        : Math.round((completedPdfs.length / subjectPdfs.length) * 100);
 
     return {
       id: subjectId,
       code: subject?.code ?? subjectId.toUpperCase(),
       name: subject?.name ?? "",
-      completed: completedTopics.length,
-      total: subjectNotes.length,
+      completed: completedPdfs.length,
+      total: subjectPdfs.length,
       progress,
+      averageRating,
     };
   });
 
@@ -52,7 +71,7 @@ export const HomeProgress = () => {
         {progressSubjects.map((subject) => (
           <Link
             key={subject.id}
-            to={`/fag/${subject.id}`}
+            to={`/fag/${subject.id}/pdfs`}
             className="home-progress-item"
           >
             <div className="home-progress-info">
@@ -63,8 +82,8 @@ export const HomeProgress = () => {
 
               <p>
                 {subject.total === 0
-                  ? "0 / 0 temaer"
-                  : `${subject.completed} / ${subject.total} temaer`}
+                  ? "0 / 0 PDF-er"
+                  : `${subject.completed} / ${subject.total} PDF-er lest`}
               </p>
             </div>
 
@@ -77,6 +96,8 @@ export const HomeProgress = () => {
 
             <p className="home-progress-percent">
               {subject.progress}% fullført
+              {subject.averageRating > 0 &&
+                ` · Forståelse: ${"★".repeat(subject.averageRating)}`}
             </p>
           </Link>
         ))}
