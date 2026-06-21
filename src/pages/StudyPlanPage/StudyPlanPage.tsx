@@ -1,6 +1,9 @@
 import "./StudyPlanPage.css";
 import { Link, useParams } from "react-router-dom";
 import { studyPlans } from "../../data/studyPlans";
+import { pdfs } from "../../data/pdfs";
+import { notes } from "../../data/notes";
+import { videos } from "../../data/videos";
 
 export const StudyPlanPage = () => {
   const { subjectId } = useParams();
@@ -19,30 +22,59 @@ export const StudyPlanPage = () => {
     return localStorage.getItem(`study-plan-${subjectId}-${itemId}`) === "true";
   };
 
+  const subjectPdfs = pdfs[subjectId as keyof typeof pdfs] || [];
+  const subjectNotes = notes[subjectId as keyof typeof notes] || [];
+  const subjectVideoTopics = videos[subjectId as keyof typeof videos] || [];
+  const subjectVideos = subjectVideoTopics.flatMap((topic) => topic.videos);
+
+  const isResourceCompleted = (
+    type: "pdf" | "note" | "video",
+    resourceId: string,
+  ) => {
+    return (
+      localStorage.getItem(
+        `resource-progress-${type}-${subjectId}-${resourceId}-completed`,
+      ) === "true"
+    );
+  };
+
   const getTopicItems = (topic: (typeof plan)[number]) => {
     return [
       ...topic.reading.map((item) => ({
         id: `${topic.id}-reading-${item}`,
-        label: item,
-        type: "reading",
+        type: "study-plan",
       })),
-      ...topic.lectures.map((item) => ({
-        id: `${topic.id}-lecture-${item}`,
-        label: item,
-        type: "lecture",
-      })),
+
       ...[...topic.exercises, ...topic.assignments, ...topic.stack].map(
         (item) => ({
           id: `${topic.id}-task-${item}`,
-          label: item,
-          type: "task",
+          type: "study-plan",
         }),
       ),
+
+      ...(topic.resources?.pdfs ?? []).map((item) => ({
+        id: `resource-progress-pdf-${subjectId}-${item}-completed`,
+        type: "resource",
+      })),
+
+      ...(topic.resources?.notes ?? []).map((item) => ({
+        id: `resource-progress-note-${subjectId}-${item}-completed`,
+        type: "resource",
+      })),
+
+      ...(topic.resources?.videos ?? []).map((item) => ({
+        id: `resource-progress-video-${subjectId}-${item}-completed`,
+        type: "resource",
+      })),
     ];
   };
 
   const allItems = plan.flatMap((topic) => getTopicItems(topic));
-  const completedItems = allItems.filter((item) => isChecked(item.id));
+  const completedItems = allItems.filter((item) =>
+    item.type === "resource"
+      ? localStorage.getItem(item.id) === "true"
+      : isChecked(item.id),
+  );
 
   const totalProgress =
     allItems.length === 0
@@ -85,7 +117,9 @@ export const StudyPlanPage = () => {
         {plan.map((topic) => {
           const topicItems = getTopicItems(topic);
           const completedTopicItems = topicItems.filter((item) =>
-            isChecked(item.id),
+            item.type === "resource"
+              ? localStorage.getItem(item.id) === "true"
+              : isChecked(item.id),
           );
 
           const topicProgress =
@@ -135,37 +169,102 @@ export const StudyPlanPage = () => {
                 </div>
 
                 <div>
-                  <h3>Forelesninger</h3>
-                  {topic.lectures.map((item) => (
+                  <h3>Oppgaver</h3>
+                  {[
+                    ...topic.exercises,
+                    ...topic.assignments,
+                    ...topic.stack,
+                  ].map((item) => (
                     <label key={item} className="study-plan-item">
                       <input
                         type="checkbox"
-                        checked={isChecked(`${topic.id}-lecture-${item}`)}
-                        onChange={() =>
-                          toggleItem(`${topic.id}-lecture-${item}`)
-                        }
+                        checked={isChecked(`${topic.id}-task-${item}`)}
+                        onChange={() => toggleItem(`${topic.id}-task-${item}`)}
                       />
                       <span>{item}</span>
                     </label>
                   ))}
                 </div>
+              </div>
 
-                <div>
-                  <h3>Oppgaver</h3>
-                  {[...topic.exercises, ...topic.assignments, ...topic.stack].map(
-                    (item) => (
-                      <label key={item} className="study-plan-item">
-                        <input
-                          type="checkbox"
-                          checked={isChecked(`${topic.id}-task-${item}`)}
-                          onChange={() => toggleItem(`${topic.id}-task-${item}`)}
-                        />
-                        <span>{item}</span>
-                      </label>
-                    ),
+              {topic.resources && (
+                <div className="study-plan-resources">
+                  {topic.resources.pdfs.length > 0 && (
+                    <div>
+                      <h3>PDF-er / forelesningsnotater</h3>
+
+                      {topic.resources.pdfs.map((pdfId) => {
+                        const pdf = subjectPdfs.find((pdf) => pdf.id === pdfId);
+
+                        return (
+                          <Link
+                            key={pdfId}
+                            to={`/fag/${subjectId}/pdfs/${pdfId}`}
+                            className="study-plan-resource-item"
+                          >
+                            <span>
+                              {isResourceCompleted("pdf", pdfId) ? "✓" : "○"}
+                            </span>
+                            <span>{pdf?.title ?? pdfId}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {topic.resources.notes.length > 0 && (
+                    <div>
+                      <h3>Notater</h3>
+
+                      {topic.resources.notes.map((noteId) => {
+                        const note = subjectNotes.find(
+                          (note) => note.id === noteId,
+                        );
+
+                        return (
+                          <Link
+                            key={noteId}
+                            to={`/fag/${subjectId}/notater/${noteId}`}
+                            className="study-plan-resource-item"
+                          >
+                            <span>
+                              {isResourceCompleted("note", noteId) ? "✓" : "○"}
+                            </span>
+                            <span>{note?.title ?? noteId}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {topic.resources.videos.length > 0 && (
+                    <div>
+                      <h3>Videoer</h3>
+
+                      {topic.resources.videos.map((videoId) => {
+                        const video = subjectVideos.find(
+                          (video) => video.youtubeId === videoId,
+                        );
+
+                        return (
+                          <Link
+                            key={videoId}
+                            to={`/fag/${subjectId}/videoer`}
+                            className="study-plan-resource-item"
+                          >
+                            <span>
+                              {isResourceCompleted("video", videoId)
+                                ? "✓"
+                                : "○"}
+                            </span>
+                            <span>{video?.title ?? videoId}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
-              </div>
+              )}
             </section>
           );
         })}

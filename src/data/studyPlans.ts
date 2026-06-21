@@ -8,6 +8,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 1"],
       assignments: [],
       stack: [],
+      resources: {
+        pdfs: ["forelesning-1", "forelesning-2"],
+        notes: ["mengdelaere"],
+        videos: ["wbBY2tTqXDA", "xZELQc11ACY"],
+      },
     },
     {
       id: "relasjoner-og-funksjoner",
@@ -17,6 +22,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 2"],
       assignments: [],
       stack: ["Stack #1"],
+      resources: {
+        pdfs: ["forelesning-3", "forelesning-4"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "utsagnslogikk",
@@ -26,6 +36,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 3"],
       assignments: ["Øving 1"],
       stack: [],
+      resources: {
+        pdfs: ["forelesning-5", "forelesning-6"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "predikatlogikk-og-bevis",
@@ -35,6 +50,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 4"],
       assignments: [],
       stack: ["Stack #2"],
+      resources: {
+        pdfs: ["forelesning-7", "forelesning-8"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "rekursjon-og-induksjon",
@@ -44,6 +64,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 5"],
       assignments: ["Øving 2"],
       stack: [],
+      resources: {
+        pdfs: ["forelesning-9", "forelesning-10"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "tallteori-innføring",
@@ -53,6 +78,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 6"],
       assignments: [],
       stack: ["Stack #3"],
+      resources: {
+        pdfs: ["forelesning-11", "forelesning-12"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "tallteori-kongruensregning",
@@ -62,6 +92,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 7"],
       assignments: ["Øving 3"],
       stack: [],
+      resources: {
+        pdfs: ["forelesning-13", "forelesning-14"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "kryptologi",
@@ -71,6 +106,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 8"],
       assignments: [],
       stack: ["Stack #4"],
+      resources: {
+        pdfs: ["forelesning-15", "forelesning-16"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "kombinatorikk/telling",
@@ -80,6 +120,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 9"],
       assignments: ["Øving 4"],
       stack: [],
+      resources: {
+        pdfs: ["forelesning-17", "forelesning-18"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "grafteori-1",
@@ -89,6 +134,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 10"],
       assignments: [],
       stack: ["Stack #5"],
+      resources: {
+        pdfs: ["forelesning-19", "forelesning-20"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "grafteori-2",
@@ -98,6 +148,11 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 11"],
       assignments: ["Øving 5"],
       stack: [],
+      resources: {
+        pdfs: ["forelesning-21", "forelesning-22"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "tilstandsmaskinger-og-regulære-språk",
@@ -107,12 +162,17 @@ export const studyPlans = {
       exercises: ["ØF-oppgave 12"],
       assignments: [],
       stack: ["Stack #6"],
+      resources: {
+        pdfs: ["forelesning-23", "forelesning-24"],
+        notes: [],
+        videos: [],
+      },
     },
     {
       id: "repetisjon",
       title: "Repetisjon",
       reading: [],
-      lectures: ["Partisjoner"],
+      lectures: [],
       exercises: ["Kont 22"],
       assignments: ["Øving 6"],
       stack: [],
@@ -122,7 +182,13 @@ export const studyPlans = {
       title: "Repetisjon 2",
       reading: [],
       lectures: [],
-      exercises: ["Kont 25 opg 5 og 7", "Kont 24 opg 5", "Høst 24 opg 4 (del 2)", "Kont 23 opg 9b", "Høst 23 opg 3"],
+      exercises: [
+        "Kont 25 opg 5 og 7",
+        "Kont 24 opg 5",
+        "Høst 24 opg 4 (del 2)",
+        "Kont 23 opg 9b",
+        "Høst 23 opg 3",
+      ],
       assignments: [],
       stack: ["Stack #7"],
     },

@@ -17,7 +17,7 @@
 
 .study-plan-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 
@@ -115,4 +115,41 @@
   background: #b38bf3;
   border-radius: 999px;
   transition: width 0.3s ease;
+}
+
+.study-plan-resources {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #eee7fb;
+}
+
+.study-plan-resources h3 {
+  margin: 0 0 12px;
+  color: #8b5cf6;
+}
+
+.study-plan-resource-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 0;
+
+  text-decoration: none;
+  color: inherit;
+  font-weight: 600;
+}
+
+.study-plan-resource-item:hover {
+  color: #8b5cf6;
+}
+
+@media (max-width: 900px) {
+  .study-plan-resources {
+    grid-template-columns: 1fr;
+  }
 }
