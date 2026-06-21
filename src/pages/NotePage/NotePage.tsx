@@ -1,8 +1,9 @@
-import "./NotePage.css"
+import "./NotePage.css";
 import { useParams } from "react-router-dom";
 import { subjects } from "../../data/subjects";
 import { notes } from "../../data/notes";
 import { Link } from "react-router-dom";
+import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
 
 export const NotePage = () => {
   const { subjectId, noteId } = useParams();
@@ -29,7 +30,7 @@ export const NotePage = () => {
       <p className="note-label">{subject.code}</p>
       <h1>{note.title}</h1>
       <p>{note.description}</p>
-
+      <ResourceProgress resourceId={`note-${subject.id}-${note.id}`} />
       <section className="note-content">
         <pre>{note.content}</pre>
       </section>

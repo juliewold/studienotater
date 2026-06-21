@@ -1,4 +1,4 @@
-import "./NotesPage.css"
+import "./NotesPage.css";
 import { useParams } from "react-router-dom";
 import { subjects } from "../../data/subjects";
 import { notes } from "../../data/notes";
@@ -36,7 +36,36 @@ export const NotesPage = () => {
             className="note-card"
           >
             <h3>{note.title}</h3>
+
             <p>{note.description}</p>
+
+            <div className="note-progress-preview">
+              <span>
+                {localStorage.getItem(
+                  `resource-progress-note-${subject.id}-${note.id}-completed`,
+                ) === "true"
+                  ? "✓ Lest"
+                  : "Ikke lest"}
+              </span>
+
+              <span
+                className={`rating-${
+                  Number(
+                    localStorage.getItem(
+                      `resource-progress-note-${subject.id}-${note.id}-rating`,
+                    ),
+                  ) || 0
+                }`}
+              >
+                {"★".repeat(
+                  Number(
+                    localStorage.getItem(
+                      `resource-progress-note-${subject.id}-${note.id}-rating`,
+                    ),
+                  ) || 0,
+                )}
+              </span>
+            </div>
           </Link>
         ))}
       </div>

@@ -42,7 +42,7 @@ export const ResourceProgress = ({ resourceId }: ResourceProgressProps) => {
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
-              onClick={() => setRating(star)}
+              onClick={() => setRating(rating === star ? 0 : star)}
               className={star <= rating ? `star-${rating}` : ""}
             >
               ★

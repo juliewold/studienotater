@@ -10,3 +10,33 @@
   margin-top: 40px;
 }
 
+.note-progress-preview {
+  margin-top: 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-weight: 600;
+  color: #8b5cf6;
+}
+
+.rating-1 {
+  color: #ef4444;
+}
+
+.rating-2 {
+  color: #f97316;
+}
+
+.rating-3 {
+  color: #eab308;
+}
+
+.rating-4 {
+  color: #84cc16;
+}
+
+.rating-5 {
+  color: #22c55e;
+}
