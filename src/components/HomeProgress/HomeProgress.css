@@ -86,3 +86,15 @@
   color: #6b647c;
   font-weight: 600;
 }
+
+.home-progress-details {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  margin-bottom: 16px;
+
+  color: #6b647c;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
