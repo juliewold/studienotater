@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar/Navbar";
 import { HomePage } from "./pages/HomePage/HomePage";
 import { SubjectPage } from "./pages/SubjectPage/SubjectPage";
@@ -21,7 +21,7 @@ import { BookProgressPage } from "./pages/BookProgressPage/BookProgressPage";
 
 function App() {
   return (
-    <BrowserRouter basename="/studienotater">
+    <HashRouter>
       <Navbar />
 
       <Routes>
@@ -64,7 +64,7 @@ function App() {
           element={<BookProgressPage />}
         />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
