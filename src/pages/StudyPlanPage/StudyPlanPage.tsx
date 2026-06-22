@@ -4,6 +4,8 @@ import { studyPlans } from "../../data/studyPlans";
 import { pdfs } from "../../data/pdfs";
 import { notes } from "../../data/notes";
 import { videos } from "../../data/videos";
+import { BookProgressCard } from "../../components/BookProgressCard/BookProgressCard";
+import { tma4412Book } from "../../data/books/tma4412Book";
 
 export const StudyPlanPage = () => {
   const { subjectId } = useParams();
@@ -19,7 +21,63 @@ export const StudyPlanPage = () => {
   };
 
   const isChecked = (itemId: string) => {
+    if (subjectId === "tma4412") {
+      const readingTitle = itemId.split("-reading-")[1];
+
+      const chapter = tma4412Book.chapters.find(
+        (chapter) => chapter.title === readingTitle,
+      );
+
+      if (chapter) {
+        const saved = localStorage.getItem(`book-progress-${tma4412Book.id}`);
+        const checkedPages: number[] = saved ? JSON.parse(saved) : [];
+
+        const pages = Array.from(
+          { length: chapter.endPage - chapter.startPage + 1 },
+          (_, index) => chapter.startPage + index,
+        );
+
+        return pages.every((page) => checkedPages.includes(page));
+      }
+    }
+
     return localStorage.getItem(`study-plan-${subjectId}-${itemId}`) === "true";
+  };
+
+  const getBookChapter = (readingTitle: string) => {
+    if (subjectId !== "tma4412") return undefined;
+
+    return tma4412Book.chapters.find(
+      (chapter) => chapter.title === readingTitle,
+    );
+  };
+
+  const getBookChapterProgress = (readingTitle: string) => {
+    const chapter = getBookChapter(readingTitle);
+
+    if (!chapter) return null;
+
+    const saved = localStorage.getItem(`book-progress-${tma4412Book.id}`);
+    const checkedPages: number[] = saved ? JSON.parse(saved) : [];
+
+    const pages = Array.from(
+      { length: chapter.endPage - chapter.startPage + 1 },
+      (_, index) => chapter.startPage + index,
+    );
+
+    const readPages = pages.filter((page) =>
+      checkedPages.includes(page),
+    ).length;
+
+    const progress =
+      pages.length === 0 ? 0 : Math.round((readPages / pages.length) * 100);
+
+    return {
+      chapter,
+      readPages,
+      totalPages: pages.length,
+      progress,
+    };
   };
 
   const subjectPdfs = pdfs[subjectId as keyof typeof pdfs] || [];
@@ -113,6 +171,8 @@ export const StudyPlanPage = () => {
         </div>
       </section>
 
+      {subjectId === "tma4412" && <BookProgressCard book={tma4412Book} />}
+
       <div className="study-plan-list">
         {plan.map((topic) => {
           const topicItems = getTopicItems(topic);
@@ -154,18 +214,53 @@ export const StudyPlanPage = () => {
               <div className="study-plan-grid">
                 <div>
                   <h3>Pensum</h3>
-                  {topic.reading.map((item) => (
-                    <label key={item} className="study-plan-item">
-                      <input
-                        type="checkbox"
-                        checked={isChecked(`${topic.id}-reading-${item}`)}
-                        onChange={() =>
-                          toggleItem(`${topic.id}-reading-${item}`)
-                        }
-                      />
-                      <span>{item}</span>
-                    </label>
-                  ))}
+                  {topic.reading.map((item) => {
+                    const bookProgress = getBookChapterProgress(item);
+
+                    if (bookProgress) {
+                      return (
+                        <Link
+                          key={item}
+                          to={`/fag/${subjectId}/bok/${tma4412Book.id}`}
+                          className="study-plan-book-item"
+                        >
+                          <div className="study-plan-book-item-header">
+                            <span>{item}</span>
+                            <span>
+                              {bookProgress.progress === 100
+                                ? "✓"
+                                : `${bookProgress.progress}%`}
+                            </span>
+                          </div>
+
+                          <div className="study-plan-progress-bar small">
+                            <div
+                              className="study-plan-progress-fill"
+                              style={{ width: `${bookProgress.progress}%` }}
+                            />
+                          </div>
+
+                          <p>
+                            {bookProgress.readPages} / {bookProgress.totalPages}{" "}
+                            sider lest
+                          </p>
+                        </Link>
+                      );
+                    }
+
+                    return (
+                      <label key={item} className="study-plan-item">
+                        <input
+                          type="checkbox"
+                          checked={isChecked(`${topic.id}-reading-${item}`)}
+                          onChange={() =>
+                            toggleItem(`${topic.id}-reading-${item}`)
+                          }
+                        />
+                        <span>{item}</span>
+                      </label>
+                    );
+                  })}
                 </div>
 
                 <div>

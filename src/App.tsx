@@ -17,10 +17,11 @@ import { SemesterStartPage } from "./pages/SemesterStartPage/SemesterStartPage";
 import { YearPage } from "./pages/YearPage/YearPage";
 import { ExamOverviewPage } from "./pages/ExamOverviewPage/ExamOverviewPage";
 import { StudyPlanPage } from "./pages/StudyPlanPage/StudyPlanPage";
+import { BookProgressPage } from "./pages/BookProgressPage/BookProgressPage";
 
 function App() {
   return (
-   <BrowserRouter basename="/studienotater">
+    <BrowserRouter basename="/studienotater">
       <Navbar />
 
       <Routes>
@@ -57,6 +58,11 @@ function App() {
         <Route path="/eksamen" element={<ExamOverviewPage />} />
 
         <Route path="/fag/:subjectId/studieplan" element={<StudyPlanPage />} />
+
+        <Route
+          path="/fag/:subjectId/bok/:bookId"
+          element={<BookProgressPage />}
+        />
       </Routes>
     </BrowserRouter>
   );

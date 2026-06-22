@@ -1,0 +1,61 @@
+.book-progress-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.book-progress-card {
+  background: white;
+  padding: 32px;
+  border-radius: 24px;
+  margin-top: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+}
+
+.book-progress-card:hover {
+  transform: translateY(-2px);
+}
+
+.book-progress-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.book-progress-header h2 {
+  margin: 8px 0;
+}
+
+.book-page-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(50px, 1fr)
+  );
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.book-page-cell {
+  border: 1px solid #e6d8ff;
+  background: #ffffff;
+  color: #17132f;
+  border-radius: 10px;
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+.book-page-cell:hover {
+  background: #f3ebff;
+  transform: translateY(-1px);
+}
+
+.book-page-cell.is-read {
+  background: #a855f7;
+  color: white;
+  border-color: #a855f7;
+}
