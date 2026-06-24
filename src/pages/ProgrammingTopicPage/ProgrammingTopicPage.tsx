@@ -62,6 +62,7 @@ export function ProgrammingTopicPage() {
 
           {lesson.sections.map((section) => {
             const code = "code" in section ? section.code : undefined;
+            const output = "output" in section ? section.output : undefined;
 
             return (
               <section key={section.title} className="lesson-section">
@@ -71,6 +72,13 @@ export function ProgrammingTopicPage() {
 
                 {typeof code === "string" && (
                   <CodeBlock language="python" code={code} />
+                )}
+
+                {typeof output === "string" && (
+                  <div className="code-output">
+                    <p>Output</p>
+                    <pre>{output}</pre>
+                  </div>
                 )}
               </section>
             );

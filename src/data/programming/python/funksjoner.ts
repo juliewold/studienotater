@@ -17,6 +17,7 @@ export const pythonFunctions = {
     print("Hei!")
 
 hei()`,
+output: `Hei!`
     },
 
     {
@@ -28,6 +29,8 @@ hei()`,
 
 hei("Julie")
 hei("Ola")`,
+output: `Hei Julie
+Hei Ola`
     },
 
     {
@@ -38,6 +41,7 @@ hei("Ola")`,
     print(a + b)
 
 addisjon(3, 5)`,
+output: `8`
     },
 
     {
@@ -50,6 +54,7 @@ addisjon(3, 5)`,
 sum = addisjon(3, 5)
 
 print(sum)`,
+output: `8`
     },
 
     {
@@ -73,6 +78,8 @@ test()
 
 hei()
 hei("Julie")`,
+output: `Hei student
+Hei Julie`
     },
 
     {

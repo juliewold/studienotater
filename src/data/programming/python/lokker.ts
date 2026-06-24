@@ -15,6 +15,11 @@ export const pythonLoops = {
         "for brukes når du vet hvor mange ganger noe skal gjentas.",
       code: `for i in range(5):
     print(i)`,
+    output: `0
+1
+2
+3
+4`
     },
 
     {
@@ -33,6 +38,9 @@ range(1, 6)   # 1, 2, 3, 4, 5`,
 
 for frukt in frukter:
     print(frukt)`,
+    output: `eple
+banan
+appelsin`
     },
 
     {
@@ -44,6 +52,11 @@ for frukt in frukter:
 while teller < 5:
     print(teller)
     teller += 1`,
+    output: `0
+1
+2
+3
+4`
     },
 
     {
@@ -55,6 +68,11 @@ while teller < 5:
         break
 
     print(i)`,
+    output: `0
+1
+2
+3
+4`
     },
 
     {
@@ -66,6 +84,10 @@ while teller < 5:
         continue
 
     print(i)`,
+    output: `0
+1
+3
+4`
     },
 
     {
@@ -76,6 +98,10 @@ while teller < 5:
     print("Hei")
 
 print("Ferdig")`,
+output: `Hei
+Hei
+Hei
+Ferdig`
     },
 
     {

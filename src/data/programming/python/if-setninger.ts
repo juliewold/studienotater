@@ -17,6 +17,7 @@ export const pythonIfStatements = {
 
 if alder >= 18:
     print("Du er myndig")`,
+    output: `Du er myndig`
     },
 
     {
@@ -29,6 +30,7 @@ if alder >= 18:
     print("Du er myndig")
 else:
     print("Du er ikke myndig")`,
+    output: `Du er ikke myndig`
     },
 
     {
@@ -43,6 +45,7 @@ elif karakter == 5:
     print("B")
 else:
     print("Ikke A eller B")`,
+    output: `Ikke A eller B`
     },
 
     {
@@ -66,6 +69,7 @@ har_billett = True
 
 if alder >= 18 and har_billett:
     print("Velkommen inn")`,
+    output: `Velkommen inn`
     },
 
     {
@@ -77,6 +81,7 @@ er_ansatt = True
 
 if er_student or er_ansatt:
     print("Rabatt")`,
+    output: `Rabatt`
     },
 
     {
@@ -87,6 +92,7 @@ if er_student or er_ansatt:
 
 if not er_logget_inn:
     print("Logg inn først")`,
+    output: `Logg inn først`
     },
 
     {
@@ -100,6 +106,9 @@ if alder >= 18:
     print("Kan stemme")
 
 print("Programmet fortsetter")`,
+output: `Myndig
+Kan stemme
+Programmet fortsetter`
     },
 
     {

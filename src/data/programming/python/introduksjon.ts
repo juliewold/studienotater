@@ -14,6 +14,7 @@ export const pythonIntroduction = {
       content: "Slik skriver du Hello World i Python.",
 
       code: `print("Hello, world!")`,
+      output: `Hello, world!`
     },
   ],
 };

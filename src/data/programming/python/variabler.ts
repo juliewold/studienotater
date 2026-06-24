@@ -19,30 +19,32 @@ er_student = True`,
     {
       title: "Bruke variabler",
       content:
-        "Når en verdi er lagret i en variabel, kan du bruke variabelnavnet senere i koden.",
+        "Når en verdi er lagret i en variabel, kan du bruke variabelnavnet senere i koden. Her skriver print ut verdien som ligger i variabelen navn.",
       code: `navn = "Julie"
 
 print(navn)`,
+      output: `Julie`,
     },
     {
       title: "Endre verdi",
       content:
-        "Du kan endre verdien til en variabel ved å gi den en ny verdi senere i koden.",
+        "Du kan endre verdien til en variabel ved å gi den en ny verdi senere i koden. Python bruker den nyeste verdien.",
       code: `alder = 19
 alder = 20
 
 print(alder)`,
+      output: `20`,
     },
     {
       title: "Navneregler",
       content:
         "Variabelnavn bør være tydelige. Bruk små bokstaver og understrek mellom ord. Ikke start med tall.",
       code: `fornavn = "Julie"
-favoritt_farge = "rosa"
+favoritt_farge = "lilla"
 
 # Dårligere navn:
 x = "Julie"
-ff = "rosa"`,
+ff = "lilla"`,
     },
     {
       title: "Oppsummering",

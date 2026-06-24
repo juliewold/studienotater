@@ -17,6 +17,7 @@ export const pythonDataTypes = {
 by = 'Trondheim'
 
 print(navn)`,
+output: `Julie`
     },
 
     {
@@ -27,6 +28,7 @@ print(navn)`,
 antall_studenter = 250
 
 print(alder)`,
+output: `19`
     },
 
     {
@@ -37,6 +39,7 @@ print(alder)`,
 temperatur = 21.5
 
 print(pi)`,
+output: `3.14159`
     },
 
     {
@@ -47,6 +50,7 @@ print(pi)`,
 har_bestatt = False
 
 print(er_student)`,
+output: `True`
     },
 
     {
@@ -58,6 +62,8 @@ alder = 19
 
 print(type(navn))
 print(type(alder))`,
+output: `<class 'str'>
+<class 'int'>`
     },
 
     {
@@ -70,6 +76,8 @@ alder_tall = int(alder)
 
 print(alder_tall)
 print(type(alder_tall))`,
+output: `19
+<class 'int'>`
     },
 
     {
