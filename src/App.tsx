@@ -69,6 +69,8 @@ function App() {
         <Route path="/programmering" element={<ProgrammingPage />} />
 
         <Route path="/programmering/:topicId" element={<ProgrammingTopicPage />} />
+
+        <Route path="/programmering/:topicId/:lessonId" element={<ProgrammingTopicPage />} />
       </Routes>
     </HashRouter>
   );

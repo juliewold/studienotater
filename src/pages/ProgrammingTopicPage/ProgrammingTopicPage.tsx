@@ -1,150 +1,110 @@
 import { Link, useParams } from "react-router-dom";
+import { pythonOverview } from "../../data/programming/python/overview";
+import { CodeBlock } from "../../components/CodeBlock/CodeBlock";
+import "./ProgrammingTopicPage.css";
 
-const programmingTopics = {
-  python: {
-    title: "Python",
-    description: "Et enkelt og populært programmeringsspråk.",
-  },
-  java: {
-    title: "Java",
-    description: "Et objektorientert språk som brukes mye i større systemer.",
-  },
-  cpp: {
-    title: "C++",
-    description: "Et kraftig språk som brukes mye i systemprogrammering.",
-  },
-  javascript: {
-    title: "JavaScript",
-    description: "Språket som gjør nettsider interaktive.",
-  },
-  typescript: {
-    title: "TypeScript",
-    description: "JavaScript med typer.",
-  },
-  sql: {
-    title: "SQL",
-    description: "Språk for å hente og endre data i databaser.",
-  },
-  react: {
-    title: "React",
-    description: "Et JavaScript-bibliotek for å bygge brukergrensesnitt.",
-  },
-  django: {
-    title: "Django",
-    description: "Et Python-rammeverk for backend og webapplikasjoner.",
-  },
-  git: {
-    title: "Git",
-    description: "Versjonskontroll for kode.",
-  },
-  html: {
-    title: "HTML",
-    description: "Strukturen på en nettside.",
-  },
-  css: {
-    title: "CSS",
-    description: "Styling og layout på nettsider.",
-  },
-  vite: {
-    title: "Vite",
-    description: "Et raskt utviklingsverktøy for moderne frontend-prosjekter.",
-  },
-  "django-rest-framework": {
-    title: "Django REST Framework",
-    description: "Brukes til å bygge API-er med Django.",
-  },
-  api: {
-    title: "API-er",
-    description: "Måten frontend og backend kommuniserer på.",
-  },
-  databaser: {
-    title: "Databaser",
-    description: "Brukes til å lagre og hente data.",
-  },
-  github: {
-    title: "GitHub",
-    description: "Plattform for å lagre og dele Git-repositories.",
-  },
-  terminal: {
-    title: "Terminal",
-    description: "Et tekstbasert verktøy for å kjøre kommandoer.",
-  },
-  "vs-code": {
-    title: "VS Code",
-    description: "En populær kodeeditor for utviklere.",
-  },
-  docker: {
-    title: "Docker",
-    description: "Brukes til å kjøre applikasjoner i containere.",
-  },
-  oop: {
-    title: "OOP",
-    description: "Objektorientert programmering med klasser og objekter.",
-  },
-  datastrukturer: {
-    title: "Datastrukturer",
-    description: "Måter å organisere data på.",
-  },
-  algoritmer: {
-    title: "Algoritmer",
-    description: "Steg-for-steg-løsninger på problemer.",
-  },
-  crud: {
-    title: "CRUD",
-    description: "Create, Read, Update og Delete.",
-  },
-  http: {
-    title: "HTTP",
-    description: "Protokollen som brukes mellom klient og server.",
-  },
-  "rest-api": {
-    title: "REST API",
-    description: "En vanlig måte å bygge API-er på.",
-  },
-  autentisering: {
-    title: "Autentisering",
-    description: "Innlogging og identifisering av brukere.",
-  },
+const programmingData = {
+  python: pythonOverview,
 };
 
 export function ProgrammingTopicPage() {
-  const { topicId } = useParams();
+  const { topicId, lessonId } = useParams();
 
   const topic = topicId
-    ? programmingTopics[topicId as keyof typeof programmingTopics]
+    ? programmingData[topicId as keyof typeof programmingData]
     : undefined;
 
   if (!topic) {
     return (
-      <main>
-        <Link to="/programmering">← Tilbake til programmering</Link>
+      <main className="programming-topic-page">
+        <Link to="/programmering" className="back-link">
+          ← Tilbake til programmering
+        </Link>
+
         <h1>Fant ikke temaet</h1>
       </main>
     );
   }
 
+  const lesson = lessonId
+    ? topic.lessons.find((lesson) => lesson.id === lessonId)
+    : undefined;
+
+  if (lesson) {
+    return (
+      <main className="programming-doc-layout">
+        <aside className="programming-sidebar">
+          <Link to={`/programmering/${topic.id}`} className="back-link">
+            ← Tilbake til {topic.title}
+          </Link>
+
+          <h2>{topic.title}</h2>
+
+          {topic.lessons.map((lessonItem) => (
+            <Link
+              key={lessonItem.id}
+              to={`/programmering/${topic.id}/${lessonItem.id}`}
+              className={
+                lessonItem.id === lesson.id
+                  ? "sidebar-link active"
+                  : "sidebar-link"
+              }
+            >
+              {lessonItem.title}
+            </Link>
+          ))}
+        </aside>
+
+        <div className="programming-doc-content">
+          <div className="lesson-header">
+            <h1>{lesson.title}</h1>
+          </div>
+
+          {lesson.sections.map((section) => {
+            const code = "code" in section ? section.code : undefined;
+
+            return (
+              <section key={section.title} className="lesson-section">
+                <h2>{section.title}</h2>
+
+                <p>{section.content}</p>
+
+                {typeof code === "string" && (
+                  <CodeBlock language="python" code={code} />
+                )}
+              </section>
+            );
+          })}
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main>
-      <Link to="/programmering">← Tilbake til programmering</Link>
+    <main className="programming-topic-page">
+      <Link to="/programmering" className="back-link">
+        ← Tilbake til programmering
+      </Link>
 
-      <h1>{topic.title}</h1>
-      <p>{topic.description}</p>
+      <div className="lesson-header">
+        <h1>{topic.title}</h1>
+        <p>{topic.description}</p>
+      </div>
 
-      <section>
-        <h2>Hva er det?</h2>
-        <p>Forklaring kommer her.</p>
+      <section className="topic-lessons-section">
+        <h2>{topic.title}-kapitler</h2>
 
-        <h2>Grunnleggende konsepter</h2>
-        <p>Notater kommer her.</p>
-
-        <h2>Vanlige kommandoer</h2>
-        <p>Kommandoer kommer her.</p>
-
-        <h2>Kodeeksempler</h2>
-        <p>Eksempler kommer her.</p>
-
-        <h2>Ressurser</h2>
-        <p>Lenker og videoer kommer her.</p>
+        <div className="topic-lessons-grid">
+          {topic.lessons.map((lesson) => (
+            <Link
+              key={lesson.id}
+              to={`/programmering/${topic.id}/${lesson.id}`}
+              className="topic-lesson-card"
+            >
+              {lesson.title}
+            </Link>
+          ))}
+        </div>
       </section>
     </main>
   );
