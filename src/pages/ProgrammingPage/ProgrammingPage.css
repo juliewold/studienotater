@@ -57,11 +57,18 @@
   gap: 10px;
 }
 
-.programming-tags span {
+.programming-tag {
   background: #f3e8ff;
   color: #6d28d9;
   padding: 8px 12px;
   border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.programming-tag:hover {
+  background: #e9d5ff;
+  transform: translateY(-2px);
 }

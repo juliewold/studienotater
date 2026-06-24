@@ -19,6 +19,7 @@ import { ExamOverviewPage } from "./pages/ExamOverviewPage/ExamOverviewPage";
 import { StudyPlanPage } from "./pages/StudyPlanPage/StudyPlanPage";
 import { BookProgressPage } from "./pages/BookProgressPage/BookProgressPage";
 import { ProgrammingPage } from "./pages/ProgrammingPage/ProgrammingPage";
+import { ProgrammingTopicPage } from "./pages/ProgrammingTopicPage/ProgrammingTopicPage";
 
 function App() {
   return (
@@ -66,6 +67,8 @@ function App() {
         />
 
         <Route path="/programmering" element={<ProgrammingPage />} />
+
+        <Route path="/programmering/:topicId" element={<ProgrammingTopicPage />} />
       </Routes>
     </HashRouter>
   );

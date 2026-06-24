@@ -1,37 +1,64 @@
 import "./ProgrammingPage.css";
+import { Link } from "react-router-dom";
+import "./ProgrammingPage.css";
 
 const programmingSections = [
   {
     title: "Språk",
     description: "Programmeringsspråk og databasespråk.",
-    items: ["Python", "Java", "C++", "JavaScript", "TypeScript", "SQL"],
+    items: [
+      { name: "Python", id: "python" },
+      { name: "Java", id: "java" },
+      { name: "C++", id: "cpp" },
+      { name: "JavaScript", id: "javascript" },
+      { name: "TypeScript", id: "typescript" },
+      { name: "SQL", id: "sql" },
+    ],
   },
   {
     title: "Frontend",
     description: "Det brukeren ser og samhandler med på nettsiden.",
-    items: ["HTML", "CSS", "JavaScript", "React", "Vite"],
+    items: [
+      { name: "HTML", id: "html" },
+      { name: "CSS", id: "css" },
+      { name: "JavaScript", id: "javascript" },
+      { name: "React", id: "react" },
+      { name: "Vite", id: "vite" },
+    ],
   },
   {
     title: "Backend",
     description: "Servere, API-er, databaser og logikken bak applikasjoner.",
-    items: ["Django", "Django REST Framework", "API-er", "Databaser", "SQL"],
+    items: [
+      { name: "Django", id: "django" },
+      { name: "Django REST Framework", id: "django-rest-framework" },
+      { name: "API-er", id: "api" },
+      { name: "Databaser", id: "databaser" },
+      { name: "SQL", id: "sql" },
+    ],
   },
   {
     title: "Verktøy",
     description: "Verktøy som brukes under utvikling og deployment.",
-    items: ["Git", "GitHub", "Terminal", "VS Code", "Docker"],
+    items: [
+      { name: "Git", id: "git" },
+      { name: "GitHub", id: "github" },
+      { name: "Terminal", id: "terminal" },
+      { name: "VS Code", id: "vs-code" },
+      { name: "Docker", id: "docker" },
+    ],
   },
   {
     title: "Konsepter",
     description: "Grunnleggende konsepter alle utviklere møter.",
     items: [
-      "OOP",
-      "Datastrukturer",
-      "Algoritmer",
-      "CRUD",
-      "HTTP",
-      "REST API",
-      "Autentisering",
+      { name: "OOP", id: "oop" },
+      { name: "Datastrukturer", id: "datastrukturer" },
+      { name: "Algoritmer", id: "algoritmer" },
+      { name: "CRUD", id: "crud" },
+      { name: "HTTP", id: "http" },
+      { name: "REST API", id: "rest-api" },
+      { name: "Autentisering", id: "autentisering" },
     ],
   },
 ];
@@ -56,7 +83,13 @@ export function ProgrammingPage() {
 
             <div className="programming-tags">
               {section.items.map((item) => (
-                <span key={item}>{item}</span>
+                <Link
+                  key={item.id}
+                  to={`/programmering/${item.id}`}
+                  className="programming-tag"
+                >
+                  {item.name}
+                </Link>
               ))}
             </div>
           </article>
