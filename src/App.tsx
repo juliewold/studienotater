@@ -18,6 +18,7 @@ import { YearPage } from "./pages/YearPage/YearPage";
 import { ExamOverviewPage } from "./pages/ExamOverviewPage/ExamOverviewPage";
 import { StudyPlanPage } from "./pages/StudyPlanPage/StudyPlanPage";
 import { BookProgressPage } from "./pages/BookProgressPage/BookProgressPage";
+import { ProgrammingPage } from "./pages/ProgrammingPage/ProgrammingPage";
 
 function App() {
   return (
@@ -63,6 +64,8 @@ function App() {
           path="/fag/:subjectId/bok/:bookId"
           element={<BookProgressPage />}
         />
+
+        <Route path="/programmering" element={<ProgrammingPage />} />
       </Routes>
     </HashRouter>
   );
