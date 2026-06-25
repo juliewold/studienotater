@@ -21,11 +21,14 @@ er_student = True`,
     {
       title: "Bruke variabler",
       content:
-        "Når en verdi er lagret i en variabel, kan du bruke variabelnavnet senere i koden. Her skriver print ut verdien som ligger i variabelen navn.",
+        "Når en verdi er lagret i en variabel, kan du bruke variabelnavnet senere i koden.",
+
       code: `navn = "Julie"
 
 print(navn)`,
       output: `Julie`,
+
+      tip: "Gi variablene beskrivende navn. 'navn' er mye bedre enn 'x'.",
     },
     {
       title: "Endre verdi",

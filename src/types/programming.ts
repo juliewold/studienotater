@@ -1,8 +1,19 @@
 export type LessonSection = {
   title: string;
+
   content?: string;
+
   code?: string;
   output?: string;
+
+  tip?: string;
+  warning?: string;
+  note?: string;
+
+  challenge?: {
+    question: string;
+    answer: string;
+  };
 };
 
 export type ProgrammingLesson = {

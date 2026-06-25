@@ -1,10 +1,12 @@
 import { Link, useParams } from "react-router-dom";
 import { pythonOverview } from "../../data/programming/python/overview";
-import { CodeBlock } from "../../components/CodeBlock/CodeBlock";
 import "./ProgrammingTopicPage.css";
+import { javascriptOverview } from "../../data/programming/javascript/overview";
+import { LessonRenderer } from "../../components/lesson/LessonRenderer/LessonRenderer";
 
 const programmingData = {
   python: pythonOverview,
+  javascript: javascriptOverview,
 };
 
 export function ProgrammingTopicPage() {
@@ -60,26 +62,7 @@ export function ProgrammingTopicPage() {
             <h1>{lesson.title}</h1>
           </div>
 
-          {lesson.sections.map((section) => {
-            return (
-              <section key={section.title} className="lesson-section">
-                <h2>{section.title}</h2>
-
-                {section.content && <p>{section.content}</p>}
-
-                {section.code && (
-                  <CodeBlock language="python" code={section.code} />
-                )}
-
-                {section.output && (
-                  <div className="code-output">
-                    <p>Output</p>
-                    <pre>{section.output}</pre>
-                  </div>
-                )}
-              </section>
-            );
-          })}
+          <LessonRenderer lesson={lesson} language={topic.id} />
         </div>
       </main>
     );

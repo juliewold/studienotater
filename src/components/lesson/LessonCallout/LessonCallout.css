@@ -1,0 +1,66 @@
+.lesson-callout {
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid;
+}
+
+.lesson-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-weight: 700;
+  border-bottom: 1px solid;
+}
+
+.lesson-callout p {
+  margin: 0;
+  padding: 16px;
+  line-height: 1.7;
+}
+
+.lesson-callout-tip {
+  border-color: #facc15;
+  background: #fefce8;
+}
+
+.lesson-callout-tip .lesson-callout-header {
+  color: #854d0e;
+  background: #fde68a;
+  border-color: #facc15;
+}
+
+.lesson-callout-tip p {
+  color: #44403c;
+}
+
+.lesson-callout-warning {
+  border-color: #fb7185;
+  background: #fff1f2;
+}
+
+.lesson-callout-warning .lesson-callout-header {
+  color: #9f1239;
+  background: #ffe4e6;
+  border-color: #fb7185;
+}
+
+.lesson-callout-warning p {
+  color: #4c0519;
+}
+
+.lesson-callout-note {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.lesson-callout-note .lesson-callout-header {
+  color: #1d4ed8;
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.lesson-callout-note p {
+  color: #1e3a8a;
+}
