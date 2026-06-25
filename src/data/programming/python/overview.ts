@@ -1,3 +1,4 @@
+import type { ProgrammingTopic } from "../../../types/programming";
 import { pythonIntroduction } from "./introduksjon";
 import { pythonVariables } from "./variabler";
 import { pythonDataTypes } from "./datatyper";
@@ -14,7 +15,7 @@ import { pythonModules } from "./moduler";
 import { pythonVirtualEnvironments } from "./virtual-environments";
 import { pythonCheatsheet } from "./cheatsheet";
 
-export const pythonOverview = {
+export const pythonOverview: ProgrammingTopic = {
   id: "python",
   title: "Python",
   description: "Et enkelt og populært programmeringsspråk.",

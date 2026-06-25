@@ -1,4 +1,6 @@
-export const pythonVariables = {
+import type { ProgrammingLesson } from "../../../types/programming";
+
+export const pythonVariables: ProgrammingLesson = {
   id: "variabler",
   title: "Variabler",
 

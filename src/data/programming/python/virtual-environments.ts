@@ -1,4 +1,6 @@
-export const pythonVirtualEnvironments = {
+import type { ProgrammingLesson } from "../../../types/programming";
+
+export const pythonVirtualEnvironments: ProgrammingLesson = {
   id: "virtual-environments",
   title: "Virtual Environments",
 

@@ -1,4 +1,6 @@
-export const pythonIfStatements = {
+import type { ProgrammingLesson } from "../../../types/programming";
+
+export const pythonIfStatements: ProgrammingLesson = {
   id: "if-setninger",
   title: "If-setninger",
 

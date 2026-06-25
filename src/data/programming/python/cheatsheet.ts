@@ -1,4 +1,6 @@
-export const pythonCheatsheet = {
+import type { ProgrammingLesson } from "../../../types/programming";
+
+export const pythonCheatsheet: ProgrammingLesson = {
   id: "cheatsheet",
   title: "Cheatsheet",
 

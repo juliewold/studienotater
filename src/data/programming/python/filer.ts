@@ -1,4 +1,6 @@
-export const pythonFiles = {
+import type { ProgrammingLesson } from "../../../types/programming";
+
+export const pythonFiles: ProgrammingLesson = {
   id: "filer",
   title: "Filer",
 
