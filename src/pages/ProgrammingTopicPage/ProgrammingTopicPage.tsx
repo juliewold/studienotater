@@ -68,7 +68,10 @@ export function ProgrammingTopicPage() {
               <section key={section.title} className="lesson-section">
                 <h2>{section.title}</h2>
 
-                <p>{section.content}</p>
+                {"content" in section &&
+                  typeof section.content === "string" && (
+                    <p>{section.content}</p>
+                  )}
 
                 {typeof code === "string" && (
                   <CodeBlock language="python" code={code} />
