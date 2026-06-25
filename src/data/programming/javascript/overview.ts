@@ -10,6 +10,14 @@ import { javascriptArrays } from "./arrays";
 import { javascriptArrayMethods } from "./array-methods";
 import { javascriptObjects } from "./objects";
 import { javascriptDom } from "./dom";
+import { javascriptEventListeners } from "./event-listeners";
+import { javascriptForms } from "./forms";
+import { javascriptAsyncAwait } from "./async-await";
+import { javascriptFetchApi } from "./fetch-api";
+import { javascriptLocalStorage } from "./local-storage";
+import { javascriptModules } from "./modules";
+import { javascriptMiniProject } from "./mini-project";
+import { javascriptCheatsheet } from "./cheatsheet";
 
 export const javascriptOverview: ProgrammingTopic = {
   id: "javascript",
@@ -28,5 +36,13 @@ export const javascriptOverview: ProgrammingTopic = {
     javascriptArrayMethods,
     javascriptObjects,
     javascriptDom,
+    javascriptEventListeners,
+    javascriptForms,
+    javascriptAsyncAwait,
+    javascriptFetchApi,
+    javascriptLocalStorage,
+    javascriptModules,
+    javascriptMiniProject,
+    javascriptCheatsheet,
   ],
 };
