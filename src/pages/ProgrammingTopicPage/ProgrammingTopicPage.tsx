@@ -3,10 +3,12 @@ import { pythonOverview } from "../../data/programming/python/overview";
 import "./ProgrammingTopicPage.css";
 import { javascriptOverview } from "../../data/programming/javascript/overview";
 import { LessonRenderer } from "../../components/lesson/LessonRenderer/LessonRenderer";
+import { typescriptOverview } from "../../data/programming/typescript/overview";
 
 const programmingData = {
   python: pythonOverview,
   javascript: javascriptOverview,
+  typescript: typescriptOverview,
 };
 
 export function ProgrammingTopicPage() {
