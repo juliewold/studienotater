@@ -14,6 +14,16 @@ const categories = [
     icon: "🖥️",
   },
   {
+    id: "pensum",
+    title: "Pensum",
+    icon: "📖",
+  },
+  {
+    id: "formler",
+    title: "Formelark",
+    icon: "📐",
+  },
+  {
     id: "eksamener",
     title: "Eksamener",
     icon: "📝",

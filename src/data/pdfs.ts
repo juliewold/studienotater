@@ -1,10 +1,21 @@
+const tma4412Pensum = [1, 6];
+
 export const pdfs = {
-  tma4412: Array.from({ length: 24 }, (_, i) => ({
-    id: `forelesning-${i + 1}`,
-    title: `Forelesning ${i + 1}`,
-    file: `pdfs/tma4412/Forelesning ${i + 1}.pdf`,
-    category: "forelesninger",
-  })),
+  tma4412: [
+    ...tma4412Pensum.map((chapter) => ({
+      id: `kapittel-${chapter}`,
+      title: `Kapittel ${chapter}`,
+      file: `pdfs/tma4412/pensum/Kapittel ${chapter}.pdf`,
+      category: "pensum",
+    })),
+
+    ...Array.from({ length: 24 }, (_, i) => ({
+      id: `forelesning-${i + 1}`,
+      title: `Forelesning ${i + 1}`,
+      file: `pdfs/tma4412/Forelesning ${i + 1}.pdf`,
+      category: "forelesninger",
+    })),
+  ],
 
   tma4400: Array.from({ length: 13 }, (_, i) => ({
     id: `forelesning-${i + 1}`,
