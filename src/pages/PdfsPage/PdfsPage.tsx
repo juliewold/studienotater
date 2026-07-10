@@ -1,32 +1,34 @@
 import "./PdfsPage.css";
 import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
+import { Heart } from "lucide-react";
 import { pdfs } from "../../data/pdfs";
+import {
+  getFavorites,
+  toggleFavorite,
+  type FavoriteItem,
+} from "../../utils/favorites";
 
 const categories = [
   {
     id: "forelesninger",
     title: "Forelesningsnotater",
-    icon: "📚",
   },
   {
     id: "presentasjoner",
     title: "Presentasjonsnotater",
-    icon: "🖥️",
   },
   {
     id: "pensum",
     title: "Pensum",
-    icon: "📖",
   },
   {
     id: "formler",
     title: "Formelark",
-    icon: "📐",
   },
   {
     id: "eksamener",
     title: "Eksamener",
-    icon: "📝",
   },
 ];
 
@@ -34,6 +36,19 @@ export const PdfsPage = () => {
   const { subjectId } = useParams();
 
   const subjectPdfs = pdfs[subjectId as keyof typeof pdfs] || [];
+
+  const [favorites, setFavorites] = useState(getFavorites);
+
+  const handleFavoriteClick = (item: FavoriteItem) => {
+    toggleFavorite(item);
+    setFavorites(getFavorites());
+  };
+
+  const pdfIsFavorite = (pdfId: string) => {
+    return favorites.some(
+      (favorite) => favorite.id === pdfId && favorite.type === "pdf",
+    );
+  };
 
   return (
     <main className="page-container">
@@ -56,9 +71,7 @@ export const PdfsPage = () => {
 
         return (
           <section key={category.id} className="pdf-category-section">
-            <h2>
-              {category.icon} {category.title}
-            </h2>
+            <h2>{category.title}</h2>
 
             <div className="pdf-grid">
               {categoryPdfs.map((pdf) => {
@@ -74,28 +87,55 @@ export const PdfsPage = () => {
                     `resource-progress-pdf-${subjectId}-${pdf.id}-completed`,
                   ) === "true";
 
+                const favorite = pdfIsFavorite(pdf.id);
+
                 return (
-                  <Link
-                    key={pdf.id}
-                    to={`/fag/${subjectId}/pdfs/${pdf.id}`}
-                    className="pdf-card"
-                  >
-                    <span className="pdf-icon">📄</span>
+                  <article className="pdf-card-wrapper" key={pdf.id}>
+                    <Link
+                      to={`/fag/${subjectId}/pdfs/${pdf.id}`}
+                      className="pdf-card"
+                    >
+                      <span className="pdf-icon">📄</span>
 
-                    <div className="pdf-card-content">
-                      <h3>{pdf.title}</h3>
+                      <div className="pdf-card-content">
+                        <h3>{pdf.title}</h3>
 
-                      <div className="pdf-progress-preview">
-                        <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
+                        <div className="pdf-progress-preview">
+                          <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
 
-                        <span className={`pdf-rating rating-${rating}`}>
-                          {"★".repeat(rating)}
-                        </span>
+                          <span className={`pdf-rating rating-${rating}`}>
+                            {"★".repeat(rating)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
 
-                    <span className="pdf-arrow">→</span>
-                  </Link>
+                    <button
+                      type="button"
+                      className={`favorite-button ${
+                        favorite ? "is-favorite" : ""
+                      }`}
+                      aria-label={
+                        favorite
+                          ? "Fjern fra favoritter"
+                          : "Legg til i favoritter"
+                      }
+                      onClick={() =>
+                        handleFavoriteClick({
+                          id: pdf.id,
+                          title: pdf.title,
+                          type: "pdf",
+                          url: `/fag/${subjectId}/pdfs/${pdf.id}`,
+                        })
+                      }
+                    >
+                      <Heart
+                        size={22}
+                        fill={favorite ? "currentColor" : "transparent"}
+                        strokeWidth={2}
+                      />
+                    </button>
+                  </article>
                 );
               })}
             </div>

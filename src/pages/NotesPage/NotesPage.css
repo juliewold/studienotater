@@ -40,3 +40,44 @@
 .rating-5 {
   color: #22c55e;
 }
+
+.note-card-wrapper {
+  position: relative;
+}
+
+.note-card-wrapper .note-card {
+  display: block;
+  height: 100%;
+  padding-right: 72px;
+}
+
+.favorite-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  place-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #8a8290;
+  font-size: 1.7rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.favorite-button:hover {
+  background: #f4ecff;
+  color: #8c63cf;
+  transform: scale(1.08);
+}
+
+.favorite-button.is-favorite {
+  color: #9a67d2;
+}

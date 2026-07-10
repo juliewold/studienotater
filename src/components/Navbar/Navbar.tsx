@@ -158,7 +158,7 @@ export const Navbar = () => {
               </NavLink>
 
               <NavLink
-                to="/"
+                to="/FavoritesPage"
                 onClick={() => setMenuOpen(false)}
                 className="menu-link"
               >

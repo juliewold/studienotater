@@ -87,3 +87,47 @@
 .pdf-rating.rating-5 {
   color: #22c55e;
 }
+
+.pdf-card-wrapper {
+  position: relative;
+}
+
+.pdf-card-wrapper .pdf-card {
+  padding-right: 72px;
+}
+
+.favorite-button {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+
+  display: grid;
+  place-items: center;
+
+  width: 40px;
+  height: 40px;
+
+  padding: 0;
+
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+
+  color: #8a8290;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.favorite-button:hover {
+  background: #f4ecff;
+  color: #8c63cf;
+  transform: scale(1.08);
+}
+
+.favorite-button.is-favorite {
+  color: #9a67d2;
+}
