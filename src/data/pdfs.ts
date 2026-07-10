@@ -1,4 +1,4 @@
-const tma4412Pensum = [1, 6, 8];
+const tma4412Pensum = [1, 6, 7, 8];
 
 export const pdfs = {
   tma4412: [
