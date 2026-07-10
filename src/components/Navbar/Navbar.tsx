@@ -208,7 +208,7 @@ export const Navbar = () => {
               <h3>ANNET</h3>
 
               <NavLink
-                to="/"
+                to="/AboutPage"
                 onClick={() => setMenuOpen(false)}
                 className="menu-link"
               >

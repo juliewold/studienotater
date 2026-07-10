@@ -20,6 +20,7 @@ import { StudyPlanPage } from "./pages/StudyPlanPage/StudyPlanPage";
 import { BookProgressPage } from "./pages/BookProgressPage/BookProgressPage";
 import { ProgrammingPage } from "./pages/ProgrammingPage/ProgrammingPage";
 import { ProgrammingTopicPage } from "./pages/ProgrammingTopicPage/ProgrammingTopicPage";
+import { AboutPage } from "./pages/AboutPage/AboutPage";
 
 function App() {
   return (
@@ -71,6 +72,8 @@ function App() {
         <Route path="/programmering/:topicId" element={<ProgrammingTopicPage />} />
 
         <Route path="/programmering/:topicId/:lessonId" element={<ProgrammingTopicPage />} />
+
+        <Route path ="/AboutPage" element={<AboutPage />}/>
       </Routes>
     </HashRouter>
   );

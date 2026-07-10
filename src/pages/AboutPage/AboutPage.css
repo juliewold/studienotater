@@ -1,0 +1,150 @@
+.about-page {
+  width: min(1100px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 64px 0 96px;
+}
+
+.about-header {
+  max-width: 720px;
+  margin-bottom: 48px;
+}
+
+.about-label {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #9067d8;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.about-header h1 {
+  margin: 0 0 16px;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.about-header p {
+  margin: 0;
+  max-width: 650px;
+  color: #686372;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+.about-features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.about-feature-card {
+  display: flex;
+  gap: 18px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(142, 105, 210, 0.12);
+  border-radius: 18px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.about-feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(78, 55, 110, 0.08);
+}
+
+.about-feature-icon {
+  display: grid;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  background: #f0e7ff;
+  border-radius: 14px;
+  font-size: 1.25rem;
+}
+
+.about-feature-card h2 {
+  margin: 1px 0 7px;
+  font-size: 1.05rem;
+}
+
+.about-feature-card p {
+  margin: 0;
+  color: #716b78;
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.about-info {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 48px;
+  padding: 40px 0;
+  border-top: 1px solid rgba(35, 28, 45, 0.1);
+  border-bottom: 1px solid rgba(35, 28, 45, 0.1);
+}
+
+.about-info h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.about-info p {
+  margin: 0;
+  color: #686372;
+  line-height: 1.8;
+}
+
+.about-development {
+  margin-top: 40px;
+  padding: 32px;
+  background: #f4ecff;
+  border-radius: 20px;
+}
+
+.about-development h2 {
+  margin-bottom: 12px;
+  font-size: 1.4rem;
+}
+
+.about-development p {
+  margin: 0;
+  color: #666;
+  line-height: 1.7;
+}
+
+.about-development span {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 999px;
+  color: #7752b6;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .about-page {
+    width: min(100% - 32px, 1100px);
+    padding-top: 40px;
+  }
+
+  .about-features,
+  .about-info {
+    grid-template-columns: 1fr;
+  }
+
+  .about-info {
+    gap: 20px;
+  }
+
+  .about-development {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
