@@ -164,14 +164,6 @@ export const Navbar = () => {
               >
                 Favoritter
               </NavLink>
-
-              <NavLink
-                to="/"
-                onClick={() => setMenuOpen(false)}
-                className="menu-link"
-              >
-                Dashboard
-              </NavLink>
             </div>
 
             <div className="menu-column">
