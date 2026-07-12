@@ -1,5 +1,10 @@
 import "./ResourceProgress.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext/AuthContext";
+import {
+  getProgress,
+  saveProgress,
+} from "../../services/progressService";
 
 type ResourceProgressProps = {
   resourceId: string;
@@ -10,23 +15,92 @@ export const ResourceProgress = ({
   resourceId,
   resourceType = "lest",
 }: ResourceProgressProps) => {
-  const storageKey = `resource-progress-${resourceId}`;
+  const { user } = useContext(AuthContext);
 
-  const [completed, setCompleted] = useState(() => {
-    return localStorage.getItem(`${storageKey}-completed`) === "true";
-  });
-
-  const [rating, setRating] = useState(() => {
-    return Number(localStorage.getItem(`${storageKey}-rating`)) || 0;
-  });
+  const [completed, setCompleted] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem(`${storageKey}-completed`, String(completed));
-  }, [completed, storageKey]);
+    const loadProgress = async () => {
+      if (!user) {
+        setCompleted(false);
+        setRating(0);
+        setIsLoading(false);
+        return;
+      }
 
-  useEffect(() => {
-    localStorage.setItem(`${storageKey}-rating`, String(rating));
-  }, [rating, storageKey]);
+      try {
+        const progress = await getProgress(
+          user.id,
+          resourceId,
+          "resource",
+        );
+
+        setCompleted(progress.completed);
+        setRating(progress.rating);
+      } catch (error) {
+        console.error("Kunne ikke hente fremdrift:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProgress();
+  }, [user, resourceId]);
+
+  const handleCompletedChange = async (checked: boolean) => {
+    if (!user) {
+      return;
+    }
+
+    setCompleted(checked);
+
+    try {
+      await saveProgress(
+        user.id,
+        resourceId,
+        "resource",
+        checked,
+        rating,
+      );
+    } catch (error) {
+      console.error("Kunne ikke lagre fremdrift:", error);
+      setCompleted(!checked);
+    }
+  };
+
+  const handleRatingChange = async (star: number) => {
+    if (!user) {
+      return;
+    }
+
+    const newRating = rating === star ? 0 : star;
+    const previousRating = rating;
+
+    setRating(newRating);
+
+    try {
+      await saveProgress(
+        user.id,
+        resourceId,
+        "resource",
+        completed,
+        newRating,
+      );
+    } catch (error) {
+      console.error("Kunne ikke lagre vurdering:", error);
+      setRating(previousRating);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <section className="resource-progress">
+        <p>Laster fremdrift...</p>
+      </section>
+    );
+  }
 
   return (
     <section className="resource-progress">
@@ -34,9 +108,14 @@ export const ResourceProgress = ({
         <input
           type="checkbox"
           checked={completed}
-          onChange={(event) => setCompleted(event.target.checked)}
+          onChange={(event) =>
+            handleCompletedChange(event.target.checked)
+          }
         />
-        <span>Marker som {resourceType === "sett" ? "sett" : "lest"}</span>
+
+        <span>
+          Marker som {resourceType === "sett" ? "sett" : "lest"}
+        </span>
       </label>
 
       <div className="resource-rating">
@@ -46,7 +125,8 @@ export const ResourceProgress = ({
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
-              onClick={() => setRating(rating === star ? 0 : star)}
+              type="button"
+              onClick={() => handleRatingChange(star)}
               className={star <= rating ? `star-${rating}` : ""}
             >
               ★
