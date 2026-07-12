@@ -1,3 +1,4 @@
+import { LoginPage } from "./pages/LoginPage/LoginPage";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar/Navbar";
 import { HomePage } from "./pages/HomePage/HomePage";
@@ -30,6 +31,8 @@ function App() {
       <Navbar />
 
       <Routes>
+        <Route path="/logg-inn" element={<LoginPage />} />
+        
         <Route path="/" element={<HomePage />} />
 
         <Route path="/fag/:subjectId" element={<SubjectPage />} />
