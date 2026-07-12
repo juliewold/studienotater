@@ -1,22 +1,47 @@
 import "./NotesPage.css";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Heart } from "lucide-react";
 import { subjects } from "../../data/subjects";
 import { notes } from "../../data/notes";
+import { AuthContext } from "../../context/AuthContext/AuthContext";
 import {
+  addFavorite,
   getFavorites,
-  toggleFavorite,
-  type FavoriteItem,
-} from "../../utils/favorites";
-import { Heart } from "lucide-react";
+  removeFavorite,
+} from "../../services/favoritesService";
+import type { FavoriteItem } from "../../utils/favorites";
 
 export const NotesPage = () => {
   const { subjectId } = useParams();
+  const { user } = useContext(AuthContext);
 
   const subject = subjects.find((subject) => subject.id === subjectId);
   const subjectNotes = notes[subjectId as keyof typeof notes] || [];
 
-  const [favorites, setFavorites] = useState(getFavorites);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
+
+  useEffect(() => {
+    const loadFavorites = async () => {
+      if (!user) {
+        setFavorites([]);
+        setIsLoadingFavorites(false);
+        return;
+      }
+
+      try {
+        const loadedFavorites = await getFavorites(user.id);
+        setFavorites(loadedFavorites);
+      } catch (error) {
+        console.error("Kunne ikke hente favoritter:", error);
+      } finally {
+        setIsLoadingFavorites(false);
+      }
+    };
+
+    loadFavorites();
+  }, [user]);
 
   if (!subject) {
     return (
@@ -26,9 +51,35 @@ export const NotesPage = () => {
     );
   }
 
-  const handleFavoriteClick = (item: FavoriteItem) => {
-    toggleFavorite(item);
-    setFavorites(getFavorites());
+  const handleFavoriteClick = async (item: FavoriteItem) => {
+    if (!user) {
+      return;
+    }
+
+    const favoriteAlreadyExists = favorites.some(
+      (favorite) => favorite.id === item.id && favorite.type === item.type,
+    );
+
+    try {
+      if (favoriteAlreadyExists) {
+        await removeFavorite(user.id, item.id, item.type);
+
+        setFavorites((currentFavorites) =>
+          currentFavorites.filter(
+            (favorite) =>
+              !(favorite.id === item.id && favorite.type === item.type),
+          ),
+        );
+
+        return;
+      }
+
+      await addFavorite(user.id, item);
+
+      setFavorites((currentFavorites) => [item, ...currentFavorites]);
+    } catch (error) {
+      console.error("Kunne ikke oppdatere favoritt:", error);
+    }
   };
 
   const noteIsFavorite = (noteId: string) => {
@@ -49,7 +100,20 @@ export const NotesPage = () => {
 
       <div className="notes-list">
         {subjectNotes.map((note) => {
-          const favorite = noteIsFavorite(note.id);
+          const favoriteId = `${subject.id}-${note.id}`;
+          const favorite = noteIsFavorite(favoriteId);
+
+          const completed =
+            localStorage.getItem(
+              `resource-progress-note-${subject.id}-${note.id}-completed`,
+            ) === "true";
+
+          const rating =
+            Number(
+              localStorage.getItem(
+                `resource-progress-note-${subject.id}-${note.id}-rating`,
+              ),
+            ) || 0;
 
           return (
             <article className="note-card-wrapper" key={note.id}>
@@ -62,30 +126,10 @@ export const NotesPage = () => {
                 <p>{note.description}</p>
 
                 <div className="note-progress-preview">
-                  <span>
-                    {localStorage.getItem(
-                      `resource-progress-note-${subject.id}-${note.id}-completed`,
-                    ) === "true"
-                      ? "✓ Lest"
-                      : "Ikke lest"}
-                  </span>
+                  <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
 
-                  <span
-                    className={`rating-${
-                      Number(
-                        localStorage.getItem(
-                          `resource-progress-note-${subject.id}-${note.id}-rating`,
-                        ),
-                      ) || 0
-                    }`}
-                  >
-                    {"★".repeat(
-                      Number(
-                        localStorage.getItem(
-                          `resource-progress-note-${subject.id}-${note.id}-rating`,
-                        ),
-                      ) || 0,
-                    )}
+                  <span className={`rating-${rating}`}>
+                    {"★".repeat(rating)}
                   </span>
                 </div>
               </Link>
@@ -96,9 +140,10 @@ export const NotesPage = () => {
                 aria-label={
                   favorite ? "Fjern fra favoritter" : "Legg til i favoritter"
                 }
+                disabled={isLoadingFavorites}
                 onClick={() =>
                   handleFavoriteClick({
-                    id: note.id,
+                    id: `${subject.id}-${note.id}`,
                     title: note.title,
                     subject: subject.name,
                     type: "note",
