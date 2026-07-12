@@ -1,13 +1,15 @@
 import "./PdfsPage.css";
 import { Link, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import { pdfs } from "../../data/pdfs";
+import { AuthContext } from "../../context/AuthContext/AuthContext";
 import {
+  addFavorite,
   getFavorites,
-  toggleFavorite,
-  type FavoriteItem,
-} from "../../utils/favorites";
+  removeFavorite,
+} from "../../services/favoritesService";
+import type { FavoriteItem } from "../../utils/favorites";
 
 const categories = [
   {
@@ -34,19 +36,76 @@ const categories = [
 
 export const PdfsPage = () => {
   const { subjectId } = useParams();
+  const { user } = useContext(AuthContext);
 
   const subjectPdfs = pdfs[subjectId as keyof typeof pdfs] || [];
 
-  const [favorites, setFavorites] = useState(getFavorites);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
 
-  const handleFavoriteClick = (item: FavoriteItem) => {
-    toggleFavorite(item);
-    setFavorites(getFavorites());
+  useEffect(() => {
+    const loadFavorites = async () => {
+      if (!user) {
+        setFavorites([]);
+        setIsLoadingFavorites(false);
+        return;
+      }
+
+      try {
+        const loadedFavorites = await getFavorites(user.id);
+        setFavorites(loadedFavorites);
+      } catch (error) {
+        console.error("Kunne ikke hente favoritter:", error);
+      } finally {
+        setIsLoadingFavorites(false);
+      }
+    };
+
+    loadFavorites();
+  }, [user]);
+
+  const handleFavoriteClick = async (item: FavoriteItem) => {
+    if (!user) {
+      return;
+    }
+
+    const favoriteAlreadyExists = favorites.some(
+      (favorite) =>
+        favorite.id === item.id && favorite.type === item.type,
+    );
+
+    try {
+      if (favoriteAlreadyExists) {
+        await removeFavorite(user.id, item.id, item.type);
+
+        setFavorites((currentFavorites) =>
+          currentFavorites.filter(
+            (favorite) =>
+              !(
+                favorite.id === item.id &&
+                favorite.type === item.type
+              ),
+          ),
+        );
+
+        return;
+      }
+
+      await addFavorite(user.id, item);
+
+      setFavorites((currentFavorites) => [
+        item,
+        ...currentFavorites,
+      ]);
+    } catch (error) {
+      console.error("Kunne ikke oppdatere favoritt:", error);
+    }
   };
 
   const pdfIsFavorite = (pdfId: string) => {
     return favorites.some(
-      (favorite) => favorite.id === pdfId && favorite.type === "pdf",
+      (favorite) =>
+        favorite.id === pdfId && favorite.type === "pdf",
     );
   };
 
@@ -70,7 +129,10 @@ export const PdfsPage = () => {
         }
 
         return (
-          <section key={category.id} className="pdf-category-section">
+          <section
+            key={category.id}
+            className="pdf-category-section"
+          >
             <h2>{category.title}</h2>
 
             <div className="pdf-grid">
@@ -90,7 +152,10 @@ export const PdfsPage = () => {
                 const favorite = pdfIsFavorite(pdf.id);
 
                 return (
-                  <article className="pdf-card-wrapper" key={pdf.id}>
+                  <article
+                    className="pdf-card-wrapper"
+                    key={pdf.id}
+                  >
                     <Link
                       to={`/fag/${subjectId}/pdfs/${pdf.id}`}
                       className="pdf-card"
@@ -101,9 +166,13 @@ export const PdfsPage = () => {
                         <h3>{pdf.title}</h3>
 
                         <div className="pdf-progress-preview">
-                          <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
+                          <span>
+                            {completed ? "✓ Lest" : "Ikke lest"}
+                          </span>
 
-                          <span className={`pdf-rating rating-${rating}`}>
+                          <span
+                            className={`pdf-rating rating-${rating}`}
+                          >
                             {"★".repeat(rating)}
                           </span>
                         </div>
@@ -120,10 +189,12 @@ export const PdfsPage = () => {
                           ? "Fjern fra favoritter"
                           : "Legg til i favoritter"
                       }
+                      disabled={isLoadingFavorites}
                       onClick={() =>
                         handleFavoriteClick({
                           id: pdf.id,
                           title: pdf.title,
+                          subject: subjectId?.toUpperCase(),
                           type: "pdf",
                           url: `/fag/${subjectId}/pdfs/${pdf.id}`,
                         })
@@ -131,7 +202,11 @@ export const PdfsPage = () => {
                     >
                       <Heart
                         size={22}
-                        fill={favorite ? "currentColor" : "transparent"}
+                        fill={
+                          favorite
+                            ? "currentColor"
+                            : "transparent"
+                        }
                         strokeWidth={2}
                       />
                     </button>
