@@ -1,4 +1,4 @@
-import "./ExamsPage.css"
+import "./ExamsPage.css";
 import { Link, useParams } from "react-router-dom";
 import { exams } from "../../data/exams";
 
@@ -14,13 +14,25 @@ export const ExamsPage = () => {
       </Link>
 
       <p className="page-label">Eksamen</p>
+
       <h1>{subjectId?.toUpperCase()}</h1>
 
-      <div className="exam-grid">
+      <div className="exam-list">
         {subjectExams.map((exam) => (
-          <article key={exam.id} className="exam-card">
-            <h3>{exam.title}</h3>
-          </article>
+          <section key={exam.id} className="exam-section">
+            <h2>{exam.title}</h2>
+
+            {exam.files.map((file) => (
+              <Link
+                key={file.id}
+                to={`/fag/${subjectId}/eksamen/${exam.id}/${file.id}`}
+                className="exam-row"
+              >
+                <span>{file.title}</span>
+                <span className="exam-arrow">→</span>
+              </Link>
+            ))}
+          </section>
         ))}
       </div>
     </main>

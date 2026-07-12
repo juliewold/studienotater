@@ -1,22 +1,47 @@
-.exam-grid {
-  display: grid;
-  gap: 20px;
+.exam-list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
   margin-top: 32px;
 }
 
-.exam-card {
-  background: white;
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+.exam-section h2 {
+  margin-bottom: 16px;
 }
 
-.exam-card h3 {
-  margin: 0 0 8px;
+.exam-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 18px 0;
+
+  text-decoration: none;
+  color: inherit;
+
+  border-bottom: 1px solid #ece8f5;
+
+  transition: color 0.2s;
 }
 
-.exam-card p {
-  margin: 0;
-  color: #6b647c;
+.exam-row:hover {
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.03);
 }
 
+.exam-row:last-child {
+  border-bottom: 1px solid #ece8f5;
+}
+
+.exam-row span:first-child {
+  font-weight: 600;
+}
+
+.exam-arrow {
+  color: #8b5cf6;
+  opacity: 0.6;
+}
+
+.exam-list {
+  max-width: 900px;
+}
