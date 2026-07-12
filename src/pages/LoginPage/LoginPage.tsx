@@ -1,29 +1,38 @@
 import { useState, type SyntheticEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../components/AuthLayout/AuthLayout";
-import "./LoginPage.css";
 import { supabase } from "../../lib/supabase";
+import "./LoginPage.css";
 
 export const LoginPage = () => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
- const handleSubmit = async (
-  event: SyntheticEvent<HTMLFormElement>,
-) => {
-  event.preventDefault();
+  const handleSubmit = async (
+    event: SyntheticEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+    setErrorMessage("");
+    setIsLoading(true);
 
-  if (error) {
-    console.error(error.message);
-    return;
-  }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  console.log("Innlogging vellykket");
-};
+    if (error) {
+      setErrorMessage("Feil e-post eller passord.");
+      setIsLoading(false);
+      return;
+    }
+
+    navigate("/");
+  };
 
   return (
     <AuthLayout label="Velkommen tilbake" title="Logg inn">
@@ -35,6 +44,7 @@ export const LoginPage = () => {
           placeholder="navn@eksempel.no"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
           required
         />
 
@@ -45,10 +55,19 @@ export const LoginPage = () => {
           placeholder="Skriv inn passordet ditt"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          autoComplete="current-password"
           required
         />
 
-        <button type="submit">Logg inn</button>
+        {errorMessage && (
+          <p className="auth-message auth-message-error">
+            {errorMessage}
+          </p>
+        )}
+
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Logger inn..." : "Logg inn"}
+        </button>
       </form>
     </AuthLayout>
   );
