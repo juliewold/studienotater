@@ -1,32 +1,35 @@
 import { useState, type SyntheticEvent } from "react";
 import { AuthLayout } from "../../components/AuthLayout/AuthLayout";
-import "./LoginPage.css";
 import { supabase } from "../../lib/supabase";
+import "./RegisterPage.css";
 
-export const LoginPage = () => {
+export const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
- const handleSubmit = async (
-  event: SyntheticEvent<HTMLFormElement>,
-) => {
-  event.preventDefault();
+  const handleSubmit = async (
+    event: SyntheticEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-  if (error) {
-    console.error(error.message);
-    return;
-  }
+    if (error) {
+      console.error(error.message);
+      return;
+    }
 
-  console.log("Innlogging vellykket");
-};
+    console.log("Registrering vellykket");
+  };
 
   return (
-    <AuthLayout label="Velkommen tilbake" title="Logg inn">
+    <AuthLayout
+      label="Opprett en konto"
+      title="Registrer deg"
+    >
       <form className="auth-form" onSubmit={handleSubmit}>
         <label htmlFor="email">E-post</label>
         <input
@@ -42,13 +45,13 @@ export const LoginPage = () => {
         <input
           id="password"
           type="password"
-          placeholder="Skriv inn passordet ditt"
+          placeholder="Velg et passord"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           required
         />
 
-        <button type="submit">Logg inn</button>
+        <button type="submit">Registrer deg</button>
       </form>
     </AuthLayout>
   );

@@ -1,4 +1,5 @@
 import { LoginPage } from "./pages/LoginPage/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage/RegisterPage";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar/Navbar";
 import { HomePage } from "./pages/HomePage/HomePage";
@@ -32,7 +33,9 @@ function App() {
 
       <Routes>
         <Route path="/logg-inn" element={<LoginPage />} />
-        
+
+        <Route path="/registrer" element={<RegisterPage />} />
+
         <Route path="/" element={<HomePage />} />
 
         <Route path="/fag/:subjectId" element={<SubjectPage />} />
