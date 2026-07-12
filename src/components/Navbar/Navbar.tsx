@@ -11,8 +11,7 @@ export const Navbar = () => {
 
   const { user, isLoading, signOut } = useContext(AuthContext);
 
-  const displayName =
-    user?.email?.split("@")[0] ?? "Profil";
+  const displayName = user?.email?.split("@")[0] ?? "Profil";
 
   const handleSignOut = async () => {
     await signOut();
@@ -80,9 +79,7 @@ export const Navbar = () => {
             <>
               <button
                 className="profile-button"
-                onClick={() =>
-                  setProfileMenuOpen(!profileMenuOpen)
-                }
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
               >
                 {displayName}
               </button>
@@ -146,10 +143,7 @@ export const Navbar = () => {
       {menuOpen && (
         <div className="menu-overlay">
           <div className="menu-top">
-            <input
-              type="text"
-              placeholder="Hva leter du etter?"
-            />
+            <input type="text" placeholder="Hva leter du etter?" />
           </div>
 
           <div className="menu-grid">
@@ -160,9 +154,7 @@ export const Navbar = () => {
                 to="/"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Hjem
@@ -172,9 +164,7 @@ export const Navbar = () => {
                 to="/notater"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Notater
@@ -184,9 +174,7 @@ export const Navbar = () => {
                 to="/flashcards"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Flashcards
@@ -196,9 +184,7 @@ export const Navbar = () => {
                 to="/videoer"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Videoer
@@ -208,9 +194,7 @@ export const Navbar = () => {
                 to="/pdfs"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 PDF-er
@@ -220,9 +204,7 @@ export const Navbar = () => {
                 to="/programmering"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Programmering
@@ -236,9 +218,7 @@ export const Navbar = () => {
                 to="/semesterstart"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Semesterstart
@@ -294,9 +274,7 @@ export const Navbar = () => {
                 to="/eksamen"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Eksamensnedtelling
@@ -348,9 +326,8 @@ export const Navbar = () => {
                   >
                     Logg inn
                   </NavLink>
-
                   <NavLink
-                    to="/register"
+                    to="/registrer"
                     onClick={() => setMenuOpen(false)}
                     className="menu-link"
                   >
