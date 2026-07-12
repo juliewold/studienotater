@@ -25,6 +25,7 @@ import { ProgrammingTopicPage } from "./pages/ProgrammingTopicPage/ProgrammingTo
 import { AboutPage } from "./pages/AboutPage/AboutPage";
 import { FavoritesPage } from "./pages/FavoritesPage/FavoritesPage";
 import { ExamViewerPage } from "./pages/ExamViewerPage/ExamViewerPage";
+import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 
 function App() {
   return (
@@ -33,67 +34,206 @@ function App() {
 
       <Routes>
         <Route path="/logg-inn" element={<LoginPage />} />
-
         <Route path="/registrer" element={<RegisterPage />} />
-
         <Route path="/" element={<HomePage />} />
+        <Route path="/AboutPage" element={<AboutPage />} />
 
-        <Route path="/fag/:subjectId" element={<SubjectPage />} />
+        <Route
+          path="/fag/:subjectId"
+          element={
+            <ProtectedRoute>
+              <SubjectPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/fag/:subjectId/notater" element={<NotesPage />} />
+        <Route
+          path="/fag/:subjectId/notater"
+          element={
+            <ProtectedRoute>
+              <NotesPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/fag/:subjectId/notater/:noteId" element={<NotePage />} />
+        <Route
+          path="/fag/:subjectId/notater/:noteId"
+          element={
+            <ProtectedRoute>
+              <NotePage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/fag/:subjectId/flashcards" element={<FlashcardsPage />} />
+        <Route
+          path="/fag/:subjectId/flashcards"
+          element={
+            <ProtectedRoute>
+              <FlashcardsPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/fag/:subjectId/videoer" element={<VideosPage />} />
+        <Route
+          path="/fag/:subjectId/videoer"
+          element={
+            <ProtectedRoute>
+              <VideosPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/fag/:subjectId/eksamen" element={<ExamsPage />} />
+        <Route
+          path="/fag/:subjectId/eksamen"
+          element={
+            <ProtectedRoute>
+              <ExamsPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/notater" element={<AllNotesPage />} />
+        <Route
+          path="/notater"
+          element={
+            <ProtectedRoute>
+              <AllNotesPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/flashcards" element={<AllFlashcardsPage />} />
+        <Route
+          path="/flashcards"
+          element={
+            <ProtectedRoute>
+              <AllFlashcardsPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/videoer" element={<AllVideosPage />} />
+        <Route
+          path="/videoer"
+          element={
+            <ProtectedRoute>
+              <AllVideosPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/fag/:subjectId/pdfs" element={<PdfsPage />} />
+        <Route
+          path="/fag/:subjectId/pdfs"
+          element={
+            <ProtectedRoute>
+              <PdfsPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/fag/:subjectId/pdfs/:pdfId" element={<PdfViewerPage />} />
+        <Route
+          path="/fag/:subjectId/pdfs/:pdfId"
+          element={
+            <ProtectedRoute>
+              <PdfViewerPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/pdfs" element={<AllPdfsPage />} />
+        <Route
+          path="/pdfs"
+          element={
+            <ProtectedRoute>
+              <AllPdfsPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/semesterstart" element={<SemesterStartPage />} />
+        <Route
+          path="/semesterstart"
+          element={
+            <ProtectedRoute>
+              <SemesterStartPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/klassetrinn/:year" element={<YearPage />} />
+        <Route
+          path="/klassetrinn/:year"
+          element={
+            <ProtectedRoute>
+              <YearPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/eksamen" element={<ExamOverviewPage />} />
+        <Route
+          path="/eksamen"
+          element={
+            <ProtectedRoute>
+              <ExamOverviewPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/fag/:subjectId/studieplan" element={<StudyPlanPage />} />
+        <Route
+          path="/fag/:subjectId/studieplan"
+          element={
+            <ProtectedRoute>
+              <StudyPlanPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/fag/:subjectId/bok/:bookId"
-          element={<BookProgressPage />}
+          element={
+            <ProtectedRoute>
+              <BookProgressPage />
+            </ProtectedRoute>
+          }
         />
 
-        <Route path="/programmering" element={<ProgrammingPage />} />
+        <Route
+          path="/programmering"
+          element={
+            <ProtectedRoute>
+              <ProgrammingPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/programmering/:topicId"
-          element={<ProgrammingTopicPage />}
+          element={
+            <ProtectedRoute>
+              <ProgrammingTopicPage />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/programmering/:topicId/:lessonId"
-          element={<ProgrammingTopicPage />}
+          element={
+            <ProtectedRoute>
+              <ProgrammingTopicPage />
+            </ProtectedRoute>
+          }
         />
 
-        <Route path="/AboutPage" element={<AboutPage />} />
-
-        <Route path="/FavoritesPage" element={<FavoritesPage />} />
+        <Route
+          path="/FavoritesPage"
+          element={
+            <ProtectedRoute>
+              <FavoritesPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/fag/:subjectId/eksamen/:examId/:fileId"
-          element={<ExamViewerPage />}
+          element={
+            <ProtectedRoute>
+              <ExamViewerPage />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </HashRouter>
