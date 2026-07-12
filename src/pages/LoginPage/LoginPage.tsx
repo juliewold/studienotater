@@ -1,20 +1,19 @@
 import { useState, type SyntheticEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../components/AuthLayout/AuthLayout";
 import { supabase } from "../../lib/supabase";
 import "./LoginPage.css";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setErrorMessage("");
@@ -31,7 +30,9 @@ export const LoginPage = () => {
       return;
     }
 
-    navigate("/");
+    const from = location.state?.from ?? "/";
+
+    navigate(from, { replace: true });
   };
 
   return (
@@ -60,9 +61,7 @@ export const LoginPage = () => {
         />
 
         {errorMessage && (
-          <p className="auth-message auth-message-error">
-            {errorMessage}
-          </p>
+          <p className="auth-message auth-message-error">{errorMessage}</p>
         )}
 
         <button type="submit" disabled={isLoading}>
