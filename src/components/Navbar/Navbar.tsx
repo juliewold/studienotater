@@ -1,17 +1,45 @@
 import "./Navbar.css";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
+import { supabase } from "../../lib/supabase";
 
 export const Navbar = () => {
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [username, setUsername] = useState("");
 
   const { user, isLoading, signOut } = useContext(AuthContext);
 
-  const displayName = user?.email?.split("@")[0] ?? "Profil";
+  useEffect(() => {
+    const loadUsername = async () => {
+      if (!user) {
+        setUsername("");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Kunne ikke hente brukernavn:", error);
+        setUsername("");
+        return;
+      }
+
+      setUsername(data.username ?? "");
+    };
+
+    loadUsername();
+  }, [user]);
+
+  const displayName =
+  username || user?.email?.split("@")[0] || "Profil";
 
   const handleSignOut = async () => {
     await signOut();

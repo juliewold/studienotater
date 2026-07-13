@@ -29,6 +29,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 import { PublicOnlyRoute } from "./components/PublicOnlyRoute/PublicOnlyRoute";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage/ForgotPasswordPage";
 import { UpdatePasswordPage } from "./pages/UpdatePasswordPage/UpdatePasswordPage";
+import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
           }
         />
 
+        <Route
+          path="/profil"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/oppdater-passord" element={<UpdatePasswordPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutPage" element={<AboutPage />} />

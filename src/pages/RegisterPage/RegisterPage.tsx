@@ -5,8 +5,11 @@ import { supabase } from "../../lib/supabase";
 import "./RegisterPage.css";
 
 export const RegisterPage = () => {
+  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,17 +23,31 @@ export const RegisterPage = () => {
     setSuccessMessage("");
     setIsLoading(true);
 
+    const normalizedUsername = username.trim().toLowerCase();
+
     const { error } = await supabase.auth.signUp({
-      email,
+      email: email.trim(),
       password,
+      options: {
+        data: {
+          username: normalizedUsername,
+          full_name: fullName.trim(),
+        },
+      },
     });
 
     if (error) {
-      setErrorMessage(
-        error.message.toLowerCase().includes("already")
-          ? "Det finnes allerede en konto med denne e-postadressen."
-          : "Kunne ikke opprette kontoen. Prøv igjen.",
-      );
+      const message = error.message.toLowerCase();
+
+      if (message.includes("duplicate") || message.includes("username")) {
+        setErrorMessage("Dette brukernavnet er allerede i bruk.");
+      } else if (message.includes("already")) {
+        setErrorMessage(
+          "Det finnes allerede en konto med denne e-postadressen.",
+        );
+      } else {
+        setErrorMessage("Kunne ikke opprette kontoen. Prøv igjen.");
+      }
 
       setIsLoading(false);
       return;
@@ -40,6 +57,8 @@ export const RegisterPage = () => {
       "Kontoen ble opprettet. Du kan nå logge inn.",
     );
 
+    setUsername("");
+    setFullName("");
     setEmail("");
     setPassword("");
     setIsLoading(false);
@@ -48,8 +67,33 @@ export const RegisterPage = () => {
   return (
     <AuthLayout label="Opprett en konto" title="Registrer deg">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <label htmlFor="email">E-post</label>
+        <label htmlFor="username">Brukernavn</label>
+        <input
+          id="username"
+          type="text"
+          placeholder="Velg et brukernavn"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          autoComplete="username"
+          minLength={3}
+          maxLength={30}
+          pattern="[A-Za-z0-9_-]+"
+          title="Bruk bare bokstaver, tall, bindestrek og understrek."
+          required
+        />
 
+        <label htmlFor="fullName">Fullt navn</label>
+        <input
+          id="fullName"
+          type="text"
+          placeholder="Ola Nordmann"
+          value={fullName}
+          onChange={(event) => setFullName(event.target.value)}
+          autoComplete="name"
+          required
+        />
+
+        <label htmlFor="email">E-post</label>
         <input
           id="email"
           type="email"
@@ -61,7 +105,6 @@ export const RegisterPage = () => {
         />
 
         <label htmlFor="password">Passord</label>
-
         <input
           id="password"
           type="password"
