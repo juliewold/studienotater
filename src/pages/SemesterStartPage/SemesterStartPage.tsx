@@ -1,45 +1,21 @@
 import "./SemesterStartPage.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { subjects } from "../../data/subjects";
-
-type CustomSubject = {
-  id: string;
-  code: string;
-  name: string;
-};
+import { useSemesterSubjects } from "../../hooks/useSemesterSubjects";
 
 export const SemesterStartPage = () => {
   const [selectedYear, setSelectedYear] = useState(1);
   const [customCode, setCustomCode] = useState("");
   const [customName, setCustomName] = useState("");
 
-  const [customSubjects, setCustomSubjects] = useState<CustomSubject[]>(() => {
-    const savedCustomSubjects = localStorage.getItem("custom-subjects");
-
-    if (savedCustomSubjects) {
-      return JSON.parse(savedCustomSubjects);
-    }
-
-    return [];
-  });
-
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(() => {
-    const savedSubjects = localStorage.getItem("semester-subjects");
-
-    if (savedSubjects) {
-      return JSON.parse(savedSubjects);
-    }
-
-    return [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem("semester-subjects", JSON.stringify(selectedSubjects));
-  }, [selectedSubjects]);
-
-  useEffect(() => {
-    localStorage.setItem("custom-subjects", JSON.stringify(customSubjects));
-  }, [customSubjects]);
+  const {
+    semesterSubjects,
+    isLoadingSemesterSubjects,
+    isSelected,
+    toggleSubject,
+    addCustomSubject,
+    removeCustomSubject,
+  } = useSemesterSubjects();
 
   const filteredSubjects = subjects.filter(
     (subject) => subject.year === selectedYear,
@@ -51,42 +27,56 @@ export const SemesterStartPage = () => {
       code: subject.code,
       name: subject.name,
     })),
-    ...customSubjects,
+    ...semesterSubjects
+      .filter(
+        (subject) =>
+          subject.customCode !== null &&
+          subject.customName !== null,
+      )
+      .map((subject) => ({
+        id: subject.subjectId,
+        code: subject.customCode ?? "",
+        name: subject.customName ?? "",
+      })),
   ];
 
-  const toggleSubject = (subjectId: string) => {
-    if (selectedSubjects.includes(subjectId)) {
-      setSelectedSubjects(selectedSubjects.filter((id) => id !== subjectId));
-    } else {
-      setSelectedSubjects([...selectedSubjects, subjectId]);
-    }
-  };
+  const selectedSubjectIds = semesterSubjects.map(
+    (subject) => subject.subjectId,
+  );
 
-  const addCustomSubject = () => {
-    if (!customCode.trim() || !customName.trim()) {
+  const handleAddCustomSubject = async () => {
+    const trimmedCode = customCode.trim();
+    const trimmedName = customName.trim();
+
+    if (!trimmedCode || !trimmedName) {
       return;
     }
 
-    const newSubject = {
-      id: customCode.trim().toLowerCase(),
-      code: customCode.trim().toUpperCase(),
-      name: customName.trim(),
-    };
+    const subjectId = trimmedCode
+      .toLowerCase()
+      .replace(/\s+/g, "-");
 
-    setCustomSubjects([...customSubjects, newSubject]);
-    setSelectedSubjects([...selectedSubjects, newSubject.id]);
+    if (isSelected(subjectId)) {
+      return;
+    }
+
+    await addCustomSubject(
+      subjectId,
+      trimmedCode.toUpperCase(),
+      trimmedName,
+    );
 
     setCustomCode("");
     setCustomName("");
   };
 
-  const removeCustomSubject = (subjectId: string) => {
-    setCustomSubjects(
-      customSubjects.filter((subject) => subject.id !== subjectId),
+  if (isLoadingSemesterSubjects) {
+    return (
+      <main className="page-container">
+        <p>Laster semesterfag...</p>
+      </main>
     );
-
-    setSelectedSubjects(selectedSubjects.filter((id) => id !== subjectId));
-  };
+  }
 
   return (
     <main className="page-container">
@@ -106,6 +96,7 @@ export const SemesterStartPage = () => {
           {[1, 2, 3, 4, 5].map((year) => (
             <button
               key={year}
+              type="button"
               className={selectedYear === year ? "active-year" : ""}
               onClick={() => setSelectedYear(year)}
             >
@@ -123,7 +114,7 @@ export const SemesterStartPage = () => {
             <label key={subject.id} className="semester-subject-item">
               <input
                 type="checkbox"
-                checked={selectedSubjects.includes(subject.id)}
+                checked={isSelected(subject.id)}
                 onChange={() => toggleSubject(subject.id)}
               />
 
@@ -153,21 +144,31 @@ export const SemesterStartPage = () => {
             onChange={(event) => setCustomName(event.target.value)}
           />
 
-          <button onClick={addCustomSubject}>Legg til fag</button>
+          <button type="button" onClick={handleAddCustomSubject}>
+            Legg til fag
+          </button>
         </div>
       </section>
 
       <section className="semester-card">
         <h2>Mine fag dette semesteret</h2>
 
-        {selectedSubjects.length === 0 ? (
+        {selectedSubjectIds.length === 0 ? (
           <p>Ingen fag valgt enda.</p>
         ) : (
           <ul>
-            {selectedSubjects.map((subjectId) => {
+            {selectedSubjectIds.map((subjectId) => {
               const subject = allSubjects.find(
-                (subject) => subject.id === subjectId,
+                (item) => item.id === subjectId,
               );
+
+              const semesterSubject = semesterSubjects.find(
+                (item) => item.subjectId === subjectId,
+              );
+
+              const isCustom =
+                semesterSubject?.customCode !== null &&
+                semesterSubject?.customName !== null;
 
               return (
                 <li key={subjectId} className="selected-subject-item">
@@ -175,10 +176,9 @@ export const SemesterStartPage = () => {
                     {subject?.code} – {subject?.name}
                   </span>
 
-                  {customSubjects.some(
-                    (customSubject) => customSubject.id === subjectId,
-                  ) && (
+                  {isCustom && (
                     <button
+                      type="button"
                       onClick={() => removeCustomSubject(subjectId)}
                       className="remove-subject-button"
                     >

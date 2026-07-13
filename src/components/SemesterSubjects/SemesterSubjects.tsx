@@ -1,31 +1,39 @@
 import "./SemesterSubjects.css";
 import { Link } from "react-router-dom";
 import { subjects } from "../../data/subjects";
+import { useSemesterSubjects } from "../../hooks/useSemesterSubjects";
 
 export const SemesterSubjects = () => {
-  const savedSubjects = localStorage.getItem("semester-subjects");
-  const savedCustomSubjects = localStorage.getItem("custom-subjects");
+  const {
+    semesterSubjects,
+    isLoadingSemesterSubjects,
+  } = useSemesterSubjects();
 
-  const selectedSubjects: string[] = savedSubjects
-    ? JSON.parse(savedSubjects)
-    : [];
+  const displaySubjects = semesterSubjects.map((semesterSubject) => {
+    const regularSubject = subjects.find(
+      (subject) => subject.id === semesterSubject.subjectId,
+    );
 
-  const customSubjects = savedCustomSubjects
-    ? JSON.parse(savedCustomSubjects)
-    : [];
+    return {
+      id: semesterSubject.subjectId,
+      code:
+        semesterSubject.customCode ??
+        regularSubject?.code ??
+        semesterSubject.subjectId.toUpperCase(),
+      name:
+        semesterSubject.customName ??
+        regularSubject?.name ??
+        "",
+    };
+  });
 
-  const allSubjects = [
-    ...subjects.map((subject) => ({
-      id: subject.id,
-      code: subject.code,
-      name: subject.name,
-    })),
-    ...customSubjects,
-  ];
-
-  const semesterSubjects = selectedSubjects
-    .map((subjectId) => allSubjects.find((subject) => subject.id === subjectId))
-    .filter(Boolean);
+  if (isLoadingSemesterSubjects) {
+    return (
+      <section className="semester-subjects">
+        <p>Laster semesterfag...</p>
+      </section>
+    );
+  }
 
   return (
     <section className="semester-subjects">
@@ -35,21 +43,21 @@ export const SemesterSubjects = () => {
         <Link to="/semesterstart">Administrer fag</Link>
       </div>
 
-      {semesterSubjects.length === 0 ? (
+      {displaySubjects.length === 0 ? (
         <p>
           Du har ikke valgt fag enda. Gå til Semesterstart for å sette opp
           semesteret ditt.
         </p>
       ) : (
         <div className="semester-subjects-grid">
-          {semesterSubjects.map((subject) => (
+          {displaySubjects.map((subject) => (
             <Link
-              key={subject!.id}
-              to={`/fag/${subject!.id}`}
+              key={subject.id}
+              to={`/fag/${subject.id}`}
               className="semester-subject-card"
             >
-              <p className="subject-code">{subject!.code}</p>
-              <h3>{subject!.name}</h3>
+              <p className="subject-code">{subject.code}</p>
+              <h3>{subject.name}</h3>
             </Link>
           ))}
         </div>

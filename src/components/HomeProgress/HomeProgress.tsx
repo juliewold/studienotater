@@ -5,15 +5,19 @@ import { notes } from "../../data/notes";
 import { videos } from "../../data/videos";
 import { subjects } from "../../data/subjects";
 import { useProgress } from "../../hooks/useProgress";
+import { useSemesterSubjects } from "../../hooks/useSemesterSubjects";
 
 export const HomeProgress = () => {
   const { getProgress, isLoadingProgress } = useProgress();
 
-  const savedSubjects = localStorage.getItem("semester-subjects");
+  const {
+    semesterSubjects,
+    isLoadingSemesterSubjects,
+  } = useSemesterSubjects();
 
-  const selectedSubjects: string[] = savedSubjects
-    ? JSON.parse(savedSubjects)
-    : [];
+  const selectedSubjects = semesterSubjects.map(
+    (subject) => subject.subjectId,
+  );
 
   const progressSubjects = selectedSubjects.map((subjectId) => {
     const subject = subjects.find((subject) => subject.id === subjectId);
@@ -108,16 +112,19 @@ export const HomeProgress = () => {
     };
   });
 
-  if (selectedSubjects.length === 0) {
-    return null;
-  }
-
-  if (isLoadingProgress) {
+  if (
+    isLoadingProgress ||
+    isLoadingSemesterSubjects
+  ) {
     return (
       <section className="home-progress">
         <p>Laster fremdrift...</p>
       </section>
     );
+  }
+
+  if (selectedSubjects.length === 0) {
+    return null;
   }
 
   return (
@@ -146,25 +153,21 @@ export const HomeProgress = () => {
               </div>
 
               <p>
-                {subject.completed} / {subject.total} ressurser
-                fullført
+                {subject.completed} / {subject.total} ressurser fullført
               </p>
             </div>
 
             <div className="home-progress-details">
               <span>
-                PDF-er: {subject.pdfCompleted} /{" "}
-                {subject.pdfTotal}
+                PDF-er: {subject.pdfCompleted} / {subject.pdfTotal}
               </span>
 
               <span>
-                Notater: {subject.noteCompleted} /{" "}
-                {subject.noteTotal}
+                Notater: {subject.noteCompleted} / {subject.noteTotal}
               </span>
 
               <span>
-                Videoer: {subject.videoCompleted} /{" "}
-                {subject.videoTotal}
+                Videoer: {subject.videoCompleted} / {subject.videoTotal}
               </span>
             </div>
 
