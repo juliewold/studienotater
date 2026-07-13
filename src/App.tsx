@@ -26,6 +26,7 @@ import { AboutPage } from "./pages/AboutPage/AboutPage";
 import { FavoritesPage } from "./pages/FavoritesPage/FavoritesPage";
 import { ExamViewerPage } from "./pages/ExamViewerPage/ExamViewerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
+import { PublicOnlyRoute } from "./components/PublicOnlyRoute/PublicOnlyRoute";
 
 function App() {
   return (
@@ -33,8 +34,23 @@ function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/logg-inn" element={<LoginPage />} />
-        <Route path="/registrer" element={<RegisterPage />} />
+        <Route
+          path="/logg-inn"
+          element={
+            <PublicOnlyRoute>
+              <LoginPage />
+            </PublicOnlyRoute>
+          }
+        />
+
+        <Route
+          path="/registrer"
+          element={
+            <PublicOnlyRoute>
+              <RegisterPage />
+            </PublicOnlyRoute>
+          }
+        />
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutPage" element={<AboutPage />} />
 

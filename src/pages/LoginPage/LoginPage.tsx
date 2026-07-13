@@ -1,5 +1,5 @@
 import { useState, type SyntheticEvent } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../components/AuthLayout/AuthLayout";
 import { supabase } from "../../lib/supabase";
 import "./LoginPage.css";
@@ -68,6 +68,9 @@ export const LoginPage = () => {
           {isLoading ? "Logger inn..." : "Logg inn"}
         </button>
       </form>
+      <p className="auth-switch">
+        Har du ikke en konto? <Link to="/registrer">Registrer deg</Link>
+      </p>
     </AuthLayout>
   );
 };
