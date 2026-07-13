@@ -27,6 +27,8 @@ import { FavoritesPage } from "./pages/FavoritesPage/FavoritesPage";
 import { ExamViewerPage } from "./pages/ExamViewerPage/ExamViewerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 import { PublicOnlyRoute } from "./components/PublicOnlyRoute/PublicOnlyRoute";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage/ForgotPasswordPage";
+import { UpdatePasswordPage } from "./pages/UpdatePasswordPage/UpdatePasswordPage";
 
 function App() {
   return (
@@ -51,6 +53,17 @@ function App() {
             </PublicOnlyRoute>
           }
         />
+
+        <Route
+          path="/glemt-passord"
+          element={
+            <PublicOnlyRoute>
+              <ForgotPasswordPage />
+            </PublicOnlyRoute>
+          }
+        />
+
+        <Route path="/oppdater-passord" element={<UpdatePasswordPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutPage" element={<AboutPage />} />
 

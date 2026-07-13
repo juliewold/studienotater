@@ -60,6 +60,10 @@ export const LoginPage = () => {
           required
         />
 
+        <Link to="/glemt-passord" className="forgot-password-link">
+          Glemt passord?
+        </Link>
+
         {errorMessage && (
           <p className="auth-message auth-message-error">{errorMessage}</p>
         )}
