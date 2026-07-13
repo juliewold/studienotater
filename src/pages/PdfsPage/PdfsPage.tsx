@@ -9,6 +9,10 @@ import {
   getFavorites,
   removeFavorite,
 } from "../../services/favoritesService";
+import {
+  getAllProgress,
+  type ProgressItem,
+} from "../../services/progressService";
 import type { FavoriteItem } from "../../utils/favorites";
 
 const categories = [
@@ -41,7 +45,10 @@ export const PdfsPage = () => {
   const subjectPdfs = pdfs[subjectId as keyof typeof pdfs] || [];
 
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const [progressItems, setProgressItems] = useState<ProgressItem[]>([]);
+
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
 
   useEffect(() => {
     const loadFavorites = async () => {
@@ -64,13 +71,35 @@ export const PdfsPage = () => {
     loadFavorites();
   }, [user]);
 
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!user) {
+        setProgressItems([]);
+        setIsLoadingProgress(false);
+        return;
+      }
+
+      try {
+        const loadedProgress = await getAllProgress(user.id);
+        setProgressItems(loadedProgress);
+      } catch (error) {
+        console.error("Kunne ikke hente fremdrift:", error);
+      } finally {
+        setIsLoadingProgress(false);
+      }
+    };
+
+    loadProgress();
+  }, [user]);
+
   const handleFavoriteClick = async (item: FavoriteItem) => {
     if (!user) {
       return;
     }
 
     const favoriteAlreadyExists = favorites.some(
-      (favorite) => favorite.id === item.id && favorite.type === item.type,
+      (favorite) =>
+        favorite.id === item.id && favorite.type === item.type,
     );
 
     try {
@@ -80,7 +109,10 @@ export const PdfsPage = () => {
         setFavorites((currentFavorites) =>
           currentFavorites.filter(
             (favorite) =>
-              !(favorite.id === item.id && favorite.type === item.type),
+              !(
+                favorite.id === item.id &&
+                favorite.type === item.type
+              ),
           ),
         );
 
@@ -89,15 +121,34 @@ export const PdfsPage = () => {
 
       await addFavorite(user.id, item);
 
-      setFavorites((currentFavorites) => [item, ...currentFavorites]);
+      setFavorites((currentFavorites) => [
+        item,
+        ...currentFavorites,
+      ]);
     } catch (error) {
       console.error("Kunne ikke oppdatere favoritt:", error);
     }
   };
 
-  const pdfIsFavorite = (pdfId: string) => {
+  const pdfIsFavorite = (favoriteId: string) => {
     return favorites.some(
-      (favorite) => favorite.id === pdfId && favorite.type === "pdf",
+      (favorite) =>
+        favorite.id === favoriteId && favorite.type === "pdf",
+    );
+  };
+
+  const getPdfProgress = (pdfId: string) => {
+    const resourceId = `pdf-${subjectId}-${pdfId}`;
+
+    return (
+      progressItems.find(
+        (progress) =>
+          progress.itemId === resourceId &&
+          progress.itemType === "resource",
+      ) ?? {
+        completed: false,
+        rating: 0,
+      }
     );
   };
 
@@ -111,6 +162,8 @@ export const PdfsPage = () => {
 
       <h1>{subjectId?.toUpperCase()}</h1>
 
+      {isLoadingProgress && <p>Laster fremdrift...</p>}
+
       {categories.map((category) => {
         const categoryPdfs = subjectPdfs.filter(
           (pdf) => pdf.category === category.id,
@@ -121,28 +174,24 @@ export const PdfsPage = () => {
         }
 
         return (
-          <section key={category.id} className="pdf-category-section">
+          <section
+            key={category.id}
+            className="pdf-category-section"
+          >
             <h2>{category.title}</h2>
 
             <div className="pdf-grid">
               {categoryPdfs.map((pdf) => {
-                const rating =
-                  Number(
-                    localStorage.getItem(
-                      `resource-progress-pdf-${subjectId}-${pdf.id}-rating`,
-                    ),
-                  ) || 0;
-
-                const completed =
-                  localStorage.getItem(
-                    `resource-progress-pdf-${subjectId}-${pdf.id}-completed`,
-                  ) === "true";
+                const { completed, rating } = getPdfProgress(pdf.id);
 
                 const favoriteId = `${subjectId}-${pdf.id}`;
                 const favorite = pdfIsFavorite(favoriteId);
 
                 return (
-                  <article className="pdf-card-wrapper" key={pdf.id}>
+                  <article
+                    className="pdf-card-wrapper"
+                    key={pdf.id}
+                  >
                     <Link
                       to={`/fag/${subjectId}/pdfs/${pdf.id}`}
                       className="pdf-card"
@@ -153,9 +202,13 @@ export const PdfsPage = () => {
                         <h3>{pdf.title}</h3>
 
                         <div className="pdf-progress-preview">
-                          <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
+                          <span>
+                            {completed ? "✓ Lest" : "Ikke lest"}
+                          </span>
 
-                          <span className={`pdf-rating rating-${rating}`}>
+                          <span
+                            className={`pdf-rating rating-${rating}`}
+                          >
                             {"★".repeat(rating)}
                           </span>
                         </div>
@@ -175,7 +228,7 @@ export const PdfsPage = () => {
                       disabled={isLoadingFavorites}
                       onClick={() =>
                         handleFavoriteClick({
-                          id: `${subjectId}-${pdf.id}`,
+                          id: favoriteId,
                           title: pdf.title,
                           subject: subjectId?.toUpperCase(),
                           type: "pdf",
@@ -185,7 +238,11 @@ export const PdfsPage = () => {
                     >
                       <Heart
                         size={22}
-                        fill={favorite ? "currentColor" : "transparent"}
+                        fill={
+                          favorite
+                            ? "currentColor"
+                            : "transparent"
+                        }
                         strokeWidth={2}
                       />
                     </button>

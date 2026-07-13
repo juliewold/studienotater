@@ -5,6 +5,11 @@ export type Progress = {
   rating: number;
 };
 
+export type ProgressItem = Progress & {
+  itemId: string;
+  itemType: string;
+};
+
 export async function getProgress(
   userId: string,
   itemId: string,
@@ -30,6 +35,26 @@ export async function getProgress(
   );
 }
 
+export async function getAllProgress(
+  userId: string,
+): Promise<ProgressItem[]> {
+  const { data, error } = await supabase
+    .from("progress")
+    .select("item_id, item_type, completed, rating")
+    .eq("user_id", userId);
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map((item) => ({
+    itemId: item.item_id,
+    itemType: item.item_type,
+    completed: item.completed,
+    rating: item.rating,
+  }));
+}
+
 export async function saveProgress(
   userId: string,
   itemId: string,
@@ -37,18 +62,20 @@ export async function saveProgress(
   completed: boolean,
   rating: number,
 ) {
-  const { error } = await supabase.from("progress").upsert(
-    {
-      user_id: userId,
-      item_id: itemId,
-      item_type: itemType,
-      completed,
-      rating,
-    },
-    {
-      onConflict: "user_id,item_id,item_type",
-    },
-  );
+  const { error } = await supabase
+    .from("progress")
+    .upsert(
+      {
+        user_id: userId,
+        item_id: itemId,
+        item_type: itemType,
+        completed,
+        rating,
+      },
+      {
+        onConflict: "user_id,item_id,item_type",
+      },
+    );
 
   if (error) {
     throw error;

@@ -10,6 +10,10 @@ import {
   getFavorites,
   removeFavorite,
 } from "../../services/favoritesService";
+import {
+  getAllProgress,
+  type ProgressItem,
+} from "../../services/progressService";
 import type { FavoriteItem } from "../../utils/favorites";
 
 export const NotesPage = () => {
@@ -20,7 +24,10 @@ export const NotesPage = () => {
   const subjectNotes = notes[subjectId as keyof typeof notes] || [];
 
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const [progressItems, setProgressItems] = useState<ProgressItem[]>([]);
+
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
 
   useEffect(() => {
     const loadFavorites = async () => {
@@ -43,6 +50,27 @@ export const NotesPage = () => {
     loadFavorites();
   }, [user]);
 
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!user) {
+        setProgressItems([]);
+        setIsLoadingProgress(false);
+        return;
+      }
+
+      try {
+        const loadedProgress = await getAllProgress(user.id);
+        setProgressItems(loadedProgress);
+      } catch (error) {
+        console.error("Kunne ikke hente fremdrift:", error);
+      } finally {
+        setIsLoadingProgress(false);
+      }
+    };
+
+    loadProgress();
+  }, [user]);
+
   if (!subject) {
     return (
       <main className="notes-page">
@@ -57,7 +85,8 @@ export const NotesPage = () => {
     }
 
     const favoriteAlreadyExists = favorites.some(
-      (favorite) => favorite.id === item.id && favorite.type === item.type,
+      (favorite) =>
+        favorite.id === item.id && favorite.type === item.type,
     );
 
     try {
@@ -67,7 +96,10 @@ export const NotesPage = () => {
         setFavorites((currentFavorites) =>
           currentFavorites.filter(
             (favorite) =>
-              !(favorite.id === item.id && favorite.type === item.type),
+              !(
+                favorite.id === item.id &&
+                favorite.type === item.type
+              ),
           ),
         );
 
@@ -76,15 +108,34 @@ export const NotesPage = () => {
 
       await addFavorite(user.id, item);
 
-      setFavorites((currentFavorites) => [item, ...currentFavorites]);
+      setFavorites((currentFavorites) => [
+        item,
+        ...currentFavorites,
+      ]);
     } catch (error) {
       console.error("Kunne ikke oppdatere favoritt:", error);
     }
   };
 
-  const noteIsFavorite = (noteId: string) => {
+  const noteIsFavorite = (favoriteId: string) => {
     return favorites.some(
-      (favorite) => favorite.id === noteId && favorite.type === "note",
+      (favorite) =>
+        favorite.id === favoriteId && favorite.type === "note",
+    );
+  };
+
+  const getNoteProgress = (noteId: string) => {
+    const resourceId = `note-${subject.id}-${noteId}`;
+
+    return (
+      progressItems.find(
+        (progress) =>
+          progress.itemId === resourceId &&
+          progress.itemType === "resource",
+      ) ?? {
+        completed: false,
+        rating: 0,
+      }
     );
   };
 
@@ -98,22 +149,14 @@ export const NotesPage = () => {
       <h1>{subject.code}</h1>
       <p>{subject.name}</p>
 
+      {isLoadingProgress && <p>Laster fremdrift...</p>}
+
       <div className="notes-list">
         {subjectNotes.map((note) => {
           const favoriteId = `${subject.id}-${note.id}`;
           const favorite = noteIsFavorite(favoriteId);
 
-          const completed =
-            localStorage.getItem(
-              `resource-progress-note-${subject.id}-${note.id}-completed`,
-            ) === "true";
-
-          const rating =
-            Number(
-              localStorage.getItem(
-                `resource-progress-note-${subject.id}-${note.id}-rating`,
-              ),
-            ) || 0;
+          const { completed, rating } = getNoteProgress(note.id);
 
           return (
             <article className="note-card-wrapper" key={note.id}>
@@ -136,14 +179,18 @@ export const NotesPage = () => {
 
               <button
                 type="button"
-                className={`favorite-button ${favorite ? "is-favorite" : ""}`}
+                className={`favorite-button ${
+                  favorite ? "is-favorite" : ""
+                }`}
                 aria-label={
-                  favorite ? "Fjern fra favoritter" : "Legg til i favoritter"
+                  favorite
+                    ? "Fjern fra favoritter"
+                    : "Legg til i favoritter"
                 }
                 disabled={isLoadingFavorites}
                 onClick={() =>
                   handleFavoriteClick({
-                    id: `${subject.id}-${note.id}`,
+                    id: favoriteId,
                     title: note.title,
                     subject: subject.name,
                     type: "note",
