@@ -81,3 +81,52 @@ export async function saveProgress(
     throw error;
   }
 }
+
+export async function getCompletedSyllabusTopics(
+  userId: string,
+  subjectId: string,
+): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("progress")
+    .select("item_id")
+    .eq("user_id", userId)
+    .eq("item_type", "syllabus")
+    .eq("completed", true)
+    .like("item_id", `${subjectId}-%`);
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map((item) =>
+    item.item_id.replace(`${subjectId}-`, ""),
+  );
+}
+
+export async function saveSyllabusTopic(
+  userId: string,
+  subjectId: string,
+  topicId: string,
+  completed: boolean,
+) {
+  const itemId = `${subjectId}-${topicId}`;
+
+  const { error } = await supabase
+    .from("progress")
+    .upsert(
+      {
+        user_id: userId,
+        item_id: itemId,
+        item_type: "syllabus",
+        completed,
+        rating: 0,
+      },
+      {
+        onConflict: "user_id,item_id,item_type",
+      },
+    );
+
+  if (error) {
+    throw error;
+  }
+}
