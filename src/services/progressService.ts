@@ -130,3 +130,50 @@ export async function saveSyllabusTopic(
     throw error;
   }
 }
+
+export async function getStudyPlanItems(
+  userId: string,
+  subjectId: string,
+): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("progress")
+    .select("item_id")
+    .eq("user_id", userId)
+    .eq("item_type", "study_plan")
+    .eq("completed", true)
+    .like("item_id", `${subjectId}-%`);
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map((item) =>
+    item.item_id.replace(`${subjectId}-`, ""),
+  );
+}
+
+export async function saveStudyPlanItem(
+  userId: string,
+  subjectId: string,
+  itemId: string,
+  completed: boolean,
+) {
+  const { error } = await supabase
+    .from("progress")
+    .upsert(
+      {
+        user_id: userId,
+        item_id: `${subjectId}-${itemId}`,
+        item_type: "study_plan",
+        completed,
+        rating: 0,
+      },
+      {
+        onConflict: "user_id,item_id,item_type",
+      },
+    );
+
+  if (error) {
+    throw error;
+  }
+}
