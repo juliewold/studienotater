@@ -1,29 +1,18 @@
 import "./BookProgressPage.css";
 import { Link, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { tma4412Book } from "../../data/books/tma4412Book";
+import { useBookProgress } from "../../hooks/useBookProgress";
 
 export const BookProgressPage = () => {
   const { subjectId } = useParams();
 
   const book = tma4412Book;
 
-  const storageKey = `book-progress-${book.id}`;
-
-  const [checkedPages, setCheckedPages] = useState<number[]>(() => {
-    const saved = localStorage.getItem(storageKey);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(checkedPages));
-  }, [storageKey, checkedPages]);
-
-  const togglePage = (page: number) => {
-    setCheckedPages((prev) =>
-      prev.includes(page) ? prev.filter((p) => p !== page) : [...prev, page],
-    );
-  };
+  const {
+    checkedPages,
+    togglePage,
+    isLoading,
+  } = useBookProgress(book.id);
 
   const totalPages = book.chapters.reduce((total, chapter) => {
     return total + (chapter.endPage - chapter.startPage + 1);
@@ -33,6 +22,14 @@ export const BookProgressPage = () => {
 
   const progress =
     totalPages === 0 ? 0 : Math.round((readPages / totalPages) * 100);
+
+  if (isLoading) {
+    return (
+      <main className="page-container">
+        <p>Laster bokfremdrift...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="page-container">

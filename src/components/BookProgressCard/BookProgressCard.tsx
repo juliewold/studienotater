@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useBookProgress } from "../../hooks/useBookProgress";
 
 type BookChapter = {
   id: string;
@@ -22,26 +22,10 @@ type BookProgressCardProps = {
 export const BookProgressCard = ({
   book,
 }: BookProgressCardProps) => {
-  const storageKey = `book-progress-${book.id}`;
-
-  const [checkedPages, setCheckedPages] = useState<number[]>(() => {
-    const saved = localStorage.getItem(storageKey);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  useEffect(() => {
-    const updateProgress = () => {
-      const saved = localStorage.getItem(storageKey);
-
-      setCheckedPages(saved ? JSON.parse(saved) : []);
-    };
-
-    window.addEventListener("focus", updateProgress);
-
-    return () => {
-      window.removeEventListener("focus", updateProgress);
-    };
-  }, [storageKey]);
+  const {
+    checkedPages,
+    isLoading,
+  } = useBookProgress(book.id);
 
   const totalPages = book.chapters.reduce(
     (total, chapter) =>
@@ -55,6 +39,14 @@ export const BookProgressCard = ({
     totalPages === 0
       ? 0
       : Math.round((readPages / totalPages) * 100);
+
+  if (isLoading) {
+    return (
+      <section className="book-progress-card">
+        <p>Laster bokfremdrift...</p>
+      </section>
+    );
+  }
 
   return (
     <Link
