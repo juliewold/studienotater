@@ -15,11 +15,11 @@ type Profile = {
 };
 
 export const ProfilePage = () => {
-  const { user } = useContext(AuthContext);
+  const { user, isAdmin } = useContext(AuthContext);
 
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState("user");
+  const [profileRole, setProfileRole] = useState("user");
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,7 +47,7 @@ export const ProfilePage = () => {
 
         setUsername(profile.username ?? "");
         setFullName(profile.full_name ?? "");
-        setRole(profile.role ?? "user");
+        setProfileRole(profile.role ?? "user");
       } catch (error) {
         console.error("Kunne ikke hente profil:", error);
         setErrorMessage("Kunne ikke hente profilen.");
@@ -123,7 +123,9 @@ export const ProfilePage = () => {
           <div>
             <h2>{fullName || username}</h2>
             <p>{user?.email}</p>
-            <span>{role === "admin" ? "Administrator" : "Vanlig bruker"}</span>
+            <span>
+              {isAdmin ? "Administrator" : "Vanlig bruker"}
+            </span>
           </div>
         </div>
 

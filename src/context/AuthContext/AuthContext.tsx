@@ -7,8 +7,12 @@ import {
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
 
+type UserRole = "user" | "admin";
+
 type AuthContextType = {
   user: User | null;
+  role: UserRole | null;
+  isAdmin: boolean;
   isLoading: boolean;
   signOut: () => Promise<void>;
 };
@@ -19,13 +23,37 @@ type AuthProviderProps = {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
+  role: null,
+  isAdmin: false,
   isLoading: true,
   signOut: async () => {},
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const loadUserRole = async (currentUser: User | null) => {
+    if (!currentUser) {
+      setRole(null);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", currentUser.id)
+      .single();
+
+    if (error) {
+      console.error("Kunne ikke hente brukerrolle:", error);
+      setRole("user");
+      return;
+    }
+
+    setRole(data.role === "admin" ? "admin" : "user");
+  };
 
   useEffect(() => {
     const getInitialSession = async () => {
@@ -33,7 +61,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         data: { session },
       } = await supabase.auth.getSession();
 
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+
+      setUser(currentUser);
+      await loadUserRole(currentUser);
       setIsLoading(false);
     };
 
@@ -41,8 +72,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null;
+
+      setUser(currentUser);
+      await loadUserRole(currentUser);
       setIsLoading(false);
     });
 
@@ -59,8 +93,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const isAdmin = role === "admin";
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        role,
+        isAdmin,
+        isLoading,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

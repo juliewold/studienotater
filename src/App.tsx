@@ -33,6 +33,9 @@ import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { YearsPage } from "./pages/YearsPage/YearsPage";
 import { SemesterPlanPage } from "./pages/SemesterPlanPage/SemesterPlanPage";
 import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
+import { AdminPage } from "./pages/AdminPage/AdminPage";
+import { AdminRoute } from "./components/AdminRoute/AdminRoute";
+import { AdminPdfsPage } from "./pages/AdminPdfsPage/AdminPdfsPage";
 
 function App() {
   return (
@@ -303,6 +306,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route path="/admin/pdfs" element={<AdminPdfsPage />} />
       </Routes>
     </HashRouter>
   );
