@@ -1,0 +1,130 @@
+.page-container {
+  width: min(1200px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.page-label {
+  margin: 0 0 0.5rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-description {
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.subject-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 190px;
+  padding: 1.5rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+a.subject-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(167, 116, 255, 0.4);
+  box-shadow: 0 16px 36px rgba(52, 38, 84, 0.1);
+}
+
+.subject-code {
+  margin: 0 0 0.75rem;
+  color: #9b6ee8;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.subject-card h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.open-subject,
+.custom-subject-label {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.open-subject {
+  color: #8b5ed7;
+}
+
+.custom-subject-label {
+  color: #777;
+}
+
+.empty-plan {
+  padding: 2rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
+}
+
+.empty-plan h2 {
+  margin-top: 0;
+}
+
+.empty-plan p {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.semester-start-link {
+  display: inline-block;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  background: #9b6ee8;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.semester-start-link:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+@media (max-width: 900px) {
+  .subject-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .page-container {
+    width: min(100% - 2rem, 1200px);
+  }
+
+  .subject-grid {
+    grid-template-columns: 1fr;
+  }
+}

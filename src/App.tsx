@@ -32,6 +32,7 @@ import { UpdatePasswordPage } from "./pages/UpdatePasswordPage/UpdatePasswordPag
 import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { MySubjectsPage } from "./pages/MySubjectsPage/MySubjectsPage";
 import { YearsPage } from "./pages/YearsPage/YearsPage";
+import { SemesterPlanPage } from "./pages/SemesterPlanPage/SemesterPlanPage";
 
 function App() {
   return (
@@ -290,6 +291,15 @@ function App() {
           element={
             <ProtectedRoute>
               <ExamViewerPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fagplan"
+          element={
+            <ProtectedRoute>
+              <SemesterPlanPage />
             </ProtectedRoute>
           }
         />

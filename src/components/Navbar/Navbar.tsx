@@ -284,21 +284,14 @@ export const Navbar = () => {
 
             <div className="menu-column">
               <h3>PLANLEGGING</h3>
-
               <NavLink
-                to="/"
+                to="/fagplan"
                 onClick={() => setMenuOpen(false)}
-                className="menu-link"
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
               >
-                Studieplanlegger
-              </NavLink>
-
-              <NavLink
-                to="/"
-                onClick={() => setMenuOpen(false)}
-                className="menu-link"
-              >
-                Semesterplan / Fagplan
+                Fagplan
               </NavLink>
 
               <NavLink
