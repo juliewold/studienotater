@@ -1,0 +1,219 @@
+.page-container {
+  width: min(1100px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.page-label {
+  margin: 0 0 0.5rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-description {
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+.admin-pdf-card {
+  padding: 2rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
+}
+
+.admin-pdf-card h2 {
+  margin: 0 0 1.5rem;
+  font-size: 1.4rem;
+}
+
+.admin-pdf-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-pdf-form label {
+  margin-top: 0.5rem;
+  font-weight: 700;
+}
+
+.admin-pdf-form input,
+.admin-pdf-form select {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(167, 116, 255, 0.25);
+  border-radius: 12px;
+  background: #ffffff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-pdf-form input:focus,
+.admin-pdf-form select:focus {
+  outline: 2px solid rgba(155, 110, 232, 0.22);
+  border-color: #9b6ee8;
+}
+
+.admin-pdf-form input[type="file"] {
+  padding: 0.7rem;
+  background: #faf7ff;
+}
+
+.admin-pdf-form button {
+  width: fit-content;
+  margin-top: 1rem;
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  background: #9b6ee8;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.admin-pdf-form button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.admin-pdf-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-pdf-message {
+  margin: 0.75rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.admin-pdf-error {
+  background: #fff0f0;
+  color: #b42318;
+}
+
+.admin-pdf-success {
+  background: #effaf2;
+  color: #247a3c;
+}
+
+.uploaded-pdfs-section {
+  margin-top: 2rem;
+}
+
+.uploaded-pdf-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.uploaded-pdf-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 16px;
+  background: #faf9fd;
+}
+
+.uploaded-pdf-item h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.uploaded-pdf-item p {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.uploaded-pdf-item span {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: #9b6ee8;
+  font-weight: 600;
+}
+
+.uploaded-pdf-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.uploaded-pdf-actions a {
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  background: #f3efff;
+  color: #7b4dd6;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.uploaded-pdf-actions a:hover {
+  background: #e8ddff;
+}
+
+.delete-pdf-button {
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #d92d20;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-pdf-button:hover:not(:disabled) {
+  background: #b42318;
+}
+
+.delete-pdf-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .uploaded-pdf-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .uploaded-pdf-actions {
+    width: 100%;
+  }
+
+  .uploaded-pdf-actions a,
+  .delete-pdf-button {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 650px) {
+  .page-container {
+    width: min(100% - 2rem, 1100px);
+  }
+
+  .admin-pdf-card {
+    padding: 1.25rem;
+  }
+
+  .admin-pdf-form button {
+    width: 100%;
+  }
+}

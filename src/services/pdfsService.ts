@@ -68,3 +68,25 @@ export async function getPdfById(
     fileUrl: publicUrlData.publicUrl,
   };
 }
+
+export async function deletePdf(
+  pdfId: string,
+  filePath: string,
+) {
+  const { error: storageError } = await supabase.storage
+    .from("pdfs")
+    .remove([filePath]);
+
+  if (storageError) {
+    throw storageError;
+  }
+
+  const { error: databaseError } = await supabase
+    .from("pdfs")
+    .delete()
+    .eq("id", pdfId);
+
+  if (databaseError) {
+    throw databaseError;
+  }
+}

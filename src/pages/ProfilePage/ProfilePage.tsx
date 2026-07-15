@@ -11,7 +11,6 @@ import { supabase } from "../../lib/supabase";
 type Profile = {
   username: string;
   full_name: string;
-  role: string;
 };
 
 export const ProfilePage = () => {
@@ -19,7 +18,6 @@ export const ProfilePage = () => {
 
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
-  const [profileRole, setProfileRole] = useState("user");
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -35,7 +33,7 @@ export const ProfilePage = () => {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("username, full_name, role")
+          .select("username, full_name")
           .eq("id", user.id)
           .single();
 
@@ -47,7 +45,6 @@ export const ProfilePage = () => {
 
         setUsername(profile.username ?? "");
         setFullName(profile.full_name ?? "");
-        setProfileRole(profile.role ?? "user");
       } catch (error) {
         console.error("Kunne ikke hente profil:", error);
         setErrorMessage("Kunne ikke hente profilen.");
