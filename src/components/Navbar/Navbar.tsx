@@ -252,16 +252,6 @@ export const Navbar = () => {
               </NavLink>
 
               <NavLink
-                to="/mine-fag"
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
-                }
-              >
-                Mine fag
-              </NavLink>
-
-              <NavLink
                 to="/klassetrinn"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
