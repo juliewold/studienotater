@@ -1,30 +1,70 @@
-import "./AllFlashcardsPage.css"
-import { useState } from "react";
-import { flashcards } from "../../data/flashcards";
-import { subjects } from "../../data/subjects";
+import "./AllFlashcardsPage.css";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { subjects } from "../../data/subjects";
+import {
+  getFlashcardsBySubject,
+  type DatabaseFlashcard,
+} from "../../services/flashcardsService";
+
+type FlashcardSubject = {
+  id: string;
+  code: string;
+  name: string;
+  count: number;
+};
 
 export const AllFlashcardsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [flashcards, setFlashcards] = useState<DatabaseFlashcard[]>([]);
+  const [isLoadingFlashcards, setIsLoadingFlashcards] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const flashcardSubjects = Object.entries(flashcards)
-    .map(([subjectId, subjectFlashcards]) => {
-      const subject = subjects.find(
-        (subject) => subject.id === subjectId
+  useEffect(() => {
+    const loadFlashcards = async () => {
+      setIsLoadingFlashcards(true);
+      setErrorMessage("");
+
+      try {
+        const flashcardsBySubject = await Promise.all(
+          subjects.map((subject) =>
+            getFlashcardsBySubject(subject.id),
+          ),
+        );
+
+        setFlashcards(flashcardsBySubject.flat());
+      } catch (error) {
+        console.error("Kunne ikke hente flashcards:", error);
+        setErrorMessage("Kunne ikke hente flashcards.");
+      } finally {
+        setIsLoadingFlashcards(false);
+      }
+    };
+
+    loadFlashcards();
+  }, []);
+
+  const flashcardSubjects = useMemo<FlashcardSubject[]>(() => {
+    const normalizedSearchTerm = searchTerm
+      .trim()
+      .toLowerCase();
+
+    return subjects
+      .map((subject) => ({
+        id: subject.id,
+        code: subject.code,
+        name: subject.name,
+        count: flashcards.filter(
+          (flashcard) => flashcard.subjectId === subject.id,
+        ).length,
+      }))
+      .filter((subject) => subject.count > 0)
+      .filter((subject) =>
+        `${subject.code} ${subject.name}`
+          .toLowerCase()
+          .includes(normalizedSearchTerm),
       );
-
-      return {
-        id: subjectId,
-        code: subject?.code ?? subjectId.toUpperCase(),
-        name: subject?.name ?? "",
-        count: subjectFlashcards.length,
-      };
-    })
-    .filter((subject) =>
-      `${subject.code} ${subject.name}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    );
+  }, [flashcards, searchTerm]);
 
   return (
     <main className="page-container">
@@ -36,7 +76,7 @@ export const AllFlashcardsPage = () => {
 
       <input
         className="notes-search"
-        type="text"
+        type="search"
         placeholder="Søk etter fag..."
         value={searchTerm}
         onChange={(event) =>
@@ -44,31 +84,41 @@ export const AllFlashcardsPage = () => {
         }
       />
 
-      <div className="all-flashcards-grid">
-        {flashcardSubjects.map((subject) => (
-          <div
-            key={subject.id}
-            className="flashcard-deck-card"
-          >
-            <p className="subject-code">
-              {subject.code}
-            </p>
+      {isLoadingFlashcards && <p>Laster flashcards...</p>}
 
-            <h3>{subject.name}</h3>
+      {errorMessage && <p>{errorMessage}</p>}
 
-            <p>
-              {subject.count} flashcards
-            </p>
+      {!isLoadingFlashcards &&
+        !errorMessage &&
+        flashcardSubjects.length === 0 && (
+          <p>Fant ingen fag med flashcards.</p>
+        )}
 
-            <Link
-              to={`/fag/${subject.id}/flashcards`}
-              className="deck-button"
+      {!isLoadingFlashcards && !errorMessage && (
+        <div className="all-flashcards-grid">
+          {flashcardSubjects.map((subject) => (
+            <div
+              key={subject.id}
+              className="flashcard-deck-card"
             >
-              Start
-            </Link>
-          </div>
-        ))}
-      </div>
+              <p className="subject-code">
+                {subject.code}
+              </p>
+
+              <h3>{subject.name}</h3>
+
+              <p>{subject.count} flashcards</p>
+
+              <Link
+                to={`/fag/${subject.id}/flashcards`}
+                className="deck-button"
+              >
+                Start
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
     </main>
   );
 };

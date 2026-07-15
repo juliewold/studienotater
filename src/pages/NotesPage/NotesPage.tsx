@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { subjects } from "../../data/subjects";
-import { notes } from "../../data/notes";
 import {
   getNotesBySubject,
   type DatabaseNote,
@@ -11,31 +10,16 @@ import {
 import { useFavorites } from "../../hooks/useFavorites";
 import { useProgress } from "../../hooks/useProgress";
 
-type LocalNote = {
-  id: string;
-  title: string;
-  description: string;
-  content?: string;
-};
-
-type NoteListItem = {
-  id: string;
-  title: string;
-  description: string;
-  source: "local" | "database";
-};
-
 export const NotesPage = () => {
   const { subjectId } = useParams();
 
-  const [databaseNotes, setDatabaseNotes] = useState<DatabaseNote[]>([]);
+  const [notes, setNotes] = useState<DatabaseNote[]>([]);
   const [isLoadingNotes, setIsLoadingNotes] = useState(true);
   const [notesError, setNotesError] = useState("");
 
-  const subject = subjects.find((subject) => subject.id === subjectId);
-
-  const localNotes: LocalNote[] =
-    notes[subjectId as keyof typeof notes] || [];
+  const subject = subjects.find(
+    (currentSubject) => currentSubject.id === subjectId,
+  );
 
   const {
     isFavorite,
@@ -51,7 +35,7 @@ export const NotesPage = () => {
   useEffect(() => {
     const loadNotes = async () => {
       if (!subjectId) {
-        setDatabaseNotes([]);
+        setNotes([]);
         setIsLoadingNotes(false);
         return;
       }
@@ -61,10 +45,10 @@ export const NotesPage = () => {
 
       try {
         const loadedNotes = await getNotesBySubject(subjectId);
-        setDatabaseNotes(loadedNotes);
+        setNotes(loadedNotes);
       } catch (error) {
         console.error("Kunne ikke hente notater:", error);
-        setNotesError("Kunne ikke hente nye notater.");
+        setNotesError("Kunne ikke hente notatene.");
       } finally {
         setIsLoadingNotes(false);
       }
@@ -80,21 +64,6 @@ export const NotesPage = () => {
       </main>
     );
   }
-
-  const allNotes: NoteListItem[] = [
-    ...localNotes.map((note) => ({
-      id: note.id,
-      title: note.title,
-      description: note.description,
-      source: "local" as const,
-    })),
-    ...databaseNotes.map((note) => ({
-      id: note.slug,
-      title: note.title,
-      description: note.description,
-      source: "database" as const,
-    })),
-  ];
 
   return (
     <main className="notes-page">
@@ -114,21 +83,21 @@ export const NotesPage = () => {
 
       {notesError && <p>{notesError}</p>}
 
+      {!isLoadingNotes && notes.length === 0 && (
+        <p>Ingen notater er lagt til ennå.</p>
+      )}
+
       {!isLoadingNotes && (
         <div className="notes-list">
-          {allNotes.map((note) => {
-            const sourcePrefix =
-              note.source === "database" ? "database" : "local";
-
+          {notes.map((note) => {
             const favoriteId =
-              `${subject.id}-${sourcePrefix}-${note.id}`;
+              `${subject.id}-database-${note.slug}`;
 
             const resourceId =
-              `note-${subject.id}-${sourcePrefix}-${note.id}`;
+              `note-${subject.id}-database-${note.slug}`;
 
             const noteUrl =
-              `/fag/${subject.id}/notater/${note.id}` +
-              `?source=${note.source}`;
+              `/fag/${subject.id}/notater/${note.slug}`;
 
             const favorite = isFavorite(favoriteId, "note");
 
@@ -140,7 +109,7 @@ export const NotesPage = () => {
             return (
               <article
                 className="note-card-wrapper"
-                key={`${note.source}-${note.id}`}
+                key={note.id}
               >
                 <Link to={noteUrl} className="note-card">
                   <h3>{note.title}</h3>

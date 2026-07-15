@@ -10,7 +10,7 @@ export const studyPlans = {
       stack: [],
       resources: {
         pdfs: ["forelesning-1", "forelesning-2"],
-        notes: ["mengdelaere"],
+        notes: [],
         videos: ["wbBY2tTqXDA", "xZELQc11ACY"],
       },
     },

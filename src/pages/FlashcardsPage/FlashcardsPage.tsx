@@ -1,44 +1,28 @@
 import "./FlashcardsPage.css";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { flashcards } from "../../data/flashcards";
 import {
   getFlashcardsBySubject,
   type DatabaseFlashcard,
 } from "../../services/flashcardsService";
 
-type LocalFlashcard = {
-  id: string;
-  question: string;
-  answer: string;
-};
-
-type FlashcardListItem = {
-  id: string;
-  question: string;
-  answer: string;
-  source: "local" | "database";
-};
-
 export const FlashcardsPage = () => {
   const { subjectId } = useParams();
 
-  const [databaseFlashcards, setDatabaseFlashcards] = useState<
+  const [flashcards, setFlashcards] = useState<
     DatabaseFlashcard[]
   >([]);
-  const [isLoadingFlashcards, setIsLoadingFlashcards] = useState(true);
+  const [isLoadingFlashcards, setIsLoadingFlashcards] =
+    useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const [flippedCardId, setFlippedCardId] = useState<string | null>(
-    null,
-  );
-
-  const localFlashcards: LocalFlashcard[] =
-    flashcards[subjectId as keyof typeof flashcards] || [];
+  const [flippedCardId, setFlippedCardId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const loadFlashcards = async () => {
       if (!subjectId) {
-        setDatabaseFlashcards([]);
+        setFlashcards([]);
         setIsLoadingFlashcards(false);
         return;
       }
@@ -50,10 +34,10 @@ export const FlashcardsPage = () => {
         const loadedFlashcards =
           await getFlashcardsBySubject(subjectId);
 
-        setDatabaseFlashcards(loadedFlashcards);
+        setFlashcards(loadedFlashcards);
       } catch (error) {
         console.error("Kunne ikke hente flashcards:", error);
-        setErrorMessage("Kunne ikke hente nye flashcards.");
+        setErrorMessage("Kunne ikke hente flashcards.");
       } finally {
         setIsLoadingFlashcards(false);
       }
@@ -61,21 +45,6 @@ export const FlashcardsPage = () => {
 
     loadFlashcards();
   }, [subjectId]);
-
-  const allFlashcards: FlashcardListItem[] = [
-    ...localFlashcards.map((card) => ({
-      id: card.id,
-      question: card.question,
-      answer: card.answer,
-      source: "local" as const,
-    })),
-    ...databaseFlashcards.map((card) => ({
-      id: card.slug,
-      question: card.question,
-      answer: card.answer,
-      source: "database" as const,
-    })),
-  ];
 
   return (
     <main className="page-container">
@@ -91,20 +60,25 @@ export const FlashcardsPage = () => {
 
       {errorMessage && <p>{errorMessage}</p>}
 
-      {!isLoadingFlashcards && (
+      {!isLoadingFlashcards &&
+        !errorMessage &&
+        flashcards.length === 0 && (
+          <p>Ingen flashcards er lagt til ennå.</p>
+        )}
+
+      {!isLoadingFlashcards && !errorMessage && (
         <div className="flashcards-grid">
-          {allFlashcards.map((card) => {
-            const cardKey = `${card.source}-${card.id}`;
-            const isFlipped = flippedCardId === cardKey;
+          {flashcards.map((card) => {
+            const isFlipped = flippedCardId === card.id;
 
             return (
               <button
-                key={cardKey}
+                key={card.id}
                 type="button"
                 className="flashcard"
                 onClick={() =>
                   setFlippedCardId(
-                    isFlipped ? null : cardKey,
+                    isFlipped ? null : card.id,
                   )
                 }
               >
@@ -113,7 +87,9 @@ export const FlashcardsPage = () => {
                 </p>
 
                 <h3>
-                  {isFlipped ? card.answer : card.question}
+                  {isFlipped
+                    ? card.answer
+                    : card.question}
                 </h3>
               </button>
             );

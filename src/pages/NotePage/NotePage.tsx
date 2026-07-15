@@ -1,57 +1,28 @@
 import "./NotePage.css";
 import { useEffect, useState } from "react";
-import {
-  Link,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { subjects } from "../../data/subjects";
-import { notes } from "../../data/notes";
 import {
   getNoteBySlug,
   type DatabaseNote,
 } from "../../services/notesService";
 import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
 
-type LocalNote = {
-  id: string;
-  title: string;
-  description: string;
-  content?: string;
-};
-
 export const NotePage = () => {
   const { subjectId, noteId } = useParams();
-  const [searchParams] = useSearchParams();
 
-  const source = searchParams.get("source") ?? "local";
-
-  const [databaseNote, setDatabaseNote] =
-    useState<DatabaseNote | null>(null);
-  const [isLoadingNote, setIsLoadingNote] = useState(
-    source === "database",
-  );
+  const [note, setNote] = useState<DatabaseNote | null>(null);
+  const [isLoadingNote, setIsLoadingNote] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
   const subject = subjects.find(
     (currentSubject) => currentSubject.id === subjectId,
   );
 
-  const subjectNotes: LocalNote[] =
-    notes[subjectId as keyof typeof notes] || [];
-
-  const localNote = subjectNotes.find(
-    (currentNote) => currentNote.id === noteId,
-  );
-
   useEffect(() => {
-    const loadDatabaseNote = async () => {
-      if (
-        source !== "database" ||
-        !subjectId ||
-        !noteId
-      ) {
-        setDatabaseNote(null);
+    const loadNote = async () => {
+      if (!subjectId || !noteId) {
+        setNote(null);
         setIsLoadingNote(false);
         return;
       }
@@ -70,7 +41,7 @@ export const NotePage = () => {
           return;
         }
 
-        setDatabaseNote(loadedNote);
+        setNote(loadedNote);
       } catch (error) {
         console.error("Kunne ikke hente notat:", error);
         setErrorMessage("Kunne ikke hente notatet.");
@@ -79,8 +50,8 @@ export const NotePage = () => {
       }
     };
 
-    loadDatabaseNote();
-  }, [noteId, source, subjectId]);
+    loadNote();
+  }, [noteId, subjectId]);
 
   if (isLoadingNote) {
     return (
@@ -89,9 +60,6 @@ export const NotePage = () => {
       </main>
     );
   }
-
-  const note =
-    source === "database" ? databaseNote : localNote;
 
   if (!subject || !note || errorMessage) {
     return (
@@ -111,7 +79,7 @@ export const NotePage = () => {
   }
 
   const resourceId =
-    `note-${subject.id}-${source}-${noteId}`;
+    `note-${subject.id}-database-${note.slug}`;
 
   return (
     <main className="note-page">
@@ -131,7 +99,7 @@ export const NotePage = () => {
       <ResourceProgress resourceId={resourceId} />
 
       <section className="note-content">
-        <pre>{note.content ?? ""}</pre>
+        <pre>{note.content}</pre>
       </section>
     </main>
   );
