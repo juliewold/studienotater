@@ -36,6 +36,7 @@ import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
 import { AdminPage } from "./pages/AdminPage/AdminPage";
 import { AdminRoute } from "./components/AdminRoute/AdminRoute";
 import { AdminPdfsPage } from "./pages/AdminPdfsPage/AdminPdfsPage";
+import { AdminNotesPage } from "./pages/AdminNotesPage/AdminNotesPage";
 
 function App() {
   return (
@@ -317,6 +318,14 @@ function App() {
         />
 
         <Route path="/admin/pdfs" element={<AdminPdfsPage />} />
+        <Route
+          path="/admin/notater"
+          element={
+            <AdminRoute>
+              <AdminNotesPage />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </HashRouter>
   );

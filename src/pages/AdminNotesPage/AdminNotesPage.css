@@ -1,0 +1,170 @@
+.page-container {
+  width: min(1200px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.page-label {
+  margin: 0 0 0.5rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-description {
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+.admin-notes-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.admin-note-card {
+  padding: 1.75rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
+}
+
+.admin-note-card h2 {
+  margin: 0 0 1.5rem;
+  font-size: 1.4rem;
+}
+
+.admin-note-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-note-form label {
+  margin-top: 0.5rem;
+  font-weight: 700;
+}
+
+.admin-note-form input,
+.admin-note-form select,
+.admin-note-form textarea {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(167, 116, 255, 0.25);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-note-form textarea {
+  resize: vertical;
+  min-height: 320px;
+  line-height: 1.6;
+}
+
+.admin-note-form input:focus,
+.admin-note-form select:focus,
+.admin-note-form textarea:focus {
+  outline: 2px solid rgba(155, 110, 232, 0.22);
+  border-color: #9b6ee8;
+}
+
+.admin-note-form button {
+  width: fit-content;
+  margin-top: 1rem;
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  background: #9b6ee8;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.admin-note-form button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.admin-note-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-note-message {
+  margin: 0.75rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.admin-note-error {
+  background: #fff0f0;
+  color: #b42318;
+}
+
+.admin-note-success {
+  background: #effaf2;
+  color: #247a3c;
+}
+
+.note-preview {
+  position: sticky;
+  top: 110px;
+}
+
+.preview-label {
+  margin: 0 0 0.5rem;
+  color: #9b6ee8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.preview-description {
+  margin: -0.75rem 0 1.5rem;
+  color: #666;
+}
+
+.preview-content {
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.preview-content p {
+  margin: 0 0 0.75rem;
+}
+
+@media (max-width: 900px) {
+  .admin-notes-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .note-preview {
+    position: static;
+  }
+}
+
+@media (max-width: 650px) {
+  .page-container {
+    width: min(100% - 2rem, 1200px);
+  }
+
+  .admin-note-card {
+    padding: 1.25rem;
+  }
+
+  .admin-note-form button {
+    width: 100%;
+  }
+}
