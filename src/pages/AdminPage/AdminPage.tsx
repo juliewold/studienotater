@@ -36,10 +36,10 @@ export const AdminPage = () => {
           <p>Legg til og administrer videoer.</p>
         </button>
 
-        <button type="button" className="admin-card">
+        <Link to="/admin/flashcards" className="admin-card">
           <h2>Flashcards</h2>
           <p>Legg til og administrer flashcards.</p>
-        </button>
+        </Link>
       </div>
     </main>
   );

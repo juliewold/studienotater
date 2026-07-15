@@ -37,6 +37,7 @@ import { AdminPage } from "./pages/AdminPage/AdminPage";
 import { AdminRoute } from "./components/AdminRoute/AdminRoute";
 import { AdminPdfsPage } from "./pages/AdminPdfsPage/AdminPdfsPage";
 import { AdminNotesPage } from "./pages/AdminNotesPage/AdminNotesPage";
+import { AdminFlashcardsPage } from "./pages/AdminFlashcardsPage/AdminFlashcardsPage";
 
 function App() {
   return (
@@ -323,6 +324,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminNotesPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/flashcards"
+          element={
+            <AdminRoute>
+              <AdminFlashcardsPage />
             </AdminRoute>
           }
         />

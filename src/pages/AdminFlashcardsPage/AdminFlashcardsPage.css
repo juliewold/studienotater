@@ -1,0 +1,274 @@
+.page-container {
+  width: min(1200px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.page-label {
+  margin: 0 0 0.5rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-description {
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+.admin-flashcards-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.admin-flashcard-card {
+  padding: 1.75rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
+}
+
+.admin-flashcard-card h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.4rem;
+}
+
+.admin-flashcard-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-flashcard-form label {
+  margin-top: 0.5rem;
+  font-weight: 700;
+}
+
+.admin-flashcard-form select,
+.admin-flashcard-form textarea {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(167, 116, 255, 0.25);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-flashcard-form textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.admin-flashcard-form select:focus,
+.admin-flashcard-form textarea:focus {
+  outline: 2px solid rgba(155, 110, 232, 0.22);
+  border-color: #9b6ee8;
+}
+
+.admin-flashcard-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.admin-flashcard-form-actions button {
+  margin: 0;
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-flashcard-form-actions button[type="submit"] {
+  background: #9b6ee8;
+  color: #fff;
+}
+
+.cancel-flashcard-edit-button {
+  background: #f1ecfb;
+  color: #6f4bb5;
+}
+
+.admin-flashcard-form-actions button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.admin-flashcard-form-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-flashcard-message {
+  margin: 0.75rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.admin-flashcard-error {
+  background: #fff0f0;
+  color: #b42318;
+}
+
+.admin-flashcard-success {
+  background: #effaf2;
+  color: #247a3c;
+}
+
+.flashcard-preview {
+  position: sticky;
+  top: 110px;
+}
+
+.preview-label {
+  margin: 0 0 0.75rem;
+  color: #9b6ee8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flashcard-preview h2 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.flashcard-preview p {
+  margin: 0;
+  color: #555;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.uploaded-flashcards-section {
+  margin-top: 2rem;
+}
+
+.uploaded-flashcard-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.uploaded-flashcard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 16px;
+  background: #faf9fd;
+}
+
+.uploaded-flashcard-item h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.uploaded-flashcard-item p {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.uploaded-flashcard-item span {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.uploaded-flashcard-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.edit-flashcard-button,
+.delete-flashcard-button {
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-flashcard-button {
+  background: #f3efff;
+  color: #7b4dd6;
+}
+
+.edit-flashcard-button:hover {
+  background: #e8ddff;
+}
+
+.delete-flashcard-button {
+  background: #d92d20;
+  color: #fff;
+}
+
+.delete-flashcard-button:hover:not(:disabled) {
+  background: #b42318;
+}
+
+.delete-flashcard-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 900px) {
+  .admin-flashcards-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .flashcard-preview {
+    position: static;
+  }
+}
+
+@media (max-width: 700px) {
+  .page-container {
+    width: min(100% - 2rem, 1200px);
+  }
+
+  .admin-flashcard-card {
+    padding: 1.25rem;
+  }
+
+  .admin-flashcard-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-flashcard-form-actions button {
+    width: 100%;
+  }
+
+  .uploaded-flashcard-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .uploaded-flashcard-actions {
+    width: 100%;
+  }
+
+  .edit-flashcard-button,
+  .delete-flashcard-button {
+    flex: 1;
+  }
+}
