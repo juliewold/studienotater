@@ -31,6 +31,7 @@ import { ForgotPasswordPage } from "./pages/ForgotPasswordPage/ForgotPasswordPag
 import { UpdatePasswordPage } from "./pages/UpdatePasswordPage/UpdatePasswordPage";
 import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { MySubjectsPage } from "./pages/MySubjectsPage/MySubjectsPage";
+import { YearsPage } from "./pages/YearsPage/YearsPage";
 
 function App() {
   return (
@@ -199,6 +200,15 @@ function App() {
           element={
             <ProtectedRoute>
               <MySubjectsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/klassetrinn"
+          element={
+            <ProtectedRoute>
+              <YearsPage />
             </ProtectedRoute>
           }
         />

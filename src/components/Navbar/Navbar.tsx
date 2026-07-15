@@ -262,9 +262,11 @@ export const Navbar = () => {
               </NavLink>
 
               <NavLink
-                to="/"
+                to="/klassetrinn"
                 onClick={() => setMenuOpen(false)}
-                className="menu-link"
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
               >
                 Klassetrinn
               </NavLink>
