@@ -16,6 +16,8 @@ export const AdminNotesPage = () => {
     content,
     setContent,
 
+    editingNote,
+
     uploadedNotes,
     isLoadingNotes,
     isSaving,
@@ -25,6 +27,8 @@ export const AdminNotesPage = () => {
     successMessage,
 
     handleSubmit,
+    handleEdit,
+    cancelEdit,
     handleDelete,
   } = useAdminNotes();
 
@@ -50,7 +54,9 @@ export const AdminNotesPage = () => {
 
       <div className="admin-notes-layout">
         <section className="admin-note-card">
-          <h2>Opprett nytt notat</h2>
+          <h2>
+            {editingNote ? "Rediger notat" : "Opprett nytt notat"}
+          </h2>
 
           <form className="admin-note-form" onSubmit={handleSubmit}>
             <label htmlFor="note-subject">Fag</label>
@@ -59,6 +65,7 @@ export const AdminNotesPage = () => {
               id="note-subject"
               value={subjectId}
               onChange={(event) => setSubjectId(event.target.value)}
+              disabled={Boolean(editingNote)}
               required
             >
               <option value="">Velg fag</option>
@@ -69,6 +76,12 @@ export const AdminNotesPage = () => {
                 </option>
               ))}
             </select>
+
+            {editingNote && (
+              <p className="admin-note-help">
+                Faget kan ikke endres når et notat redigeres.
+              </p>
+            )}
 
             <label htmlFor="note-title">Tittel</label>
 
@@ -115,9 +128,26 @@ export const AdminNotesPage = () => {
               </p>
             )}
 
-            <button type="submit" disabled={isSaving}>
-              {isSaving ? "Lagrer..." : "Opprett notat"}
-            </button>
+            <div className="admin-note-form-actions">
+              <button type="submit" disabled={isSaving}>
+                {isSaving
+                  ? "Lagrer..."
+                  : editingNote
+                    ? "Lagre endringer"
+                    : "Opprett notat"}
+              </button>
+
+              {editingNote && (
+                <button
+                  type="button"
+                  className="cancel-edit-button"
+                  onClick={cancelEdit}
+                  disabled={isSaving}
+                >
+                  Avbryt redigering
+                </button>
+              )}
+            </div>
           </form>
         </section>
 
@@ -169,6 +199,14 @@ export const AdminNotesPage = () => {
                   >
                     Åpne
                   </a>
+
+                  <button
+                    type="button"
+                    className="edit-note-button"
+                    onClick={() => handleEdit(note)}
+                  >
+                    Rediger
+                  </button>
 
                   <button
                     type="button"

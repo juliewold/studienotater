@@ -263,3 +263,62 @@
     text-align: center;
   }
 }
+
+.admin-note-help {
+  margin: -0.25rem 0 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.admin-note-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.admin-note-form-actions button {
+  margin-top: 0;
+}
+
+.cancel-edit-button,
+.edit-note-button {
+  border: none;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-edit-button {
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  background: #f1ecfb;
+  color: #6f4bb5;
+}
+
+.edit-note-button {
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  background: #f3efff;
+  color: #7b4dd6;
+}
+
+.cancel-edit-button:hover:not(:disabled),
+.edit-note-button:hover {
+  background: #e8ddff;
+}
+
+@media (max-width: 700px) {
+  .admin-note-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-note-form-actions button {
+    width: 100%;
+  }
+
+  .uploaded-note-actions {
+    flex-wrap: wrap;
+  }
+}

@@ -9,6 +9,7 @@ import {
   createNote,
   deleteNote,
   getNotesBySubject,
+  updateNote,
   type DatabaseNote,
 } from "../services/notesService";
 
@@ -17,6 +18,9 @@ export const useAdminNotes = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
+
+  const [editingNote, setEditingNote] =
+    useState<DatabaseNote | null>(null);
 
   const [uploadedNotes, setUploadedNotes] = useState<DatabaseNote[]>([]);
   const [isLoadingNotes, setIsLoadingNotes] = useState(true);
@@ -36,6 +40,14 @@ export const useAdminNotes = () => {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
+  };
+
+  const resetForm = () => {
+    setSubjectId("");
+    setTitle("");
+    setDescription("");
+    setContent("");
+    setEditingNote(null);
   };
 
   const loadUploadedNotes = useCallback(async () => {
@@ -71,41 +83,85 @@ export const useAdminNotes = () => {
   ) => {
     event.preventDefault();
 
-    const slug = createSlug(title);
-
-    if (!slug) {
-      setErrorMessage("Notatet må ha en gyldig tittel.");
-      return;
-    }
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+    const trimmedContent = content.trim();
 
     setIsSaving(true);
     setErrorMessage("");
     setSuccessMessage("");
 
     try {
+      if (editingNote) {
+        await updateNote(
+          editingNote.id,
+          trimmedTitle,
+          trimmedDescription,
+          trimmedContent,
+        );
+
+        resetForm();
+        await loadUploadedNotes();
+        setSuccessMessage("Notatet ble oppdatert.");
+        return;
+      }
+
+      const slug = createSlug(trimmedTitle);
+
+      if (!slug) {
+        setErrorMessage("Notatet må ha en gyldig tittel.");
+        return;
+      }
+
       await createNote(
         subjectId,
         slug,
-        title.trim(),
-        description.trim(),
-        content.trim(),
+        trimmedTitle,
+        trimmedDescription,
+        trimmedContent,
       );
 
-      setSubjectId("");
-      setTitle("");
-      setDescription("");
-      setContent("");
-
+      resetForm();
       await loadUploadedNotes();
       setSuccessMessage("Notatet ble opprettet.");
     } catch (error) {
-      console.error("Kunne ikke opprette notat:", error);
+      console.error(
+        editingNote
+          ? "Kunne ikke oppdatere notat:"
+          : "Kunne ikke opprette notat:",
+        error,
+      );
+
       setErrorMessage(
-        "Kunne ikke opprette notatet. Det kan allerede finnes et notat med samme adresse.",
+        editingNote
+          ? "Kunne ikke oppdatere notatet."
+          : "Kunne ikke opprette notatet. Det kan allerede finnes et notat med samme adresse.",
       );
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleEdit = (note: DatabaseNote) => {
+    setEditingNote(note);
+    setSubjectId(note.subjectId);
+    setTitle(note.title);
+    setDescription(note.description);
+    setContent(note.content);
+
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const cancelEdit = () => {
+    resetForm();
+    setErrorMessage("");
+    setSuccessMessage("");
   };
 
   const handleDelete = async (note: DatabaseNote) => {
@@ -130,6 +186,10 @@ export const useAdminNotes = () => {
         ),
       );
 
+      if (editingNote?.id === note.id) {
+        resetForm();
+      }
+
       setSuccessMessage("Notatet ble slettet.");
     } catch (error) {
       console.error("Kunne ikke slette notat:", error);
@@ -152,6 +212,8 @@ export const useAdminNotes = () => {
     content,
     setContent,
 
+    editingNote,
+
     uploadedNotes,
     isLoadingNotes,
     isSaving,
@@ -161,6 +223,8 @@ export const useAdminNotes = () => {
     successMessage,
 
     handleSubmit,
+    handleEdit,
+    cancelEdit,
     handleDelete,
   };
 };
