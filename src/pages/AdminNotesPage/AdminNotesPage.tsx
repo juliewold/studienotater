@@ -1,67 +1,41 @@
 import "./AdminNotesPage.css";
-import { useState, type SyntheticEvent } from "react";
 import { subjects } from "../../data/subjects";
-import { createNote } from "../../services/notesService";
+import { useAdminNotes } from "../../hooks/useAdminNotes";
 
 export const AdminNotesPage = () => {
-  const [subjectId, setSubjectId] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [content, setContent] = useState("");
+  const {
+    subjectId,
+    setSubjectId,
 
-  const [isSaving, setIsSaving] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+    title,
+    setTitle,
 
-  const createSlug = (value: string) => {
-    return value
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-  };
+    description,
+    setDescription,
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
-    event.preventDefault();
+    content,
+    setContent,
 
-    const slug = createSlug(title);
+    uploadedNotes,
+    isLoadingNotes,
+    isSaving,
+    deletingNoteId,
 
-    if (!slug) {
-      setErrorMessage("Notatet må ha en gyldig tittel.");
-      return;
-    }
+    errorMessage,
+    successMessage,
 
-    setIsSaving(true);
-    setErrorMessage("");
-    setSuccessMessage("");
+    handleSubmit,
+    handleDelete,
+  } = useAdminNotes();
 
-    try {
-      await createNote(
-        subjectId,
-        slug,
-        title.trim(),
-        description.trim(),
-        content.trim(),
-      );
+  const getSubjectLabel = (noteSubjectId: string) => {
+    const subject = subjects.find(
+      (currentSubject) => currentSubject.id === noteSubjectId,
+    );
 
-      setSubjectId("");
-      setTitle("");
-      setDescription("");
-      setContent("");
-
-      setSuccessMessage("Notatet ble opprettet.");
-    } catch (error) {
-      console.error("Kunne ikke opprette notat:", error);
-      setErrorMessage(
-        "Kunne ikke opprette notatet. Det kan allerede finnes et notat med samme adresse.",
-      );
-    } finally {
-      setIsSaving(false);
-    }
+    return subject
+      ? `${subject.code} – ${subject.name}`
+      : noteSubjectId.toUpperCase();
   };
 
   return (
@@ -169,6 +143,49 @@ export const AdminNotesPage = () => {
           </div>
         </section>
       </div>
+
+      <section className="admin-note-card uploaded-notes-section">
+        <h2>Opprettede notater</h2>
+
+        {isLoadingNotes ? (
+          <p>Laster notater...</p>
+        ) : uploadedNotes.length === 0 ? (
+          <p>Ingen notater er opprettet gjennom adminpanelet ennå.</p>
+        ) : (
+          <div className="uploaded-note-list">
+            {uploadedNotes.map((note) => (
+              <article key={note.id} className="uploaded-note-item">
+                <div>
+                  <h3>{note.title}</h3>
+
+                  <p>{note.description}</p>
+
+                  <span>{getSubjectLabel(note.subjectId)}</span>
+                </div>
+
+                <div className="uploaded-note-actions">
+                  <a
+                    href={`#/fag/${note.subjectId}/notater/${note.slug}?source=database`}
+                  >
+                    Åpne
+                  </a>
+
+                  <button
+                    type="button"
+                    className="delete-note-button"
+                    disabled={deletingNoteId === note.id}
+                    onClick={() => handleDelete(note)}
+                  >
+                    {deletingNoteId === note.id
+                      ? "Sletter..."
+                      : "Slett"}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
     </main>
   );
 };

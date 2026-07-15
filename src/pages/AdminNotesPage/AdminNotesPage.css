@@ -168,3 +168,98 @@
     width: 100%;
   }
 }
+
+.uploaded-notes-section {
+  margin-top: 2rem;
+}
+
+.uploaded-note-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.uploaded-note-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 16px;
+  background: #faf9fd;
+}
+
+.uploaded-note-item h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.uploaded-note-item p {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.uploaded-note-item span {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.uploaded-note-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.uploaded-note-actions a {
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  background: #f3efff;
+  color: #7b4dd6;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.uploaded-note-actions a:hover {
+  background: #e8ddff;
+}
+
+.delete-note-button {
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #d92d20;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delete-note-button:hover:not(:disabled) {
+  background: #b42318;
+}
+
+.delete-note-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .uploaded-note-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .uploaded-note-actions {
+    width: 100%;
+  }
+
+  .uploaded-note-actions a,
+  .delete-note-button {
+    flex: 1;
+    text-align: center;
+  }
+}
