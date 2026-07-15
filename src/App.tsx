@@ -30,6 +30,7 @@ import { PublicOnlyRoute } from "./components/PublicOnlyRoute/PublicOnlyRoute";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage/ForgotPasswordPage";
 import { UpdatePasswordPage } from "./pages/UpdatePasswordPage/UpdatePasswordPage";
 import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
+import { MySubjectsPage } from "./pages/MySubjectsPage/MySubjectsPage";
 
 function App() {
   return (
@@ -189,6 +190,15 @@ function App() {
           element={
             <ProtectedRoute>
               <SemesterStartPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/mine-fag"
+          element={
+            <ProtectedRoute>
+              <MySubjectsPage />
             </ProtectedRoute>
           }
         />

@@ -38,8 +38,7 @@ export const Navbar = () => {
     loadUsername();
   }, [user]);
 
-  const displayName =
-  username || user?.email?.split("@")[0] || "Profil";
+  const displayName = username || user?.email?.split("@")[0] || "Profil";
 
   const handleSignOut = async () => {
     await signOut();
@@ -253,9 +252,11 @@ export const Navbar = () => {
               </NavLink>
 
               <NavLink
-                to="/"
+                to="/mine-fag"
                 onClick={() => setMenuOpen(false)}
-                className="menu-link"
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
               >
                 Mine fag
               </NavLink>
