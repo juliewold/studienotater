@@ -31,10 +31,10 @@ export const AdminPage = () => {
           <p>Legg til og administrer notater.</p>
         </Link>
 
-        <button type="button" className="admin-card">
+        <Link to="/admin/videoer" className="admin-card">
           <h2>Videoer</h2>
           <p>Legg til og administrer videoer.</p>
-        </button>
+        </Link>
 
         <Link to="/admin/flashcards" className="admin-card">
           <h2>Flashcards</h2>
