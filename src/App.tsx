@@ -33,6 +33,7 @@ import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { MySubjectsPage } from "./pages/MySubjectsPage/MySubjectsPage";
 import { YearsPage } from "./pages/YearsPage/YearsPage";
 import { SemesterPlanPage } from "./pages/SemesterPlanPage/SemesterPlanPage";
+import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
 
 function App() {
   return (
@@ -300,6 +301,15 @@ function App() {
           element={
             <ProtectedRoute>
               <SemesterPlanPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/innstillinger"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
             </ProtectedRoute>
           }
         />
