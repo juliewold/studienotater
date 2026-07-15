@@ -39,6 +39,7 @@ import { AdminPdfsPage } from "./pages/AdminPdfsPage/AdminPdfsPage";
 import { AdminNotesPage } from "./pages/AdminNotesPage/AdminNotesPage";
 import { AdminFlashcardsPage } from "./pages/AdminFlashcardsPage/AdminFlashcardsPage";
 import { AdminVideosPage } from "./pages/AdminVideosPage/AdminVideosPage";
+import { AdminExamsPage } from "./pages/AdminExamsPage/AdminExamsPage";
 
 function App() {
   return (
@@ -284,6 +285,15 @@ function App() {
         />
 
         <Route
+          path="/fag/:subjectId/eksamen/:source/:examId/:fileId"
+          element={
+            <ProtectedRoute>
+              <ExamViewerPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/fag/:subjectId/eksamen/:examId/:fileId"
           element={
             <ProtectedRoute>
@@ -319,7 +329,15 @@ function App() {
           }
         />
 
-        <Route path="/admin/pdfs" element={<AdminPdfsPage />} />
+        <Route
+          path="/admin/pdfs"
+          element={
+            <AdminRoute>
+              <AdminPdfsPage />
+            </AdminRoute>
+          }
+        />
+        
         <Route
           path="/admin/notater"
           element={
@@ -343,6 +361,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminVideosPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/eksamener"
+          element={
+            <AdminRoute>
+              <AdminExamsPage />
             </AdminRoute>
           }
         />

@@ -1,0 +1,271 @@
+.page-container {
+  width: min(1200px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.page-label {
+  margin: 0 0 0.5rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-description {
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+.admin-exam-card {
+  padding: 1.75rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
+}
+
+.admin-exam-card h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.4rem;
+}
+
+.admin-exam-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-exam-form label {
+  margin-top: 0.5rem;
+  font-weight: 700;
+}
+
+.admin-exam-form input,
+.admin-exam-form select {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(167, 116, 255, 0.25);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-exam-form input:focus,
+.admin-exam-form select:focus {
+  outline: 2px solid rgba(155, 110, 232, 0.22);
+  border-color: #9b6ee8;
+}
+
+.admin-exam-form input:disabled,
+.admin-exam-form select:disabled {
+  background: #f6f3fa;
+  color: #777;
+  cursor: not-allowed;
+}
+
+.admin-exam-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-exam-row > div {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-exam-help {
+  margin: 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.admin-exam-message {
+  margin: 0.75rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.admin-exam-error {
+  background: #fff0f0;
+  color: #b42318;
+}
+
+.admin-exam-success {
+  background: #effaf2;
+  color: #247a3c;
+}
+
+.admin-exam-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.admin-exam-form-actions button {
+  margin: 0;
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-exam-form-actions button[type="submit"] {
+  background: #9b6ee8;
+  color: #fff;
+}
+
+.cancel-exam-edit-button {
+  background: #f1ecfb;
+  color: #6f4bb5;
+}
+
+.admin-exam-form-actions button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.admin-exam-form-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.uploaded-exams-section {
+  margin-top: 2rem;
+}
+
+.uploaded-exam-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.uploaded-exam-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 16px;
+  background: #faf9fd;
+}
+
+.uploaded-exam-content h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.uploaded-exam-content > p {
+  margin: 0;
+  color: #666;
+}
+
+.uploaded-exam-content > span {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.uploaded-exam-files {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+}
+
+.uploaded-exam-files span {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.uploaded-exam-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.uploaded-exam-actions a,
+.edit-exam-button,
+.delete-exam-button {
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.uploaded-exam-actions a,
+.edit-exam-button {
+  background: #f3efff;
+  color: #7b4dd6;
+}
+
+.uploaded-exam-actions a:hover,
+.edit-exam-button:hover {
+  background: #e8ddff;
+}
+
+.delete-exam-button {
+  background: #d92d20;
+  color: #fff;
+}
+
+.delete-exam-button:hover:not(:disabled) {
+  background: #b42318;
+}
+
+.delete-exam-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 750px) {
+  .page-container {
+    width: min(100% - 2rem, 1200px);
+  }
+
+  .admin-exam-card {
+    padding: 1.25rem;
+  }
+
+  .admin-exam-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-exam-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-exam-form-actions button {
+    width: 100%;
+  }
+
+  .uploaded-exam-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .uploaded-exam-actions {
+    width: 100%;
+  }
+
+  .uploaded-exam-actions a,
+  .edit-exam-button,
+  .delete-exam-button {
+    flex: 1;
+    text-align: center;
+  }
+}
