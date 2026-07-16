@@ -1,43 +1,27 @@
 import "./VideosPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { videos } from "../../data/videos";
 import {
   getVideosBySubject,
   type DatabaseVideo,
 } from "../../services/videosService";
 import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
 
-type LocalVideo = {
-  title: string;
-  youtubeId: string;
-};
-
-type VideoItem = {
-  id: string;
-  title: string;
-  youtubeId: string;
-  topic: string;
-  source: "local" | "database";
-};
-
 export const VideosPage = () => {
   const { subjectId } = useParams();
 
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
-  const [databaseVideos, setDatabaseVideos] = useState<DatabaseVideo[]>(
-    [],
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(
+    null,
   );
+
+  const [videos, setVideos] = useState<DatabaseVideo[]>([]);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const localVideoTopics =
-    videos[subjectId as keyof typeof videos] || [];
 
   useEffect(() => {
     const loadVideos = async () => {
       if (!subjectId) {
-        setDatabaseVideos([]);
+        setVideos([]);
         setIsLoadingVideos(false);
         return;
       }
@@ -46,11 +30,13 @@ export const VideosPage = () => {
       setErrorMessage("");
 
       try {
-        const loadedVideos = await getVideosBySubject(subjectId);
-        setDatabaseVideos(loadedVideos);
+        const loadedVideos =
+          await getVideosBySubject(subjectId);
+
+        setVideos(loadedVideos);
       } catch (error) {
         console.error("Kunne ikke hente videoer:", error);
-        setErrorMessage("Kunne ikke hente nye videoer.");
+        setErrorMessage("Kunne ikke hente videoene.");
       } finally {
         setIsLoadingVideos(false);
       }
@@ -60,28 +46,9 @@ export const VideosPage = () => {
   }, [subjectId]);
 
   const groupedVideos = useMemo(() => {
-    const allVideos: VideoItem[] = [
-      ...localVideoTopics.flatMap((topic) =>
-        topic.videos.map((video: LocalVideo) => ({
-          id: `local-${topic.id}-${video.youtubeId}`,
-          title: video.title,
-          youtubeId: video.youtubeId,
-          topic: topic.topic,
-          source: "local" as const,
-        })),
-      ),
-      ...databaseVideos.map((video) => ({
-        id: `database-${video.id}`,
-        title: video.title,
-        youtubeId: video.youtubeId,
-        topic: video.topic,
-        source: "database" as const,
-      })),
-    ];
+    const grouped = new Map<string, DatabaseVideo[]>();
 
-    const grouped = new Map<string, VideoItem[]>();
-
-    allVideos.forEach((video) => {
+    videos.forEach((video) => {
       const topicVideos = grouped.get(video.topic) ?? [];
       topicVideos.push(video);
       grouped.set(video.topic, topicVideos);
@@ -93,7 +60,7 @@ export const VideosPage = () => {
         videos: topicVideos,
       }),
     );
-  }, [databaseVideos, localVideoTopics]);
+  }, [videos]);
 
   return (
     <main className="page-container">
@@ -109,7 +76,13 @@ export const VideosPage = () => {
 
       {errorMessage && <p>{errorMessage}</p>}
 
-      {!isLoadingVideos && (
+      {!isLoadingVideos &&
+        !errorMessage &&
+        groupedVideos.length === 0 && (
+          <p>Ingen videoer er lagt til ennå.</p>
+        )}
+
+      {!isLoadingVideos && !errorMessage && (
         <div className="video-topics">
           {groupedVideos.map((topicGroup) => (
             <section
@@ -120,11 +93,14 @@ export const VideosPage = () => {
 
               <div className="video-grid">
                 {topicGroup.videos.map((video) => {
-                  const activeId = `${video.source}-${video.id}`;
-                  const isActive = activeVideoId === activeId;
+                  const isActive =
+                    activeVideoId === video.id;
 
                   return (
-                    <div key={video.id} className="video-card">
+                    <div
+                      key={video.id}
+                      className="video-card"
+                    >
                       {isActive ? (
                         <iframe
                           src={`https://www.youtube.com/embed/${video.youtubeId}`}
@@ -135,21 +111,25 @@ export const VideosPage = () => {
                         <button
                           type="button"
                           className="video-thumbnail-button"
-                          onClick={() => setActiveVideoId(activeId)}
+                          onClick={() =>
+                            setActiveVideoId(video.id)
+                          }
                         >
                           <img
                             src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
                             alt={video.title}
                           />
 
-                          <span className="play-button">▶</span>
+                          <span className="play-button">
+                            ▶
+                          </span>
                         </button>
                       )}
 
                       <h3>{video.title}</h3>
 
                       <ResourceProgress
-                        resourceId={`video-${subjectId}-${video.source}-${video.youtubeId}`}
+                        resourceId={`video-${subjectId}-database-${video.youtubeId}`}
                         resourceType="sett"
                       />
                     </div>

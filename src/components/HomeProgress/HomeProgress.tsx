@@ -2,12 +2,15 @@ import "./HomeProgress.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { pdfs } from "../../data/pdfs";
-import { videos } from "../../data/videos";
 import { subjects } from "../../data/subjects";
 import {
   getNotesBySubject,
   type DatabaseNote,
 } from "../../services/notesService";
+import {
+  getVideosBySubject,
+  type DatabaseVideo,
+} from "../../services/videosService";
 import { useProgress } from "../../hooks/useProgress";
 import { useSemesterSubjects } from "../../hooks/useSemesterSubjects";
 
@@ -22,50 +25,75 @@ export const HomeProgress = () => {
   const [databaseNotes, setDatabaseNotes] = useState<DatabaseNote[]>(
     [],
   );
-  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
-  const [notesError, setNotesError] = useState("");
 
-  const selectedSubjectIds = semesterSubjects.map(
-    (subject) => subject.subjectId,
+  const [databaseVideos, setDatabaseVideos] = useState<
+    DatabaseVideo[]
+  >([]);
+
+  const [isLoadingResources, setIsLoadingResources] =
+    useState(true);
+
+  const [resourcesError, setResourcesError] = useState("");
+
+  const selectedSubjectIds = useMemo(
+    () =>
+      semesterSubjects.map(
+        (subject) => subject.subjectId,
+      ),
+    [semesterSubjects],
   );
 
   useEffect(() => {
-    const loadNotes = async () => {
+    const loadResources = async () => {
       if (selectedSubjectIds.length === 0) {
         setDatabaseNotes([]);
-        setIsLoadingNotes(false);
+        setDatabaseVideos([]);
+        setIsLoadingResources(false);
         return;
       }
 
-      setIsLoadingNotes(true);
-      setNotesError("");
+      setIsLoadingResources(true);
+      setResourcesError("");
 
       try {
-        const notesBySubject = await Promise.all(
-          selectedSubjectIds.map((subjectId) =>
-            getNotesBySubject(subjectId),
-          ),
-        );
+        const [notesBySubject, videosBySubject] =
+          await Promise.all([
+            Promise.all(
+              selectedSubjectIds.map((subjectId) =>
+                getNotesBySubject(subjectId),
+              ),
+            ),
+            Promise.all(
+              selectedSubjectIds.map((subjectId) =>
+                getVideosBySubject(subjectId),
+              ),
+            ),
+          ]);
 
         setDatabaseNotes(notesBySubject.flat());
+        setDatabaseVideos(videosBySubject.flat());
       } catch (error) {
         console.error(
-          "Kunne ikke hente notater til fremdriften:",
+          "Kunne ikke hente ressurser til fremdriften:",
           error,
         );
-        setNotesError("Kunne ikke hente all fremdrift.");
+
+        setResourcesError(
+          "Kunne ikke hente all fremdrift.",
+        );
       } finally {
-        setIsLoadingNotes(false);
+        setIsLoadingResources(false);
       }
     };
 
-    loadNotes();
-  }, [semesterSubjects]);
+    loadResources();
+  }, [selectedSubjectIds]);
 
   const progressSubjects = useMemo(() => {
     return selectedSubjectIds.map((subjectId) => {
       const subject = subjects.find(
-        (currentSubject) => currentSubject.id === subjectId,
+        (currentSubject) =>
+          currentSubject.id === subjectId,
       );
 
       const subjectPdfs =
@@ -75,11 +103,8 @@ export const HomeProgress = () => {
         (note) => note.subjectId === subjectId,
       );
 
-      const subjectVideoTopics =
-        videos[subjectId as keyof typeof videos] || [];
-
-      const subjectVideos = subjectVideoTopics.flatMap(
-        (topic) => topic.videos,
+      const subjectVideos = databaseVideos.filter(
+        (video) => video.subjectId === subjectId,
       );
 
       const pdfProgress = subjectPdfs.map((pdf) =>
@@ -98,7 +123,7 @@ export const HomeProgress = () => {
 
       const videoProgress = subjectVideos.map((video) =>
         getProgress(
-          `video-${subjectId}-local-${video.youtubeId}`,
+          `video-${subjectId}-database-${video.youtubeId}`,
           "resource",
         ),
       );
@@ -116,9 +141,15 @@ export const HomeProgress = () => {
       );
 
       const ratings = [
-        ...pdfProgress.map((progress) => progress.rating),
-        ...noteProgress.map((progress) => progress.rating),
-        ...videoProgress.map((progress) => progress.rating),
+        ...pdfProgress.map(
+          (progress) => progress.rating,
+        ),
+        ...noteProgress.map(
+          (progress) => progress.rating,
+        ),
+        ...videoProgress.map(
+          (progress) => progress.rating,
+        ),
       ].filter((rating) => rating > 0);
 
       const averageRating =
@@ -148,7 +179,8 @@ export const HomeProgress = () => {
 
       return {
         id: subjectId,
-        code: subject?.code ?? subjectId.toUpperCase(),
+        code:
+          subject?.code ?? subjectId.toUpperCase(),
         name: subject?.name ?? "",
         completed,
         total,
@@ -164,6 +196,7 @@ export const HomeProgress = () => {
     });
   }, [
     databaseNotes,
+    databaseVideos,
     getProgress,
     selectedSubjectIds,
   ]);
@@ -171,7 +204,7 @@ export const HomeProgress = () => {
   if (
     isLoadingProgress ||
     isLoadingSemesterSubjects ||
-    isLoadingNotes
+    isLoadingResources
   ) {
     return (
       <section className="home-progress">
@@ -180,10 +213,10 @@ export const HomeProgress = () => {
     );
   }
 
-  if (notesError) {
+  if (resourcesError) {
     return (
       <section className="home-progress">
-        <p>{notesError}</p>
+        <p>{resourcesError}</p>
       </section>
     );
   }
@@ -218,28 +251,34 @@ export const HomeProgress = () => {
               </div>
 
               <p>
-                {subject.completed} / {subject.total} ressurser fullført
+                {subject.completed} / {subject.total}{" "}
+                ressurser fullført
               </p>
             </div>
 
             <div className="home-progress-details">
               <span>
-                PDF-er: {subject.pdfCompleted} / {subject.pdfTotal}
+                PDF-er: {subject.pdfCompleted} /{" "}
+                {subject.pdfTotal}
               </span>
 
               <span>
-                Notater: {subject.noteCompleted} / {subject.noteTotal}
+                Notater: {subject.noteCompleted} /{" "}
+                {subject.noteTotal}
               </span>
 
               <span>
-                Videoer: {subject.videoCompleted} / {subject.videoTotal}
+                Videoer: {subject.videoCompleted} /{" "}
+                {subject.videoTotal}
               </span>
             </div>
 
             <div className="home-progress-bar">
               <div
                 className="home-progress-fill"
-                style={{ width: `${subject.progress}%` }}
+                style={{
+                  width: `${subject.progress}%`,
+                }}
               />
             </div>
 
