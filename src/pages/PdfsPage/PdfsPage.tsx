@@ -2,10 +2,7 @@ import "./PdfsPage.css";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
-import {
-  getPdfsBySubject,
-  type DatabasePdf,
-} from "../../services/pdfsService";
+import { getPdfsBySubject, type DatabasePdf } from "../../services/pdfsService";
 import { useFavorites } from "../../hooks/useFavorites";
 import { useProgress } from "../../hooks/useProgress";
 
@@ -26,6 +23,10 @@ const categories = [
     id: "formler",
     title: "Formelark",
   },
+  {
+    id: "eksamener",
+    title: "Eksamener jeg har løst",
+  },
 ];
 
 export const PdfsPage = () => {
@@ -35,16 +36,9 @@ export const PdfsPage = () => {
   const [isLoadingPdfs, setIsLoadingPdfs] = useState(true);
   const [pdfError, setPdfError] = useState("");
 
-  const {
-    isFavorite,
-    toggleFavorite,
-    isLoadingFavorites,
-  } = useFavorites();
+  const { isFavorite, toggleFavorite, isLoadingFavorites } = useFavorites();
 
-  const {
-    getProgress,
-    isLoadingProgress,
-  } = useProgress();
+  const { getProgress, isLoadingProgress } = useProgress();
 
   useEffect(() => {
     const loadPdfs = async () => {
@@ -81,17 +75,13 @@ export const PdfsPage = () => {
 
       <h1>{subjectId?.toUpperCase()}</h1>
 
-      {(isLoadingProgress || isLoadingPdfs) && (
-        <p>Laster PDF-er...</p>
-      )}
+      {(isLoadingProgress || isLoadingPdfs) && <p>Laster PDF-er...</p>}
 
       {pdfError && <p>{pdfError}</p>}
 
-      {!isLoadingPdfs &&
-        !pdfError &&
-        pdfs.length === 0 && (
-          <p>Ingen PDF-er er lagt til ennå.</p>
-        )}
+      {!isLoadingPdfs && !pdfError && pdfs.length === 0 && (
+        <p>Ingen PDF-er er lagt til ennå.</p>
+      )}
 
       {!isLoadingPdfs &&
         !pdfError &&
@@ -105,55 +95,36 @@ export const PdfsPage = () => {
           }
 
           return (
-            <section
-              key={category.id}
-              className="pdf-category-section"
-            >
+            <section key={category.id} className="pdf-category-section">
               <h2>{category.title}</h2>
 
               <div className="pdf-grid">
                 {categoryPdfs.map((pdf) => {
-                  const resourceId =
-                    `pdf-${subjectId}-database-${pdf.id}`;
+                  const resourceId = `pdf-${subjectId}-database-${pdf.id}`;
 
-                  const favoriteId =
-                    `${subjectId}-database-${pdf.id}`;
+                  const favoriteId = `${subjectId}-database-${pdf.id}`;
 
-                  const pdfUrl =
-                    `/fag/${subjectId}/pdfs/${pdf.id}`;
+                  const pdfUrl = `/fag/${subjectId}/pdfs/${pdf.id}`;
 
                   const { completed, rating } = getProgress(
                     resourceId,
                     "resource",
                   );
 
-                  const favorite = isFavorite(
-                    favoriteId,
-                    "pdf",
-                  );
+                  const favorite = isFavorite(favoriteId, "pdf");
 
                   return (
-                    <article
-                      className="pdf-card-wrapper"
-                      key={pdf.id}
-                    >
-                      <Link
-                        to={pdfUrl}
-                        className="pdf-card"
-                      >
+                    <article className="pdf-card-wrapper" key={pdf.id}>
+                      <Link to={pdfUrl} className="pdf-card">
                         <span className="pdf-icon">📄</span>
 
                         <div className="pdf-card-content">
                           <h3>{pdf.title}</h3>
 
                           <div className="pdf-progress-preview">
-                            <span>
-                              {completed ? "✓ Lest" : "Ikke lest"}
-                            </span>
+                            <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
 
-                            <span
-                              className={`pdf-rating rating-${rating}`}
-                            >
+                            <span className={`pdf-rating rating-${rating}`}>
                               {"★".repeat(rating)}
                             </span>
                           </div>
@@ -175,8 +146,7 @@ export const PdfsPage = () => {
                           toggleFavorite({
                             id: favoriteId,
                             title: pdf.title,
-                            subject:
-                              subjectId?.toUpperCase(),
+                            subject: subjectId?.toUpperCase(),
                             type: "pdf",
                             url: pdfUrl,
                           })
@@ -184,11 +154,7 @@ export const PdfsPage = () => {
                       >
                         <Heart
                           size={22}
-                          fill={
-                            favorite
-                              ? "currentColor"
-                              : "transparent"
-                          }
+                          fill={favorite ? "currentColor" : "transparent"}
                           strokeWidth={2}
                         />
                       </button>
