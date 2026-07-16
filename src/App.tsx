@@ -295,15 +295,6 @@ function App() {
         />
 
         <Route
-          path="/fag/:subjectId/eksamen/:examId/:fileId"
-          element={
-            <ProtectedRoute>
-              <ExamViewerPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
           path="/fagplan"
           element={
             <ProtectedRoute>

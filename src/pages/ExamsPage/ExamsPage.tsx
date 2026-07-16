@@ -1,7 +1,6 @@
 import "./ExamsPage.css";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { exams } from "../../data/exams";
 import {
   getExamsBySubject,
   type DatabaseExam,
@@ -10,17 +9,14 @@ import {
 export const ExamsPage = () => {
   const { subjectId } = useParams();
 
-  const [databaseExams, setDatabaseExams] = useState<DatabaseExam[]>([]);
+  const [exams, setExams] = useState<DatabaseExam[]>([]);
   const [isLoadingExams, setIsLoadingExams] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const localExams =
-    exams[subjectId as keyof typeof exams] || [];
 
   useEffect(() => {
     const loadExams = async () => {
       if (!subjectId) {
-        setDatabaseExams([]);
+        setExams([]);
         setIsLoadingExams(false);
         return;
       }
@@ -30,7 +26,7 @@ export const ExamsPage = () => {
 
       try {
         const loadedExams = await getExamsBySubject(subjectId);
-        setDatabaseExams(loadedExams);
+        setExams(loadedExams);
       } catch (error) {
         console.error("Kunne ikke hente eksamener:", error);
         setErrorMessage("Kunne ikke hente eksamener.");
@@ -56,30 +52,17 @@ export const ExamsPage = () => {
 
       {errorMessage && <p>{errorMessage}</p>}
 
-      <div className="exam-list">
-        {/* Lokale eksamener */}
-        {localExams.map((exam) => (
-          <section key={`local-${exam.id}`} className="exam-section">
-            <h2>{exam.title}</h2>
+      {!isLoadingExams &&
+        !errorMessage &&
+        exams.length === 0 && (
+          <p>Ingen eksamener er lagt til ennå.</p>
+        )}
 
-            {exam.files.map((file) => (
-              <Link
-                key={file.id}
-                to={`/fag/${subjectId}/eksamen/${exam.id}/${file.id}`}
-                className="exam-row"
-              >
-                <span>{file.title}</span>
-                <span className="exam-arrow">→</span>
-              </Link>
-            ))}
-          </section>
-        ))}
-
-        {/* Databaseeksamener */}
-        {!isLoadingExams &&
-          databaseExams.map((exam) => (
+      {!isLoadingExams && !errorMessage && (
+        <div className="exam-list">
+          {exams.map((exam) => (
             <section
-              key={`database-${exam.id}`}
+              key={exam.id}
               className="exam-section"
             >
               <h2>{exam.title}</h2>
@@ -109,7 +92,8 @@ export const ExamsPage = () => {
               )}
             </section>
           ))}
-      </div>
+        </div>
+      )}
     </main>
   );
 };

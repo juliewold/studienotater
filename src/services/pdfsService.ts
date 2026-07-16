@@ -38,6 +38,32 @@ export async function getPdfsBySubject(
   });
 }
 
+export async function getAllPdfs(): Promise<DatabasePdf[]> {
+  const { data, error } = await supabase
+    .from("pdfs")
+    .select("id, subject_id, title, category, file_path")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map((pdf) => {
+    const { data: publicUrlData } = supabase.storage
+      .from("pdfs")
+      .getPublicUrl(pdf.file_path);
+
+    return {
+      id: pdf.id,
+      subjectId: pdf.subject_id,
+      title: pdf.title,
+      category: pdf.category,
+      filePath: pdf.file_path,
+      fileUrl: publicUrlData.publicUrl,
+    };
+  });
+}
+
 export async function getPdfById(
   pdfId: string,
 ): Promise<DatabasePdf | null> {

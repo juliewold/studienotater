@@ -1,8 +1,11 @@
 import "./HomeProgress.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { pdfs } from "../../data/pdfs";
 import { subjects } from "../../data/subjects";
+import {
+  getPdfsBySubject,
+  type DatabasePdf,
+} from "../../services/pdfsService";
 import {
   getNotesBySubject,
   type DatabaseNote,
@@ -21,6 +24,10 @@ export const HomeProgress = () => {
     semesterSubjects,
     isLoadingSemesterSubjects,
   } = useSemesterSubjects();
+
+  const [databasePdfs, setDatabasePdfs] = useState<DatabasePdf[]>(
+    [],
+  );
 
   const [databaseNotes, setDatabaseNotes] = useState<DatabaseNote[]>(
     [],
@@ -46,6 +53,7 @@ export const HomeProgress = () => {
   useEffect(() => {
     const loadResources = async () => {
       if (selectedSubjectIds.length === 0) {
+        setDatabasePdfs([]);
         setDatabaseNotes([]);
         setDatabaseVideos([]);
         setIsLoadingResources(false);
@@ -56,20 +64,29 @@ export const HomeProgress = () => {
       setResourcesError("");
 
       try {
-        const [notesBySubject, videosBySubject] =
-          await Promise.all([
-            Promise.all(
-              selectedSubjectIds.map((subjectId) =>
-                getNotesBySubject(subjectId),
-              ),
+        const [
+          pdfsBySubject,
+          notesBySubject,
+          videosBySubject,
+        ] = await Promise.all([
+          Promise.all(
+            selectedSubjectIds.map((subjectId) =>
+              getPdfsBySubject(subjectId),
             ),
-            Promise.all(
-              selectedSubjectIds.map((subjectId) =>
-                getVideosBySubject(subjectId),
-              ),
+          ),
+          Promise.all(
+            selectedSubjectIds.map((subjectId) =>
+              getNotesBySubject(subjectId),
             ),
-          ]);
+          ),
+          Promise.all(
+            selectedSubjectIds.map((subjectId) =>
+              getVideosBySubject(subjectId),
+            ),
+          ),
+        ]);
 
+        setDatabasePdfs(pdfsBySubject.flat());
         setDatabaseNotes(notesBySubject.flat());
         setDatabaseVideos(videosBySubject.flat());
       } catch (error) {
@@ -96,8 +113,9 @@ export const HomeProgress = () => {
           currentSubject.id === subjectId,
       );
 
-      const subjectPdfs =
-        pdfs[subjectId as keyof typeof pdfs] || [];
+      const subjectPdfs = databasePdfs.filter(
+        (pdf) => pdf.subjectId === subjectId,
+      );
 
       const subjectNotes = databaseNotes.filter(
         (note) => note.subjectId === subjectId,
@@ -109,7 +127,7 @@ export const HomeProgress = () => {
 
       const pdfProgress = subjectPdfs.map((pdf) =>
         getProgress(
-          `pdf-${subjectId}-local-${pdf.id}`,
+          `pdf-${subjectId}-database-${pdf.id}`,
           "resource",
         ),
       );
@@ -195,6 +213,7 @@ export const HomeProgress = () => {
       };
     });
   }, [
+    databasePdfs,
     databaseNotes,
     databaseVideos,
     getProgress,

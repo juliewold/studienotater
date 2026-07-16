@@ -1,7 +1,6 @@
 import "./ExamViewerPage.css";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { exams } from "../../data/exams";
 import {
   getExamsBySubject,
   type DatabaseExam,
@@ -12,39 +11,18 @@ import { ResourceProgress } from "../../components/ResourceProgress/ResourceProg
 export const ExamViewerPage = () => {
   const {
     subjectId,
-    source,
     examId,
     fileId,
   } = useParams();
 
-  const isDatabaseExam = source === "database";
-
-  const [databaseExam, setDatabaseExam] =
-    useState<DatabaseExam | null>(null);
-  const [isLoadingExam, setIsLoadingExam] = useState(
-    isDatabaseExam,
-  );
+  const [exam, setExam] = useState<DatabaseExam | null>(null);
+  const [isLoadingExam, setIsLoadingExam] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const subjectExams =
-    exams[subjectId as keyof typeof exams] || [];
-
-  const localExam = subjectExams.find(
-    (exam) => exam.id === examId,
-  );
-
-  const localExamFile = localExam?.files.find(
-    (file) => file.id === fileId,
-  );
-
   useEffect(() => {
-    const loadDatabaseExam = async () => {
-      if (
-        !isDatabaseExam ||
-        !subjectId ||
-        !examId
-      ) {
-        setDatabaseExam(null);
+    const loadExam = async () => {
+      if (!subjectId || !examId) {
+        setExam(null);
         setIsLoadingExam(false);
         return;
       }
@@ -57,7 +35,7 @@ export const ExamViewerPage = () => {
           await getExamsBySubject(subjectId);
 
         const selectedExam = loadedExams.find(
-          (exam) => exam.id === examId,
+          (currentExam) => currentExam.id === examId,
         );
 
         if (!selectedExam) {
@@ -65,7 +43,7 @@ export const ExamViewerPage = () => {
           return;
         }
 
-        setDatabaseExam(selectedExam);
+        setExam(selectedExam);
       } catch (error) {
         console.error("Kunne ikke hente eksamen:", error);
         setErrorMessage("Kunne ikke hente eksamenen.");
@@ -74,8 +52,8 @@ export const ExamViewerPage = () => {
       }
     };
 
-    loadDatabaseExam();
-  }, [examId, isDatabaseExam, subjectId]);
+    loadExam();
+  }, [examId, subjectId]);
 
   if (isLoadingExam) {
     return (
@@ -85,51 +63,38 @@ export const ExamViewerPage = () => {
     );
   }
 
-  let examTitle = "";
-  let fileTitle = "";
+  const isSolution = fileId === "solution";
+
+  const filePath = isSolution
+    ? exam?.solutionFilePath
+    : exam?.examFilePath;
+
+  const fileTitle = isSolution
+    ? "Løsningsforslag"
+    : "Oppgavesett";
+
   let fileUrl = "";
-  let resourceId = "";
 
-  if (isDatabaseExam && databaseExam) {
-    const filePath =
-      fileId === "solution"
-        ? databaseExam.solutionFilePath
-        : databaseExam.examFilePath;
+  if (filePath) {
+    const { data } = supabase.storage
+      .from("pdfs")
+      .getPublicUrl(filePath);
 
-    if (filePath) {
-      const { data } = supabase.storage
-        .from("pdfs")
-        .getPublicUrl(filePath);
-
-      fileUrl = data.publicUrl;
-    }
-
-    examTitle =
-      `${databaseExam.title} – ` +
-      `${databaseExam.semester} ${databaseExam.year}`;
-
-    fileTitle =
-      fileId === "solution"
-        ? "Løsningsforslag"
-        : "Oppgavesett";
-
-    resourceId =
-      `exam-${subjectId}-database-${databaseExam.id}-${fileId}`;
-  } else if (localExam && localExamFile) {
-    examTitle = localExam.title;
-    fileTitle = localExamFile.title;
-
-    fileUrl =
-      `${import.meta.env.BASE_URL}${localExamFile.file}`;
-
-    resourceId =
-      `exam-${subjectId}-${localExam.id}-${localExamFile.id}`;
+    fileUrl = data.publicUrl;
   }
+
+  const examTitle = exam
+    ? `${exam.title} – ${exam.semester} ${exam.year}`
+    : "";
+
+  const resourceId = exam
+    ? `exam-${subjectId}-database-${exam.id}-${fileId}`
+    : "";
 
   if (
     errorMessage ||
-    !examTitle ||
-    !fileTitle ||
+    !exam ||
+    !filePath ||
     !fileUrl
   ) {
     return (
