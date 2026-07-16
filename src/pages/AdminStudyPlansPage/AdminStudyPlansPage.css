@@ -1,0 +1,314 @@
+.page-container {
+  width: min(1200px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.page-label,
+.admin-study-plan-section-label {
+  margin: 0 0 0.5rem;
+  color: #9b6ee8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-description {
+  margin: 0.5rem 0 2rem;
+  color: #666;
+}
+
+.admin-study-plan-card {
+  margin-top: 1.5rem;
+  padding: 1.75rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
+}
+
+.admin-study-plan-card h2 {
+  margin: 0 0 1.25rem;
+}
+
+.admin-study-plan-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.admin-study-plan-form label {
+  margin-top: 0.45rem;
+  font-weight: 700;
+}
+
+.admin-study-plan-form input,
+.admin-study-plan-form select,
+.admin-study-plan-form textarea {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(167, 116, 255, 0.25);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-study-plan-form textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.admin-study-plan-form input:focus,
+.admin-study-plan-form select:focus,
+.admin-study-plan-form textarea:focus {
+  outline: 2px solid rgba(155, 110, 232, 0.22);
+  border-color: #9b6ee8;
+}
+
+.admin-study-plan-form input:disabled,
+.admin-study-plan-form select:disabled {
+  background: #f6f3fa;
+  cursor: not-allowed;
+}
+
+.admin-study-plan-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(130px, 1fr);
+  gap: 1rem;
+}
+
+.admin-study-plan-row > div,
+.admin-study-plan-textareas > div {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.admin-study-plan-textareas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.admin-study-plan-resources {
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(167, 116, 255, 0.18);
+}
+
+.admin-study-plan-resource-heading h3 {
+  margin: 0 0 0.35rem;
+}
+
+.admin-study-plan-resource-heading p {
+  margin: 0 0 1rem;
+  color: #666;
+}
+
+.admin-resource-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-resource-group {
+  min-width: 0;
+  padding: 1rem;
+  border-radius: 16px;
+  background: #faf8ff;
+}
+
+.admin-resource-group h3 {
+  margin: 0 0 0.8rem;
+}
+
+.admin-resource-group > p {
+  margin: 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.admin-resource-list {
+  display: grid;
+  gap: 0.55rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.admin-resource-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0 !important;
+  padding: 0.6rem;
+  border-radius: 10px;
+  background: #fff;
+  font-weight: 500 !important;
+  cursor: pointer;
+}
+
+.admin-resource-option:hover {
+  background: #f2edff;
+}
+
+.admin-resource-option input {
+  width: auto;
+  margin-top: 0.15rem;
+}
+
+.admin-study-plan-help {
+  margin: 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.admin-study-plan-message {
+  margin: 0.75rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.admin-study-plan-error {
+  background: #fff0f0;
+  color: #b42318;
+}
+
+.admin-study-plan-success {
+  background: #effaf2;
+  color: #247a3c;
+}
+
+.admin-study-plan-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.admin-study-plan-form-actions button,
+.study-topic-actions button {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 11px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-study-plan-form-actions button[type="submit"] {
+  background: #9b6ee8;
+  color: #fff;
+}
+
+.cancel-study-topic-button,
+.edit-study-topic-button {
+  background: #f3efff;
+  color: #7048bd;
+}
+
+.delete-study-topic-button {
+  background: #d92d20;
+  color: #fff;
+}
+
+.admin-study-plan-form-actions button:disabled,
+.study-topic-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.study-topic-list-section {
+  margin-top: 2rem;
+}
+
+.study-topic-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.study-topic-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.2rem;
+  border: 1px solid rgba(167, 116, 255, 0.15);
+  border-radius: 16px;
+  background: #faf9fd;
+}
+
+.study-topic-content {
+  min-width: 0;
+}
+
+.study-topic-heading h3 {
+  margin: 0.15rem 0 0.35rem;
+}
+
+.study-topic-heading span {
+  color: #9b6ee8;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.study-topic-order {
+  margin: 0;
+  color: #777;
+  font-size: 0.82rem;
+}
+
+.study-topic-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.study-topic-summary span {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: #eee8fb;
+  color: #6543a6;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.study-topic-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.7rem;
+}
+
+@media (max-width: 900px) {
+  .admin-resource-columns,
+  .admin-study-plan-textareas {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .page-container {
+    width: min(100% - 2rem, 1200px);
+  }
+
+  .admin-study-plan-card {
+    padding: 1.25rem;
+  }
+
+  .admin-study-plan-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-study-plan-form-actions,
+  .study-topic-item,
+  .study-topic-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-study-plan-form-actions button,
+  .study-topic-actions button {
+    width: 100%;
+  }
+}

@@ -40,6 +40,7 @@ import { AdminNotesPage } from "./pages/AdminNotesPage/AdminNotesPage";
 import { AdminFlashcardsPage } from "./pages/AdminFlashcardsPage/AdminFlashcardsPage";
 import { AdminVideosPage } from "./pages/AdminVideosPage/AdminVideosPage";
 import { AdminExamsPage } from "./pages/AdminExamsPage/AdminExamsPage";
+import { AdminStudyPlansPage } from "./pages/AdminStudyPlansPage/AdminStudyPlansPage";
 
 function App() {
   return (
@@ -337,7 +338,7 @@ function App() {
             </AdminRoute>
           }
         />
-        
+
         <Route
           path="/admin/notater"
           element={
@@ -370,6 +371,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminExamsPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/studieplaner"
+          element={
+            <AdminRoute>
+              <AdminStudyPlansPage />
             </AdminRoute>
           }
         />

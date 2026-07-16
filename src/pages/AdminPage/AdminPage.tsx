@@ -40,6 +40,11 @@ export const AdminPage = () => {
           <h2>Flashcards</h2>
           <p>Legg til og administrer flashcards.</p>
         </Link>
+
+        <Link to="/admin/studieplaner" className="admin-card">
+          <h2>Studieplaner</h2>
+          <p>Opprett og administrer temaer, oppgaver og ressurser.</p>
+        </Link>
       </div>
     </main>
   );
