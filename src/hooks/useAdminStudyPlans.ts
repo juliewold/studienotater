@@ -427,7 +427,6 @@ export const useAdminStudyPlans = () => {
 
   const toggleResource = (
     resourceId: string,
-    selectedIds: string[],
     setSelectedIds: Dispatch<SetStateAction<string[]>>,
   ) => {
     setSelectedIds((currentIds) =>
@@ -438,15 +437,15 @@ export const useAdminStudyPlans = () => {
   };
 
   const togglePdf = (pdfId: string) => {
-    toggleResource(pdfId, selectedPdfIds, setSelectedPdfIds);
+    toggleResource(pdfId, setSelectedPdfIds);
   };
 
   const toggleNote = (noteId: string) => {
-    toggleResource(noteId, selectedNoteIds, setSelectedNoteIds);
+    toggleResource(noteId, setSelectedNoteIds);
   };
 
   const toggleVideo = (videoId: string) => {
-    toggleResource(videoId, selectedVideoIds, setSelectedVideoIds);
+    toggleResource(videoId, setSelectedVideoIds);
   };
 
   return {
