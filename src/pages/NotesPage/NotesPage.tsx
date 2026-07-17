@@ -1,17 +1,26 @@
 import "./NotesPage.css";
-import { useContext, useEffect, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Link, useParams } from "react-router-dom";
-import { Heart, Plus } from "lucide-react";
+import { Heart, Plus, X } from "lucide-react";
+
 import { subjects } from "../../data/subjects";
+
 import {
   getNotesBySubject,
   type DatabaseNote,
 } from "../../services/notesService";
+
 import {
   createNoteFolder,
   getNoteFoldersBySubject,
   type NoteFolder,
 } from "../../services/noteFoldersService";
+
 import { useFavorites } from "../../hooks/useFavorites";
 import { useProgress } from "../../hooks/useProgress";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
@@ -22,20 +31,41 @@ export const NotesPage = () => {
   const { isAdmin } = useContext(AuthContext);
 
   const [notes, setNotes] = useState<DatabaseNote[]>([]);
-  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
+  const [isLoadingNotes, setIsLoadingNotes] =
+    useState(true);
   const [notesError, setNotesError] = useState("");
 
-  const [folders, setFolders] = useState<NoteFolder[]>([]);
-  const [isLoadingFolders, setIsLoadingFolders] = useState(true);
+  const [folders, setFolders] = useState<NoteFolder[]>(
+    [],
+  );
+  const [isLoadingFolders, setIsLoadingFolders] =
+    useState(true);
   const [foldersError, setFoldersError] = useState("");
 
+  const [isFolderModalOpen, setIsFolderModalOpen] =
+    useState(false);
+  const [folderName, setFolderName] = useState("");
+  const [folderModalError, setFolderModalError] =
+    useState("");
+  const [isCreatingFolder, setIsCreatingFolder] =
+    useState(false);
+
+  const folderNameInputRef =
+    useRef<HTMLInputElement | null>(null);
+
   const subject = subjects.find(
-    (currentSubject) => currentSubject.id === subjectId,
+    (currentSubject) =>
+      currentSubject.id === subjectId,
   );
 
-  const { isFavorite, toggleFavorite, isLoadingFavorites } = useFavorites();
+  const {
+    isFavorite,
+    toggleFavorite,
+    isLoadingFavorites,
+  } = useFavorites();
 
-  const { getProgress, isLoadingProgress } = useProgress();
+  const { getProgress, isLoadingProgress } =
+    useProgress();
 
   useEffect(() => {
     const loadNotes = async () => {
@@ -49,12 +79,19 @@ export const NotesPage = () => {
       setNotesError("");
 
       try {
-        const loadedNotes = await getNotesBySubject(subjectId);
+        const loadedNotes =
+          await getNotesBySubject(subjectId);
 
         setNotes(loadedNotes);
       } catch (error) {
-        console.error("Kunne ikke hente notater:", error);
-        setNotesError("Kunne ikke hente notatene.");
+        console.error(
+          "Kunne ikke hente notater:",
+          error,
+        );
+
+        setNotesError(
+          "Kunne ikke hente notatene.",
+        );
       } finally {
         setIsLoadingNotes(false);
       }
@@ -75,12 +112,19 @@ export const NotesPage = () => {
       setFoldersError("");
 
       try {
-        const loadedFolders = await getNoteFoldersBySubject(subjectId);
+        const loadedFolders =
+          await getNoteFoldersBySubject(subjectId);
 
         setFolders(loadedFolders);
       } catch (error) {
-        console.error("Kunne ikke hente mapper:", error);
-        setFoldersError("Kunne ikke hente mappene.");
+        console.error(
+          "Kunne ikke hente mapper:",
+          error,
+        );
+
+        setFoldersError(
+          "Kunne ikke hente mappene.",
+        );
       } finally {
         setIsLoadingFolders(false);
       }
@@ -89,27 +133,102 @@ export const NotesPage = () => {
     loadFolders();
   }, [subjectId]);
 
+  useEffect(() => {
+    if (!isFolderModalOpen) {
+      return;
+    }
+
+    folderNameInputRef.current?.focus();
+
+    const handleKeyDown = (
+      event: KeyboardEvent,
+    ) => {
+      if (event.key === "Escape") {
+        setIsFolderModalOpen(false);
+        setFolderName("");
+        setFolderModalError("");
+      }
+    };
+
+    document.addEventListener(
+      "keydown",
+      handleKeyDown,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      );
+    };
+  }, [isFolderModalOpen]);
+
+  const openFolderModal = () => {
+    setFolderName("");
+    setFolderModalError("");
+    setIsFolderModalOpen(true);
+  };
+
+  const closeFolderModal = () => {
+    if (isCreatingFolder) {
+      return;
+    }
+
+    setIsFolderModalOpen(false);
+    setFolderName("");
+    setFolderModalError("");
+  };
+
   const handleCreateFolder = async () => {
     if (!subjectId) {
       return;
     }
 
-    const folderName = window.prompt("Hva skal mappen hete?");
+    const trimmedFolderName = folderName.trim();
 
-    if (!folderName?.trim()) {
+    if (!trimmedFolderName) {
+      setFolderModalError(
+        "Du må skrive inn et navn på mappen.",
+      );
       return;
     }
 
+    setIsCreatingFolder(true);
+    setFolderModalError("");
     setFoldersError("");
 
     try {
-      const newFolder = await createNoteFolder(subjectId, folderName.trim());
+      const newFolder = await createNoteFolder(
+        subjectId,
+        trimmedFolderName,
+      );
 
-      setFolders((currentFolders) => [...currentFolders, newFolder]);
+      setFolders((currentFolders) => [
+        ...currentFolders,
+        newFolder,
+      ]);
+
+      setIsFolderModalOpen(false);
+      setFolderName("");
     } catch (error) {
-      console.error("Kunne ikke opprette mappe:", error);
-      setFoldersError("Kunne ikke opprette mappen.");
+      console.error(
+        "Kunne ikke opprette mappe:",
+        error,
+      );
+
+      setFolderModalError(
+        "Kunne ikke opprette mappen.",
+      );
+    } finally {
+      setIsCreatingFolder(false);
     }
+  };
+
+  const handleFolderFormSubmit = (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    handleCreateFolder();
   };
 
   if (!subject) {
@@ -122,7 +241,10 @@ export const NotesPage = () => {
 
   return (
     <main className="notes-page">
-      <Link to={`/fag/${subject.id}`} className="back-link">
+      <Link
+        to={`/fag/${subject.id}`}
+        className="back-link"
+      >
         ← Tilbake til faget
       </Link>
 
@@ -139,7 +261,7 @@ export const NotesPage = () => {
           <button
             type="button"
             className="new-folder-button"
-            onClick={handleCreateFolder}
+            onClick={openFolderModal}
           >
             <Plus size={20} />
             Ny mappe
@@ -147,87 +269,235 @@ export const NotesPage = () => {
         )}
       </div>
 
-      {foldersError && <p>{foldersError}</p>}
+      {foldersError && (
+        <p className="notes-error-message">
+          {foldersError}
+        </p>
+      )}
 
       {isLoadingFolders && <p>Laster mapper...</p>}
 
-      {!isLoadingFolders && folders.length > 0 && (
-        <div className="notes-folders">
-          {folders.map((folder) => (
-            <Link
-              key={folder.id}
-              to={`/fag/${subject.id}/notater/mappe/${folder.id}`}
-              className="notes-folder-card"
+      {!isLoadingFolders &&
+        folders.length > 0 && (
+          <div className="notes-folders">
+            {folders.map((folder) => (
+              <Link
+                key={folder.id}
+                to={`/fag/${subject.id}/notater/mappe/${folder.id}`}
+                className="notes-folder-card"
+              >
+                <span
+                  className="notes-folder-icon"
+                  aria-hidden="true"
+                >
+                  📁
+                </span>
+
+                <span>{folder.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
+
+      {(isLoadingProgress ||
+        isLoadingNotes) && <p>Laster notater...</p>}
+
+      {notesError && (
+        <p className="notes-error-message">
+          {notesError}
+        </p>
+      )}
+
+      {!isLoadingNotes &&
+        notes.length === 0 && (
+          <p>Ingen notater er lagt til ennå.</p>
+        )}
+
+      {!isLoadingNotes &&
+        notes.length > 0 && (
+          <div className="notes-list">
+            {notes.map((note) => {
+              const favoriteId =
+                `${subject.id}-database-${note.slug}`;
+
+              const resourceId =
+                `note-${subject.id}-database-${note.slug}`;
+
+              const noteUrl =
+                `/fag/${subject.id}/notater/${note.slug}`;
+
+              const favorite = isFavorite(
+                favoriteId,
+                "note",
+              );
+
+              const { completed, rating } =
+                getProgress(
+                  resourceId,
+                  "resource",
+                );
+
+              return (
+                <article
+                  className="note-card-wrapper"
+                  key={note.id}
+                >
+                  <Link
+                    to={noteUrl}
+                    className="note-card"
+                  >
+                    <h3>{note.title}</h3>
+
+                    <p>{note.description}</p>
+
+                    <div className="note-progress-preview">
+                      <span>
+                        {completed
+                          ? "✓ Lest"
+                          : "Ikke lest"}
+                      </span>
+
+                      <span
+                        className={`rating-${rating}`}
+                      >
+                        {"★".repeat(rating)}
+                      </span>
+                    </div>
+                  </Link>
+
+                  <button
+                    type="button"
+                    className={`favorite-button ${
+                      favorite
+                        ? "is-favorite"
+                        : ""
+                    }`}
+                    aria-label={
+                      favorite
+                        ? "Fjern fra favoritter"
+                        : "Legg til i favoritter"
+                    }
+                    disabled={isLoadingFavorites}
+                    onClick={() =>
+                      toggleFavorite({
+                        id: favoriteId,
+                        title: note.title,
+                        subject: subject.name,
+                        type: "note",
+                        url: noteUrl,
+                      })
+                    }
+                  >
+                    <Heart
+                      size={22}
+                      fill={
+                        favorite
+                          ? "currentColor"
+                          : "transparent"
+                      }
+                      strokeWidth={2}
+                    />
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+        )}
+
+      {isFolderModalOpen && (
+        <div
+          className="folder-modal-backdrop"
+          onMouseDown={closeFolderModal}
+        >
+          <section
+            className="folder-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="folder-modal-title"
+            onMouseDown={(event) =>
+              event.stopPropagation()
+            }
+          >
+            <div className="folder-modal-header">
+              <div>
+                <p className="folder-modal-label">
+                  Ny mappe
+                </p>
+
+                <h2 id="folder-modal-title">
+                  Opprett mappe
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                className="folder-modal-close-button"
+                aria-label="Lukk"
+                onClick={closeFolderModal}
+                disabled={isCreatingFolder}
+              >
+                <X size={21} />
+              </button>
+            </div>
+
+            <form
+              className="folder-modal-form"
+              onSubmit={
+                handleFolderFormSubmit
+              }
             >
-              📁 {folder.name}
-            </Link>
-          ))}
-        </div>
-      )}
+              <label htmlFor="folder-name">
+                Mappenavn
+              </label>
 
-      {(isLoadingProgress || isLoadingNotes) && <p>Laster notater...</p>}
+              <input
+                ref={folderNameInputRef}
+                id="folder-name"
+                type="text"
+                value={folderName}
+                onChange={(event) => {
+                  setFolderName(
+                    event.target.value,
+                  );
 
-      {notesError && <p>{notesError}</p>}
+                  if (folderModalError) {
+                    setFolderModalError("");
+                  }
+                }}
+                placeholder="For eksempel Forelesninger"
+                disabled={isCreatingFolder}
+              />
 
-      {!isLoadingNotes && notes.length === 0 && (
-        <p>Ingen notater er lagt til ennå.</p>
-      )}
+              {folderModalError && (
+                <p className="folder-modal-error">
+                  {folderModalError}
+                </p>
+              )}
 
-      {!isLoadingNotes && notes.length > 0 && (
-        <div className="notes-list">
-          {notes.map((note) => {
-            const favoriteId = `${subject.id}-database-${note.slug}`;
-
-            const resourceId = `note-${subject.id}-database-${note.slug}`;
-
-            const noteUrl = `/fag/${subject.id}/notater/${note.slug}`;
-
-            const favorite = isFavorite(favoriteId, "note");
-
-            const { completed, rating } = getProgress(resourceId, "resource");
-
-            return (
-              <article className="note-card-wrapper" key={note.id}>
-                <Link to={noteUrl} className="note-card">
-                  <h3>{note.title}</h3>
-
-                  <p>{note.description}</p>
-
-                  <div className="note-progress-preview">
-                    <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
-
-                    <span className={`rating-${rating}`}>
-                      {"★".repeat(rating)}
-                    </span>
-                  </div>
-                </Link>
-
+              <div className="folder-modal-actions">
                 <button
                   type="button"
-                  className={`favorite-button ${favorite ? "is-favorite" : ""}`}
-                  aria-label={
-                    favorite ? "Fjern fra favoritter" : "Legg til i favoritter"
-                  }
-                  disabled={isLoadingFavorites}
-                  onClick={() =>
-                    toggleFavorite({
-                      id: favoriteId,
-                      title: note.title,
-                      subject: subject.name,
-                      type: "note",
-                      url: noteUrl,
-                    })
-                  }
+                  className="folder-modal-cancel-button"
+                  onClick={closeFolderModal}
+                  disabled={isCreatingFolder}
                 >
-                  <Heart
-                    size={22}
-                    fill={favorite ? "currentColor" : "transparent"}
-                    strokeWidth={2}
-                  />
+                  Avbryt
                 </button>
-              </article>
-            );
-          })}
+
+                <button
+                  type="submit"
+                  className="folder-modal-submit-button"
+                  disabled={isCreatingFolder}
+                >
+                  <Plus size={18} />
+
+                  {isCreatingFolder
+                    ? "Oppretter..."
+                    : "Opprett mappe"}
+                </button>
+              </div>
+            </form>
+          </section>
         </div>
       )}
     </main>
