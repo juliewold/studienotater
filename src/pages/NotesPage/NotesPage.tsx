@@ -224,6 +224,15 @@ export const NotesPage = () => {
               key={folder.id}
               folder={folder}
               subjectId={subject.id}
+              onFolderUpdated={(updatedFolder) => {
+                setFolders((currentFolders) =>
+                  currentFolders.map((currentFolder) =>
+                    currentFolder.id === updatedFolder.id
+                      ? updatedFolder
+                      : currentFolder,
+                  ),
+                );
+              }}
             />
           ))}
         </div>
