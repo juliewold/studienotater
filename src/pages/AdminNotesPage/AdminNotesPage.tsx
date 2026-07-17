@@ -1,6 +1,7 @@
 import "./AdminNotesPage.css";
 import { subjects } from "../../data/subjects";
 import { useAdminNotes } from "../../hooks/useAdminNotes";
+import { NoteEditor } from "../../components/NoteEditor/NoteEditor";
 
 export const AdminNotesPage = () => {
   const {
@@ -52,13 +53,11 @@ export const AdminNotesPage = () => {
         Opprett, rediger og slett notater på nettsiden.
       </p>
 
-      <div className="admin-notes-layout">
-        <section className="admin-note-card">
-          <h2>
-            {editingNote ? "Rediger notat" : "Opprett nytt notat"}
-          </h2>
+      <section className="admin-note-card admin-note-editor-card">
+        <h2>{editingNote ? "Rediger notat" : "Opprett nytt notat"}</h2>
 
-          <form className="admin-note-form" onSubmit={handleSubmit}>
+        <form className="admin-note-form" onSubmit={handleSubmit}>
+          <div className="admin-note-field">
             <label htmlFor="note-subject">Fag</label>
 
             <select
@@ -82,97 +81,70 @@ export const AdminNotesPage = () => {
                 Faget kan ikke endres når et notat redigeres.
               </p>
             )}
+          </div>
 
-            <label htmlFor="note-title">Tittel</label>
-
+          <div className="admin-note-document-header">
             <input
               id="note-title"
+              className="admin-note-title-input"
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="For eksempel Mengdelære"
+              placeholder="Tittel på notatet"
+              aria-label="Tittel"
               required
             />
-
-            <label htmlFor="note-description">Beskrivelse</label>
 
             <input
               id="note-description"
+              className="admin-note-description-input"
               type="text"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="Kort beskrivelse av notatet"
+              placeholder="Skriv en kort beskrivelse..."
+              aria-label="Beskrivelse"
               required
             />
+          </div>
 
-            <label htmlFor="note-content">Innhold</label>
+          <div className="admin-note-editor-section">
+            <NoteEditor value={content} onChange={setContent} />
+          </div>
 
-            <textarea
-              id="note-content"
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
-              placeholder="Skriv notatet her..."
-              rows={18}
-              required
-            />
+          {errorMessage && (
+            <p className="admin-note-message admin-note-error">
+              {errorMessage}
+            </p>
+          )}
 
-            {errorMessage && (
-              <p className="admin-note-message admin-note-error">
-                {errorMessage}
-              </p>
-            )}
+          {successMessage && (
+            <p className="admin-note-message admin-note-success">
+              {successMessage}
+            </p>
+          )}
 
-            {successMessage && (
-              <p className="admin-note-message admin-note-success">
-                {successMessage}
-              </p>
-            )}
+          <div className="admin-note-form-actions">
+            <button type="submit" disabled={isSaving}>
+              {isSaving
+                ? "Lagrer..."
+                : editingNote
+                  ? "Lagre endringer"
+                  : "Opprett notat"}
+            </button>
 
-            <div className="admin-note-form-actions">
-              <button type="submit" disabled={isSaving}>
-                {isSaving
-                  ? "Lagrer..."
-                  : editingNote
-                    ? "Lagre endringer"
-                    : "Opprett notat"}
+            {editingNote && (
+              <button
+                type="button"
+                className="cancel-edit-button"
+                onClick={cancelEdit}
+                disabled={isSaving}
+              >
+                Avbryt redigering
               </button>
-
-              {editingNote && (
-                <button
-                  type="button"
-                  className="cancel-edit-button"
-                  onClick={cancelEdit}
-                  disabled={isSaving}
-                >
-                  Avbryt redigering
-                </button>
-              )}
-            </div>
-          </form>
-        </section>
-
-        <section className="admin-note-card note-preview">
-          <p className="preview-label">Forhåndsvisning</p>
-
-          <h2>{title.trim() || "Tittel på notatet"}</h2>
-
-          <p className="preview-description">
-            {description.trim() || "Beskrivelsen vises her."}
-          </p>
-
-          <div className="preview-content">
-            {content.trim() ? (
-              content.split("\n").map((line, index) => (
-                <p key={`${line}-${index}`}>
-                  {line || "\u00A0"}
-                </p>
-              ))
-            ) : (
-              <p>Innholdet vises her mens du skriver.</p>
             )}
           </div>
-        </section>
-      </div>
+        </form>
+      </section>
 
       <section className="admin-note-card uploaded-notes-section">
         <h2>Opprettede notater</h2>
@@ -214,9 +186,7 @@ export const AdminNotesPage = () => {
                     disabled={deletingNoteId === note.id}
                     onClick={() => handleDelete(note)}
                   >
-                    {deletingNoteId === note.id
-                      ? "Sletter..."
-                      : "Slett"}
+                    {deletingNoteId === note.id ? "Sletter..." : "Slett"}
                   </button>
                 </div>
               </article>

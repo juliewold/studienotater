@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type SyntheticEvent,
-} from "react";
+import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
 import { subjects } from "../data/subjects";
 import {
   createNote,
@@ -19,15 +14,12 @@ export const useAdminNotes = () => {
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
 
-  const [editingNote, setEditingNote] =
-    useState<DatabaseNote | null>(null);
+  const [editingNote, setEditingNote] = useState<DatabaseNote | null>(null);
 
   const [uploadedNotes, setUploadedNotes] = useState<DatabaseNote[]>([]);
   const [isLoadingNotes, setIsLoadingNotes] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(
-    null,
-  );
+  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -78,9 +70,7 @@ export const useAdminNotes = () => {
     loadUploadedNotes();
   }, [loadUploadedNotes]);
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedTitle = title.trim();
@@ -93,12 +83,11 @@ export const useAdminNotes = () => {
 
     try {
       if (editingNote) {
-        await updateNote(
-          editingNote.id,
-          trimmedTitle,
-          trimmedDescription,
-          trimmedContent,
-        );
+        await updateNote(editingNote.id, {
+          title: trimmedTitle,
+          description: trimmedDescription,
+          content: trimmedContent,
+        });
 
         resetForm();
         await loadUploadedNotes();
@@ -113,14 +102,14 @@ export const useAdminNotes = () => {
         return;
       }
 
-      await createNote(
+      await createNote({
         subjectId,
         slug,
-        trimmedTitle,
-        trimmedDescription,
-        trimmedContent,
-      );
-
+        title: trimmedTitle,
+        description: trimmedDescription,
+        content: trimmedContent,
+      });
+      
       resetForm();
       await loadUploadedNotes();
       setSuccessMessage("Notatet ble opprettet.");
@@ -181,9 +170,7 @@ export const useAdminNotes = () => {
       await deleteNote(note.id);
 
       setUploadedNotes((currentNotes) =>
-        currentNotes.filter(
-          (currentNote) => currentNote.id !== note.id,
-        ),
+        currentNotes.filter((currentNote) => currentNote.id !== note.id),
       );
 
       if (editingNote?.id === note.id) {

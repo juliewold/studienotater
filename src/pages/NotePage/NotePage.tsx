@@ -1,22 +1,49 @@
 import "./NotePage.css";
-import { useEffect, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { Link, useParams } from "react-router-dom";
+import { Edit3, Save, X } from "lucide-react";
+
 import { subjects } from "../../data/subjects";
 import {
   getNoteBySlug,
+  updateNote,
   type DatabaseNote,
 } from "../../services/notesService";
+
+import { AuthContext } from "../../context/AuthContext/AuthContext";
+import { NoteEditor } from "../../components/NoteEditor/NoteEditor";
 import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
 
 export const NotePage = () => {
   const { subjectId, noteId } = useParams();
 
-  const [note, setNote] = useState<DatabaseNote | null>(null);
-  const [isLoadingNote, setIsLoadingNote] = useState(true);
+  const { isAdmin } = useContext(AuthContext);
+
+  const [note, setNote] = useState<DatabaseNote | null>(
+    null,
+  );
+
+  const [isLoadingNote, setIsLoadingNote] =
+    useState(true);
+
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] =
+    useState("");
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [content, setContent] = useState("");
 
   const subject = subjects.find(
-    (currentSubject) => currentSubject.id === subjectId,
+    (currentSubject) =>
+      currentSubject.id === subjectId,
   );
 
   useEffect(() => {
@@ -29,6 +56,7 @@ export const NotePage = () => {
 
       setIsLoadingNote(true);
       setErrorMessage("");
+      setSuccessMessage("");
 
       try {
         const loadedNote = await getNoteBySlug(
@@ -38,13 +66,23 @@ export const NotePage = () => {
 
         if (!loadedNote) {
           setErrorMessage("Fant ikke notatet.");
+          setNote(null);
           return;
         }
 
         setNote(loadedNote);
+        setTitle(loadedNote.title);
+        setDescription(loadedNote.description);
+        setContent(loadedNote.content);
       } catch (error) {
-        console.error("Kunne ikke hente notat:", error);
-        setErrorMessage("Kunne ikke hente notatet.");
+        console.error(
+          "Kunne ikke hente notat:",
+          error,
+        );
+
+        setErrorMessage(
+          "Kunne ikke hente notatet.",
+        );
       } finally {
         setIsLoadingNote(false);
       }
@@ -52,6 +90,80 @@ export const NotePage = () => {
 
     loadNote();
   }, [noteId, subjectId]);
+
+  const handleStartEditing = () => {
+    if (!note) {
+      return;
+    }
+
+    setTitle(note.title);
+    setDescription(note.description);
+    setContent(note.content);
+
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsEditing(true);
+  };
+
+  const handleCancelEditing = () => {
+    if (!note) {
+      return;
+    }
+
+    setTitle(note.title);
+    setDescription(note.description);
+    setContent(note.content);
+
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsEditing(false);
+  };
+
+  const handleSave = async () => {
+    if (!note) {
+      return;
+    }
+
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedTitle) {
+      setErrorMessage("Notatet må ha en tittel.");
+      return;
+    }
+
+    setIsSaving(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const updatedNote = await updateNote(note.id, {
+        title: trimmedTitle,
+        description: trimmedDescription,
+        content,
+        contentJson: note.contentJson,
+      });
+
+      setNote(updatedNote);
+      setTitle(updatedNote.title);
+      setDescription(updatedNote.description);
+      setContent(updatedNote.content);
+
+      setIsEditing(false);
+      setSuccessMessage("Notatet ble lagret.");
+    } catch (error) {
+      console.error(
+        "Kunne ikke lagre notatet:",
+        error,
+      );
+
+      setErrorMessage(
+        "Kunne ikke lagre notatet.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoadingNote) {
     return (
@@ -61,7 +173,7 @@ export const NotePage = () => {
     );
   }
 
-  if (!subject || !note || errorMessage) {
+  if (!subject || !note) {
     return (
       <main className="note-page">
         <Link
@@ -78,29 +190,120 @@ export const NotePage = () => {
     );
   }
 
+  const backUrl = note.folderId
+    ? `/fag/${subject.id}/notater/mappe/${note.folderId}`
+    : `/fag/${subject.id}/notater`;
+
   const resourceId =
     `note-${subject.id}-database-${note.slug}`;
 
   return (
     <main className="note-page">
-      <Link
-        to={`/fag/${subject.id}/notater`}
-        className="back-link"
-      >
-        ← Tilbake til notater
-      </Link>
+      <div className="note-top-bar">
+        <Link to={backUrl} className="back-link">
+          ← Tilbake
+        </Link>
 
-      <p className="note-label">{subject.code}</p>
+        {isAdmin && !isEditing && (
+          <button
+            type="button"
+            className="note-edit-button"
+            onClick={handleStartEditing}
+          >
+            <Edit3 size={18} />
+            Rediger
+          </button>
+        )}
+      </div>
 
-      <h1>{note.title}</h1>
+      {errorMessage && (
+        <p className="note-error-message">
+          {errorMessage}
+        </p>
+      )}
 
-      <p>{note.description}</p>
+      {successMessage && (
+        <p className="note-success-message">
+          {successMessage}
+        </p>
+      )}
 
-      <ResourceProgress resourceId={resourceId} />
+      {isEditing ? (
+        <section className="note-editor-view">
+          <p className="note-label">{subject.code}</p>
 
-      <section className="note-content">
-        <pre>{note.content}</pre>
-      </section>
+          <input
+            type="text"
+            className="note-title-input"
+            value={title}
+            onChange={(event) =>
+              setTitle(event.target.value)
+            }
+            placeholder="Tittel"
+          />
+
+          <input
+            type="text"
+            className="note-description-input"
+            value={description}
+            onChange={(event) =>
+              setDescription(event.target.value)
+            }
+            placeholder="Kort beskrivelse"
+          />
+
+          <NoteEditor
+            value={content}
+            onChange={setContent}
+          />
+
+          <div className="note-editor-actions">
+            <button
+              type="button"
+              className="note-cancel-button"
+              onClick={handleCancelEditing}
+              disabled={isSaving}
+            >
+              <X size={18} />
+              Avbryt
+            </button>
+
+            <button
+              type="button"
+              className="note-save-button"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              <Save size={18} />
+
+              {isSaving ? "Lagrer..." : "Lagre"}
+            </button>
+          </div>
+        </section>
+      ) : (
+        <>
+          <p className="note-label">{subject.code}</p>
+
+          <h1>{note.title}</h1>
+
+          {note.description && (
+            <p className="note-description">
+              {note.description}
+            </p>
+          )}
+
+          <ResourceProgress
+            resourceId={resourceId}
+          />
+
+          <section
+            className="note-content"
+            dangerouslySetInnerHTML={{
+              __html: note.content,
+            }}
+          />
+        </>
+      )}
     </main>
   );
 };

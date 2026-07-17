@@ -41,6 +41,7 @@ import { AdminFlashcardsPage } from "./pages/AdminFlashcardsPage/AdminFlashcards
 import { AdminVideosPage } from "./pages/AdminVideosPage/AdminVideosPage";
 import { AdminExamsPage } from "./pages/AdminExamsPage/AdminExamsPage";
 import { AdminStudyPlansPage } from "./pages/AdminStudyPlansPage/AdminStudyPlansPage";
+import { FolderPage } from "./pages/FolderPage/FolderPage";
 
 function App() {
   return (
@@ -101,6 +102,15 @@ function App() {
           element={
             <ProtectedRoute>
               <NotesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fag/:subjectId/notater/mappe/:folderId"
+          element={
+            <ProtectedRoute>
+              <FolderPage />
             </ProtectedRoute>
           }
         />
