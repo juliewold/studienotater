@@ -1,0 +1,192 @@
+.editable-note {
+  width: 100%;
+}
+
+.editable-note-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.editable-note-subject {
+  color: var(--text-muted, #6b7280);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.editable-note-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.editable-note-edit-button,
+.editable-note-save-button,
+.editable-note-cancel-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 42px;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.editable-note-edit-button,
+.editable-note-save-button {
+  background: var(--primary, #7c6ee6);
+  color: white;
+}
+
+.editable-note-cancel-button {
+  background: var(--surface, #f3f4f6);
+  color: var(--text, #1f2937);
+}
+
+.editable-note-edit-button:hover,
+.editable-note-save-button:hover,
+.editable-note-cancel-button:hover {
+  transform: translateY(-1px);
+}
+
+.editable-note-edit-button:disabled,
+.editable-note-save-button:disabled,
+.editable-note-cancel-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.editable-note-title {
+  max-width: 850px;
+  margin: 0 0 0.75rem;
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  line-height: 1.1;
+}
+
+.editable-note-description {
+  max-width: 750px;
+  margin: 0 0 2.5rem;
+  color: var(--text-muted, #6b7280);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.editable-note-title-input,
+.editable-note-description-input {
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.editable-note-title-input {
+  margin-bottom: 0.75rem;
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.editable-note-title-input::placeholder,
+.editable-note-description-input::placeholder {
+  color: var(--text-muted, #9ca3af);
+}
+
+.editable-note-description-input {
+  margin-bottom: 2rem;
+  color: var(--text-muted, #6b7280);
+  font-size: 1.1rem;
+}
+
+.editable-note-editor {
+  min-height: 500px;
+}
+
+.editable-note-content {
+  max-width: 850px;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.editable-note-content h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.editable-note-content h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.65rem;
+}
+
+.editable-note-content p {
+  margin: 0 0 1rem;
+}
+
+.editable-note-content ul,
+.editable-note-content ol {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+
+.editable-note-content blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid var(--primary, #7c6ee6);
+  color: var(--text-muted, #6b7280);
+}
+
+.editable-note-content pre {
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--surface, #f3f4f6);
+  white-space: pre-wrap;
+}
+
+.editable-note-message {
+  margin: 0 0 1.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+}
+
+.editable-note-success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.editable-note-error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+@media (max-width: 650px) {
+  .editable-note-toolbar {
+    align-items: flex-start;
+  }
+
+  .editable-note-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .editable-note-edit-button,
+  .editable-note-save-button,
+  .editable-note-cancel-button {
+    padding: 0.6rem 0.8rem;
+  }
+}
