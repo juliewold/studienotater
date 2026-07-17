@@ -247,3 +247,15 @@
 .folder-modal-submit:hover:not(:disabled) {
   background: #745394;
 }
+
+.folder-card-content {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.folder-card-count {
+  color: #817788;
+  font-size: 0.84rem;
+  font-weight: 500;
+}

@@ -12,6 +12,7 @@ import {
 type FolderCardProps = {
   folder: NoteFolder;
   subjectId: string;
+  noteCount: number;
   onFolderUpdated: (updatedFolder: NoteFolder) => void;
   onFolderDeleted: (deletedFolderId: string) => void;
 };
@@ -19,6 +20,7 @@ type FolderCardProps = {
 export const FolderCard = ({
   folder,
   subjectId,
+  noteCount,
   onFolderUpdated,
   onFolderDeleted,
 }: FolderCardProps) => {
@@ -185,7 +187,13 @@ export const FolderCard = ({
             📁
           </span>
 
-          <span className="folder-card-name">{folder.name}</span>
+          <span className="folder-card-content">
+            <span className="folder-card-name">{folder.name}</span>
+
+            <span className="folder-card-count">
+              {noteCount === 1 ? "1 notat" : `${noteCount} notater`}
+            </span>
+          </span>
         </Link>
 
         <div className="folder-card-menu" ref={menuRef}>
