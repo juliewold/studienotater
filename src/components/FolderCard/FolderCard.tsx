@@ -1,18 +1,10 @@
 import "./FolderCard.css";
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  MoreVertical,
-  Pencil,
-  Trash2,
-  X,
-} from "lucide-react";
+import { MoreVertical, Pencil, Trash2, X } from "lucide-react";
 
 import {
+  deleteNoteFolder,
   updateNoteFolder,
   type NoteFolder,
 } from "../../services/noteFoldersService";
@@ -20,92 +12,80 @@ import {
 type FolderCardProps = {
   folder: NoteFolder;
   subjectId: string;
-  onFolderUpdated: (
-    updatedFolder: NoteFolder,
-  ) => void;
+  onFolderUpdated: (updatedFolder: NoteFolder) => void;
+  onFolderDeleted: (deletedFolderId: string) => void;
 };
 
 export const FolderCard = ({
   folder,
   subjectId,
   onFolderUpdated,
+  onFolderDeleted,
 }: FolderCardProps) => {
-  const [isMenuOpen, setIsMenuOpen] =
-    useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const [isRenaming, setIsRenaming] =
-    useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
 
-  const [folderName, setFolderName] =
-    useState(folder.name);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const [isSaving, setIsSaving] =
-    useState(false);
+  const [folderName, setFolderName] = useState(folder.name);
 
-  const [errorMessage, setErrorMessage] =
-    useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
-  const menuRef =
-    useRef<HTMLDivElement | null>(null);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
+
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!isMenuOpen) {
       return;
     }
 
-    const handleClickOutside = (
-      event: MouseEvent,
-    ) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(
-          event.target as Node,
-        )
-      ) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside,
-    );
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside,
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMenuOpen]);
 
   useEffect(() => {
-    if (!isRenaming) {
+    if (!isRenaming && !isDeleting) {
       return;
     }
 
-    const handleKeyDown = (
-      event: KeyboardEvent,
-    ) => {
-      if (event.key === "Escape") {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      if (isRenaming && !isSaving) {
         setIsRenaming(false);
         setErrorMessage("");
         setFolderName(folder.name);
       }
+
+      if (isDeleting && !isDeleteLoading) {
+        setIsDeleting(false);
+        setDeleteErrorMessage("");
+      }
     };
 
-    document.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isRenaming, folder.name]);
+  }, [isRenaming, isDeleting, isSaving, isDeleteLoading, folder.name]);
 
   const openRenameModal = () => {
     setFolderName(folder.name);
@@ -124,17 +104,28 @@ export const FolderCard = ({
     setFolderName(folder.name);
   };
 
-  const handleRename = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const openDeleteModal = () => {
+    setDeleteErrorMessage("");
+    setIsMenuOpen(false);
+    setIsDeleting(true);
+  };
+
+  const closeDeleteModal = () => {
+    if (isDeleteLoading) {
+      return;
+    }
+
+    setIsDeleting(false);
+    setDeleteErrorMessage("");
+  };
+
+  const handleRename = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedName = folderName.trim();
 
     if (!trimmedName) {
-      setErrorMessage(
-        "Du må skrive inn et mappenavn.",
-      );
+      setErrorMessage("Du må skrive inn et mappenavn.");
       return;
     }
 
@@ -148,10 +139,7 @@ export const FolderCard = ({
       setIsSaving(true);
       setErrorMessage("");
 
-      await updateNoteFolder(
-        folder.id,
-        trimmedName,
-      );
+      await updateNoteFolder(folder.id, trimmedName);
 
       onFolderUpdated({
         ...folder,
@@ -160,16 +148,29 @@ export const FolderCard = ({
 
       setIsRenaming(false);
     } catch (error) {
-      console.error(
-        "Kunne ikke oppdatere mappen:",
-        error,
-      );
+      console.error("Kunne ikke oppdatere mappen:", error);
 
-      setErrorMessage(
-        "Kunne ikke endre navnet. Prøv igjen.",
-      );
+      setErrorMessage("Kunne ikke endre navnet. Prøv igjen.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleteLoading(true);
+      setDeleteErrorMessage("");
+
+      await deleteNoteFolder(folder.id);
+
+      onFolderDeleted(folder.id);
+      setIsDeleting(false);
+    } catch (error) {
+      console.error("Kunne ikke slette mappen:", error);
+
+      setDeleteErrorMessage("Kunne ikke slette mappen. Prøv igjen.");
+    } finally {
+      setIsDeleteLoading(false);
     }
   };
 
@@ -180,22 +181,14 @@ export const FolderCard = ({
           to={`/fag/${subjectId}/notater/mappe/${folder.id}`}
           className="folder-card"
         >
-          <span
-            className="folder-card-icon"
-            aria-hidden="true"
-          >
+          <span className="folder-card-icon" aria-hidden="true">
             📁
           </span>
 
-          <span className="folder-card-name">
-            {folder.name}
-          </span>
+          <span className="folder-card-name">{folder.name}</span>
         </Link>
 
-        <div
-          className="folder-card-menu"
-          ref={menuRef}
-        >
+        <div className="folder-card-menu" ref={menuRef}>
           <button
             type="button"
             className="folder-card-menu-button"
@@ -205,9 +198,7 @@ export const FolderCard = ({
               event.preventDefault();
               event.stopPropagation();
 
-              setIsMenuOpen(
-                (current) => !current,
-              );
+              setIsMenuOpen((current) => !current);
             }}
           >
             <MoreVertical size={18} />
@@ -215,20 +206,12 @@ export const FolderCard = ({
 
           {isMenuOpen && (
             <div className="folder-card-dropdown">
-              <button
-                type="button"
-                onClick={openRenameModal}
-              >
+              <button type="button" onClick={openRenameModal}>
                 <Pencil size={16} />
                 Gi nytt navn
               </button>
 
-              <button
-                type="button"
-                onClick={() =>
-                  setIsMenuOpen(false)
-                }
-              >
+              <button type="button" onClick={openDeleteModal}>
                 <Trash2 size={16} />
                 Slett mappe
               </button>
@@ -241,10 +224,7 @@ export const FolderCard = ({
         <div
           className="folder-modal-backdrop"
           onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+            if (event.target === event.currentTarget) {
               closeRenameModal();
             }
           }}
@@ -257,15 +237,9 @@ export const FolderCard = ({
           >
             <div className="folder-modal-header">
               <div>
-                <p className="folder-modal-label">
-                  Mappe
-                </p>
+                <p className="folder-modal-label">Mappe</p>
 
-                <h2
-                  id={`rename-folder-${folder.id}`}
-                >
-                  Gi nytt navn
-                </h2>
+                <h2 id={`rename-folder-${folder.id}`}>Gi nytt navn</h2>
               </div>
 
               <button
@@ -285,7 +259,6 @@ export const FolderCard = ({
                 htmlFor={`folder-name-${folder.id}`}
               >
                 Mappenavn
-
                 <input
                   id={`folder-name-${folder.id}`}
                   type="text"
@@ -293,9 +266,7 @@ export const FolderCard = ({
                   autoFocus
                   disabled={isSaving}
                   onChange={(event) => {
-                    setFolderName(
-                      event.target.value,
-                    );
+                    setFolderName(event.target.value);
 
                     if (errorMessage) {
                       setErrorMessage("");
@@ -305,9 +276,7 @@ export const FolderCard = ({
               </label>
 
               {errorMessage && (
-                <p className="folder-modal-error">
-                  {errorMessage}
-                </p>
+                <p className="folder-modal-error">{errorMessage}</p>
               )}
 
               <div className="folder-modal-actions">
@@ -325,12 +294,79 @@ export const FolderCard = ({
                   className="folder-modal-submit"
                   disabled={isSaving}
                 >
-                  {isSaving
-                    ? "Lagrer..."
-                    : "Lagre navn"}
+                  {isSaving ? "Lagrer..." : "Lagre navn"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleting && (
+        <div
+          className="folder-modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeDeleteModal();
+            }
+          }}
+        >
+          <div
+            className="folder-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`delete-folder-${folder.id}`}
+          >
+            <div className="folder-modal-header">
+              <div>
+                <p className="folder-modal-label">Slett mappe</p>
+
+                <h2 id={`delete-folder-${folder.id}`}>Er du sikker?</h2>
+              </div>
+
+              <button
+                type="button"
+                className="folder-modal-close"
+                aria-label="Lukk"
+                disabled={isDeleteLoading}
+                onClick={closeDeleteModal}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p className="folder-delete-text">
+              Mappen <strong>{folder.name}</strong> blir slettet.
+            </p>
+
+            <p className="folder-delete-info">
+              Notatene i mappen blir ikke slettet. De flyttes tilbake til
+              notatsiden.
+            </p>
+
+            {deleteErrorMessage && (
+              <p className="folder-modal-error">{deleteErrorMessage}</p>
+            )}
+
+            <div className="folder-modal-actions">
+              <button
+                type="button"
+                className="folder-modal-cancel"
+                disabled={isDeleteLoading}
+                onClick={closeDeleteModal}
+              >
+                Avbryt
+              </button>
+
+              <button
+                type="button"
+                className="folder-modal-delete"
+                disabled={isDeleteLoading}
+                onClick={handleDelete}
+              >
+                {isDeleteLoading ? "Sletter..." : "Slett mappe"}
+              </button>
+            </div>
           </div>
         </div>
       )}

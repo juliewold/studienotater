@@ -87,6 +87,21 @@ export async function getNotesByFolder(
   return (data ?? []).map(mapDatabaseNote);
 }
 
+export async function moveAllNotesOutOfFolder(
+  folderId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("notes")
+    .update({
+      folder_id: null,
+    })
+    .eq("folder_id", folderId);
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function getNotesWithoutFolder(
   subjectId: string,
 ): Promise<DatabaseNote[]> {

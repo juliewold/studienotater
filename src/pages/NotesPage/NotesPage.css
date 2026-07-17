@@ -339,3 +339,29 @@
     width: 100%;
   }
 }
+
+.folder-delete-text {
+  margin: 0;
+  color: #332c38;
+  line-height: 1.6;
+}
+
+.folder-delete-info {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f7f3fa;
+  color: #655b6c;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.folder-modal-delete {
+  border: 1px solid #b42318;
+  background: #b42318;
+  color: #ffffff;
+}
+
+.folder-modal-delete:hover:not(:disabled) {
+  background: #922018;
+}
