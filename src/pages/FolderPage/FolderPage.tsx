@@ -16,6 +16,8 @@ import {
   type DatabaseNote,
 } from "../../services/notesService";
 
+import { NoteCard } from "../../components/NoteCard/NoteCard";
+
 export const FolderPage = () => {
   const { subjectId, folderId } = useParams();
   const navigate = useNavigate();
@@ -177,15 +179,12 @@ export const FolderPage = () => {
       ) : (
         <div className="notes-list">
           {notes.map((note) => (
-            <Link
+            <NoteCard
               key={note.id}
-              to={`/fag/${subjectId}/notater/${note.slug}`}
-              className="note-card"
-            >
-              <h3>{note.title}</h3>
-
-              <p>{note.description || "Klikk for å åpne notatet."}</p>
-            </Link>
+              note={note}
+              subjectId={subjectId!}
+              descriptionFallback="Klikk for å åpne notatet."
+            />
           ))}
         </div>
       )}

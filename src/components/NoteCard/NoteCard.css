@@ -1,0 +1,25 @@
+.note-card-wrapper {
+  position: relative;
+}
+
+.note-card {
+  display: block;
+  height: 100%;
+  padding: 1.25rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.note-card h3 {
+  margin: 0 0 0.5rem;
+}
+
+.note-card p {
+  margin: 0;
+}
+
+.note-card-actions {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+}

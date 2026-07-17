@@ -20,6 +20,7 @@ import { useFavorites } from "../../hooks/useFavorites";
 import { useProgress } from "../../hooks/useProgress";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 import { FolderCard } from "../../components/FolderCard/FolderCard";
+import { NoteCard } from "../../components/NoteCard/NoteCard";
 
 export const NotesPage = () => {
   const { subjectId } = useParams();
@@ -292,52 +293,49 @@ export const NotesPage = () => {
 
             const resourceId = `note-${subject.id}-database-${note.slug}`;
 
-            const noteUrl = `/fag/${subject.id}/notater/${note.slug}`;
-
             const favorite = isFavorite(favoriteId, "note");
 
             const { completed, rating } = getProgress(resourceId, "resource");
 
             return (
-              <article className="note-card-wrapper" key={note.id}>
-                <Link to={noteUrl} className="note-card">
-                  <h3>{note.title}</h3>
-
-                  <p>{note.description}</p>
-
-                  <div className="note-progress-preview">
-                    <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
-
-                    <span className={`rating-${rating}`}>
-                      {"★".repeat(rating)}
-                    </span>
-                  </div>
-                </Link>
-
-                <button
-                  type="button"
-                  className={`favorite-button ${favorite ? "is-favorite" : ""}`}
-                  aria-label={
-                    favorite ? "Fjern fra favoritter" : "Legg til i favoritter"
-                  }
-                  disabled={isLoadingFavorites}
-                  onClick={() =>
-                    toggleFavorite({
-                      id: favoriteId,
-                      title: note.title,
-                      subject: subject.name,
-                      type: "note",
-                      url: noteUrl,
-                    })
-                  }
-                >
-                  <Heart
-                    size={22}
-                    fill={favorite ? "currentColor" : "transparent"}
-                    strokeWidth={2}
-                  />
-                </button>
-              </article>
+              <NoteCard
+                key={note.id}
+                note={note}
+                subjectId={subject.id}
+                progress={{
+                  completed,
+                  rating,
+                }}
+                actions={
+                  <button
+                    type="button"
+                    className={`favorite-button ${
+                      favorite ? "is-favorite" : ""
+                    }`}
+                    aria-label={
+                      favorite
+                        ? "Fjern fra favoritter"
+                        : "Legg til i favoritter"
+                    }
+                    disabled={isLoadingFavorites}
+                    onClick={() =>
+                      toggleFavorite({
+                        id: favoriteId,
+                        title: note.title,
+                        subject: subject.name,
+                        type: "note",
+                        url: `/fag/${subject.id}/notater/${note.slug}`,
+                      })
+                    }
+                  >
+                    <Heart
+                      size={22}
+                      fill={favorite ? "currentColor" : "transparent"}
+                      strokeWidth={2}
+                    />
+                  </button>
+                }
+              />
             );
           })}
         </div>
