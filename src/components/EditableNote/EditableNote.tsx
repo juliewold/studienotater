@@ -1,21 +1,11 @@
 import "./EditableNote.css";
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  Check,
-  Edit3,
-  LoaderCircle,
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Edit3, LoaderCircle } from "lucide-react";
 
 import { NoteEditor } from "../NoteEditor/NoteEditor";
 
-import {
-  updateNote,
-  type DatabaseNote,
-} from "../../services/notesService";
+import { updateNote, type DatabaseNote } from "../../services/notesService";
+import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
 type EditableNoteProps = {
   note: DatabaseNote;
@@ -24,11 +14,7 @@ type EditableNoteProps = {
   onNoteUpdated: (updatedNote: DatabaseNote) => void;
 };
 
-type SaveStatus =
-  | "idle"
-  | "saving"
-  | "saved"
-  | "error";
+type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 type NoteDraft = {
   title: string;
@@ -45,13 +31,10 @@ export const EditableNote = ({
   const [isEditing, setIsEditing] = useState(false);
 
   const [title, setTitle] = useState(note.title);
-  const [description, setDescription] = useState(
-    note.description,
-  );
+  const [description, setDescription] = useState(note.description);
   const [content, setContent] = useState(note.content);
 
-  const [saveStatus, setSaveStatus] =
-    useState<SaveStatus>("idle");
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -93,9 +76,7 @@ export const EditableNote = ({
     );
   };
 
-  const saveDraft = async (
-    draft: NoteDraft,
-  ): Promise<boolean> => {
+  const saveDraft = async (draft: NoteDraft): Promise<boolean> => {
     if (!draft.title) {
       setErrorMessage("Notatet må ha en tittel.");
       setSaveStatus("error");
@@ -189,10 +170,7 @@ export const EditableNote = ({
     if (saveStatus === "saving") {
       return (
         <span className="editable-note-save-status">
-          <LoaderCircle
-            size={15}
-            className="editable-note-save-spinner"
-          />
+          <LoaderCircle size={15} className="editable-note-save-spinner" />
           Lagrer...
         </span>
       );
@@ -216,9 +194,7 @@ export const EditableNote = ({
     }
 
     return (
-      <span className="editable-note-save-status">
-        Ulagrede endringer
-      </span>
+      <span className="editable-note-save-status">Ulagrede endringer</span>
     );
   };
 
@@ -226,9 +202,7 @@ export const EditableNote = ({
     return (
       <article className="editable-note editable-note-editing">
         <header className="editable-note-topbar">
-          <span className="editable-note-subject">
-            {subjectCode}
-          </span>
+          <span className="editable-note-subject">{subjectCode}</span>
 
           <div className="editable-note-actions">
             {renderSaveStatus()}
@@ -256,9 +230,7 @@ export const EditableNote = ({
             type="text"
             className="editable-note-title-input"
             value={title}
-            onChange={(event) =>
-              setTitle(event.target.value)
-            }
+            onChange={(event) => setTitle(event.target.value)}
             placeholder="Uten tittel"
             autoFocus
           />
@@ -266,19 +238,14 @@ export const EditableNote = ({
           <textarea
             className="editable-note-description-input"
             value={description}
-            onChange={(event) =>
-              setDescription(event.target.value)
-            }
+            onChange={(event) => setDescription(event.target.value)}
             placeholder="Legg til en kort beskrivelse..."
             rows={1}
           />
         </div>
 
         <div className="editable-note-editor">
-          <NoteEditor
-            value={content}
-            onChange={setContent}
-          />
+          <NoteEditor value={content} onChange={setContent} />
         </div>
       </article>
     );
@@ -287,9 +254,7 @@ export const EditableNote = ({
   return (
     <article className="editable-note">
       <header className="editable-note-topbar">
-        <span className="editable-note-subject">
-          {subjectCode}
-        </span>
+        <span className="editable-note-subject">{subjectCode}</span>
 
         {isAdmin && (
           <button
@@ -310,23 +275,14 @@ export const EditableNote = ({
       )}
 
       <div className="editable-note-document-header">
-        <h1 className="editable-note-title">
-          {note.title}
-        </h1>
+        <h1 className="editable-note-title">{note.title}</h1>
 
         {note.description && (
-          <p className="editable-note-description">
-            {note.description}
-          </p>
+          <p className="editable-note-description">{note.description}</p>
         )}
       </div>
 
-      <div
-        className="editable-note-content"
-        dangerouslySetInnerHTML={{
-          __html: note.content,
-        }}
-      />
+      <ReadOnlyNote content={note.content} />
     </article>
   );
 };

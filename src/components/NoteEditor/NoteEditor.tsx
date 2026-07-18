@@ -1,19 +1,29 @@
 import "./NoteEditor.css";
+import "katex/dist/katex.min.css";
+
 import { useEffect } from "react";
 import {
   Bold,
-  Italic,
+  Braces,
+  Code2,
   Heading1,
   Heading2,
+  Italic,
   List,
   ListOrdered,
   Quote,
-  Code2,
-  Undo2,
   Redo2,
+  Sigma,
+  Undo2,
 } from "lucide-react";
+
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { Mathematics } from "@tiptap/extension-mathematics";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { common, createLowlight } from "lowlight";
+
+const lowlight = createLowlight(common);
 
 type NoteEditorProps = {
   value: string;
@@ -22,13 +32,30 @@ type NoteEditorProps = {
 
 export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({
+        codeBlock: false,
+      }),
+
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
+
+      Mathematics.configure({
+        katexOptions: {
+          throwOnError: false,
+        },
+      }),
+    ],
+
     content: value,
+
     editorProps: {
       attributes: {
         class: "note-editor-content",
       },
     },
+
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
@@ -51,6 +78,44 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   if (!editor) {
     return null;
   }
+
+  const handleInsertInlineMath = () => {
+    const latex = window.prompt(
+      "Skriv inn LaTeX-formelen:",
+      String.raw`x^2 + y^2 = z^2`,
+    );
+
+    if (!latex?.trim()) {
+      return;
+    }
+
+    editor
+      .chain()
+      .focus()
+      .insertInlineMath({
+        latex: latex.trim(),
+      })
+      .run();
+  };
+
+  const handleInsertBlockMath = () => {
+    const latex = window.prompt(
+      "Skriv inn LaTeX-formelen:",
+      String.raw`\sum_{i=1}^{n} i = \frac{n(n+1)}{2}`,
+    );
+
+    if (!latex?.trim()) {
+      return;
+    }
+
+    editor
+      .chain()
+      .focus()
+      .insertBlockMath({
+        latex: latex.trim(),
+      })
+      .run();
+  };
 
   return (
     <div className="note-editor">
@@ -137,6 +202,24 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           title="Kodeblokk"
         >
           <Code2 size={18} />
+        </button>
+
+        <div className="toolbar-divider" />
+
+        <button
+          type="button"
+          onClick={handleInsertInlineMath}
+          title="Sett inn formel i tekst"
+        >
+          <Sigma size={18} />
+        </button>
+
+        <button
+          type="button"
+          onClick={handleInsertBlockMath}
+          title="Sett inn formelblokk"
+        >
+          <Braces size={18} />
         </button>
 
         <div className="toolbar-divider" />

@@ -1,0 +1,220 @@
+.read-only-note {
+  max-width: 900px;
+  min-height: 300px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 5rem;
+}
+
+.read-only-note-content {
+  color: #29252f;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  outline: none;
+}
+
+.read-only-note-content > *:first-child {
+  margin-top: 0;
+}
+
+.read-only-note-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.read-only-note-content p {
+  margin: 0.8rem 0;
+}
+
+.read-only-note-content h1,
+.read-only-note-content h2,
+.read-only-note-content h3 {
+  color: #241e2e;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.read-only-note-content h1 {
+  margin: 2rem 0 0.8rem;
+  font-size: 2rem;
+}
+
+.read-only-note-content h2 {
+  margin: 1.75rem 0 0.7rem;
+  font-size: 1.55rem;
+}
+
+.read-only-note-content h3 {
+  margin: 1.5rem 0 0.65rem;
+  font-size: 1.3rem;
+}
+
+.read-only-note-content ul,
+.read-only-note-content ol {
+  margin: 1rem 0;
+  padding-left: 1.6rem;
+}
+
+.read-only-note-content li {
+  margin: 0.35rem 0;
+}
+
+.read-only-note-content blockquote {
+  margin: 1.5rem 0;
+  padding: 0.9rem 1.1rem;
+  border-left: 4px solid #9b6ee8;
+  border-radius: 0 12px 12px 0;
+  background: #f8f4ff;
+  color: #574b68;
+}
+
+.read-only-note-content code {
+  padding: 0.15rem 0.35rem;
+  border-radius: 6px;
+  background: #f1edf6;
+  color: #7146bd;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 0.92em;
+}
+
+.read-only-note-content pre {
+  position: relative;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  padding: 1.35rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: #211d27;
+  box-shadow: 0 10px 30px rgba(34, 28, 41, 0.14);
+  color: #f8f5fb;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+.read-only-note-content pre code {
+  display: block;
+  min-width: max-content;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #f8f5fb;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 0.92rem;
+  white-space: pre;
+}
+
+/* Syntax highlighting */
+
+.read-only-note-content .hljs-comment,
+.read-only-note-content .hljs-quote {
+  color: #9b91a4;
+  font-style: italic;
+}
+
+.read-only-note-content .hljs-keyword,
+.read-only-note-content .hljs-selector-tag,
+.read-only-note-content .hljs-literal,
+.read-only-note-content .hljs-section,
+.read-only-note-content .hljs-link {
+  color: #d79cff;
+}
+
+.read-only-note-content .hljs-string,
+.read-only-note-content .hljs-title,
+.read-only-note-content .hljs-name,
+.read-only-note-content .hljs-type,
+.read-only-note-content .hljs-attribute,
+.read-only-note-content .hljs-symbol,
+.read-only-note-content .hljs-bullet,
+.read-only-note-content .hljs-addition,
+.read-only-note-content .hljs-variable,
+.read-only-note-content .hljs-template-tag,
+.read-only-note-content .hljs-template-variable {
+  color: #b5e8a5;
+}
+
+.read-only-note-content .hljs-number,
+.read-only-note-content .hljs-meta,
+.read-only-note-content .hljs-built_in,
+.read-only-note-content .hljs-builtin-name,
+.read-only-note-content .hljs-params {
+  color: #f3c98b;
+}
+
+.read-only-note-content .hljs-function,
+.read-only-note-content .hljs-title.function_,
+.read-only-note-content .hljs-class,
+.read-only-note-content .hljs-title.class_ {
+  color: #8ecdf4;
+}
+
+.read-only-note-content .hljs-tag,
+.read-only-note-content .hljs-selector-id,
+.read-only-note-content .hljs-selector-class,
+.read-only-note-content .hljs-regexp,
+.read-only-note-content .hljs-deletion {
+  color: #f29aa3;
+}
+
+.read-only-note-content .hljs-operator,
+.read-only-note-content .hljs-punctuation {
+  color: #d8d0df;
+}
+
+.read-only-note-content .hljs-emphasis {
+  font-style: italic;
+}
+
+.read-only-note-content .hljs-strong {
+  font-weight: 700;
+}
+
+.read-only-note-content hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid #e8e1ee;
+}
+
+.read-only-note-content .tiptap-mathematics-render {
+  cursor: default;
+}
+
+.read-only-note-content
+  .tiptap-mathematics-render[data-type="inline-math"] {
+  display: inline-block;
+  margin: 0 0.18rem;
+  vertical-align: middle;
+}
+
+.read-only-note-content
+  .tiptap-mathematics-render[data-type="block-math"] {
+  display: block;
+  width: 100%;
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  border: 1px solid #ebe6f2;
+  border-radius: 12px;
+  background: #faf8fd;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .read-only-note {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .read-only-note-content pre {
+    margin-right: -0.25rem;
+    margin-left: -0.25rem;
+    padding: 1.1rem 1.15rem;
+    border-radius: 12px;
+  }
+}

@@ -25,9 +25,14 @@
 }
 
 .note-editor-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  min-width: 38px;
   min-height: 36px;
   margin: 0;
-  padding: 0.55rem 0.75rem;
+  padding: 0;
   border: 1px solid transparent;
   border-radius: 9px;
   background: transparent;
@@ -61,6 +66,18 @@
   opacity: 0.35;
 }
 
+.note-editor-toolbar svg {
+  stroke-width: 2;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  margin: 0 0.35rem;
+  background: rgba(155, 110, 232, 0.18);
+  align-self: center;
+}
+
 .note-editor-content {
   min-height: 420px;
   max-width: 900px;
@@ -71,6 +88,7 @@
   line-height: 1.85;
   outline: none;
 }
+
 .note-editor-content > *:first-child {
   margin-top: 0;
 }
@@ -131,24 +149,108 @@
   border-radius: 6px;
   background: #f1edf6;
   color: #7146bd;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
   font-size: 0.92em;
 }
 
 .note-editor-content pre {
+  position: relative;
   overflow-x: auto;
   margin: 1.5rem 0;
-  padding: 1.2rem 1.35rem;
+  padding: 1.35rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   background: #211d27;
+  box-shadow: 0 10px 30px rgba(34, 28, 41, 0.14);
   color: #f8f5fb;
   line-height: 1.65;
+  tab-size: 2;
 }
 
 .note-editor-content pre code {
+  display: block;
+  min-width: max-content;
   padding: 0;
+  border-radius: 0;
   background: transparent;
-  color: inherit;
+  color: #f8f5fb;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 0.92rem;
+  white-space: pre;
+}
+
+/* Syntax highlighting */
+
+.note-editor-content .hljs-comment,
+.note-editor-content .hljs-quote {
+  color: #9b91a4;
+  font-style: italic;
+}
+
+.note-editor-content .hljs-keyword,
+.note-editor-content .hljs-selector-tag,
+.note-editor-content .hljs-literal,
+.note-editor-content .hljs-section,
+.note-editor-content .hljs-link {
+  color: #d79cff;
+}
+
+.note-editor-content .hljs-string,
+.note-editor-content .hljs-title,
+.note-editor-content .hljs-name,
+.note-editor-content .hljs-type,
+.note-editor-content .hljs-attribute,
+.note-editor-content .hljs-symbol,
+.note-editor-content .hljs-bullet,
+.note-editor-content .hljs-addition,
+.note-editor-content .hljs-variable,
+.note-editor-content .hljs-template-tag,
+.note-editor-content .hljs-template-variable {
+  color: #b5e8a5;
+}
+
+.note-editor-content .hljs-number,
+.note-editor-content .hljs-meta,
+.note-editor-content .hljs-built_in,
+.note-editor-content .hljs-builtin-name,
+.note-editor-content .hljs-params {
+  color: #f3c98b;
+}
+
+.note-editor-content .hljs-function,
+.note-editor-content .hljs-title.function_,
+.note-editor-content .hljs-class,
+.note-editor-content .hljs-title.class_ {
+  color: #8ecdf4;
+}
+
+.note-editor-content .hljs-tag,
+.note-editor-content .hljs-selector-id,
+.note-editor-content .hljs-selector-class,
+.note-editor-content .hljs-regexp,
+.note-editor-content .hljs-deletion {
+  color: #f29aa3;
+}
+
+.note-editor-content .hljs-operator,
+.note-editor-content .hljs-punctuation {
+  color: #d8d0df;
+}
+
+.note-editor-content .hljs-emphasis {
+  font-style: italic;
+}
+
+.note-editor-content .hljs-strong {
+  font-weight: 700;
 }
 
 .note-editor-content hr {
@@ -163,6 +265,32 @@
   color: #aaa1b3;
   content: "Begynn å skrive notatet ditt...";
   pointer-events: none;
+}
+
+.tiptap-mathematics-render {
+  cursor: pointer;
+}
+
+.tiptap-mathematics-render[data-type="inline-math"] {
+  display: inline-block;
+  margin: 0 0.18rem;
+  vertical-align: middle;
+}
+
+.tiptap-mathematics-render[data-type="block-math"] {
+  display: block;
+  width: 100%;
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  border: 1px solid #ebe6f2;
+  border-radius: 12px;
+  background: #faf8fd;
+  text-align: center;
+}
+
+.tiptap-mathematics-render--editable:hover {
+  background: #f5f1fb;
 }
 
 @media (max-width: 700px) {
@@ -182,25 +310,11 @@
     padding: 2.5rem 1.15rem 6rem;
     font-size: 1rem;
   }
-}
 
-.toolbar-divider {
-  width: 1px;
-  height: 24px;
-  margin: 0 0.35rem;
-  background: rgba(155, 110, 232, 0.18);
-  align-self: center;
-}
-
-.note-editor-toolbar button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  min-width: 38px;
-  padding: 0;
-}
-
-.note-editor-toolbar svg {
-  stroke-width: 2;
+  .note-editor-content pre {
+    margin-right: -0.25rem;
+    margin-left: -0.25rem;
+    padding: 1.1rem 1.15rem;
+    border-radius: 12px;
+  }
 }
