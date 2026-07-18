@@ -87,9 +87,7 @@ export async function getNotesByFolder(
   return (data ?? []).map(mapDatabaseNote);
 }
 
-export async function moveAllNotesOutOfFolder(
-  folderId: string,
-): Promise<void> {
+export async function moveAllNotesOutOfFolder(folderId: string): Promise<void> {
   const { error } = await supabase
     .from("notes")
     .update({
@@ -119,9 +117,7 @@ export async function getNotesWithoutFolder(
   return (data ?? []).map(mapDatabaseNote);
 }
 
-export async function getNoteById(
-  id: string,
-): Promise<DatabaseNote | null> {
+export async function getNoteById(id: string): Promise<DatabaseNote | null> {
   const { data, error } = await supabase
     .from("notes")
     .select("*")
@@ -185,13 +181,7 @@ export async function createNote({
 
 export async function updateNote(
   id: string,
-  {
-    title,
-    description,
-    content,
-    contentJson,
-    folderId,
-  }: UpdateNoteInput,
+  { title, description, content, contentJson, folderId }: UpdateNoteInput,
 ): Promise<DatabaseNote> {
   const updates: {
     title: string;
@@ -227,6 +217,22 @@ export async function updateNote(
   return mapDatabaseNote(data);
 }
 
+export async function updateNoteTitle(
+  id: string,
+  title: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("notes")
+    .update({
+      title,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function moveNoteToFolder(
   id: string,
   folderId: string | null,
@@ -244,10 +250,7 @@ export async function moveNoteToFolder(
 }
 
 export async function deleteNote(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("notes")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("notes").delete().eq("id", id);
 
   if (error) {
     throw error;

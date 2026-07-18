@@ -48,6 +48,7 @@ export const NoteCard = ({
 
         <NoteMenu
           noteId={note.id}
+          noteTitle={note.title}
           subjectId={subjectId}
           currentFolderId={note.folderId}
         />

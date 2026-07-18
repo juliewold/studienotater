@@ -26,7 +26,7 @@
   top: calc(100% + 6px);
   right: 0;
 
-  min-width: 170px;
+  min-width: 190px;
 
   background: white;
   border-radius: 12px;
@@ -38,13 +38,20 @@
 }
 
 .note-menu-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
   width: 100%;
   padding: 12px 16px;
 
   border: none;
   background: transparent;
 
+  color: inherit;
+  font: inherit;
   text-align: left;
+
   cursor: pointer;
 }
 
@@ -52,7 +59,15 @@
   background: #f7f7f7;
 }
 
-.note-move-overlay {
+.note-menu-dropdown .note-menu-delete-option {
+  color: #c62828;
+}
+
+.note-menu-dropdown .note-menu-delete-option:hover {
+  background: #fff1f1;
+}
+
+.note-modal-overlay {
   position: fixed;
   inset: 0;
 
@@ -67,7 +82,7 @@
   z-index: 1000;
 }
 
-.note-move-modal {
+.note-modal {
   width: 100%;
   max-width: 440px;
 
@@ -79,7 +94,7 @@
   box-shadow: 0 20px 60px rgb(0 0 0 / 20%);
 }
 
-.note-move-header {
+.note-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -88,12 +103,12 @@
   margin-bottom: 20px;
 }
 
-.note-move-header h2 {
+.note-modal-header h2 {
   margin: 0;
   font-size: 1.35rem;
 }
 
-.note-move-close-button {
+.note-modal-close-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,12 +123,13 @@
   cursor: pointer;
 }
 
-.note-move-close-button:hover {
+.note-modal-close-button:hover {
   background: #f2f2f2;
 }
 
-.note-move-message {
-  margin: 20px 0;
+.note-modal-message {
+  margin: 0;
+  line-height: 1.6;
 }
 
 .note-move-options {
@@ -147,7 +163,37 @@
   height: 18px;
 }
 
-.note-move-actions {
+.note-rename-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  font-weight: 600;
+}
+
+.note-rename-label input {
+  width: 100%;
+  padding: 12px 14px;
+
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+
+  font: inherit;
+  font-weight: 400;
+}
+
+.note-rename-label input:focus {
+  border-color: #555;
+  outline: none;
+}
+
+.note-delete-warning {
+  margin: 10px 0 0;
+  color: #c62828;
+  font-size: 0.9rem;
+}
+
+.note-modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -155,8 +201,9 @@
   margin-top: 24px;
 }
 
-.note-move-cancel-button,
-.note-move-submit-button {
+.note-modal-cancel-button,
+.note-modal-submit-button,
+.note-modal-delete-button {
   padding: 10px 18px;
 
   border: none;
@@ -166,16 +213,22 @@
   cursor: pointer;
 }
 
-.note-move-cancel-button {
+.note-modal-cancel-button {
   background: #eeeeee;
 }
 
-.note-move-submit-button {
+.note-modal-submit-button {
   background: #222222;
   color: white;
 }
 
-.note-move-submit-button:disabled {
+.note-modal-delete-button {
+  background: #c62828;
+  color: white;
+}
+
+.note-modal-submit-button:disabled,
+.note-modal-delete-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
