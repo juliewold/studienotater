@@ -1,17 +1,6 @@
 import "./NoteMenu.css";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  FolderInput,
-  MoreVertical,
-  Pencil,
-  Trash2,
-  X,
-} from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FolderInput, MoreVertical, Pencil, Trash2, X } from "lucide-react";
 import {
   getNoteFoldersBySubject,
   type NoteFolder,
@@ -27,6 +16,12 @@ type NoteMenuProps = {
   noteTitle: string;
   subjectId: string;
   currentFolderId: string | null;
+  onNoteChanged: (
+    change:
+      | { type: "moved" }
+      | { type: "renamed"; title: string }
+      | { type: "deleted" },
+  ) => void;
 };
 
 export const NoteMenu = ({
@@ -34,27 +29,25 @@ export const NoteMenu = ({
   noteTitle,
   subjectId,
   currentFolderId,
+  onNoteChanged,
 }: NoteMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [isMoveModalOpen, setIsMoveModalOpen] =
-    useState(false);
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
 
-  const [isRenameModalOpen, setIsRenameModalOpen] =
-    useState(false);
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] =
-    useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [folders, setFolders] = useState<NoteFolder[]>([]);
 
-  const [selectedFolderId, setSelectedFolderId] =
-    useState<string | null>(currentFolderId);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(
+    currentFolderId,
+  );
 
   const [newTitle, setNewTitle] = useState(noteTitle);
 
-  const [isLoadingFolders, setIsLoadingFolders] =
-    useState(false);
+  const [isLoadingFolders, setIsLoadingFolders] = useState(false);
 
   const [isMoving, setIsMoving] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -68,24 +61,15 @@ export const NoteMenu = ({
     }
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside,
-    );
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside,
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
@@ -93,8 +77,7 @@ export const NoteMenu = ({
     setIsLoadingFolders(true);
 
     try {
-      const data =
-        await getNoteFoldersBySubject(subjectId);
+      const data = await getNoteFoldersBySubject(subjectId);
 
       setFolders(data);
       setSelectedFolderId(currentFolderId);
@@ -154,19 +137,17 @@ export const NoteMenu = ({
     setIsMoving(true);
 
     try {
-      await moveNoteToFolder(
-        noteId,
-        selectedFolderId,
-      );
+      await moveNoteToFolder(noteId, selectedFolderId);
 
-      window.location.reload();
+      setIsMoveModalOpen(false);
+      onNoteChanged({
+        type: "moved",
+      });
     } catch (error) {
       console.error("Kunne ikke flytte notatet:", error);
 
       alert(
-        error instanceof Error
-          ? error.message
-          : "Kunne ikke flytte notatet.",
+        error instanceof Error ? error.message : "Kunne ikke flytte notatet.",
       );
     } finally {
       setIsMoving(false);
@@ -185,12 +166,13 @@ export const NoteMenu = ({
     try {
       await updateNoteTitle(noteId, trimmedTitle);
 
-      window.location.reload();
+      setIsRenameModalOpen(false);
+      onNoteChanged({
+        type: "renamed",
+        title: trimmedTitle,
+      });
     } catch (error) {
-      console.error(
-        "Kunne ikke gi notatet nytt navn:",
-        error,
-      );
+      console.error("Kunne ikke gi notatet nytt navn:", error);
 
       alert(
         error instanceof Error
@@ -208,14 +190,15 @@ export const NoteMenu = ({
     try {
       await deleteNote(noteId);
 
-      window.location.reload();
+      setIsDeleteModalOpen(false);
+      onNoteChanged({
+        type: "deleted",
+      });
     } catch (error) {
       console.error("Kunne ikke slette notatet:", error);
 
       alert(
-        error instanceof Error
-          ? error.message
-          : "Kunne ikke slette notatet.",
+        error instanceof Error ? error.message : "Kunne ikke slette notatet.",
       );
     } finally {
       setIsDeleting(false);
@@ -224,10 +207,7 @@ export const NoteMenu = ({
 
   return (
     <>
-      <div
-        className="note-menu"
-        ref={menuRef}
-      >
+      <div className="note-menu" ref={menuRef}>
         <button
           type="button"
           className="note-menu-button"
@@ -288,10 +268,7 @@ export const NoteMenu = ({
       </div>
 
       {isMoveModalOpen && (
-        <div
-          className="note-modal-overlay"
-          onClick={closeMoveModal}
-        >
+        <div className="note-modal-overlay" onClick={closeMoveModal}>
           <div
             className="note-modal"
             role="dialog"
@@ -302,9 +279,7 @@ export const NoteMenu = ({
             }}
           >
             <div className="note-modal-header">
-              <h2 id="note-move-title">
-                Flytt notat
-              </h2>
+              <h2 id="note-move-title">Flytt notat</h2>
 
               <button
                 type="button"
@@ -317,9 +292,7 @@ export const NoteMenu = ({
             </div>
 
             {isLoadingFolders ? (
-              <p className="note-modal-message">
-                Henter mapper...
-              </p>
+              <p className="note-modal-message">Henter mapper...</p>
             ) : (
               <div className="note-move-options">
                 <label className="note-move-option">
@@ -327,28 +300,19 @@ export const NoteMenu = ({
                     type="radio"
                     name={`folder-${noteId}`}
                     checked={selectedFolderId === null}
-                    onChange={() =>
-                      setSelectedFolderId(null)
-                    }
+                    onChange={() => setSelectedFolderId(null)}
                   />
 
                   <span>Ingen mappe</span>
                 </label>
 
                 {folders.map((folder) => (
-                  <label
-                    key={folder.id}
-                    className="note-move-option"
-                  >
+                  <label key={folder.id} className="note-move-option">
                     <input
                       type="radio"
                       name={`folder-${noteId}`}
-                      checked={
-                        selectedFolderId === folder.id
-                      }
-                      onChange={() =>
-                        setSelectedFolderId(folder.id)
-                      }
+                      checked={selectedFolderId === folder.id}
+                      onChange={() => setSelectedFolderId(folder.id)}
                     />
 
                     <span>{folder.name}</span>
@@ -385,10 +349,7 @@ export const NoteMenu = ({
       )}
 
       {isRenameModalOpen && (
-        <div
-          className="note-modal-overlay"
-          onClick={closeRenameModal}
-        >
+        <div className="note-modal-overlay" onClick={closeRenameModal}>
           <form
             className="note-modal"
             role="dialog"
@@ -404,9 +365,7 @@ export const NoteMenu = ({
             }}
           >
             <div className="note-modal-header">
-              <h2 id="note-rename-title">
-                Gi notatet nytt navn
-              </h2>
+              <h2 id="note-rename-title">Gi notatet nytt navn</h2>
 
               <button
                 type="button"
@@ -420,15 +379,12 @@ export const NoteMenu = ({
 
             <label className="note-rename-label">
               Navn på notatet
-
               <input
                 type="text"
                 value={newTitle}
                 autoFocus
                 maxLength={100}
-                onChange={(event) =>
-                  setNewTitle(event.target.value)
-                }
+                onChange={(event) => setNewTitle(event.target.value)}
               />
             </label>
 
@@ -458,10 +414,7 @@ export const NoteMenu = ({
       )}
 
       {isDeleteModalOpen && (
-        <div
-          className="note-modal-overlay"
-          onClick={closeDeleteModal}
-        >
+        <div className="note-modal-overlay" onClick={closeDeleteModal}>
           <div
             className="note-modal"
             role="dialog"
@@ -472,9 +425,7 @@ export const NoteMenu = ({
             }}
           >
             <div className="note-modal-header">
-              <h2 id="note-delete-title">
-                Slett notat
-              </h2>
+              <h2 id="note-delete-title">Slett notat</h2>
 
               <button
                 type="button"

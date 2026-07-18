@@ -184,6 +184,34 @@ export const FolderPage = () => {
               note={note}
               subjectId={subjectId!}
               descriptionFallback="Klikk for å åpne notatet."
+              onNoteChanged={(change) => {
+                if (
+                  change.type === "moved" ||
+                  change.type === "deleted"
+                ) {
+                  setNotes((currentNotes) =>
+                    currentNotes.filter(
+                      (currentNote) =>
+                        currentNote.id !== note.id,
+                    ),
+                  );
+
+                  return;
+                }
+
+                if (change.type === "renamed") {
+                  setNotes((currentNotes) =>
+                    currentNotes.map((currentNote) =>
+                      currentNote.id === note.id
+                        ? {
+                            ...currentNote,
+                            title: change.title,
+                          }
+                        : currentNote,
+                    ),
+                  );
+                }
+              }}
             />
           ))}
         </div>

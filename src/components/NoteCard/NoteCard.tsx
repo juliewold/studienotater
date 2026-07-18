@@ -5,6 +5,11 @@ import { Link } from "react-router-dom";
 import type { DatabaseNote } from "../../services/notesService";
 import { NoteMenu } from "../NoteMenu/NoteMenu";
 
+export type NoteChange =
+  | { type: "moved" }
+  | { type: "renamed"; title: string }
+  | { type: "deleted" };
+
 type NoteCardProps = {
   note: DatabaseNote;
   subjectId: string;
@@ -14,14 +19,16 @@ type NoteCardProps = {
     rating: number;
   };
   actions?: ReactNode;
+  onNoteChanged?: (change: NoteChange) => void;
 };
 
 export const NoteCard = ({
   note,
   subjectId,
-  descriptionFallback = "",
+  descriptionFallback,
   progress,
   actions,
+  onNoteChanged,
 }: NoteCardProps) => {
   const noteUrl = `/fag/${subjectId}/notater/${note.slug}`;
 
@@ -30,7 +37,11 @@ export const NoteCard = ({
       <Link to={noteUrl} className="note-card">
         <h3>{note.title}</h3>
 
-        <p>{note.description || descriptionFallback}</p>
+        <p>
+          {note.description ||
+            descriptionFallback ||
+            "Klikk for å åpne notatet."}
+        </p>
 
         {progress && (
           <div className="note-progress-preview">
@@ -51,6 +62,9 @@ export const NoteCard = ({
           noteTitle={note.title}
           subjectId={subjectId}
           currentFolderId={note.folderId}
+          onNoteChanged={(change) => {
+            onNoteChanged?.(change);
+          }}
         />
       </div>
     </article>
