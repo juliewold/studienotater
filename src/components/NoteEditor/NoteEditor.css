@@ -318,3 +318,41 @@
     border-radius: 12px;
   }
 }
+
+.image-upload-spinner {
+  animation: image-upload-spin 0.8s linear infinite;
+}
+
+@keyframes image-upload-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.note-editor-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem auto;
+  border-radius: 12px;
+}
+
+.note-editor-content img.ProseMirror-selectednode {
+  outline: 3px solid rgba(155, 110, 232, 0.45);
+  outline-offset: 3px;
+}
+
+/* Området rundt et bilde som kan endres i størrelse */
+.note-editor-content [data-node-view-wrapper] {
+  max-width: 100%;
+}
+
+/* TipTap sine håndtak for bildestørrelse */
+.note-editor-content [data-resize-handle] {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #7c4dce;
+  box-shadow: 0 2px 7px rgba(42, 31, 58, 0.25);
+}

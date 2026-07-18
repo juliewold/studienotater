@@ -5,6 +5,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Mathematics } from "@tiptap/extension-mathematics";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import Image from "@tiptap/extension-image";
 import { common, createLowlight } from "lowlight";
 
 const lowlight = createLowlight(common);
@@ -30,6 +31,11 @@ export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
         katexOptions: {
           throwOnError: false,
         },
+      }),
+
+      Image.configure({
+        inline: false,
+        allowBase64: false,
       }),
     ],
 
