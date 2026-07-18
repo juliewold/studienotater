@@ -4,10 +4,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { subjects } from "../../data/subjects";
 
-import {
-  getNoteBySlug,
-  type DatabaseNote,
-} from "../../services/notesService";
+import { getNoteBySlug, type DatabaseNote } from "../../services/notesService";
 
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 
@@ -39,10 +36,7 @@ export const NotePage = () => {
       setErrorMessage("");
 
       try {
-        const loadedNote = await getNoteBySlug(
-          subjectId,
-          noteId,
-        );
+        const loadedNote = await getNoteBySlug(subjectId, noteId);
 
         if (!loadedNote) {
           setNote(null);
@@ -73,10 +67,7 @@ export const NotePage = () => {
   if (!subject || !note) {
     return (
       <main className="note-page">
-        <Link
-          to={`/fag/${subjectId}/notater`}
-          className="back-link"
-        >
+        <Link to={`/fag/${subjectId}/notater`} className="back-link">
           ← Tilbake til notater
         </Link>
 
@@ -91,8 +82,7 @@ export const NotePage = () => {
     ? `/fag/${subject.id}/notater/mappe/${note.folderId}`
     : `/fag/${subject.id}/notater`;
 
-  const resourceId =
-    `note-${subject.id}-database-${note.slug}`;
+  const resourceId = `note-${subject.id}-database-${note.slug}`;
 
   return (
     <main className="note-page">
@@ -106,6 +96,8 @@ export const NotePage = () => {
         isAdmin={isAdmin}
         onNoteUpdated={setNote}
       />
+
+      <hr className="note-page-divider" />
 
       <ResourceProgress resourceId={resourceId} />
     </main>

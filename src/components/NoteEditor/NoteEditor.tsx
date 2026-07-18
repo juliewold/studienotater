@@ -1,5 +1,17 @@
 import "./NoteEditor.css";
 import { useEffect } from "react";
+import {
+  Bold,
+  Italic,
+  Heading1,
+  Heading2,
+  List,
+  ListOrdered,
+  Quote,
+  Code2,
+  Undo2,
+  Redo2,
+} from "lucide-react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
@@ -47,16 +59,33 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           type="button"
           className={editor.isActive("bold") ? "is-active" : ""}
           onClick={() => editor.chain().focus().toggleBold().run()}
+          title="Fet"
         >
-          Fet
+          <Bold size={18} />
         </button>
 
         <button
           type="button"
           className={editor.isActive("italic") ? "is-active" : ""}
           onClick={() => editor.chain().focus().toggleItalic().run()}
+          title="Kursiv"
         >
-          Kursiv
+          <Italic size={18} />
+        </button>
+
+        <div className="toolbar-divider" />
+
+        <button
+          type="button"
+          className={
+            editor.isActive("heading", { level: 1 }) ? "is-active" : ""
+          }
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+          title="Overskrift 1"
+        >
+          <Heading1 size={18} />
         </button>
 
         <button
@@ -67,56 +96,67 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           onClick={() =>
             editor.chain().focus().toggleHeading({ level: 2 }).run()
           }
+          title="Overskrift 2"
         >
-          Overskrift
+          <Heading2 size={18} />
         </button>
+
+        <div className="toolbar-divider" />
 
         <button
           type="button"
           className={editor.isActive("bulletList") ? "is-active" : ""}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
+          title="Punktliste"
         >
-          Punktliste
+          <List size={18} />
         </button>
 
         <button
           type="button"
           className={editor.isActive("orderedList") ? "is-active" : ""}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          title="Nummerert liste"
         >
-          Nummerert liste
+          <ListOrdered size={18} />
         </button>
 
         <button
           type="button"
           className={editor.isActive("blockquote") ? "is-active" : ""}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          title="Sitat"
         >
-          Sitat
+          <Quote size={18} />
         </button>
 
         <button
           type="button"
           className={editor.isActive("codeBlock") ? "is-active" : ""}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          title="Kodeblokk"
         >
-          Kode
+          <Code2 size={18} />
         </button>
+
+        <div className="toolbar-divider" />
 
         <button
           type="button"
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
+          title="Angre"
         >
-          Angre
+          <Undo2 size={18} />
         </button>
 
         <button
           type="button"
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
+          title="Gjør om"
         >
-          Gjør om
+          <Redo2 size={18} />
         </button>
       </div>
 
