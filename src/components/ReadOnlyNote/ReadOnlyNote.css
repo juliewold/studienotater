@@ -299,3 +299,192 @@
 .note-editor-content.resize-cursor {
   cursor: col-resize;
 }
+
+.read-only-note-content .note-callout {
+  margin: 1.4rem 0;
+  overflow: hidden;
+  border: 1px solid;
+  border-radius: 14px;
+}
+
+.read-only-note-content .note-callout-body {
+  padding: 1.2rem 1.25rem;
+}
+
+.read-only-note-content .note-callout-body p {
+  margin: 0;
+}
+
+.note-editor-content .note-callout,
+.read-only-note-content .note-callout {
+  position: relative;
+  margin: 1.4rem 0;
+  overflow: hidden;
+  border: 1px solid;
+  border-radius: 16px;
+}
+
+.note-editor-content .note-callout-header,
+.read-only-note-content .note-callout-header {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid rgba(30, 24, 38, 0.06);
+}
+
+.note-editor-content .note-callout-heading,
+.read-only-note-content .note-callout-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.note-editor-content .note-callout-body,
+.read-only-note-content .note-callout-body {
+  padding: 1rem 1.1rem;
+}
+
+.note-editor-content .note-callout-body p,
+.read-only-note-content .note-callout-body p {
+  margin: 0;
+}
+
+.note-editor-content .note-callout-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.note-editor-content
+  .note-callout:hover
+  .note-callout-actions,
+.note-editor-content
+  .note-callout:focus-within
+  .note-callout-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.note-editor-content .note-callout-type-select {
+  height: 32px;
+  padding: 0 1.8rem 0 0.65rem;
+  border: 1px solid rgba(30, 24, 38, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.note-editor-content .note-callout-delete-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(30, 24, 38, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  color: inherit;
+  cursor: pointer;
+}
+
+.note-editor-content
+  .note-callout-delete-button:hover {
+  border-color: #e39a9a;
+  background: #fff1f1;
+  color: #b53c3c;
+}
+
+.note-editor-content .note-callout:focus-within {
+  outline: 3px solid rgba(155, 110, 232, 0.15);
+  outline-offset: 2px;
+}
+
+/* Definisjon */
+
+.note-editor-content
+  .note-callout[data-callout-type="definition"],
+.read-only-note-content
+  .note-callout[data-callout-type="definition"] {
+  border-color: #b8dfc3;
+  background: #f3faf5;
+}
+
+.note-editor-content
+  .note-callout[data-callout-type="definition"]
+  .note-callout-header,
+.read-only-note-content
+  .note-callout[data-callout-type="definition"]
+  .note-callout-header {
+  background: #e4f4e9;
+  color: #2d7147;
+}
+
+/* Tips */
+
+.note-editor-content
+  .note-callout[data-callout-type="tip"],
+.read-only-note-content
+  .note-callout[data-callout-type="tip"] {
+  border-color: #ead8a8;
+  background: #fffaf0;
+}
+
+.note-editor-content
+  .note-callout[data-callout-type="tip"]
+  .note-callout-header,
+.read-only-note-content
+  .note-callout[data-callout-type="tip"]
+  .note-callout-header {
+  background: #fff2c9;
+  color: #8a651f;
+}
+
+/* Teorem */
+
+.note-editor-content
+  .note-callout[data-callout-type="theorem"],
+.read-only-note-content
+  .note-callout[data-callout-type="theorem"] {
+  border-color: #efbcbc;
+  background: #fff5f5;
+}
+
+.note-editor-content
+  .note-callout[data-callout-type="theorem"]
+  .note-callout-header,
+.read-only-note-content
+  .note-callout[data-callout-type="theorem"]
+  .note-callout-header {
+  background: #fde5e5;
+  color: #b03838;
+}
+
+/* Eksempel */
+
+.note-editor-content
+  .note-callout[data-callout-type="example"],
+.read-only-note-content
+  .note-callout[data-callout-type="example"] {
+  border-color: #b8d8f3;
+  background: #f2f8fd;
+}
+
+.note-editor-content
+  .note-callout[data-callout-type="example"]
+  .note-callout-header,
+.read-only-note-content
+  .note-callout[data-callout-type="example"]
+  .note-callout-header {
+  background: #e5f1fb;
+  color: #2f6ea5;
+}

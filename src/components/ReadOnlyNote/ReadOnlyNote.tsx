@@ -8,6 +8,7 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
 import { common, createLowlight } from "lowlight";
 import { TableKit } from "@tiptap/extension-table";
+import { Callout } from "../NoteEditor/Callout";
 
 const lowlight = createLowlight(common);
 
@@ -24,8 +25,6 @@ export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
 
       CodeBlockLowlight.configure({
         lowlight,
-        enableTabIndentation: true,
-        tabSize: 2,
       }),
 
       Mathematics.configure({
@@ -47,6 +46,8 @@ export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
           },
         },
       }),
+
+      Callout,
     ],
 
     content,
