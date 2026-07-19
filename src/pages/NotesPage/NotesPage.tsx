@@ -282,9 +282,12 @@ export const NotesPage = () => {
 
       {notesError && <p className="notes-error-message">{notesError}</p>}
 
-      {!isLoadingNotes && notes.length === 0 && (
-        <p>Ingen notater er lagt til ennå.</p>
-      )}
+      {!isLoadingNotes &&
+        !isLoadingFolders &&
+        notes.length === 0 &&
+        folders.length === 0 && (
+          <p>Ingen mapper eller notater er lagt til ennå.</p>
+        )}
 
       {!isLoadingNotes && notes.length > 0 && (
         <div className="notes-list">
