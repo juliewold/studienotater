@@ -226,3 +226,76 @@
   margin: 1.5rem auto;
   border-radius: 12px;
 }
+
+.note-editor-content .tableWrapper,
+.read-only-note-content .tableWrapper {
+  overflow-x: auto;
+  margin: 1.75rem 0;
+}
+
+.note-editor-content table,
+.read-only-note-content table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  overflow: hidden;
+  border: 1px solid #ded6e8;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.note-editor-content th,
+.note-editor-content td,
+.read-only-note-content th,
+.read-only-note-content td {
+  position: relative;
+  min-width: 90px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #ded6e8;
+  vertical-align: top;
+  text-align: left;
+}
+
+.note-editor-content th,
+.read-only-note-content th {
+  background: #f6f1fd;
+  color: #463752;
+  font-weight: 700;
+}
+
+.note-editor-content td,
+.read-only-note-content td {
+  background: #ffffff;
+}
+
+.note-editor-content th p,
+.note-editor-content td p,
+.read-only-note-content th p,
+.read-only-note-content td p {
+  margin: 0;
+}
+
+.note-editor-content .selectedCell::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(155, 110, 232, 0.16);
+  content: "";
+  pointer-events: none;
+}
+
+.note-editor-content .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: -2px;
+  z-index: 20;
+  width: 4px;
+  background: #9b6ee8;
+  pointer-events: none;
+}
+
+.note-editor-content.resize-cursor {
+  cursor: col-resize;
+}

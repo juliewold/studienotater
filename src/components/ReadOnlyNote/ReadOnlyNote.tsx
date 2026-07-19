@@ -7,6 +7,7 @@ import { Mathematics } from "@tiptap/extension-mathematics";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
 import { common, createLowlight } from "lowlight";
+import { TableKit } from "@tiptap/extension-table";
 
 const lowlight = createLowlight(common);
 
@@ -36,6 +37,15 @@ export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
       Image.configure({
         inline: false,
         allowBase64: false,
+      }),
+
+      TableKit.configure({
+        table: {
+          resizable: false,
+          HTMLAttributes: {
+            class: "note-table",
+          },
+        },
       }),
     ],
 
