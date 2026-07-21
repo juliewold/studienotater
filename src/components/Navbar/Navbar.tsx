@@ -38,7 +38,8 @@ export const Navbar = () => {
     loadUsername();
   }, [user]);
 
-  const displayName = username || user?.email?.split("@")[0] || "Profil";
+  const displayName =
+    username || user?.email?.split("@")[0] || "Profil";
 
   const handleSignOut = async () => {
     await signOut();
@@ -64,6 +65,15 @@ export const Navbar = () => {
           }
         >
           Hjem
+        </NavLink>
+
+        <NavLink
+          to="/fagplan"
+          className={({ isActive }) =>
+            isActive ? "nav-link active-nav-link" : "nav-link"
+          }
+        >
+          Fagplan
         </NavLink>
 
         <NavLink
@@ -95,7 +105,10 @@ export const Navbar = () => {
       </nav>
 
       <div className="nav-actions">
-        <button className="icon-button" aria-label="Bytt tema">
+        <button
+          className="icon-button"
+          aria-label="Bytt tema"
+        >
           ☾
         </button>
 
@@ -106,7 +119,9 @@ export const Navbar = () => {
             <>
               <button
                 className="profile-button"
-                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                onClick={() =>
+                  setProfileMenuOpen(!profileMenuOpen)
+                }
               >
                 {displayName}
               </button>
@@ -118,7 +133,9 @@ export const Navbar = () => {
                   <NavLink
                     to="/profil"
                     className="profile-menu-link"
-                    onClick={() => setProfileMenuOpen(false)}
+                    onClick={() =>
+                      setProfileMenuOpen(false)
+                    }
                   >
                     Min profil
                   </NavLink>
@@ -126,7 +143,9 @@ export const Navbar = () => {
                   <NavLink
                     to="/FavoritesPage"
                     className="profile-menu-link"
-                    onClick={() => setProfileMenuOpen(false)}
+                    onClick={() =>
+                      setProfileMenuOpen(false)
+                    }
                   >
                     Favoritter
                   </NavLink>
@@ -134,7 +153,9 @@ export const Navbar = () => {
                   <NavLink
                     to="/innstillinger"
                     className="profile-menu-link"
-                    onClick={() => setProfileMenuOpen(false)}
+                    onClick={() =>
+                      setProfileMenuOpen(false)
+                    }
                   >
                     Innstillinger
                   </NavLink>
@@ -149,7 +170,10 @@ export const Navbar = () => {
               )}
             </>
           ) : (
-            <Link to="/logg-inn" className="profile-button">
+            <Link
+              to="/logg-inn"
+              className="profile-button"
+            >
               Logg inn
             </Link>
           )}
@@ -161,7 +185,9 @@ export const Navbar = () => {
             setMenuOpen(!menuOpen);
             setProfileMenuOpen(false);
           }}
-          aria-label={menuOpen ? "Lukk meny" : "Åpne meny"}
+          aria-label={
+            menuOpen ? "Lukk meny" : "Åpne meny"
+          }
         >
           {menuOpen ? "×" : "☰"}
         </button>
@@ -170,7 +196,10 @@ export const Navbar = () => {
       {menuOpen && (
         <div className="menu-overlay">
           <div className="menu-top">
-            <input type="text" placeholder="Hva leter du etter?" />
+            <input
+              type="text"
+              placeholder="Hva leter du etter?"
+            />
           </div>
 
           <div className="menu-grid">
@@ -181,17 +210,33 @@ export const Navbar = () => {
                 to="/"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
                 Hjem
               </NavLink>
 
               <NavLink
+                to="/fagplan"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
+                }
+              >
+                Fagplan
+              </NavLink>
+
+              <NavLink
                 to="/notater"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
                 Notater
@@ -201,7 +246,9 @@ export const Navbar = () => {
                 to="/flashcards"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
                 Flashcards
@@ -211,7 +258,9 @@ export const Navbar = () => {
                 to="/videoer"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
                 Videoer
@@ -221,17 +270,21 @@ export const Navbar = () => {
                 to="/pdfs"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
-                PDF-er
+                Forelesningsnotater
               </NavLink>
 
               <NavLink
                 to="/programmering"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
                 Programmering
@@ -245,7 +298,9 @@ export const Navbar = () => {
                 to="/semesterstart"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
                 Semesterstart
@@ -255,7 +310,9 @@ export const Navbar = () => {
                 to="/klassetrinn"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
                 Klassetrinn
@@ -274,21 +331,14 @@ export const Navbar = () => {
 
             <div className="menu-column">
               <h3>PLANLEGGING</h3>
-              <NavLink
-                to="/fagplan"
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
-                }
-              >
-                Fagplan
-              </NavLink>
 
               <NavLink
                 to="/eksamen"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive ? "menu-link active-menu-link" : "menu-link"
+                  isActive
+                    ? "menu-link active-menu-link"
+                    : "menu-link"
                 }
               >
                 Eksamensnedtelling
@@ -335,14 +385,19 @@ export const Navbar = () => {
                 <>
                   <NavLink
                     to="/logg-inn"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={() =>
+                      setMenuOpen(false)
+                    }
                     className="menu-link"
                   >
                     Logg inn
                   </NavLink>
+
                   <NavLink
                     to="/registrer"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={() =>
+                      setMenuOpen(false)
+                    }
                     className="menu-link"
                   >
                     Registrer deg

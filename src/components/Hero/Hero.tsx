@@ -8,17 +8,17 @@ export const Hero = () => {
         <h1>Studienotater for datateknologi</h1>
 
         <p className="hero-text">
-          Samle notater, øv med flashcards, se videoer og følg pensum gjennom
-          hele studiet.
+          Samle egne notater, les forelesningsnotater, øv med flashcards og
+          forbered deg til eksamen gjennom hele studiet.
         </p>
 
         <div className="hero-actions">
-          <Link to="/notater" className="hero-button">
-            Se notater
+          <Link to="/pdfs" className="hero-button">
+            Se forelesningsnotater
           </Link>
 
-          <Link to="/pdfs" className="hero-button secondary">
-            Utforsk PDF-er
+          <Link to="/notater" className="hero-button secondary">
+            Se egne notater
           </Link>
         </div>
       </div>

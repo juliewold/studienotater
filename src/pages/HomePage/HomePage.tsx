@@ -77,7 +77,7 @@ export const HomePage = () => {
         />
 
         <StatsCard
-          title="Notater"
+          title="Egne notater"
           value={
             isLoadingStats ? "–" : String(totalNotes)
           }
@@ -93,7 +93,7 @@ export const HomePage = () => {
         />
 
         <StatsCard
-          title="PDF-er"
+          title="Forelesningsnotater"
           value={
             isLoadingStats ? "–" : String(totalPdfs)
           }
