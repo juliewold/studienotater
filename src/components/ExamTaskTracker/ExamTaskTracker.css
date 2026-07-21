@@ -1,30 +1,121 @@
 .exam-task-tracker {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  border: 1px solid rgba(132, 87, 229, 0.12);
-  border-radius: 16px;
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  border: 1px solid #ece8f7;
+  border-radius: 20px;
   background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
 }
 
 .exam-task-tracker h2 {
   margin: 0 0 1rem;
+  font-size: 1.4rem;
+}
+
+.exam-task-tracker {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.exam-task-tracker h2,
+.exam-task-progress,
+.exam-task-tracker progress {
+  grid-column: 1 / -1;
 }
 
 .exam-task-item {
   display: flex;
-  gap: 0.75rem;
   align-items: center;
-  margin-bottom: 0.75rem;
+  gap: 0.6rem;
+
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+
+  background: #faf8ff;
+  border: 1px solid #ece8f7;
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.exam-task-item:hover {
+  background: #f5efff;
+  border-color: #d8c7ff;
+  transform: translateY(-2px);
+}
+
+.exam-task-item input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #8b5cf6;
   cursor: pointer;
 }
 
 .exam-task-progress {
-  margin-top: 1rem;
-  font-weight: 600;
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .exam-task-tracker progress {
   width: 100%;
-  height: 10px;
-  margin-top: 0.75rem;
+  height: 9px;
+  margin-top: 0;
+
+  border: none;
+  border-radius: 999px;
+  overflow: hidden;
+
+  background: #f1eefb;
+}
+
+.exam-task-tracker progress::-webkit-progress-bar {
+  background: #f1eefb;
+  border-radius: 999px;
+}
+
+.exam-task-tracker progress::-webkit-progress-value {
+  background: linear-gradient(
+    90deg,
+    #8b5cf6,
+    #a855f7
+  );
+  border-radius: 999px;
+}
+
+.exam-task-tracker progress::-moz-progress-bar {
+  background: linear-gradient(
+    90deg,
+    #8b5cf6,
+    #a855f7
+  );
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .exam-task-tracker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .exam-task-tracker {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+}
+
+.exam-workspace-sidebar .exam-task-tracker {
+  grid-template-columns: 1fr;
+}
+
+.exam-workspace-sidebar .exam-task-item {
+  width: 100%;
 }

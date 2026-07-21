@@ -6,7 +6,6 @@ import {
   type DatabaseExam,
 } from "../../services/examsService";
 import { supabase } from "../../lib/supabase";
-import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
 import { ExamTaskTracker } from "../../components/ExamTaskTracker/ExamTaskTracker";
 
 export const ExamViewerPage = () => {
@@ -75,10 +74,6 @@ export const ExamViewerPage = () => {
 
   const examTitle = exam ? `${exam.title} – ${exam.semester} ${exam.year}` : "";
 
-  const resourceId = exam
-    ? `exam-${subjectId}-database-${exam.id}-${fileId}`
-    : "";
-
   if (errorMessage || !exam || !filePath || !fileUrl) {
     return (
       <main className="page-container">
@@ -94,24 +89,32 @@ export const ExamViewerPage = () => {
   }
 
   return (
-    <main className="page-container">
-      <Link to={`/fag/${subjectId}/eksamen`} className="back-link">
-        ← Tilbake til eksamener
-      </Link>
+    <main className="page-container exam-viewer-page">
+      <header className="exam-compact-header">
+        <Link to={`/fag/${subjectId}/eksamen`} className="exam-compact-back">
+          ← Tilbake
+        </Link>
 
-      <p className="page-label">{examTitle}</p>
+        <div className="exam-compact-title">
+          <span>{examTitle}</span>
+          <span className="exam-compact-separator">·</span>
+          <strong>{fileTitle}</strong>
+        </div>
+      </header>
 
-      <h1>{fileTitle}</h1>
+      <div className="exam-workspace">
+        <aside className="exam-workspace-sidebar">
+          <ExamTaskTracker examId={exam.id} tasks={exam.relevantTasks} />
+        </aside>
 
-      <ResourceProgress resourceId={resourceId} />
-
-      <ExamTaskTracker examId={exam.id} tasks={exam.relevantTasks} />
-
-      <iframe
-        className="exam-viewer"
-        src={fileUrl}
-        title={`${examTitle} – ${fileTitle}`}
-      />
+        <div className="exam-workspace-pdf">
+          <iframe
+            className="exam-viewer"
+            src={fileUrl}
+            title={`${examTitle} – ${fileTitle}`}
+          />
+        </div>
+      </div>
     </main>
   );
 };
