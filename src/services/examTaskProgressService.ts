@@ -5,7 +5,13 @@ export type ExamTaskProgress = {
   completed: boolean;
 };
 
+export type ExamProgressByExam = Record<
+  string,
+  ExamTaskProgress[]
+>;
+
 type ExamTaskProgressRow = {
+  exam_id: string;
   task_label: string;
   completed: boolean;
 };
@@ -36,7 +42,7 @@ export async function getExamTaskProgress(
 
   const { data, error } = await supabase
     .from("exam_task_progress")
-    .select("task_label, completed")
+    .select("exam_id, task_label, completed")
     .eq("user_id", userId)
     .eq("exam_id", examId);
 
@@ -50,6 +56,41 @@ export async function getExamTaskProgress(
       completed: progress.completed,
     }),
   );
+}
+
+export async function getProgressForExams(
+  examIds: string[],
+): Promise<ExamProgressByExam> {
+  if (examIds.length === 0) {
+    return {};
+  }
+
+  const userId = await getAuthenticatedUserId();
+
+  const { data, error } = await supabase
+    .from("exam_task_progress")
+    .select("exam_id, task_label, completed")
+    .eq("user_id", userId)
+    .in("exam_id", examIds);
+
+  if (error) {
+    throw error;
+  }
+
+  const progressByExam: ExamProgressByExam = {};
+
+  for (const examId of examIds) {
+    progressByExam[examId] = [];
+  }
+
+  for (const row of (data ?? []) as ExamTaskProgressRow[]) {
+    progressByExam[row.exam_id].push({
+      taskLabel: row.task_label,
+      completed: row.completed,
+    });
+  }
+
+  return progressByExam;
 }
 
 export async function setExamTaskCompleted(
