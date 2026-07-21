@@ -6,9 +6,32 @@ export type DatabaseExam = {
   title: string;
   semester: string;
   year: number;
+  relevantTasks: string[];
   examFilePath: string | null;
   solutionFilePath: string | null;
 };
+
+function mapDatabaseExam(exam: {
+  id: string;
+  subject_id: string;
+  title: string;
+  semester: string;
+  year: number;
+  relevant_tasks: string[] | null;
+  exam_file_path: string | null;
+  solution_file_path: string | null;
+}): DatabaseExam {
+  return {
+    id: exam.id,
+    subjectId: exam.subject_id,
+    title: exam.title,
+    semester: exam.semester,
+    year: exam.year,
+    relevantTasks: exam.relevant_tasks ?? [],
+    examFilePath: exam.exam_file_path,
+    solutionFilePath: exam.solution_file_path,
+  };
+}
 
 export async function getExamsBySubject(
   subjectId: string,
@@ -23,15 +46,7 @@ export async function getExamsBySubject(
     throw error;
   }
 
-  return (data ?? []).map((exam) => ({
-    id: exam.id,
-    subjectId: exam.subject_id,
-    title: exam.title,
-    semester: exam.semester,
-    year: exam.year,
-    examFilePath: exam.exam_file_path,
-    solutionFilePath: exam.solution_file_path,
-  }));
+  return (data ?? []).map(mapDatabaseExam);
 }
 
 export async function createExam(
@@ -39,14 +54,16 @@ export async function createExam(
   title: string,
   semester: string,
   year: number,
+  relevantTasks: string[],
   examFilePath: string | null,
   solutionFilePath: string | null,
-) {
+): Promise<void> {
   const { error } = await supabase.from("exams").insert({
     subject_id: subjectId,
     title,
     semester,
     year,
+    relevant_tasks: relevantTasks,
     exam_file_path: examFilePath,
     solution_file_path: solutionFilePath,
   });
@@ -61,15 +78,17 @@ export async function updateExam(
   title: string,
   semester: string,
   year: number,
+  relevantTasks: string[],
   examFilePath: string | null,
   solutionFilePath: string | null,
-) {
+): Promise<void> {
   const { error } = await supabase
     .from("exams")
     .update({
       title,
       semester,
       year,
+      relevant_tasks: relevantTasks,
       exam_file_path: examFilePath,
       solution_file_path: solutionFilePath,
     })
@@ -80,7 +99,7 @@ export async function updateExam(
   }
 }
 
-export async function deleteExam(id: string) {
+export async function deleteExam(id: string): Promise<void> {
   const { error } = await supabase
     .from("exams")
     .delete()

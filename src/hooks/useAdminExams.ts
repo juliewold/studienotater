@@ -23,6 +23,7 @@ export const useAdminExams = () => {
   const [title, setTitle] = useState("");
   const [semester, setSemester] = useState("");
   const [year, setYear] = useState("");
+  const [relevantTasks, setRelevantTasks] = useState("");
 
   const [examFile, setExamFile] = useState<File | null>(null);
   const [solutionFile, setSolutionFile] = useState<File | null>(null);
@@ -53,6 +54,7 @@ export const useAdminExams = () => {
     setTitle("");
     setSemester("");
     setYear("");
+    setRelevantTasks("");
     setExamFile(null);
     setSolutionFile(null);
     setEditingExam(null);
@@ -134,10 +136,18 @@ export const useAdminExams = () => {
     }
   };
 
+  const parseRelevantTasks = (value: string): string[] => {
+    return value
+      .split(",")
+      .map((task) => task.trim())
+      .filter(Boolean);
+  };
+
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const parsedYear = Number(year);
+    const parsedRelevantTasks = parseRelevantTasks(relevantTasks);
 
     if (!Number.isInteger(parsedYear) || parsedYear < 1900) {
       setErrorMessage("Skriv inn et gyldig årstall.");
@@ -177,6 +187,7 @@ export const useAdminExams = () => {
           title.trim(),
           semester,
           parsedYear,
+          parsedRelevantTasks,
           examFilePath,
           solutionFilePath,
         );
@@ -212,6 +223,7 @@ export const useAdminExams = () => {
         title.trim(),
         semester,
         parsedYear,
+        parsedRelevantTasks,
         examFilePath,
         solutionFilePath,
       );
@@ -253,6 +265,8 @@ export const useAdminExams = () => {
 
     setErrorMessage("");
     setSuccessMessage("");
+
+    setRelevantTasks(exam.relevantTasks.join(", "));
 
     window.scrollTo({
       top: 0,
@@ -329,6 +343,9 @@ export const useAdminExams = () => {
 
     year,
     setYear,
+
+    relevantTasks,
+    setRelevantTasks,
 
     setExamFile,
     setSolutionFile,

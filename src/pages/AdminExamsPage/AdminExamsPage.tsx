@@ -26,6 +26,9 @@ export const AdminExamsPage = () => {
     year,
     setYear,
 
+    relevantTasks,
+    setRelevantTasks,
+
     setExamFile,
     setSolutionFile,
 
@@ -114,22 +117,15 @@ export const AdminExamsPage = () => {
         </div>
 
         <section className="admin-exam-card">
-          <h2>
-            {editingExam ? "Rediger eksamen" : "Opprett ny eksamen"}
-          </h2>
+          <h2>{editingExam ? "Rediger eksamen" : "Opprett ny eksamen"}</h2>
 
-          <form
-            className="admin-exam-form"
-            onSubmit={handlePreviousExamSubmit}
-          >
+          <form className="admin-exam-form" onSubmit={handlePreviousExamSubmit}>
             <label htmlFor="exam-subject">Fag</label>
 
             <select
               id="exam-subject"
               value={previousExamSubjectId}
-              onChange={(event) =>
-                setPreviousExamSubjectId(event.target.value)
-              }
+              onChange={(event) => setPreviousExamSubjectId(event.target.value)}
               disabled={Boolean(editingExam)}
               required
             >
@@ -198,6 +194,20 @@ export const AdminExamsPage = () => {
               </div>
             </div>
 
+            <label htmlFor="exam-relevant-tasks">Relevante oppgaver</label>
+
+            <input
+              id="exam-relevant-tasks"
+              type="text"
+              value={relevantTasks}
+              onChange={(event) => setRelevantTasks(event.target.value)}
+              placeholder="1, 2, 3a, 3b, 5, 7"
+            />
+
+            <p className="admin-exam-help">
+              Skriv oppgavene som er relevante, separert med komma.
+            </p>
+
             <label htmlFor="exam-file">Oppgavesett</label>
 
             <input
@@ -205,15 +215,13 @@ export const AdminExamsPage = () => {
               id="exam-file"
               type="file"
               accept="application/pdf"
-              onChange={(event) =>
-                setExamFile(event.target.files?.[0] ?? null)
-              }
+              onChange={(event) => setExamFile(event.target.files?.[0] ?? null)}
             />
 
             {editingExam?.examFilePath && (
               <p className="admin-exam-help">
-                Det finnes allerede et oppgavesett. Velg en ny fil bare
-                dersom du vil erstatte den.
+                Det finnes allerede et oppgavesett. Velg en ny fil bare dersom
+                du vil erstatte den.
               </p>
             )}
 
@@ -278,22 +286,16 @@ export const AdminExamsPage = () => {
             <p>Laster eksamener...</p>
           ) : uploadedExams.length === 0 ? (
             <p>
-              Ingen tidligere eksamener er opprettet gjennom adminpanelet
-              ennå.
+              Ingen tidligere eksamener er opprettet gjennom adminpanelet ennå.
             </p>
           ) : (
             <div className="uploaded-exam-list">
               {uploadedExams.map((exam) => {
                 const examFileUrl = getFileUrl(exam.examFilePath);
-                const solutionFileUrl = getFileUrl(
-                  exam.solutionFilePath,
-                );
+                const solutionFileUrl = getFileUrl(exam.solutionFilePath);
 
                 return (
-                  <article
-                    key={exam.id}
-                    className="uploaded-exam-item"
-                  >
+                  <article key={exam.id} className="uploaded-exam-item">
                     <div className="uploaded-exam-content">
                       <h3>{exam.title}</h3>
 
@@ -306,16 +308,12 @@ export const AdminExamsPage = () => {
                       <div className="uploaded-exam-files">
                         <span>
                           Oppgavesett:{" "}
-                          {exam.examFilePath
-                            ? "Lastet opp"
-                            : "Ikke valgt"}
+                          {exam.examFilePath ? "Lastet opp" : "Ikke valgt"}
                         </span>
 
                         <span>
                           Løsningsforslag:{" "}
-                          {exam.solutionFilePath
-                            ? "Lastet opp"
-                            : "Ikke valgt"}
+                          {exam.solutionFilePath ? "Lastet opp" : "Ikke valgt"}
                         </span>
                       </div>
                     </div>
@@ -372,9 +370,7 @@ export const AdminExamsPage = () => {
         <div className="admin-exam-section-heading">
           <p className="admin-exam-section-label">Eksamenskalender</p>
           <h2>Kommende eksamensdatoer</h2>
-          <p>
-            Legg inn dato, klokkeslett og sted for kommende eksamener.
-          </p>
+          <p>Legg inn dato, klokkeslett og sted for kommende eksamener.</p>
         </div>
 
         <section className="admin-exam-card">
@@ -384,18 +380,13 @@ export const AdminExamsPage = () => {
               : "Legg til eksamensdato"}
           </h2>
 
-          <form
-            className="admin-exam-form"
-            onSubmit={handleUpcomingExamSubmit}
-          >
+          <form className="admin-exam-form" onSubmit={handleUpcomingExamSubmit}>
             <label htmlFor="upcoming-exam-subject">Fag</label>
 
             <select
               id="upcoming-exam-subject"
               value={upcomingSubjectId}
-              onChange={(event) =>
-                setUpcomingSubjectId(event.target.value)
-              }
+              onChange={(event) => setUpcomingSubjectId(event.target.value)}
               disabled={Boolean(editingUpcomingExam)}
               required
             >
@@ -428,9 +419,7 @@ export const AdminExamsPage = () => {
               </div>
 
               <div>
-                <label htmlFor="upcoming-exam-time">
-                  Klokkeslett
-                </label>
+                <label htmlFor="upcoming-exam-time">Klokkeslett</label>
 
                 <input
                   id="upcoming-exam-time"
@@ -496,10 +485,7 @@ export const AdminExamsPage = () => {
           ) : (
             <div className="uploaded-exam-list">
               {upcomingExams.map((exam) => (
-                <article
-                  key={exam.id}
-                  className="uploaded-exam-item"
-                >
+                <article key={exam.id} className="uploaded-exam-item">
                   <div className="uploaded-exam-content">
                     <h3>{getSubjectLabel(exam.subjectId)}</h3>
 
@@ -507,9 +493,7 @@ export const AdminExamsPage = () => {
 
                     <div className="upcoming-exam-details">
                       {exam.startTime && (
-                        <span>
-                          Klokken {formatTime(exam.startTime)}
-                        </span>
+                        <span>Klokken {formatTime(exam.startTime)}</span>
                       )}
 
                       {exam.note && <span>{exam.note}</span>}

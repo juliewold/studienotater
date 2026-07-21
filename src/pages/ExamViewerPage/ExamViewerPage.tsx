@@ -7,13 +7,10 @@ import {
 } from "../../services/examsService";
 import { supabase } from "../../lib/supabase";
 import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
+import { ExamTaskTracker } from "../../components/ExamTaskTracker/ExamTaskTracker";
 
 export const ExamViewerPage = () => {
-  const {
-    subjectId,
-    examId,
-    fileId,
-  } = useParams();
+  const { subjectId, examId, fileId } = useParams();
 
   const [exam, setExam] = useState<DatabaseExam | null>(null);
   const [isLoadingExam, setIsLoadingExam] = useState(true);
@@ -31,8 +28,7 @@ export const ExamViewerPage = () => {
       setErrorMessage("");
 
       try {
-        const loadedExams =
-          await getExamsBySubject(subjectId);
+        const loadedExams = await getExamsBySubject(subjectId);
 
         const selectedExam = loadedExams.find(
           (currentExam) => currentExam.id === examId,
@@ -65,44 +61,28 @@ export const ExamViewerPage = () => {
 
   const isSolution = fileId === "solution";
 
-  const filePath = isSolution
-    ? exam?.solutionFilePath
-    : exam?.examFilePath;
+  const filePath = isSolution ? exam?.solutionFilePath : exam?.examFilePath;
 
-  const fileTitle = isSolution
-    ? "Løsningsforslag"
-    : "Oppgavesett";
+  const fileTitle = isSolution ? "Løsningsforslag" : "Oppgavesett";
 
   let fileUrl = "";
 
   if (filePath) {
-    const { data } = supabase.storage
-      .from("pdfs")
-      .getPublicUrl(filePath);
+    const { data } = supabase.storage.from("pdfs").getPublicUrl(filePath);
 
     fileUrl = data.publicUrl;
   }
 
-  const examTitle = exam
-    ? `${exam.title} – ${exam.semester} ${exam.year}`
-    : "";
+  const examTitle = exam ? `${exam.title} – ${exam.semester} ${exam.year}` : "";
 
   const resourceId = exam
     ? `exam-${subjectId}-database-${exam.id}-${fileId}`
     : "";
 
-  if (
-    errorMessage ||
-    !exam ||
-    !filePath ||
-    !fileUrl
-  ) {
+  if (errorMessage || !exam || !filePath || !fileUrl) {
     return (
       <main className="page-container">
-        <Link
-          to={`/fag/${subjectId}/eksamen`}
-          className="back-link"
-        >
+        <Link to={`/fag/${subjectId}/eksamen`} className="back-link">
           ← Tilbake til eksamener
         </Link>
 
@@ -115,10 +95,7 @@ export const ExamViewerPage = () => {
 
   return (
     <main className="page-container">
-      <Link
-        to={`/fag/${subjectId}/eksamen`}
-        className="back-link"
-      >
+      <Link to={`/fag/${subjectId}/eksamen`} className="back-link">
         ← Tilbake til eksamener
       </Link>
 
@@ -127,6 +104,8 @@ export const ExamViewerPage = () => {
       <h1>{fileTitle}</h1>
 
       <ResourceProgress resourceId={resourceId} />
+
+      <ExamTaskTracker examId={exam.id} tasks={exam.relevantTasks} />
 
       <iframe
         className="exam-viewer"
