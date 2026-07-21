@@ -1,49 +1,13 @@
 import "./SubjectPage.css";
-import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { subjects } from "../../data/subjects";
 import { SubjectFeatureCard } from "../../components/SubjectFeatureCard/SubjectFeatureCard";
-import { SyllabusTracker } from "../../components/SyllabusTracker/SyllabusTracker";
-import {
-  getNotesBySubject,
-  type DatabaseNote,
-} from "../../services/notesService";
 
 export const SubjectPage = () => {
   const { subjectId } = useParams();
-
-  const [subjectNotes, setSubjectNotes] = useState<DatabaseNote[]>([]);
-  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-
   const subject = subjects.find(
     (currentSubject) => currentSubject.id === subjectId,
   );
-
-  useEffect(() => {
-    const loadNotes = async () => {
-      if (!subjectId) {
-        setSubjectNotes([]);
-        setIsLoadingNotes(false);
-        return;
-      }
-
-      setIsLoadingNotes(true);
-      setErrorMessage("");
-
-      try {
-        const loadedNotes = await getNotesBySubject(subjectId);
-        setSubjectNotes(loadedNotes);
-      } catch (error) {
-        console.error("Kunne ikke hente notater:", error);
-        setErrorMessage("Kunne ikke hente pensumoversikten.");
-      } finally {
-        setIsLoadingNotes(false);
-      }
-    };
-
-    loadNotes();
-  }, [subjectId]);
 
   if (!subject) {
     return (
@@ -52,13 +16,6 @@ export const SubjectPage = () => {
       </main>
     );
   }
-
-  const syllabusTopics = subjectNotes.map((note) => ({
-    id: note.slug,
-    title: note.title,
-    description: note.description,
-  }));
-
   return (
     <main className="subject-page">
       <Link to="/" className="back-link">
@@ -69,12 +26,12 @@ export const SubjectPage = () => {
 
       <h1>{subject.code}</h1>
 
-      <p>{subject.name}</p>
+      <p className="subject-page-name">{subject.name}</p>
 
       <div className="subject-features-grid">
         <SubjectFeatureCard
           title="Notater"
-          description="Les og organiser notater"
+          description="Les fagnotater og sammendrag"
           link={`/fag/${subject.id}/notater`}
         />
 
@@ -91,34 +48,23 @@ export const SubjectPage = () => {
         />
 
         <SubjectFeatureCard
-          title="Eksamen"
-          description="Tidligere eksamener og løsninger"
+          title="Tidligere eksamener"
+          description="Øv med tidligere eksamener"
           link={`/fag/${subject.id}/eksamen`}
         />
 
         <SubjectFeatureCard
-          title="PDF-er"
-          description="Forelesninger og egne notater"
+          title="Forelesningsnotater"
+          description="Forelesninger, presentasjoner og pensum"
           link={`/fag/${subject.id}/pdfs`}
         />
 
         <SubjectFeatureCard
-          title="Studieplan"
-          description="Pensum, oppgaver og fremdrift"
+          title="Pensum"
+          description="Følg pensum og fremdrift"
           link={`/fag/${subject.id}/studieplan`}
         />
       </div>
-
-      {isLoadingNotes ? (
-        <p>Laster pensumoversikt...</p>
-      ) : errorMessage ? (
-        <p>{errorMessage}</p>
-      ) : (
-        <SyllabusTracker
-          subjectId={subject.id}
-          topics={syllabusTopics}
-        />
-      )}
     </main>
   );
 };

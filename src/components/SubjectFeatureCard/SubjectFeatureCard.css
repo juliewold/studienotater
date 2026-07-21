@@ -1,24 +1,66 @@
 .subject-feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
   background: white;
+  border: 1px solid #ede9fe;
   border-radius: 24px;
   padding: 28px;
 
   text-decoration: none;
   color: inherit;
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .subject-feature-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+  border-color: #c4b5fd;
+  box-shadow: 0 18px 36px rgba(139, 92, 246, 0.15);
+}
+
+.subject-feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 16px;
+  background: #f5f3ff;
+  color: #8b5cf6;
 }
 
 .subject-feature-card h3 {
-  margin: 0 0 8px;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .subject-feature-card p {
   margin: 0;
-  color: #6b647c;
+  color: #6b7280;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.subject-feature-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 12px;
+
+  color: #8b5cf6;
+  font-weight: 600;
+}
+
+.subject-feature-card:hover .subject-feature-link {
+  gap: 10px;
 }
