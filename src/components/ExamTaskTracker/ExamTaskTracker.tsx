@@ -10,19 +10,13 @@ type Props = {
   tasks: string[];
 };
 
-export const ExamTaskTracker = ({
-  examId,
-  tasks,
-}: Props) => {
-  const [completedTasks, setCompletedTasks] = useState<
-    Set<string>
-  >(new Set());
+export const ExamTaskTracker = ({ examId, tasks }: Props) => {
+  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadProgress = async () => {
       try {
-        const progress =
-          await getExamTaskProgress(examId);
+        const progress = await getExamTaskProgress(examId);
 
         setCompletedTasks(
           new Set(
@@ -40,18 +34,15 @@ export const ExamTaskTracker = ({
   }, [examId]);
 
   const completedCount = useMemo(
-    () => completedTasks.size,
-    [completedTasks],
+    () => tasks.filter((task) => completedTasks.has(task)).length,
+    [tasks, completedTasks],
   );
 
   const progress =
-    tasks.length === 0
-      ? 0
-      : (completedCount / tasks.length) * 100;
+    tasks.length === 0 ? 0 : (completedCount / tasks.length) * 100;
 
   const toggleTask = async (task: string) => {
-    const isCompleted =
-      completedTasks.has(task);
+    const isCompleted = completedTasks.has(task);
 
     const nextCompleted = new Set(completedTasks);
 
@@ -63,11 +54,7 @@ export const ExamTaskTracker = ({
 
     setCompletedTasks(nextCompleted);
 
-    await setExamTaskCompleted(
-      examId,
-      task,
-      !isCompleted,
-    );
+    await setExamTaskCompleted(examId, task, !isCompleted);
   };
 
   return (
@@ -75,16 +62,12 @@ export const ExamTaskTracker = ({
       <h2>Oppgaver</h2>
 
       {tasks.map((task) => (
-        <label
-          key={task}
-          className="exam-task-item"
-        >
+        <label key={task} className="exam-task-item">
           <input
             type="checkbox"
             checked={completedTasks.has(task)}
             onChange={() => toggleTask(task)}
           />
-
           Oppgave {task}
         </label>
       ))}
@@ -93,10 +76,7 @@ export const ExamTaskTracker = ({
         {completedCount} / {tasks.length} fullført
       </p>
 
-      <progress
-        value={progress}
-        max={100}
-      />
+      <progress value={progress} max={100} />
     </section>
   );
 };
