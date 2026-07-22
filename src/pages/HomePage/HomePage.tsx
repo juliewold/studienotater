@@ -77,7 +77,7 @@ export const HomePage = () => {
         />
 
         <StatsCard
-          title="Egne notater"
+          title="Notater"
           value={
             isLoadingStats ? "–" : String(totalNotes)
           }
