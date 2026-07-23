@@ -7,11 +7,10 @@ type Props = {
   exams: DatabaseExam[];
 };
 
-export const ExamProgressOverview = ({
-  exams,
-}: Props) => {
-  const [completedByExam, setCompletedByExam] =
-    useState<Record<string, Set<string>>>({});
+export const ExamProgressOverview = ({ exams }: Props) => {
+  const [completedByExam, setCompletedByExam] = useState<
+    Record<string, Set<string>>
+  >({});
 
   useEffect(() => {
     const loadProgress = async () => {
@@ -49,16 +48,18 @@ export const ExamProgressOverview = ({
 
     for (const exam of exams) {
       const taskCount = exam.relevantTasks.length;
-      const completedCount =
-        completedByExam[exam.id]?.size ?? 0;
+      const completedTaskLabels =
+        completedByExam[exam.id] ?? new Set<string>();
+
+      // Teller bare oppgaver som fortsatt finnes i relevantTasks
+      const completedCount = exam.relevantTasks.filter((task) =>
+        completedTaskLabels.has(task),
+      ).length;
 
       totalTasks += taskCount;
       completedTasks += completedCount;
 
-      if (
-        taskCount > 0 &&
-        completedCount === taskCount
-      ) {
+      if (taskCount > 0 && completedCount === taskCount) {
         completedExams++;
       }
     }
@@ -71,9 +72,7 @@ export const ExamProgressOverview = ({
       percentage:
         totalTasks === 0
           ? 0
-          : Math.round(
-              (completedTasks / totalTasks) * 100,
-            ),
+          : Math.round((completedTasks / totalTasks) * 100),
     };
   }, [completedByExam, exams]);
 
