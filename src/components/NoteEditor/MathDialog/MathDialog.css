@@ -1,0 +1,243 @@
+.math-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1.5rem;
+
+  background: rgba(34, 28, 41, 0.42);
+  backdrop-filter: blur(4px);
+}
+
+.math-dialog {
+  width: min(620px, 100%);
+  overflow: hidden;
+
+  border: 1px solid rgba(155, 110, 232, 0.18);
+  border-radius: 20px;
+
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(34, 28, 41, 0.22);
+}
+
+.math-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding: 1.25rem 1.5rem;
+
+  border-bottom: 1px solid rgba(155, 110, 232, 0.12);
+}
+
+.math-dialog-header h2 {
+  margin: 0;
+
+  color: #29252f;
+  font-size: 1.25rem;
+}
+
+.math-dialog-close-button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+
+  place-items: center;
+
+  border: none;
+  border-radius: 9px;
+
+  background: transparent;
+  color: #5f5873;
+
+  cursor: pointer;
+}
+
+.math-dialog-close-button:hover {
+  background: #f3efff;
+  color: #7046c5;
+}
+
+.math-dialog-content {
+  display: grid;
+  gap: 0.6rem;
+
+  padding: 1.5rem;
+}
+
+.math-dialog-content label {
+  color: #463752;
+  font-weight: 700;
+}
+
+.math-dialog-content input {
+  width: 100%;
+  padding: 0.9rem 1rem;
+
+  border: 1px solid rgba(155, 110, 232, 0.28);
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #29252f;
+
+  font: inherit;
+}
+
+.math-dialog-content input:focus {
+  border-color: #9b6ee8;
+  outline: 3px solid rgba(155, 110, 232, 0.16);
+}
+
+.math-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.math-dialog-actions button {
+  padding: 0.75rem 1.1rem;
+
+  border: none;
+  border-radius: 10px;
+
+  font: inherit;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.math-dialog-cancel-button {
+  background: #f1ecfb;
+  color: #6f4bb5;
+}
+
+.math-dialog-cancel-button:hover {
+  background: #e8ddff;
+}
+
+.math-dialog-insert-button {
+  background: #9b6ee8;
+  color: #ffffff;
+}
+
+.math-dialog-insert-button:hover:not(:disabled) {
+  background: #8758d8;
+}
+
+.math-dialog-insert-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (max-width: 600px) {
+  .math-dialog-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .math-dialog {
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .math-dialog-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .math-dialog-actions button {
+    width: 100%;
+  }
+}
+
+.math-symbol-groups {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.math-symbol-group {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.math-symbol-group h3 {
+  margin: 0;
+  color: #5f5873;
+  font-size: 0.9rem;
+}
+
+.math-symbol-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.math-symbol-button {
+  min-width: 44px;
+  min-height: 40px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgba(155, 110, 232, 0.2);
+  border-radius: 10px;
+  background: #faf8fd;
+  color: #3f354b;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.math-symbol-button:hover {
+  border-color: rgba(155, 110, 232, 0.38);
+  background: #f1eafd;
+  color: #7046c5;
+}
+
+.math-preview-section {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+
+.math-preview-label {
+  color: #463752;
+  font-weight: 700;
+}
+
+.math-preview {
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+
+  border: 1px solid rgba(155, 110, 232, 0.16);
+  border-radius: 12px;
+
+  background: #faf8fd;
+  color: #29252f;
+}
+
+.math-preview:empty::before {
+  color: #aaa1b3;
+  content: "Formelen vises her";
+  font-size: 0.92rem;
+}
+
+.math-preview-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.88rem;
+  font-weight: 600;
+}

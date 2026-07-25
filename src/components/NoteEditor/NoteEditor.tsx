@@ -34,8 +34,8 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
 import { TableKit } from "@tiptap/extension-table";
 import { common, createLowlight } from "lowlight";
-
 import { supabase } from "../../lib/supabase";
+import { MathDialog } from "./MathDialog/MathDialog";
 
 const lowlight = createLowlight(common);
 
@@ -49,6 +49,9 @@ type NoteEditorProps = {
 export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [mathDialogType, setMathDialogType] = useState<
+    "inline" | "block" | null
+  >(null);
 
   const editor = useEditor({
     extensions: [
@@ -118,49 +121,11 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   }, [editor, value]);
 
   const handleInsertInlineMath = () => {
-    if (!editor) {
-      return;
-    }
-
-    const latex = window.prompt(
-      "Skriv inn LaTeX-formelen:",
-      String.raw`x^2 + y^2 = z^2`,
-    );
-
-    if (!latex?.trim()) {
-      return;
-    }
-
-    editor
-      .chain()
-      .focus()
-      .insertInlineMath({
-        latex: latex.trim(),
-      })
-      .run();
+    setMathDialogType("inline");
   };
 
   const handleInsertBlockMath = () => {
-    if (!editor) {
-      return;
-    }
-
-    const latex = window.prompt(
-      "Skriv inn LaTeX-formelen:",
-      String.raw`\sum_{i=1}^{n} i = \frac{n(n+1)}{2}`,
-    );
-
-    if (!latex?.trim()) {
-      return;
-    }
-
-    editor
-      .chain()
-      .focus()
-      .insertBlockMath({
-        latex: latex.trim(),
-      })
-      .run();
+    setMathDialogType("block");
   };
 
   const handleChooseImage = () => {
@@ -432,7 +397,7 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
         >
           <Trash2 size={18} />
         </button>
-        
+
         <button
           type="button"
           onClick={handleChooseImage}
@@ -523,6 +488,37 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
       </div>
 
       <EditorContent editor={editor} />
+
+      <MathDialog
+        open={mathDialogType !== null}
+        title={
+          mathDialogType === "block"
+            ? "Sett inn formelblokk"
+            : "Sett inn formel i tekst"
+        }
+        onClose={() => setMathDialogType(null)}
+        onInsert={(latex) => {
+          if (mathDialogType === "block") {
+            editor
+              .chain()
+              .focus()
+              .insertBlockMath({
+                latex,
+              })
+              .run();
+          } else {
+            editor
+              .chain()
+              .focus()
+              .insertInlineMath({
+                latex,
+              })
+              .run();
+          }
+
+          setMathDialogType(null);
+        }}
+      />
     </div>
   );
 };
