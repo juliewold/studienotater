@@ -1,20 +1,43 @@
 import type { Editor } from "@tiptap/react";
 import {
+  BookOpen,
+  Braces,
   Code2,
   Heading1,
   Heading2,
+  ImagePlus,
+  Lightbulb,
   List,
   ListOrdered,
   Minus,
+  Puzzle,
   Quote,
+  Sigma,
+  Table2,
 } from "lucide-react";
+
+export type SlashCalloutType =
+  | "definition"
+  | "tip"
+  | "theorem"
+  | "example";
+
+export type SlashCommandActions = {
+  openMathDialog: (type: "inline" | "block") => void;
+  insertCallout: (type: SlashCalloutType) => void;
+  chooseImage: () => void;
+};
 
 export type SlashCommandItem = {
   title: string;
   description: string;
   searchTerms: string[];
   icon: typeof Heading1;
-  command: (editor: Editor) => void;
+  calloutType?: SlashCalloutType;
+  command: (
+    editor: Editor,
+    actions: SlashCommandActions,
+  ) => void;
 };
 
 export const slashCommands: SlashCommandItem[] = [
@@ -70,6 +93,90 @@ export const slashCommands: SlashCommandItem[] = [
     icon: Code2,
     command: (editor) => {
       editor.chain().focus().toggleCodeBlock().run();
+    },
+  },
+  {
+    title: "Formel i tekst",
+    description: "Sett inn matematikk på samme linje",
+    searchTerms: ["matte", "matematikk", "formel", "inline", "latex"],
+    icon: Sigma,
+    command: (_editor, actions) => {
+      actions.openMathDialog("inline");
+    },
+  },
+  {
+    title: "Formelblokk",
+    description: "Sett inn en stor formel på egen linje",
+    searchTerms: ["matte", "matematikk", "formel", "blokk", "latex"],
+    icon: Braces,
+    command: (_editor, actions) => {
+      actions.openMathDialog("block");
+    },
+  },
+  {
+    title: "Definisjon",
+    description: "Sett inn en boks for en definisjon",
+    searchTerms: ["definisjon", "begrep", "callout"],
+    icon: BookOpen,
+    calloutType: "definition",
+    command: (_editor, actions) => {
+      actions.insertCallout("definition");
+    },
+  },
+  {
+    title: "Teorem",
+    description: "Sett inn en boks for et teorem",
+    searchTerms: ["teorem", "regel", "setning", "callout"],
+    icon: Sigma,
+    calloutType: "theorem",
+    command: (_editor, actions) => {
+      actions.insertCallout("theorem");
+    },
+  },
+  {
+    title: "Tips",
+    description: "Sett inn en boks for viktig tankegang",
+    searchTerms: ["tips", "husk", "tankegang", "callout"],
+    icon: Lightbulb,
+    calloutType: "tip",
+    command: (_editor, actions) => {
+      actions.insertCallout("tip");
+    },
+  },
+  {
+    title: "Eksempel",
+    description: "Sett inn en boks for et eksempel",
+    searchTerms: ["eksempel", "oppgave", "callout"],
+    icon: Puzzle,
+    calloutType: "example",
+    command: (_editor, actions) => {
+      actions.insertCallout("example");
+    },
+  },
+  {
+    title: "Tabell",
+    description: "Sett inn en tabell med 3 kolonner og 3 rader",
+    searchTerms: ["tabell", "rader", "kolonner"],
+    icon: Table2,
+    command: (editor) => {
+      editor
+        .chain()
+        .focus()
+        .insertTable({
+          rows: 3,
+          cols: 3,
+          withHeaderRow: true,
+        })
+        .run();
+    },
+  },
+  {
+    title: "Bilde",
+    description: "Last opp og sett inn et bilde",
+    searchTerms: ["bilde", "foto", "image", "last opp"],
+    icon: ImagePlus,
+    command: (_editor, actions) => {
+      actions.chooseImage();
     },
   },
   {

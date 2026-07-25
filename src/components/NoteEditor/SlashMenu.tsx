@@ -1,5 +1,6 @@
 import "./SlashMenu.css";
 
+import { useEffect, useRef } from "react";
 import type { SlashCommandItem } from "./slashCommands";
 
 type SlashMenuProps = {
@@ -13,9 +14,17 @@ export const SlashMenu = ({
   selectedIndex,
   onSelect,
 }: SlashMenuProps) => {
+  const selectedItemRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    selectedItemRef.current?.scrollIntoView({
+      block: "nearest",
+    });
+  }, [selectedIndex]);
+
   if (items.length === 0) {
     return (
-      <div className="slash-menu">
+      <div className="slash-menu" role="listbox">
         <div className="slash-menu-empty">
           Ingen kommandoer funnet
         </div>
@@ -24,18 +33,24 @@ export const SlashMenu = ({
   }
 
   return (
-    <div className="slash-menu">
+    <div
+      className="slash-menu"
+      role="listbox"
+      aria-label="Kommandoer"
+    >
       {items.map((item, index) => {
         const Icon = item.icon;
+        const isSelected = index === selectedIndex;
 
         return (
           <button
             key={item.title}
+            ref={isSelected ? selectedItemRef : null}
             type="button"
+            role="option"
+            aria-selected={isSelected}
             className={`slash-menu-item ${
-              index === selectedIndex
-                ? "is-selected"
-                : ""
+              isSelected ? "is-selected" : ""
             }`}
             onMouseDown={(event) => {
               event.preventDefault();
