@@ -8,8 +8,8 @@
 
 .note-editor-toolbar {
   position: sticky;
-  top: 0;
-  z-index: 5;
+  top: 104px;
+  z-index: 100;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -149,11 +149,7 @@
   border-radius: 6px;
   background: #f1edf6;
   color: #7146bd;
-  font-family:
-    "SFMono-Regular",
-    Consolas,
-    "Liberation Mono",
-    monospace;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.92em;
 }
 
@@ -178,11 +174,7 @@
   border-radius: 0;
   background: transparent;
   color: #f8f5fb;
-  font-family:
-    "SFMono-Regular",
-    Consolas,
-    "Liberation Mono",
-    monospace;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.92rem;
   white-space: pre;
 }
@@ -295,6 +287,7 @@
 
 @media (max-width: 700px) {
   .note-editor-toolbar {
+    top: 88px;
     margin: 0 0.75rem;
     padding: 0.6rem;
   }
@@ -445,7 +438,6 @@
   margin: 0;
 }
 
-
 .note-editor-content .note-callout,
 .read-only-note-content .note-callout {
   position: relative;
@@ -493,12 +485,8 @@
   transition: opacity 150ms ease;
 }
 
-.note-editor-content
-  .note-callout:hover
-  .note-callout-actions,
-.note-editor-content
-  .note-callout:focus-within
-  .note-callout-actions {
+.note-editor-content .note-callout:hover .note-callout-actions,
+.note-editor-content .note-callout:focus-within .note-callout-actions {
   opacity: 1;
   pointer-events: auto;
 }
@@ -528,8 +516,7 @@
   cursor: pointer;
 }
 
-.note-editor-content
-  .note-callout-delete-button:hover {
+.note-editor-content .note-callout-delete-button:hover {
   border-color: #e39a9a;
   background: #fff1f1;
   color: #b53c3c;
@@ -542,10 +529,8 @@
 
 /* Definisjon */
 
-.note-editor-content
-  .note-callout[data-callout-type="definition"],
-.read-only-note-content
-  .note-callout[data-callout-type="definition"] {
+.note-editor-content .note-callout[data-callout-type="definition"],
+.read-only-note-content .note-callout[data-callout-type="definition"] {
   border-color: #b8dfc3;
   background: #f3faf5;
 }
@@ -562,10 +547,8 @@
 
 /* Tips */
 
-.note-editor-content
-  .note-callout[data-callout-type="tip"],
-.read-only-note-content
-  .note-callout[data-callout-type="tip"] {
+.note-editor-content .note-callout[data-callout-type="tip"],
+.read-only-note-content .note-callout[data-callout-type="tip"] {
   border-color: #ead8a8;
   background: #fffaf0;
 }
@@ -582,10 +565,8 @@
 
 /* Teorem */
 
-.note-editor-content
-  .note-callout[data-callout-type="theorem"],
-.read-only-note-content
-  .note-callout[data-callout-type="theorem"] {
+.note-editor-content .note-callout[data-callout-type="theorem"],
+.read-only-note-content .note-callout[data-callout-type="theorem"] {
   border-color: #efbcbc;
   background: #fff5f5;
 }
@@ -602,10 +583,8 @@
 
 /* Eksempel */
 
-.note-editor-content
-  .note-callout[data-callout-type="example"],
-.read-only-note-content
-  .note-callout[data-callout-type="example"] {
+.note-editor-content .note-callout[data-callout-type="example"],
+.read-only-note-content .note-callout[data-callout-type="example"] {
   border-color: #b8d8f3;
   background: #f2f8fd;
 }
