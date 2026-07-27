@@ -21,6 +21,11 @@ import {
   type PracticeQuestion,
 } from "../../data/practiceQuestions";
 import { MathText } from "../../components/MathText/MathText";
+import { getPracticeStatistics } from "../../services/practice/practiceStatistics";
+import {
+  savePracticeSession,
+  type StoredPracticeAnswer,
+} from "../../services/practice/practiceStorage";
 
 type QuestionType = "mixed" | "multiple-choice" | "number-answer";
 
@@ -33,60 +38,67 @@ type PracticeStage = "setup" | "session" | "result";
 export const PracticePage = () => {
   const { subjectId } = useParams();
 
-  const topics =
-    practiceTopics[subjectId as keyof typeof practiceTopics] ?? [];
+  const topics = practiceTopics[subjectId as keyof typeof practiceTopics] ?? [];
+
+  const [statisticsVersion, setStatisticsVersion] = useState(0);
+
+  const statistics = useMemo(
+    () =>
+      subjectId
+        ? getPracticeStatistics(subjectId)
+        : {
+            totalSessions: 0,
+            totalQuestions: 0,
+            correctAnswers: 0,
+            accuracy: 0,
+            bestSession: 0,
+          },
+    [subjectId, statisticsVersion],
+  );
 
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 
-  const [questionType, setQuestionType] =
-    useState<QuestionType>("mixed");
+  const [questionType, setQuestionType] = useState<QuestionType>("mixed");
 
-  const [difficulty, setDifficulty] =
-    useState<Difficulty>("mixed");
+  const [difficulty, setDifficulty] = useState<Difficulty>("mixed");
 
-  const [questionAmount, setQuestionAmount] =
-    useState<QuestionAmount>(10);
+  const [questionAmount, setQuestionAmount] = useState<QuestionAmount>(10);
 
-  const [stage, setStage] =
-    useState<PracticeStage>("setup");
+  const [stage, setStage] = useState<PracticeStage>("setup");
 
-  const [sessionQuestions, setSessionQuestions] = useState<
-    PracticeQuestion[]
-  >([]);
+  const [sessionQuestions, setSessionQuestions] = useState<PracticeQuestion[]>(
+    [],
+  );
 
-  const [currentQuestionIndex, setCurrentQuestionIndex] =
-    useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const [selectedOption, setSelectedOption] =
-    useState("");
+  const [selectedOption, setSelectedOption] = useState("");
 
-  const [numberAnswer, setNumberAnswer] =
-    useState("");
+  const [numberAnswer, setNumberAnswer] = useState("");
 
-  const [isAnswerChecked, setIsAnswerChecked] =
-    useState(false);
+  const [isAnswerChecked, setIsAnswerChecked] = useState(false);
 
-  const [correctAnswers, setCorrectAnswers] =
-    useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
 
-  const currentQuestion =
-    sessionQuestions[currentQuestionIndex];
+  const [sessionStartedAt, setSessionStartedAt] = useState("");
+
+  const [sessionAnswers, setSessionAnswers] = useState<StoredPracticeAnswer[]>(
+    [],
+  );
+
+  const currentQuestion = sessionQuestions[currentQuestionIndex];
 
   const availableQuestions = useMemo(() => {
     return practiceQuestions.filter((question) => {
-      const belongsToSubject =
-        question.subjectId === subjectId;
+      const belongsToSubject = question.subjectId === subjectId;
 
-      const hasSelectedTopic =
-        selectedTopics.includes(question.topic);
+      const hasSelectedTopic = selectedTopics.includes(question.topic);
 
       const hasSelectedType =
-        questionType === "mixed" ||
-        question.type === questionType;
+        questionType === "mixed" || question.type === questionType;
 
       const hasSelectedDifficulty =
-        difficulty === "mixed" ||
-        question.difficulty === difficulty;
+        difficulty === "mixed" || question.difficulty === difficulty;
 
       return (
         belongsToSubject &&
@@ -95,25 +107,14 @@ export const PracticePage = () => {
         hasSelectedDifficulty
       );
     });
-  }, [
-    difficulty,
-    questionType,
-    selectedTopics,
-    subjectId,
-  ]);
+  }, [difficulty, questionType, selectedTopics, subjectId]);
 
   const actualQuestionAmount =
     questionAmount === "all"
       ? availableQuestions.length
-      : Math.min(
-          questionAmount,
-          availableQuestions.length,
-        );
+      : Math.min(questionAmount, availableQuestions.length);
 
-  const estimatedMinutes = Math.max(
-    1,
-    Math.round(actualQuestionAmount * 1.5),
-  );
+  const estimatedMinutes = Math.max(1, Math.round(actualQuestionAmount * 1.5));
 
   const selectedQuestionTypeLabel = {
     mixed: "Blandet",
@@ -131,10 +132,7 @@ export const PracticePage = () => {
   const toggleTopic = (topic: string) => {
     setSelectedTopics((currentTopics) =>
       currentTopics.includes(topic)
-        ? currentTopics.filter(
-            (currentTopic) =>
-              currentTopic !== topic,
-          )
+        ? currentTopics.filter((currentTopic) => currentTopic !== topic)
         : [...currentTopics, topic],
     );
   };
@@ -147,12 +145,8 @@ export const PracticePage = () => {
     setSelectedTopics([]);
   };
 
-  const shuffleQuestions = (
-    questions: PracticeQuestion[],
-  ) => {
-    return [...questions].sort(
-      () => Math.random() - 0.5,
-    );
+  const shuffleQuestions = (questions: PracticeQuestion[]) => {
+    return [...questions].sort(() => Math.random() - 0.5);
   };
 
   const createBalancedSession = (
@@ -163,32 +157,22 @@ export const PracticePage = () => {
       .map((topic) => ({
         topic,
         questions: shuffleQuestions(
-          questions.filter(
-            (question) =>
-              question.topic === topic,
-          ),
+          questions.filter((question) => question.topic === topic),
         ),
       }))
-      .filter(
-        (topicGroup) =>
-          topicGroup.questions.length > 0,
-      );
+      .filter((topicGroup) => topicGroup.questions.length > 0);
 
-    const balancedQuestions: PracticeQuestion[] =
-      [];
+    const balancedQuestions: PracticeQuestion[] = [];
 
     let questionIndex = 0;
 
     while (
       questionsByTopic.some(
-        (topicGroup) =>
-          topicGroup.questions.length >
-          questionIndex,
+        (topicGroup) => topicGroup.questions.length > questionIndex,
       )
     ) {
       for (const topicGroup of questionsByTopic) {
-        const question =
-          topicGroup.questions[questionIndex];
+        const question = topicGroup.questions[questionIndex];
 
         if (question) {
           balancedQuestions.push(question);
@@ -198,36 +182,30 @@ export const PracticePage = () => {
       questionIndex += 1;
     }
 
-    const shuffledBalancedQuestions =
-      shuffleQuestions(balancedQuestions);
+    const shuffledBalancedQuestions = shuffleQuestions(balancedQuestions);
 
     if (amount === "all") {
       return shuffledBalancedQuestions;
     }
 
-    return shuffledBalancedQuestions.slice(
-      0,
-      amount,
-    );
+    return shuffledBalancedQuestions.slice(0, amount);
   };
 
   const handleStartPractice = () => {
-    if (
-      selectedTopics.length === 0 ||
-      availableQuestions.length === 0
-    ) {
+    if (selectedTopics.length === 0 || availableQuestions.length === 0) {
       return;
     }
 
-    const selectedQuestions =
-      createBalancedSession(
-        availableQuestions,
-        questionAmount,
-      );
+    const selectedQuestions = createBalancedSession(
+      availableQuestions,
+      questionAmount,
+    );
 
     setSessionQuestions(selectedQuestions);
     setCurrentQuestionIndex(0);
     setCorrectAnswers(0);
+    setSessionAnswers([]);
+    setSessionStartedAt(new Date().toISOString());
     setSelectedOption("");
     setNumberAnswer("");
     setIsAnswerChecked(false);
@@ -239,56 +217,67 @@ export const PracticePage = () => {
       return false;
     }
 
-    if (
-      currentQuestion.type ===
-      "multiple-choice"
-    ) {
-      return (
-        selectedOption ===
-        currentQuestion.correctAnswer
-      );
+    if (currentQuestion.type === "multiple-choice") {
+      return selectedOption === currentQuestion.correctAnswer;
     }
 
     const parsedAnswer = Number(numberAnswer);
 
     return (
       Number.isFinite(parsedAnswer) &&
-      parsedAnswer ===
-        currentQuestion.correctAnswer
+      parsedAnswer === currentQuestion.correctAnswer
     );
   };
 
   const handleCheckAnswer = () => {
-    if (
-      !currentQuestion ||
-      isAnswerChecked
-    ) {
+    if (!currentQuestion || isAnswerChecked || !subjectId) {
       return;
     }
 
-    if (isCurrentAnswerCorrect()) {
-      setCorrectAnswers(
-        (currentCorrectAnswers) =>
-          currentCorrectAnswers + 1,
-      );
+    const answerIsCorrect = isCurrentAnswerCorrect();
+
+    if (answerIsCorrect) {
+      setCorrectAnswers((currentCorrectAnswers) => currentCorrectAnswers + 1);
     }
+
+    const storedAnswer: StoredPracticeAnswer = {
+      questionId: currentQuestion.id,
+      subjectId,
+      topic: currentQuestion.topic,
+      difficulty: currentQuestion.difficulty,
+      questionType: currentQuestion.type,
+      correct: answerIsCorrect,
+      answeredAt: new Date().toISOString(),
+    };
+
+    setSessionAnswers((currentAnswers) => [...currentAnswers, storedAnswer]);
 
     setIsAnswerChecked(true);
   };
 
   const handleNextQuestion = () => {
-    const isLastQuestion =
-      currentQuestionIndex ===
-      sessionQuestions.length - 1;
+    const isLastQuestion = currentQuestionIndex === sessionQuestions.length - 1;
 
     if (isLastQuestion) {
+      if (subjectId && sessionQuestions.length > 0) {
+        savePracticeSession({
+          id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          subjectId,
+          startedAt: sessionStartedAt || new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          totalQuestions: sessionQuestions.length,
+          correctAnswers,
+          answers: sessionAnswers,
+        });
+
+        setStatisticsVersion((currentVersion) => currentVersion + 1);
+      }
+
       setStage("result");
       return;
     }
 
-    setCurrentQuestionIndex(
-      (currentIndex) => currentIndex + 1,
-    );
+    setCurrentQuestionIndex((currentIndex) => currentIndex + 1);
 
     setSelectedOption("");
     setNumberAnswer("");
@@ -298,6 +287,8 @@ export const PracticePage = () => {
   const handleRestart = () => {
     setStage("setup");
     setSessionQuestions([]);
+    setSessionAnswers([]);
+    setSessionStartedAt("");
     setCurrentQuestionIndex(0);
     setSelectedOption("");
     setNumberAnswer("");
@@ -305,39 +296,27 @@ export const PracticePage = () => {
     setCorrectAnswers(0);
   };
 
-  if (
-    stage === "session" &&
-    currentQuestion
-  ) {
-    const answerIsCorrect =
-      isCurrentAnswerCorrect();
+  if (stage === "session" && currentQuestion) {
+    const answerIsCorrect = isCurrentAnswerCorrect();
 
     const hasAnswer =
-      currentQuestion.type ===
-      "multiple-choice"
+      currentQuestion.type === "multiple-choice"
         ? selectedOption !== ""
         : numberAnswer.trim() !== "";
 
     return (
       <main className="practice-page">
-        <Link
-          to={`/fag/${subjectId}`}
-          className="back-link"
-        >
+        <Link to={`/fag/${subjectId}`} className="back-link">
           ← Tilbake til faget
         </Link>
 
         <section className="question-section">
           <div className="question-header">
             <span>
-              Oppgave{" "}
-              {currentQuestionIndex + 1} av{" "}
-              {sessionQuestions.length}
+              Oppgave {currentQuestionIndex + 1} av {sessionQuestions.length}
             </span>
 
-            <span>
-              {currentQuestion.topic}
-            </span>
+            <span>{currentQuestion.topic}</span>
           </div>
 
           <div className="question-progress">
@@ -345,80 +324,52 @@ export const PracticePage = () => {
               className="question-progress-fill"
               style={{
                 width: `${
-                  ((currentQuestionIndex + 1) /
-                    sessionQuestions.length) *
-                  100
+                  ((currentQuestionIndex + 1) / sessionQuestions.length) * 100
                 }%`,
               }}
             />
           </div>
 
           <h1>
-            <MathText>
-              {currentQuestion.question}
-            </MathText>
+            <MathText>{currentQuestion.question}</MathText>
           </h1>
 
-          {currentQuestion.type ===
-            "multiple-choice" && (
+          {currentQuestion.type === "multiple-choice" && (
             <div className="answer-options">
-              {currentQuestion.options.map(
-                (option) => (
-                  <label
-                    key={option}
-                    className={`answer-option ${
-                      selectedOption ===
-                      option
-                        ? "answer-option-selected"
-                        : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="answer"
-                      value={option}
-                      checked={
-                        selectedOption ===
-                        option
-                      }
-                      disabled={
-                        isAnswerChecked
-                      }
-                      onChange={() =>
-                        setSelectedOption(
-                          option,
-                        )
-                      }
-                    />
+              {currentQuestion.options.map((option) => (
+                <label
+                  key={option}
+                  className={`answer-option ${
+                    selectedOption === option ? "answer-option-selected" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="answer"
+                    value={option}
+                    checked={selectedOption === option}
+                    disabled={isAnswerChecked}
+                    onChange={() => setSelectedOption(option)}
+                  />
 
-                    <span>
-                      <MathText>
-                        {option}
-                      </MathText>
-                    </span>
-                  </label>
-                ),
-              )}
+                  <span>
+                    <MathText>{option}</MathText>
+                  </span>
+                </label>
+              ))}
             </div>
           )}
 
-          {currentQuestion.type ===
-            "number-answer" && (
+          {currentQuestion.type === "number-answer" && (
             <div className="number-answer-wrapper">
-              <label htmlFor="number-answer">
-                Skriv inn svaret
-              </label>
+              <label htmlFor="number-answer">Skriv inn svaret</label>
 
               <input
                 id="number-answer"
                 type="number"
                 value={numberAnswer}
                 disabled={isAnswerChecked}
-                onChange={(event) =>
-                  setNumberAnswer(
-                    event.target.value,
-                  )
-                }
+                onChange={(event) => setNumberAnswer(event.target.value)}
               />
             </div>
           )}
@@ -432,28 +383,18 @@ export const PracticePage = () => {
               }`}
             >
               <strong>
-                {answerIsCorrect
-                  ? "Riktig!"
-                  : "Ikke helt riktig"}
+                {answerIsCorrect ? "Riktig!" : "Ikke helt riktig"}
               </strong>
 
               {!answerIsCorrect && (
                 <p>
                   Riktig svar:{" "}
-                  <MathText>
-                    {String(
-                      currentQuestion.correctAnswer,
-                    )}
-                  </MathText>
+                  <MathText>{String(currentQuestion.correctAnswer)}</MathText>
                 </p>
               )}
 
               <p>
-                <MathText>
-                  {
-                    currentQuestion.explanation
-                  }
-                </MathText>
+                <MathText>{currentQuestion.explanation}</MathText>
               </p>
             </div>
           )}
@@ -473,8 +414,7 @@ export const PracticePage = () => {
               className="start-practice-button"
               onClick={handleNextQuestion}
             >
-              {currentQuestionIndex ===
-              sessionQuestions.length - 1
+              {currentQuestionIndex === sessionQuestions.length - 1
                 ? "Se resultat"
                 : "Neste oppgave"}
             </button>
@@ -488,29 +428,20 @@ export const PracticePage = () => {
     const percentage =
       sessionQuestions.length === 0
         ? 0
-        : Math.round(
-            (correctAnswers /
-              sessionQuestions.length) *
-              100,
-          );
+        : Math.round((correctAnswers / sessionQuestions.length) * 100);
 
     return (
       <main className="practice-page">
         <section className="result-section">
-          <p className="page-label">
-            Resultat
-          </p>
+          <p className="page-label">Resultat</p>
 
           <h1>Økten er ferdig</h1>
 
           <div className="result-score">
-            {correctAnswers} av{" "}
-            {sessionQuestions.length} riktig
+            {correctAnswers} av {sessionQuestions.length} riktig
           </div>
 
-          <p className="result-percentage">
-            {percentage} %
-          </p>
+          <p className="result-percentage">{percentage} %</p>
 
           <button
             type="button"
@@ -527,10 +458,7 @@ export const PracticePage = () => {
 
   return (
     <main className="practice-page">
-      <Link
-        to={`/fag/${subjectId}`}
-        className="back-link"
-      >
+      <Link to={`/fag/${subjectId}`} className="back-link">
         ← Tilbake til faget
       </Link>
 
@@ -540,15 +468,12 @@ export const PracticePage = () => {
         </div>
 
         <div>
-          <p className="page-label">
-            Oppgaver
-          </p>
+          <p className="page-label">Oppgaver</p>
 
           <h1>Sett sammen en øvingsøkt</h1>
 
           <p className="practice-intro">
-            Velg tema, oppgavetype og nivå.
-            Vi lager en variert økt tilpasset
+            Velg tema, oppgavetype og nivå. Vi lager en variert økt tilpasset
             valgene dine.
           </p>
         </div>
@@ -558,24 +483,18 @@ export const PracticePage = () => {
         <div className="practice-settings">
           <section className="practice-section">
             <div className="practice-section-title">
-              <div className="practice-step-number">
-                1
-              </div>
+              <div className="practice-step-number">1</div>
 
               <div>
                 <h2>Velg tema</h2>
 
-                <p>
-                  Velg ett eller flere temaer
-                  du vil øve på.
-                </p>
+                <p>Velg ett eller flere temaer du vil øve på.</p>
               </div>
             </div>
 
             <div className="practice-section-header">
               <p className="selection-count">
-                {selectedTopics.length} av{" "}
-                {topics.length} temaer valgt
+                {selectedTopics.length} av {topics.length} temaer valgt
               </p>
 
               <div className="topic-actions">
@@ -599,30 +518,23 @@ export const PracticePage = () => {
 
             <div className="topics-grid">
               {topics.map((topic) => {
-                const isSelected =
-                  selectedTopics.includes(topic);
+                const isSelected = selectedTopics.includes(topic);
 
                 return (
                   <label
                     key={topic}
                     className={`topic-card ${
-                      isSelected
-                        ? "topic-card-selected"
-                        : ""
+                      isSelected ? "topic-card-selected" : ""
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() =>
-                        toggleTopic(topic)
-                      }
+                      onChange={() => toggleTopic(topic)}
                     />
 
                     <span className="topic-check">
-                      {isSelected && (
-                        <Check size={15} />
-                      )}
+                      {isSelected && <Check size={15} />}
                     </span>
 
                     <span>{topic}</span>
@@ -634,37 +546,26 @@ export const PracticePage = () => {
 
           <section className="practice-section">
             <div className="practice-section-title">
-              <div className="practice-step-number">
-                2
-              </div>
+              <div className="practice-step-number">2</div>
 
               <div>
                 <h2>Velg oppgavetype</h2>
 
-                <p>
-                  Bland oppgavetyper eller
-                  fokuser på én type.
-                </p>
+                <p>Bland oppgavetyper eller fokuser på én type.</p>
               </div>
             </div>
 
             <div className="option-grid">
               <label
                 className={`option-card ${
-                  questionType === "mixed"
-                    ? "option-card-selected"
-                    : ""
+                  questionType === "mixed" ? "option-card-selected" : ""
                 }`}
               >
                 <input
                   type="radio"
                   name="question-type"
-                  checked={
-                    questionType === "mixed"
-                  }
-                  onChange={() =>
-                    setQuestionType("mixed")
-                  }
+                  checked={questionType === "mixed"}
+                  onChange={() => setQuestionType("mixed")}
                 />
 
                 <div className="option-card-icon">
@@ -673,16 +574,13 @@ export const PracticePage = () => {
 
                 <div>
                   <strong>Blandet</strong>
-                  <span>
-                    Flervalg og tallsvar
-                  </span>
+                  <span>Flervalg og tallsvar</span>
                 </div>
               </label>
 
               <label
                 className={`option-card ${
-                  questionType ===
-                  "multiple-choice"
+                  questionType === "multiple-choice"
                     ? "option-card-selected"
                     : ""
                 }`}
@@ -690,15 +588,8 @@ export const PracticePage = () => {
                 <input
                   type="radio"
                   name="question-type"
-                  checked={
-                    questionType ===
-                    "multiple-choice"
-                  }
-                  onChange={() =>
-                    setQuestionType(
-                      "multiple-choice",
-                    )
-                  }
+                  checked={questionType === "multiple-choice"}
+                  onChange={() => setQuestionType("multiple-choice")}
                 />
 
                 <div className="option-card-icon">
@@ -707,33 +598,20 @@ export const PracticePage = () => {
 
                 <div>
                   <strong>Flervalg</strong>
-                  <span>
-                    Velg mellom flere
-                    alternativer
-                  </span>
+                  <span>Velg mellom flere alternativer</span>
                 </div>
               </label>
 
               <label
                 className={`option-card ${
-                  questionType ===
-                  "number-answer"
-                    ? "option-card-selected"
-                    : ""
+                  questionType === "number-answer" ? "option-card-selected" : ""
                 }`}
               >
                 <input
                   type="radio"
                   name="question-type"
-                  checked={
-                    questionType ===
-                    "number-answer"
-                  }
-                  onChange={() =>
-                    setQuestionType(
-                      "number-answer",
-                    )
-                  }
+                  checked={questionType === "number-answer"}
+                  onChange={() => setQuestionType("number-answer")}
                 />
 
                 <div className="option-card-icon">
@@ -742,9 +620,7 @@ export const PracticePage = () => {
 
                 <div>
                   <strong>Tallsvar</strong>
-                  <span>
-                    Skriv inn svaret selv
-                  </span>
+                  <span>Skriv inn svaret selv</span>
                 </div>
               </label>
             </div>
@@ -752,39 +628,26 @@ export const PracticePage = () => {
 
           <section className="practice-section">
             <div className="practice-section-title">
-              <div className="practice-step-number">
-                3
-              </div>
+              <div className="practice-step-number">3</div>
 
               <div>
-                <h2>
-                  Velg vanskelighetsgrad
-                </h2>
+                <h2>Velg vanskelighetsgrad</h2>
 
-                <p>
-                  Tilpass nivået til det du
-                  ønsker å trene på.
-                </p>
+                <p>Tilpass nivået til det du ønsker å trene på.</p>
               </div>
             </div>
 
             <div className="option-grid difficulty-grid">
               <label
                 className={`option-card ${
-                  difficulty === "mixed"
-                    ? "option-card-selected"
-                    : ""
+                  difficulty === "mixed" ? "option-card-selected" : ""
                 }`}
               >
                 <input
                   type="radio"
                   name="difficulty"
-                  checked={
-                    difficulty === "mixed"
-                  }
-                  onChange={() =>
-                    setDifficulty("mixed")
-                  }
+                  checked={difficulty === "mixed"}
+                  onChange={() => setDifficulty("mixed")}
                 />
 
                 <div>
@@ -795,20 +658,14 @@ export const PracticePage = () => {
 
               <label
                 className={`option-card ${
-                  difficulty === "easy"
-                    ? "option-card-selected"
-                    : ""
+                  difficulty === "easy" ? "option-card-selected" : ""
                 }`}
               >
                 <input
                   type="radio"
                   name="difficulty"
-                  checked={
-                    difficulty === "easy"
-                  }
-                  onChange={() =>
-                    setDifficulty("easy")
-                  }
+                  checked={difficulty === "easy"}
+                  onChange={() => setDifficulty("easy")}
                 />
 
                 <div>
@@ -819,20 +676,14 @@ export const PracticePage = () => {
 
               <label
                 className={`option-card ${
-                  difficulty === "medium"
-                    ? "option-card-selected"
-                    : ""
+                  difficulty === "medium" ? "option-card-selected" : ""
                 }`}
               >
                 <input
                   type="radio"
                   name="difficulty"
-                  checked={
-                    difficulty === "medium"
-                  }
-                  onChange={() =>
-                    setDifficulty("medium")
-                  }
+                  checked={difficulty === "medium"}
+                  onChange={() => setDifficulty("medium")}
                 />
 
                 <div>
@@ -843,20 +694,14 @@ export const PracticePage = () => {
 
               <label
                 className={`option-card ${
-                  difficulty === "hard"
-                    ? "option-card-selected"
-                    : ""
+                  difficulty === "hard" ? "option-card-selected" : ""
                 }`}
               >
                 <input
                   type="radio"
                   name="difficulty"
-                  checked={
-                    difficulty === "hard"
-                  }
-                  onChange={() =>
-                    setDifficulty("hard")
-                  }
+                  checked={difficulty === "hard"}
+                  onChange={() => setDifficulty("hard")}
                 />
 
                 <div>
@@ -869,17 +714,12 @@ export const PracticePage = () => {
 
           <section className="practice-section">
             <div className="practice-section-title">
-              <div className="practice-step-number">
-                4
-              </div>
+              <div className="practice-step-number">4</div>
 
               <div>
                 <h2>Velg lengde på økten</h2>
 
-                <p>
-                  Ta en kort økt eller jobb
-                  deg gjennom alle oppgavene.
-                </p>
+                <p>Ta en kort økt eller jobb deg gjennom alle oppgavene.</p>
               </div>
             </div>
 
@@ -888,22 +728,14 @@ export const PracticePage = () => {
                 <label
                   key={amount}
                   className={`amount-card ${
-                    questionAmount === amount
-                      ? "amount-card-selected"
-                      : ""
+                    questionAmount === amount ? "amount-card-selected" : ""
                   }`}
                 >
                   <input
                     type="radio"
                     name="question-amount"
-                    checked={
-                      questionAmount === amount
-                    }
-                    onChange={() =>
-                      setQuestionAmount(
-                        amount as QuestionAmount,
-                      )
-                    }
+                    checked={questionAmount === amount}
+                    onChange={() => setQuestionAmount(amount as QuestionAmount)}
                   />
 
                   <strong>{amount}</strong>
@@ -913,20 +745,14 @@ export const PracticePage = () => {
 
               <label
                 className={`amount-card ${
-                  questionAmount === "all"
-                    ? "amount-card-selected"
-                    : ""
+                  questionAmount === "all" ? "amount-card-selected" : ""
                 }`}
               >
                 <input
                   type="radio"
                   name="question-amount"
-                  checked={
-                    questionAmount === "all"
-                  }
-                  onChange={() =>
-                    setQuestionAmount("all")
-                  }
+                  checked={questionAmount === "all"}
+                  onChange={() => setQuestionAmount("all")}
                 />
 
                 <strong>Alle</strong>
@@ -959,9 +785,7 @@ export const PracticePage = () => {
                 <span>Temaer</span>
               </div>
 
-              <strong>
-                {selectedTopics.length}
-              </strong>
+              <strong>{selectedTopics.length}</strong>
             </div>
 
             <div className="practice-summary-row">
@@ -970,9 +794,7 @@ export const PracticePage = () => {
                 <span>Oppgavetype</span>
               </div>
 
-              <strong>
-                {selectedQuestionTypeLabel}
-              </strong>
+              <strong>{selectedQuestionTypeLabel}</strong>
             </div>
 
             <div className="practice-summary-row">
@@ -981,9 +803,7 @@ export const PracticePage = () => {
                 <span>Nivå</span>
               </div>
 
-              <strong>
-                {selectedDifficultyLabel}
-              </strong>
+              <strong>{selectedDifficultyLabel}</strong>
             </div>
 
             <div className="practice-summary-row">
@@ -992,9 +812,7 @@ export const PracticePage = () => {
                 <span>Oppgaver</span>
               </div>
 
-              <strong>
-                {actualQuestionAmount}
-              </strong>
+              <strong>{actualQuestionAmount}</strong>
             </div>
 
             <div className="practice-summary-row">
@@ -1003,62 +821,73 @@ export const PracticePage = () => {
                 <span>Estimert tid</span>
               </div>
 
-              <strong>
-                ca. {estimatedMinutes} min
-              </strong>
+              <strong>ca. {estimatedMinutes} min</strong>
             </div>
           </div>
 
           {selectedTopics.length === 0 && (
             <p className="practice-warning">
-              Velg minst ett tema for å
-              starte.
+              Velg minst ett tema for å starte.
             </p>
           )}
 
-          {selectedTopics.length > 0 &&
-            availableQuestions.length === 0 && (
-              <p className="practice-warning">
-                Det finnes ingen oppgaver
-                som passer til dette
-                utvalget ennå.
-              </p>
-            )}
+          {selectedTopics.length > 0 && availableQuestions.length === 0 && (
+            <p className="practice-warning">
+              Det finnes ingen oppgaver som passer til dette utvalget ennå.
+            </p>
+          )}
 
-          {selectedTopics.length > 0 &&
-            availableQuestions.length > 0 && (
-              <div className="available-question-count">
-                <Check size={17} />
+          {selectedTopics.length > 0 && availableQuestions.length > 0 && (
+            <div className="available-question-count">
+              <Check size={17} />
 
-                <span>
-                  {availableQuestions.length}{" "}
-                  oppgaver passer til valgene
-                  dine.
-                </span>
-              </div>
-            )}
+              <span>
+                {availableQuestions.length} oppgaver passer til valgene dine.
+              </span>
+            </div>
+          )}
 
           {questionAmount !== "all" &&
             availableQuestions.length > 0 &&
-            availableQuestions.length <
-              questionAmount && (
+            availableQuestions.length < questionAmount && (
               <p className="practice-info">
-                Du har valgt{" "}
-                {questionAmount} oppgaver,
-                men bare{" "}
-                {availableQuestions.length}{" "}
-                passer. Økten vil derfor
-                inneholde{" "}
+                Du har valgt {questionAmount} oppgaver, men bare{" "}
+                {availableQuestions.length} passer. Økten vil derfor inneholde{" "}
                 {availableQuestions.length}.
               </p>
             )}
+
+          <hr className="practice-divider" />
+
+          <div className="practice-stats">
+            <h3>Din statistikk</h3>
+
+            <div className="practice-stat">
+              <span>Økter</span>
+              <strong>{statistics.totalSessions}</strong>
+            </div>
+
+            <div className="practice-stat">
+              <span>Besvarte oppgaver</span>
+              <strong>{statistics.totalQuestions}</strong>
+            </div>
+
+            <div className="practice-stat">
+              <span>Treffprosent</span>
+              <strong>{statistics.accuracy}%</strong>
+            </div>
+
+            <div className="practice-stat">
+              <span>Beste økt</span>
+              <strong>{statistics.bestSession}%</strong>
+            </div>
+          </div>
 
           <button
             type="button"
             className="start-practice-button practice-summary-start"
             disabled={
-              selectedTopics.length === 0 ||
-              availableQuestions.length === 0
+              selectedTopics.length === 0 || availableQuestions.length === 0
             }
             onClick={handleStartPractice}
           >
