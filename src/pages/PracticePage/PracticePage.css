@@ -1570,3 +1570,29 @@
     grid-template-columns: 1fr;
   }
 }
+
+.topic-group {
+  margin-top: 2.5rem;
+}
+
+.topic-group:first-child {
+  margin-top: 0;
+}
+
+.topic-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1rem;
+}
+
+.topic-group-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.topic-group-header span {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}

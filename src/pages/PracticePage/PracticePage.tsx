@@ -60,6 +60,49 @@ export const PracticePage = () => {
 
   const topics = practiceTopics[subjectId as keyof typeof practiceTopics] ?? [];
 
+  const topicGroups = [
+    {
+      title: "📘 Mengder og logikk",
+      topics: [
+        "Mengder",
+        "Relasjoner",
+        "Funksjoner",
+        "Utsagnslogikk",
+        "Predikatlogikk",
+        "Bevisteknikker",
+      ],
+    },
+    {
+      title: "🔁 Rekursjon og induksjon",
+      topics: ["Rekursjon", "Induksjon", "Induktivt definerte mengder"],
+    },
+    {
+      title: "🔢 Tallteori",
+      topics: [
+        "Delbarhet og primtall",
+        "GCD og Euklids algoritme",
+        "Diofantiske ligninger",
+        "Kongruensregning",
+        "Modulære inverser",
+        "Kinesisk restteorem",
+        "Diskrete logaritmer",
+        "RSA",
+      ],
+    },
+    {
+      title: "🎲 Kombinatorikk",
+      topics: ["Kombinatorikk"],
+    },
+    {
+      title: "📈 Grafteori",
+      topics: ["Grafteori", "Trær"],
+    },
+    {
+      title: "🤖 Tilstandsmaskiner og regulære språk",
+      topics: ["Automater", "Regulære uttrykk"],
+    },
+  ];
+
   const [statisticsVersion, setStatisticsVersion] = useState(0);
 
   const statistics = useMemo(
@@ -1104,32 +1147,42 @@ export const PracticePage = () => {
               </div>
             </div>
 
-            <div className="topics-grid">
-              {topics.map((topic) => {
-                const isSelected = selectedTopics.includes(topic);
+            {topicGroups.map((group) => (
+              <div key={group.title} className="topic-group">
+                <div className="topic-group-header">
+                  <h3>{group.title}</h3>
 
-                return (
-                  <label
-                    key={topic}
-                    className={`topic-card ${
-                      isSelected ? "topic-card-selected" : ""
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleTopic(topic)}
-                    />
+                  <span>{group.topics.length} tema</span>
+                </div>
 
-                    <span className="topic-check">
-                      {isSelected && <Check size={15} />}
-                    </span>
+                <div className="topics-grid">
+                  {group.topics.map((topic) => {
+                    const isSelected = selectedTopics.includes(topic);
 
-                    <span>{topic}</span>
-                  </label>
-                );
-              })}
-            </div>
+                    return (
+                      <label
+                        key={topic}
+                        className={`topic-card ${
+                          isSelected ? "topic-card-selected" : ""
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleTopic(topic)}
+                        />
+
+                        <span className="topic-check">
+                          {isSelected && <Check size={15} />}
+                        </span>
+
+                        <span>{topic}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </section>
 
           <section className="practice-section">
