@@ -1,4 +1,8 @@
 import "./PracticePage.css";
+import "./styles/PracticeSetup.css";
+import "./styles/PracticeSession.css";
+import "./styles/PracticeResult.css";
+import "./styles/PracticeProgress.css";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -660,11 +664,33 @@ export const PracticePage = () => {
 
         <section className="question-section">
           <div className="question-header">
-            <span>
+            <span className="question-counter">
               Oppgave {currentQuestionIndex + 1} av {sessionQuestions.length}
             </span>
 
-            <span>{currentQuestion.topic}</span>
+            <div className="question-meta">
+              <span>{currentQuestion.topic}</span>
+
+              <span>•</span>
+
+              <span>
+                {
+                  {
+                    easy: "Lett",
+                    medium: "Middels",
+                    hard: "Vanskelig",
+                  }[currentQuestion.difficulty]
+                }
+              </span>
+
+              <span>•</span>
+
+              <span>
+                {currentQuestion.type === "multiple-choice"
+                  ? "Flervalg"
+                  : "Tallsvar"}
+              </span>
+            </div>
           </div>
 
           <div className="question-progress">
@@ -1517,7 +1543,7 @@ export const PracticePage = () => {
               </div>
 
               <div>
-                <strong>Øv på feil svar</strong>
+                <strong>Feiløving</strong>
 
                 <span>
                   {incorrectQuestions.length === 0

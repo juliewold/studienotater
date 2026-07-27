@@ -1,0 +1,559 @@
+/* -------------------------------------------------- */
+/* Oppsett med innstillinger og sammendrag */
+/* -------------------------------------------------- */
+
+.practice-setup-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  align-items: start;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.practice-settings {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.practice-section {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e7e9ee;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(16, 24, 40, 0.035);
+}
+
+.practice-section-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin-bottom: 1.35rem;
+}
+
+.practice-step-number {
+  display: grid;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  background: #eef0ff;
+  color: #565db8;
+  border: 1px solid #d9dcfa;
+  border-radius: 11px;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.practice-section-title h2 {
+  margin: 0;
+  color: #1d2939;
+  font-size: 1.2rem;
+}
+
+.practice-section-title p {
+  margin: 0.3rem 0 0;
+  color: #667085;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.practice-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.selection-count {
+  margin: 0;
+  color: #475467;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.topic-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* -------------------------------------------------- */
+/* Temakort */
+/* -------------------------------------------------- */
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(210px, 1fr)
+  );
+  gap: 0.75rem;
+}
+
+.topic-card,
+.option-card,
+.amount-card {
+  position: relative;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.topic-card input,
+.option-card input,
+.amount-card input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.topic-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0.85rem 0.95rem;
+  background: #ffffff;
+  color: #344054;
+  border: 1px solid #e0e3e8;
+  border-radius: 13px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.topic-card:hover {
+  border-color: #aeb3dd;
+  box-shadow: 0 6px 16px rgba(16, 24, 40, 0.06);
+  transform: translateY(-1px);
+}
+
+.topic-card-selected {
+  background: #f4f5ff;
+  color: #454b9b;
+  border-color: #7c83db;
+  box-shadow: 0 0 0 3px rgba(124, 131, 219, 0.1);
+}
+
+.topic-check {
+  display: grid;
+  flex: 0 0 auto;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  background: #ffffff;
+  color: #ffffff;
+  border: 1.5px solid #c7cbd2;
+  border-radius: 7px;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.topic-card-selected .topic-check {
+  background: #676ec8;
+  border-color: #676ec8;
+}
+
+/* -------------------------------------------------- */
+/* Oppgavetype og vanskelighetsgrad */
+/* -------------------------------------------------- */
+
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 82px;
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e3e8;
+  border-radius: 14px;
+}
+
+.option-card:hover {
+  border-color: #aeb3dd;
+  box-shadow: 0 7px 18px rgba(16, 24, 40, 0.055);
+  transform: translateY(-1px);
+}
+
+.option-card-selected {
+  background: #f4f5ff;
+  border-color: #7c83db;
+  box-shadow: 0 0 0 3px rgba(124, 131, 219, 0.1);
+}
+
+.option-card-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  background: #f2f4f7;
+  color: #667085;
+  border-radius: 11px;
+}
+
+.option-card-selected .option-card-icon {
+  background: #e1e3ff;
+  color: #565db8;
+}
+
+.option-card > div:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.option-card strong {
+  color: #344054;
+  font-size: 0.95rem;
+}
+
+.option-card-selected strong {
+  color: #454b9b;
+}
+
+.option-card span {
+  color: #667085;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.difficulty-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.difficulty-grid .option-card {
+  min-height: 76px;
+}
+
+/* -------------------------------------------------- */
+/* Antall oppgaver */
+/* -------------------------------------------------- */
+
+.amount-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.amount-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.2rem;
+  min-height: 82px;
+  padding: 0.9rem;
+  background: #ffffff;
+  border: 1px solid #e0e3e8;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.amount-card:hover {
+  border-color: #aeb3dd;
+  box-shadow: 0 7px 18px rgba(16, 24, 40, 0.055);
+  transform: translateY(-1px);
+}
+
+.amount-card-selected {
+  background: #f4f5ff;
+  border-color: #7c83db;
+  box-shadow: 0 0 0 3px rgba(124, 131, 219, 0.1);
+}
+
+.amount-card strong {
+  color: #344054;
+  font-size: 1.05rem;
+}
+
+.amount-card-selected strong {
+  color: #454b9b;
+}
+
+.amount-card span {
+  color: #667085;
+  font-size: 0.78rem;
+}
+
+/* -------------------------------------------------- */
+/* Sammendragskort */
+/* -------------------------------------------------- */
+
+.practice-summary-card {
+  position: sticky;
+  top: 90px;
+  padding: 1.35rem;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(247, 247, 255, 0.95),
+      #ffffff 45%
+    );
+  border: 1px solid #dedff0;
+  border-radius: 20px;
+  box-shadow: 0 15px 38px rgba(16, 24, 40, 0.08);
+}
+
+.practice-summary-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding-bottom: 1.15rem;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.practice-summary-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  background: #676ec8;
+  color: #ffffff;
+  border-radius: 13px;
+}
+
+.practice-summary-heading p {
+  margin: 0 0 0.15rem;
+  color: #667085;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.practice-summary-heading h2 {
+  margin: 0;
+  color: #1d2939;
+  font-size: 1.1rem;
+}
+
+.practice-summary-list {
+  display: grid;
+  gap: 0;
+  margin-top: 0.8rem;
+}
+
+.practice-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 48px;
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.practice-summary-row:last-child {
+  border-bottom: none;
+}
+
+.practice-summary-row > div {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #667085;
+}
+
+.practice-summary-row span {
+  font-size: 0.86rem;
+}
+
+.practice-summary-row strong {
+  color: #344054;
+  font-size: 0.86rem;
+  text-align: right;
+}
+
+.available-question-count {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: #ecfdf3;
+  color: #067647;
+  border: 1px solid #abefc6;
+  border-radius: 11px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.available-question-count svg {
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+}
+
+.practice-warning {
+  margin: 1rem 0 0;
+  padding: 0.8rem;
+  background: #fffaeb;
+  color: #b54708;
+  border: 1px solid #fedf89;
+  border-radius: 11px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.practice-info {
+  margin: 0.75rem 0 0;
+  padding: 0.8rem;
+  background: #f2f4f7;
+  color: #475467;
+  border-radius: 11px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+/* -------------------------------------------------- */
+/* Nettbrett */
+/* -------------------------------------------------- */
+
+@media (max-width: 980px) {
+  .practice-setup-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-summary-card {
+    position: static;
+  }
+
+  .practice-summary-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.25rem;
+  }
+
+  .difficulty-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* -------------------------------------------------- */
+/* Mobil */
+/* -------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .practice-section {
+    padding: 1.1rem;
+    border-radius: 16px;
+  }
+
+  .practice-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .topic-actions {
+    width: 100%;
+  }
+
+  .secondary-button {
+    flex: 1;
+  }
+
+  .option-grid,
+  .difficulty-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .amount-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .practice-summary-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  .topics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .amount-options {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .practice-section-title {
+    gap: 0.7rem;
+  }
+}
+
+/* -------------------------------------------------- */
+/* Feiløving */
+/* -------------------------------------------------- */
+
+.mistake-practice-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+
+  border-top: 1px solid var(--border-color);
+}
+
+.mistake-practice-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.mistake-practice-heading > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mistake-practice-heading strong {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.mistake-practice-heading span {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.mistake-practice-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  background: var(--card-background);
+  border-radius: 11px;
+}
+
+.mistake-practice-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.mistake-practice-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

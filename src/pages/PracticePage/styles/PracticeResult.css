@@ -1,0 +1,369 @@
+/* -------------------------------------------------- */
+/* Resultatside */
+/* -------------------------------------------------- */
+
+.result-section {
+  width: min(100%, 900px);
+  margin: 2rem auto 0;
+  padding: 2rem;
+  background: #ffffff;
+  border: 1px solid #e7e9ee;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(16, 24, 40, 0.055);
+}
+
+.result-heading {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.result-heading h1 {
+  margin: 0.35rem 0 0.65rem;
+  color: #1d2939;
+}
+
+.result-heading > p:last-child {
+  max-width: 600px;
+  margin: 0 auto;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* -------------------------------------------------- */
+/* Resultatsammendrag */
+/* -------------------------------------------------- */
+
+.result-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.result-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1.25rem;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.result-summary-card span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.result-summary-card strong {
+  color: var(--text-primary);
+  font-size: 1.45rem;
+}
+
+/* -------------------------------------------------- */
+/* Resultat per tema */
+/* -------------------------------------------------- */
+
+.result-topic-section {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.result-topic-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-topic-heading h2 {
+  margin: 0.25rem 0 0;
+}
+
+.result-topic-heading > span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.result-topic-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.result-topic-card {
+  padding: 1rem;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+}
+
+.result-topic-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.result-topic-card-header > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.result-topic-card-header strong {
+  color: var(--text-primary);
+}
+
+.result-topic-card-header > strong {
+  flex: 0 0 auto;
+  color: #565db8;
+  font-size: 1rem;
+}
+
+.result-topic-card-header span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.result-topic-progress {
+  height: 7px;
+  margin-top: 0.8rem;
+  overflow: hidden;
+  background: var(--background-secondary);
+  border-radius: 999px;
+}
+
+.result-topic-progress-fill {
+  height: 100%;
+  background: #676ec8;
+  border-radius: 999px;
+}
+
+/* -------------------------------------------------- */
+/* Gjennomgang av oppgavene */
+/* -------------------------------------------------- */
+
+.result-review {
+  margin-top: 2rem;
+}
+
+.result-review-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-review-heading h2 {
+  margin: 0.25rem 0 0;
+}
+
+.result-review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.result-review-actions > span {
+  margin-right: 0.25rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.result-question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* -------------------------------------------------- */
+/* Resultatkort */
+/* -------------------------------------------------- */
+
+.result-question-card {
+  overflow: hidden;
+  padding: 0;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+}
+
+.result-question-correct {
+  border-left: 5px solid #45a26b;
+}
+
+.result-question-wrong {
+  border-left: 5px solid #d96b6b;
+}
+
+.result-question-toggle {
+  width: 100%;
+  padding: 1.35rem 1.4rem;
+  background: transparent;
+  color: inherit;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.result-question-toggle:hover {
+  background: var(--background-secondary);
+}
+
+.result-question-toggle h3 {
+  margin: 1rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.result-question-expanded .result-question-toggle {
+  padding-bottom: 1rem;
+}
+
+.result-question-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.result-question-header > div {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.result-question-correct .result-question-header svg {
+  color: #45a26b;
+}
+
+.result-question-wrong .result-question-header svg {
+  color: #d96b6b;
+}
+
+.result-question-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-secondary);
+}
+
+.result-question-meta span {
+  font-size: 0.85rem;
+}
+
+/* -------------------------------------------------- */
+/* Utvidet oppgaveinnhold */
+/* -------------------------------------------------- */
+
+.result-question-content {
+  padding: 0 1.4rem 1.4rem;
+}
+
+.result-answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-answer-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  background: var(--background-secondary);
+  border-radius: 12px;
+}
+
+.result-answer-grid span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.result-user-answer-correct {
+  border: 1px solid rgba(69, 162, 107, 0.35);
+}
+
+.result-user-answer-wrong {
+  border: 1px solid rgba(217, 107, 107, 0.35);
+}
+
+.result-correct-answer {
+  border: 1px solid rgba(69, 162, 107, 0.35);
+}
+
+.result-explanation {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.result-explanation > strong {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.result-explanation p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* -------------------------------------------------- */
+/* Start ny økt */
+/* -------------------------------------------------- */
+
+.result-restart-button {
+  margin: 2rem auto 0;
+}
+
+/* -------------------------------------------------- */
+/* Mobil */
+/* -------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .result-section {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+
+  .result-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .result-topic-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .result-review-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .result-review-actions {
+    justify-content: flex-start;
+  }
+
+  .result-answer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .result-question-header {
+    align-items: flex-start;
+  }
+
+  .result-question-toggle {
+    padding: 1.15rem;
+  }
+
+  .result-question-content {
+    padding: 0 1.15rem 1.15rem;
+  }
+}
