@@ -1,0 +1,386 @@
+import type { PracticeQuestion } from "../types";
+
+export const diofantiskeLigningerQuestions: PracticeQuestion[] = [
+  {
+    id: "tma4412-diofantiske-ligninger-1",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "easy",
+    tags: ["definisjon", "heltallsløsninger"],
+    estimatedTime: 30,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question: "Hva er en lineær diofantisk ligning?",
+    options: [
+      "En ligning der vi bare søker etter heltallsløsninger",
+      "En ligning som alltid har nøyaktig én løsning",
+      "En ligning som bare inneholder primtall",
+      "En ligning uten variabler",
+    ],
+    correctAnswer: "En ligning der vi bare søker etter heltallsløsninger",
+    explanation:
+      "En lineær diofantisk ligning har vanligvis formen $ax+by=c$, der vi søker etter heltall $x$ og $y$ som oppfyller ligningen.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-2",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "easy",
+    tags: ["lineær ligning", "heltallsløsninger"],
+    estimatedTime: 30,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question: "Hvilken av følgende er en lineær diofantisk ligning?",
+    options: [
+      "$3x+5y=17$, der $x,y\\in\\mathbb{Z}$",
+      "$x^2+y^2=10$",
+      "$\\frac{x}{y}=3$",
+      "$x+\\sqrt{y}=4$",
+    ],
+    correctAnswer: "$3x+5y=17$, der $x,y\\in\\mathbb{Z}$",
+    explanation:
+      "Ligningen har formen $ax+by=c$, og variablene skal være heltall.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-3",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "easy",
+    tags: ["løsningsbetingelse", "gcd"],
+    estimatedTime: 45,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Når har den lineære diofantiske ligningen $ax+by=c$ heltallsløsninger?",
+    options: [
+      "Når $\\gcd(a,b)\\mid c$",
+      "Når $a+b=c$",
+      "Når både $a$ og $b$ er primtall",
+      "Når $c$ er et partall",
+    ],
+    correctAnswer: "Når $\\gcd(a,b)\\mid c$",
+    explanation:
+      "Ligningen $ax+by=c$ har heltallsløsninger hvis og bare hvis største felles divisor til $a$ og $b$ deler $c$.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-4",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "easy",
+    tags: ["gcd", "løsningsbetingelse"],
+    estimatedTime: 45,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question: "Har ligningen $6x+9y=15$ heltallsløsninger?",
+    options: [
+      "Ja, fordi $\\gcd(6,9)=3$ og $3\\mid15$",
+      "Nei, fordi 6 ikke deler 15",
+      "Nei, fordi 9 ikke deler 15",
+      "Ja, fordi 15 er et oddetall",
+    ],
+    correctAnswer: "Ja, fordi $\\gcd(6,9)=3$ og $3\\mid15$",
+    explanation:
+      "Vi har $\\gcd(6,9)=3$. Siden $15=3\\cdot5$, deler 3 høyresiden. Derfor finnes det heltallsløsninger.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-5",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "easy",
+    tags: ["gcd", "ingen løsning"],
+    estimatedTime: 45,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question: "Har ligningen $6x+10y=7$ heltallsløsninger?",
+    options: [
+      "Nei, fordi $\\gcd(6,10)=2$ og $2\\nmid7$",
+      "Ja, fordi 6 og 10 er partall",
+      "Ja, fordi 7 er et primtall",
+      "Nei, fordi $6+10>7$",
+    ],
+    correctAnswer: "Nei, fordi $\\gcd(6,10)=2$ og $2\\nmid7$",
+    explanation:
+      "Alle uttrykk på formen $6x+10y$ er delelige med 2. Tallet 7 er ikke delelig med 2, så ligningen kan ikke ha heltallsløsninger.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-6",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "easy",
+    tags: ["kontroll av løsning", "substitusjon"],
+    estimatedTime: 45,
+    examFrequency: "medium",
+    type: "multiple-choice",
+    question: "Hvilket par $(x,y)$ er en løsning av $3x+5y=11$?",
+    options: ["$(2,1)$", "$(1,2)$", "$(3,1)$", "$(0,3)$"],
+    correctAnswer: "$(2,1)$",
+    explanation:
+      "Setter vi inn $x=2$ og $y=1$, får vi $3\\cdot2+5\\cdot1=6+5=11$.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-7",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "easy",
+    tags: ["kontroll av løsning", "heltallspar"],
+    estimatedTime: 45,
+    examFrequency: "medium",
+    type: "multiple-choice",
+    question: "Hvilket par $(x,y)$ er en løsning av $4x+7y=18$?",
+    options: ["$(1,2)$", "$(2,1)$", "$(3,1)$", "$(1,3)$"],
+    correctAnswer: "$(1,2)$",
+    explanation: "Vi får $4\\cdot1+7\\cdot2=4+14=18$.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-8",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "medium",
+    tags: ["utvidet euklid", "bezouts identitet"],
+    estimatedTime: 75,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Utvidet Euklids algoritme gir $1=3\\cdot7-2\\cdot10$. Hvilken løsning av $7x+10y=1$ får vi direkte?",
+    options: [
+      "$x=3$ og $y=-2$",
+      "$x=-2$ og $y=3$",
+      "$x=7$ og $y=10$",
+      "$x=1$ og $y=1$",
+    ],
+    correctAnswer: "$x=3$ og $y=-2$",
+    explanation:
+      "Uttrykket kan skrives som $7\\cdot3+10\\cdot(-2)=1$. Derfor er $x=3$ og $y=-2$ en løsning.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-9",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "medium",
+    tags: ["skalering", "bezouts identitet"],
+    estimatedTime: 75,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Vi vet at $1=3\\cdot7-2\\cdot10$. Hvordan finner vi en løsning av $7x+10y=5$?",
+    options: [
+      "Multipliser hele likheten med 5",
+      "Legg 5 til begge sider",
+      "Del hele likheten på 5",
+      "Bytt plass på 7 og 10",
+    ],
+    correctAnswer: "Multipliser hele likheten med 5",
+    explanation:
+      "Når vi multipliserer med 5, får vi $5=15\\cdot7-10\\cdot10$. Dermed er $x=15$ og $y=-10$ en løsning.",
+  },
+  {
+    id: "tma4412-diofantiske-ligninger-10",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "medium",
+    tags: ["finne én løsning", "utvidet euklid"],
+    estimatedTime: 90,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Vi vet at $1=2\\cdot5-1\\cdot9$. Hvilken løsning av $5x+9y=7$ får vi ved å multiplisere likheten med 7?",
+    options: [
+      "$x=14$ og $y=-7$",
+      "$x=2$ og $y=-1$",
+      "$x=7$ og $y=7$",
+      "$x=-7$ og $y=14$",
+    ],
+    correctAnswer: "$x=14$ og $y=-7$",
+    explanation:
+      "Multipliserer vi med 7, får vi $7=14\\cdot5-7\\cdot9$. Derfor er $x=14$ og $y=-7$ en løsning.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-11",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "medium",
+    tags: ["uendelig mange løsninger", "teori"],
+    estimatedTime: 60,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Hvor mange heltallsløsninger har en lineær diofantisk ligning når den har minst én løsning?",
+    options: ["Ingen", "Nøyaktig én", "Uendelig mange", "Akkurat to"],
+    correctAnswer: "Uendelig mange",
+    explanation:
+      "Hvis én heltallsløsning finnes, kan alle de andre skrives ved hjelp av en parameter.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-12",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "medium",
+    tags: ["generell løsning", "parameter"],
+    estimatedTime: 90,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Hva brukes parameteren $t$ til når vi skriver alle løsningene til en diofantisk ligning?",
+    options: [
+      "Å beskrive alle heltallsløsningene",
+      "Å beregne gcd",
+      "Å finne primtallsfaktoriseringen",
+      "Å kontrollere svaret",
+    ],
+    correctAnswer: "Å beskrive alle heltallsløsningene",
+    explanation:
+      "Når én løsning er funnet, brukes en parameter $t\\in\\mathbb{Z}$ til å beskrive alle de uendelig mange løsningene.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-13",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "medium",
+    tags: ["gcd", "løsningsbetingelse"],
+    estimatedTime: 60,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question: "Har ligningen $12x+18y=24$ heltallsløsninger?",
+    options: ["Ja", "Nei", "Bare hvis $x>0$", "Bare hvis $y>0$"],
+    correctAnswer: "Ja",
+    explanation:
+      "$\\gcd(12,18)=6$, og $6\\mid24$. Derfor finnes det heltallsløsninger.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-14",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "medium",
+    tags: ["gcd", "løsningsbetingelse"],
+    estimatedTime: 60,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question: "Har ligningen $15x+21y=8$ heltallsløsninger?",
+    options: ["Ja", "Nei", "Bare én", "Bare hvis $x=y$"],
+    correctAnswer: "Nei",
+    explanation:
+      "$\\gcd(15,21)=3$, men $3\\nmid8$. Dermed finnes ingen heltallsløsninger.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-15",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "hard",
+    tags: ["generell løsning", "parameter"],
+    estimatedTime: 90,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Hvis $(x_0,y_0)$ er én løsning av $ax+by=c$, hvordan finner vi de andre løsningene?",
+    options: [
+      "Ved å bruke en heltallsparameter",
+      "Ved å multiplisere begge sider med 2",
+      "Ved å bruke primtallsfaktorisering",
+      "Det finnes ingen flere løsninger",
+    ],
+    correctAnswer: "Ved å bruke en heltallsparameter",
+    explanation:
+      "Alle løsninger kan skrives ved hjelp av en parameter $t\\in\\mathbb{Z}$ når én løsning er kjent.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-16",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "hard",
+    tags: ["bezout", "gcd"],
+    estimatedTime: 90,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question: "Hva brukes Bézouts identitet til i diofantiske ligninger?",
+    options: [
+      "Å finne én heltallsløsning",
+      "Å finne primtall",
+      "Å faktorisere tall",
+      "Å finne rest ved divisjon",
+    ],
+    correctAnswer: "Å finne én heltallsløsning",
+    explanation:
+      "Utvidet Euklids algoritme gir Bézout-koeffisienter som brukes til å finne en første løsning av ligningen.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-17",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "hard",
+    tags: ["kontroll", "substitusjon"],
+    estimatedTime: 60,
+    examFrequency: "medium",
+    type: "number-answer",
+    question:
+      "Hva blir venstresiden dersom vi setter inn $x=2$ og $y=3$ i $5x+4y$?",
+    correctAnswer: 22,
+    explanation: "$5\\cdot2+4\\cdot3=10+12=22$.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-18",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "hard",
+    tags: ["gcd", "utvidet euklid"],
+    estimatedTime: 90,
+    examFrequency: "high",
+    type: "number-answer",
+    question: "Hva er $\\gcd(18,30)$?",
+    correctAnswer: 6,
+    explanation:
+      "$18=2\\cdot3^2$ og $30=2\\cdot3\\cdot5$, så største felles divisor er 6.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-19",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "hard",
+    tags: ["løsningsbetingelse", "gcd"],
+    estimatedTime: 75,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Hva er alltid det første du bør undersøke når du får en lineær diofantisk ligning på eksamen?",
+    options: [
+      "Om $\\gcd(a,b)$ deler høyresiden",
+      "Om $a$ er et primtall",
+      "Om $b$ er et partall",
+      "Om $x=0$",
+    ],
+    correctAnswer: "Om $\\gcd(a,b)$ deler høyresiden",
+    explanation:
+      "Hvis $\\gcd(a,b)\\nmid c$, finnes det ingen heltallsløsninger. Derfor er dette alltid første sjekk.",
+  },
+
+  {
+    id: "tma4412-diofantiske-ligninger-20",
+    subjectId: "tma4412",
+    topic: "Diofantiske ligninger",
+    difficulty: "hard",
+    tags: ["eksamen", "strategi"],
+    estimatedTime: 90,
+    examFrequency: "high",
+    type: "multiple-choice",
+    question:
+      "Hva er riktig rekkefølge når du løser en lineær diofantisk ligning på eksamen?",
+    options: [
+      "Finn $\\gcd$, sjekk om den deler høyresiden, finn én løsning med utvidet Euklid, skriv alle løsningene",
+      "Gjett en løsning og håp den stemmer",
+      "Primtallsfaktoriser høyresiden først",
+      "Sett alltid $x=1$",
+    ],
+    correctAnswer:
+      "Finn $\\gcd$, sjekk om den deler høyresiden, finn én løsning med utvidet Euklid, skriv alle løsningene",
+    explanation:
+      "Dette er standard framgangsmåten på eksamen og dekker alle nødvendige steg.",
+  },
+];

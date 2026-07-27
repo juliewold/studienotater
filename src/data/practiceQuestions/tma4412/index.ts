@@ -13,6 +13,7 @@ import { grafteoriQuestions } from "./grafteori";
 import { rekursjonQuestions } from "./rekursjon";
 import { induktivtDefinerteMengderQuestions } from "./induktivtDefinerteMengder";
 import { delbarhetOgPrimtallQuestions } from "./delbarhetOgPrimtall";
+import { diofantiskeLigningerQuestions } from "./diofantiskeLigninger";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -29,4 +30,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...rekursjonQuestions,
   ...induktivtDefinerteMengderQuestions,
   ...delbarhetOgPrimtallQuestions,
+  ...diofantiskeLigningerQuestions,
 ];
