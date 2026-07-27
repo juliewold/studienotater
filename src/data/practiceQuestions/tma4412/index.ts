@@ -20,6 +20,7 @@ import { diskreteLogaritmerQuestions } from "./diskreteLogaritmer";
 import { rsaQuestions } from "./rsa";
 import { traerQuestions } from "./traer";
 import { automaterQuestions } from "./automater";
+import { regulaereUttrykkQuestions } from "./regulaereUttrykk";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -43,4 +44,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...rsaQuestions,
   ...traerQuestions,
   ...automaterQuestions,
+  ...regulaereUttrykkQuestions,
 ];
