@@ -852,3 +852,242 @@
 .practice-stat strong {
   font-size: 1rem;
 }
+
+.result-section {
+  width: min(100%, 900px);
+  margin: 0 auto;
+}
+
+.result-heading {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.result-heading h1 {
+  margin: 0.35rem 0 0.65rem;
+}
+
+.result-heading > p:last-child {
+  margin: 0 auto;
+  max-width: 600px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.result-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.result-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--card-background);
+  text-align: center;
+}
+
+.result-summary-card span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.result-summary-card strong {
+  font-size: 1.45rem;
+}
+
+.result-review {
+  margin-top: 2rem;
+}
+
+.result-review-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-review-heading h2 {
+  margin: 0.25rem 0 0;
+}
+
+.result-review-heading > span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.result-question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-question-card {
+  padding: 1.4rem;
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  background: var(--card-background);
+}
+
+.result-question-correct {
+  border-left: 5px solid #45a26b;
+}
+
+.result-question-wrong {
+  border-left: 5px solid #d96b6b;
+}
+
+.result-question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-question-header > div {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.result-question-correct
+  .result-question-header
+  svg {
+  color: #45a26b;
+}
+
+.result-question-wrong
+  .result-question-header
+  svg {
+  color: #d96b6b;
+}
+
+.result-question-header > span {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.result-question-card h3 {
+  margin: 0 0 1.25rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.result-answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-answer-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: var(--background-secondary);
+}
+
+.result-answer-grid span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.result-explanation {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.result-explanation > strong {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.result-explanation p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.result-restart-button {
+  margin: 2rem auto 0;
+}
+
+@media (max-width: 700px) {
+  .result-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .result-answer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .result-review-heading,
+  .result-question-header {
+    align-items: flex-start;
+  }
+}
+
+.mistake-practice-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--background-secondary);
+}
+
+.mistake-practice-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mistake-practice-heading > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.mistake-practice-heading strong {
+  font-size: 0.95rem;
+}
+
+.mistake-practice-heading span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.mistake-practice-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--card-background);
+}
+
+.mistake-practice-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.mistake-practice-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}

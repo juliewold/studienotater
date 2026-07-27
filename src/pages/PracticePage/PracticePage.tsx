@@ -13,6 +13,9 @@ import {
   SlidersHorizontal,
   Sparkles,
   Target,
+  CheckCircle2,
+  XCircle,
+  Brain,
 } from "lucide-react";
 
 import { practiceTopics } from "../../data/practiceTopics";
@@ -26,6 +29,8 @@ import {
   savePracticeSession,
   type StoredPracticeAnswer,
 } from "../../services/practice/practiceStorage";
+
+import { getIncorrectQuestionIds } from "../../services/practice/practiceMistakes";
 
 type QuestionType = "mixed" | "multiple-choice" | "number-answer";
 
@@ -54,6 +59,21 @@ export const PracticePage = () => {
             bestSession: 0,
           },
     [subjectId, statisticsVersion],
+  );
+
+  const incorrectQuestionIds = useMemo(
+    () => (subjectId ? getIncorrectQuestionIds(subjectId) : []),
+    [subjectId, statisticsVersion],
+  );
+
+  const incorrectQuestions = useMemo(
+    () =>
+      practiceQuestions.filter(
+        (question) =>
+          question.subjectId === subjectId &&
+          incorrectQuestionIds.includes(question.id),
+      ),
+    [incorrectQuestionIds, subjectId],
   );
 
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
@@ -85,6 +105,10 @@ export const PracticePage = () => {
   const [sessionAnswers, setSessionAnswers] = useState<StoredPracticeAnswer[]>(
     [],
   );
+
+  const [completedAnswers, setCompletedAnswers] = useState<
+    StoredPracticeAnswer[]
+  >([]);
 
   const currentQuestion = sessionQuestions[currentQuestionIndex];
 
@@ -205,6 +229,26 @@ export const PracticePage = () => {
     setCurrentQuestionIndex(0);
     setCorrectAnswers(0);
     setSessionAnswers([]);
+    setCompletedAnswers([]);
+    setSessionStartedAt(new Date().toISOString());
+    setSelectedOption("");
+    setNumberAnswer("");
+    setIsAnswerChecked(false);
+    setStage("session");
+  };
+
+  const handleStartMistakePractice = () => {
+    if (incorrectQuestions.length === 0) {
+      return;
+    }
+
+    const selectedQuestions = shuffleQuestions(incorrectQuestions);
+
+    setSessionQuestions(selectedQuestions);
+    setCurrentQuestionIndex(0);
+    setCorrectAnswers(0);
+    setSessionAnswers([]);
+    setCompletedAnswers([]);
     setSessionStartedAt(new Date().toISOString());
     setSelectedOption("");
     setNumberAnswer("");
@@ -246,6 +290,10 @@ export const PracticePage = () => {
       topic: currentQuestion.topic,
       difficulty: currentQuestion.difficulty,
       questionType: currentQuestion.type,
+      userAnswer:
+        currentQuestion.type === "multiple-choice"
+          ? selectedOption
+          : numberAnswer,
       correct: answerIsCorrect,
       answeredAt: new Date().toISOString(),
     };
@@ -259,6 +307,14 @@ export const PracticePage = () => {
     const isLastQuestion = currentQuestionIndex === sessionQuestions.length - 1;
 
     if (isLastQuestion) {
+      const finalAnswers = [...sessionAnswers];
+
+      const finalCorrectAnswers = finalAnswers.filter(
+        (answer) => answer.correct,
+      ).length;
+
+      setCompletedAnswers(finalAnswers);
+
       if (subjectId && sessionQuestions.length > 0) {
         savePracticeSession({
           id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -266,13 +322,14 @@ export const PracticePage = () => {
           startedAt: sessionStartedAt || new Date().toISOString(),
           completedAt: new Date().toISOString(),
           totalQuestions: sessionQuestions.length,
-          correctAnswers,
-          answers: sessionAnswers,
+          correctAnswers: finalCorrectAnswers,
+          answers: finalAnswers,
         });
 
         setStatisticsVersion((currentVersion) => currentVersion + 1);
       }
 
+      setCorrectAnswers(finalCorrectAnswers);
       setStage("result");
       return;
     }
@@ -288,6 +345,7 @@ export const PracticePage = () => {
     setStage("setup");
     setSessionQuestions([]);
     setSessionAnswers([]);
+    setCompletedAnswers([]);
     setSessionStartedAt("");
     setCurrentQuestionIndex(0);
     setSelectedOption("");
@@ -430,22 +488,142 @@ export const PracticePage = () => {
         ? 0
         : Math.round((correctAnswers / sessionQuestions.length) * 100);
 
+    const resultTitle =
+      percentage === 100
+        ? "Perfekt resultat!"
+        : percentage >= 80
+          ? "Veldig bra jobbet!"
+          : percentage >= 60
+            ? "Bra jobbet!"
+            : "God øving!";
+
+    const resultMessage =
+      percentage === 100
+        ? "Du svarte riktig på alle oppgavene."
+        : percentage >= 80
+          ? "Du har svært god kontroll på dette stoffet."
+          : percentage >= 60
+            ? "Du er på god vei. Se gjennom oppgavene du bommet på."
+            : "Se gjennom forklaringene under og prøv gjerne en ny økt.";
+
     return (
       <main className="practice-page">
+        <Link to={`/fag/${subjectId}`} className="back-link">
+          ← Tilbake til faget
+        </Link>
+
         <section className="result-section">
-          <p className="page-label">Resultat</p>
+          <div className="result-heading">
+            <p className="page-label">Resultat</p>
 
-          <h1>Økten er ferdig</h1>
+            <h1>{resultTitle}</h1>
 
-          <div className="result-score">
-            {correctAnswers} av {sessionQuestions.length} riktig
+            <p>{resultMessage}</p>
           </div>
 
-          <p className="result-percentage">{percentage} %</p>
+          <div className="result-summary-grid">
+            <div className="result-summary-card">
+              <span>Riktige svar</span>
+
+              <strong>
+                {correctAnswers} av {sessionQuestions.length}
+              </strong>
+            </div>
+
+            <div className="result-summary-card">
+              <span>Treffprosent</span>
+              <strong>{percentage}%</strong>
+            </div>
+
+            <div className="result-summary-card">
+              <span>Feil svar</span>
+
+              <strong>{sessionQuestions.length - correctAnswers}</strong>
+            </div>
+          </div>
+
+          <div className="result-review">
+            <div className="result-review-heading">
+              <div>
+                <p className="page-label">Gjennomgang</p>
+
+                <h2>Se gjennom oppgavene</h2>
+              </div>
+
+              <span>{sessionQuestions.length} oppgaver</span>
+            </div>
+
+            <div className="result-question-list">
+              {sessionQuestions.map((question, index) => {
+                const storedAnswer = completedAnswers.find(
+                  (answer) => answer.questionId === question.id,
+                );
+
+                const answerWasCorrect = storedAnswer?.correct ?? false;
+
+                return (
+                  <article
+                    key={question.id}
+                    className={`result-question-card ${
+                      answerWasCorrect
+                        ? "result-question-correct"
+                        : "result-question-wrong"
+                    }`}
+                  >
+                    <div className="result-question-header">
+                      <div>
+                        {answerWasCorrect ? (
+                          <CheckCircle2 size={21} />
+                        ) : (
+                          <XCircle size={21} />
+                        )}
+
+                        <strong>Oppgave {index + 1}</strong>
+                      </div>
+
+                      <span>{question.topic}</span>
+                    </div>
+
+                    <h3>
+                      <MathText>{question.question}</MathText>
+                    </h3>
+
+                    <div className="result-answer-grid">
+                      <div>
+                        <span>Ditt svar</span>
+
+                        <strong>
+                          <MathText>
+                            {storedAnswer?.userAnswer || "Ikke besvart"}
+                          </MathText>
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Riktig svar</span>
+
+                        <strong>
+                          <MathText>{String(question.correctAnswer)}</MathText>
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="result-explanation">
+                      <strong>Forklaring</strong>
+
+                      <p>
+                        <MathText>{question.explanation}</MathText>
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
 
           <button
             type="button"
-            className="start-practice-button"
+            className="start-practice-button result-restart-button"
             onClick={handleRestart}
           >
             <RotateCcw size={18} />
@@ -856,6 +1034,38 @@ export const PracticePage = () => {
                 {availableQuestions.length}.
               </p>
             )}
+
+          <div className="mistake-practice-card">
+            <div className="mistake-practice-heading">
+              <div className="mistake-practice-icon">
+                <Brain size={20} />
+              </div>
+
+              <div>
+                <strong>Øv på feil svar</strong>
+
+                <span>
+                  {incorrectQuestions.length === 0
+                    ? "Ingen oppgaver trenger repetisjon"
+                    : `${incorrectQuestions.length} ${
+                        incorrectQuestions.length === 1
+                          ? "oppgave trenger"
+                          : "oppgaver trenger"
+                      } repetisjon`}
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="secondary-button mistake-practice-button"
+              disabled={incorrectQuestions.length === 0}
+              onClick={handleStartMistakePractice}
+            >
+              Start feiløving
+              <ChevronRight size={17} />
+            </button>
+          </div>
 
           <hr className="practice-divider" />
 

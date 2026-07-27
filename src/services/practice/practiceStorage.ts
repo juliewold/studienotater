@@ -4,6 +4,7 @@ export type StoredPracticeAnswer = {
   topic: string;
   difficulty: "easy" | "medium" | "hard";
   questionType: "multiple-choice" | "number-answer";
+  userAnswer?: string;
   correct: boolean;
   answeredAt: string;
 };
@@ -38,6 +39,8 @@ const isStoredPracticeAnswer = (
       answer.difficulty === "hard") &&
     (answer.questionType === "multiple-choice" ||
       answer.questionType === "number-answer") &&
+    (answer.userAnswer === undefined ||
+      typeof answer.userAnswer === "string") &&
     typeof answer.correct === "boolean" &&
     typeof answer.answeredAt === "string"
   );
@@ -64,60 +67,44 @@ const isStoredPracticeSession = (
   );
 };
 
-export const getPracticeSessions =
-  (): StoredPracticeSession[] => {
-    try {
-      const storedValue = localStorage.getItem(
-        PRACTICE_SESSIONS_KEY,
-      );
+export const getPracticeSessions = (): StoredPracticeSession[] => {
+  try {
+    const storedValue = localStorage.getItem(PRACTICE_SESSIONS_KEY);
 
-      if (!storedValue) {
-        return [];
-      }
-
-      const parsedValue: unknown = JSON.parse(storedValue);
-
-      if (!Array.isArray(parsedValue)) {
-        return [];
-      }
-
-      return parsedValue.filter(isStoredPracticeSession);
-    } catch (error) {
-      console.error(
-        "Kunne ikke hente lagrede øvingsøkter:",
-        error,
-      );
-
+    if (!storedValue) {
       return [];
     }
-  };
 
-export const savePracticeSession = (
-  session: StoredPracticeSession,
-) => {
+    const parsedValue: unknown = JSON.parse(storedValue);
+
+    if (!Array.isArray(parsedValue)) {
+      return [];
+    }
+
+    return parsedValue.filter(isStoredPracticeSession);
+  } catch (error) {
+    console.error("Kunne ikke hente lagrede øvingsøkter:", error);
+
+    return [];
+  }
+};
+
+export const savePracticeSession = (session: StoredPracticeSession) => {
   try {
     const currentSessions = getPracticeSessions();
 
-    const updatedSessions = [
-      session,
-      ...currentSessions,
-    ];
+    const updatedSessions = [session, ...currentSessions];
 
     localStorage.setItem(
       PRACTICE_SESSIONS_KEY,
       JSON.stringify(updatedSessions),
     );
   } catch (error) {
-    console.error(
-      "Kunne ikke lagre øvingsøkten:",
-      error,
-    );
+    console.error("Kunne ikke lagre øvingsøkten:", error);
   }
 };
 
-export const getPracticeSessionsForSubject = (
-  subjectId: string,
-) => {
+export const getPracticeSessionsForSubject = (subjectId: string) => {
   return getPracticeSessions().filter(
     (session) => session.subjectId === subjectId,
   );
@@ -127,9 +114,6 @@ export const clearPracticeSessions = () => {
   try {
     localStorage.removeItem(PRACTICE_SESSIONS_KEY);
   } catch (error) {
-    console.error(
-      "Kunne ikke slette øvingshistorikken:",
-      error,
-    );
+    console.error("Kunne ikke slette øvingshistorikken:", error);
   }
 };
