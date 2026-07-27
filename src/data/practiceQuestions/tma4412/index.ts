@@ -12,6 +12,7 @@ import { kombinatorikkQuestions } from "./kombinatorikk";
 import { grafteoriQuestions } from "./grafteori";
 import { rekursjonQuestions } from "./rekursjon";
 import { induktivtDefinerteMengderQuestions } from "./induktivtDefinerteMengder";
+import { delbarhetOgPrimtallQuestions } from "./delbarhetOgPrimtall";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -27,4 +28,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...grafteoriQuestions,
   ...rekursjonQuestions,
   ...induktivtDefinerteMengderQuestions,
+  ...delbarhetOgPrimtallQuestions,
 ];
