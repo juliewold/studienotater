@@ -56,3 +56,64 @@ export const getPracticeStatistics = (
     bestSession,
   };
 };
+
+export type PracticeTopicStatistic = {
+  topic: string;
+  totalQuestions: number;
+  correctAnswers: number;
+  accuracy: number;
+};
+
+export const getPracticeTopicStatistics = (
+  subjectId: string,
+): PracticeTopicStatistic[] => {
+  const sessions =
+    getPracticeSessionsForSubject(subjectId);
+
+  const topicStatistics = new Map<
+    string,
+    {
+      totalQuestions: number;
+      correctAnswers: number;
+    }
+  >();
+
+  for (const session of sessions) {
+    for (const answer of session.answers) {
+      const currentStatistic =
+        topicStatistics.get(answer.topic) ?? {
+          totalQuestions: 0,
+          correctAnswers: 0,
+        };
+
+      currentStatistic.totalQuestions += 1;
+
+      if (answer.correct) {
+        currentStatistic.correctAnswers += 1;
+      }
+
+      topicStatistics.set(
+        answer.topic,
+        currentStatistic,
+      );
+    }
+  }
+
+  return Array.from(topicStatistics.entries()).map(
+    ([topic, statistic]) => ({
+      topic,
+      totalQuestions:
+        statistic.totalQuestions,
+      correctAnswers:
+        statistic.correctAnswers,
+      accuracy:
+        statistic.totalQuestions === 0
+          ? 0
+          : Math.round(
+              (statistic.correctAnswers /
+                statistic.totalQuestions) *
+                100,
+            ),
+    }),
+  );
+};

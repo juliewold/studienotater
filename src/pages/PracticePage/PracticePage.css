@@ -957,15 +957,11 @@
   gap: 0.55rem;
 }
 
-.result-question-correct
-  .result-question-header
-  svg {
+.result-question-correct .result-question-header svg {
   color: #45a26b;
 }
 
-.result-question-wrong
-  .result-question-header
-  svg {
+.result-question-wrong .result-question-header svg {
   color: #d96b6b;
 }
 
@@ -1126,8 +1122,7 @@
   padding: 0 1.4rem 1.4rem;
 }
 
-.result-question-expanded
-  .result-question-toggle {
+.result-question-expanded .result-question-toggle {
   padding-bottom: 1rem;
 }
 
@@ -1182,12 +1177,7 @@
   gap: 1.5rem;
   margin-top: 1.25rem;
   padding: 1.25rem 1.4rem;
-  background:
-    linear-gradient(
-      135deg,
-      #f4f5ff,
-      #ffffff
-    );
+  background: linear-gradient(135deg, #f4f5ff, #ffffff);
   border: 1px solid #d9dcfa;
   border-radius: 18px;
   box-shadow: 0 8px 24px rgba(16, 24, 40, 0.045);
@@ -1289,8 +1279,7 @@
   transition: transform 0.18s ease;
 }
 
-.practice-data-management[open]
-  summary svg {
+.practice-data-management[open] summary svg {
   transform: rotate(180deg);
 }
 
@@ -1360,5 +1349,224 @@
   .active-session-continue,
   .active-session-delete {
     width: 100%;
+  }
+}
+
+/* -------------------------------------------------- */
+/* Temaresultater */
+/* -------------------------------------------------- */
+
+.result-topic-section {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.result-topic-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-topic-heading h2 {
+  margin: 0.25rem 0 0;
+}
+
+.result-topic-heading > span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.result-topic-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.result-topic-card {
+  padding: 1rem;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+}
+
+.result-topic-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.result-topic-card-header > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.result-topic-card-header strong {
+  color: var(--text-primary);
+}
+
+.result-topic-card-header > strong {
+  flex: 0 0 auto;
+  color: #565db8;
+  font-size: 1rem;
+}
+
+.result-topic-card-header span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.result-topic-progress {
+  height: 7px;
+  margin-top: 0.8rem;
+  overflow: hidden;
+  background: var(--background-secondary);
+  border-radius: 999px;
+}
+
+.result-topic-progress-fill {
+  height: 100%;
+  background: #676ec8;
+  border-radius: 999px;
+}
+
+@media (max-width: 700px) {
+  .result-topic-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* -------------------------------------------------- */
+/* Samlet fremgang per tema */
+/* -------------------------------------------------- */
+
+.topic-progress-section {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e7e9ee;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(16, 24, 40, 0.035);
+}
+
+.topic-progress-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.topic-progress-heading .page-label {
+  margin: 0 0 0.3rem;
+  color: #676ec8;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.topic-progress-heading h2 {
+  margin: 0;
+  color: #1d2939;
+  font-size: 1.3rem;
+}
+
+.topic-progress-heading p {
+  margin: 0.4rem 0 0;
+  color: #667085;
+  font-size: 0.9rem;
+}
+
+.topic-progress-heading > span {
+  color: #667085;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.topic-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.topic-progress-card {
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e3e8;
+  border-radius: 14px;
+}
+
+.topic-progress-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.topic-progress-card-header > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.topic-progress-card-header strong {
+  color: #344054;
+  font-size: 0.9rem;
+}
+
+.topic-progress-card-header > strong {
+  flex: 0 0 auto;
+  color: #565db8;
+}
+
+.topic-progress-card-header span {
+  color: #667085;
+  font-size: 0.78rem;
+}
+
+.topic-progress-bar {
+  height: 7px;
+  margin-top: 0.8rem;
+  overflow: hidden;
+  background: #eaecf0;
+  border-radius: 999px;
+}
+
+.topic-progress-bar-fill {
+  height: 100%;
+  background: #676ec8;
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+@media (max-width: 980px) {
+  .topic-progress-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .topic-progress-section {
+    padding: 1.1rem;
+    border-radius: 16px;
+  }
+
+  .topic-progress-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .topic-progress-heading > span {
+    white-space: normal;
+  }
+
+  .topic-progress-grid {
+    grid-template-columns: 1fr;
   }
 }

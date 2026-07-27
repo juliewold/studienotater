@@ -26,7 +26,10 @@ import {
   type PracticeQuestion,
 } from "../../data/practiceQuestions";
 import { MathText } from "../../components/MathText/MathText";
-import { getPracticeStatistics } from "../../services/practice/practiceStatistics";
+import {
+  getPracticeStatistics,
+  getPracticeTopicStatistics,
+} from "../../services/practice/practiceStatistics";
 import {
   clearPracticeSessions,
   clearPracticeSessionsForSubject,
@@ -72,6 +75,27 @@ export const PracticePage = () => {
           },
     [subjectId, statisticsVersion],
   );
+
+  const topicStatistics = useMemo(() => {
+    const storedStatistics = subjectId
+      ? getPracticeTopicStatistics(subjectId)
+      : [];
+
+    return topics.map((topic) => {
+      const storedTopic = storedStatistics.find(
+        (statistic) => statistic.topic === topic,
+      );
+
+      return (
+        storedTopic ?? {
+          topic,
+          totalQuestions: 0,
+          correctAnswers: 0,
+          accuracy: 0,
+        }
+      );
+    });
+  }, [subjectId, topics, statisticsVersion]);
 
   const incorrectQuestionIds = useMemo(
     () => (subjectId ? getIncorrectQuestionIds(subjectId) : []),
@@ -699,6 +723,39 @@ export const PracticePage = () => {
         ? 0
         : Math.round((correctAnswers / sessionQuestions.length) * 100);
 
+    const topicResults = sessionQuestions.reduce<
+      Record<
+        string,
+        {
+          total: number;
+          correct: number;
+        }
+      >
+    >((results, question) => {
+      const storedAnswer = completedAnswers.find(
+        (answer) => answer.questionId === question.id,
+      );
+
+      if (!results[question.topic]) {
+        results[question.topic] = {
+          total: 0,
+          correct: 0,
+        };
+      }
+
+      results[question.topic].total += 1;
+
+      if (storedAnswer?.correct) {
+        results[question.topic].correct += 1;
+      }
+
+      return results;
+    }, {});
+
+    const sortedTopicResults = Object.entries(topicResults).sort(
+      ([topicA], [topicB]) => topicA.localeCompare(topicB, "nb"),
+    );
+
     const resultTitle =
       percentage === 100
         ? "Perfekt resultat!"
@@ -752,7 +809,49 @@ export const PracticePage = () => {
               <strong>{sessionQuestions.length - correctAnswers}</strong>
             </div>
           </div>
+          <div className="result-topic-section">
+            <div className="result-topic-heading">
+              <div>
+                <p className="page-label">Temaresultater</p>
+                <h2>Resultat per tema</h2>
+              </div>
 
+              <span>{sortedTopicResults.length} temaer</span>
+            </div>
+
+            <div className="result-topic-list">
+              {sortedTopicResults.map(([topic, topicResult]) => {
+                const topicPercentage = Math.round(
+                  (topicResult.correct / topicResult.total) * 100,
+                );
+
+                return (
+                  <div key={topic} className="result-topic-card">
+                    <div className="result-topic-card-header">
+                      <div>
+                        <strong>{topic}</strong>
+
+                        <span>
+                          {topicResult.correct} av {topicResult.total} riktige
+                        </span>
+                      </div>
+
+                      <strong>{topicPercentage}%</strong>
+                    </div>
+
+                    <div className="result-topic-progress">
+                      <div
+                        className="result-topic-progress-fill"
+                        style={{
+                          width: `${topicPercentage}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
           <div className="result-review">
             <div className="result-review-heading">
               <div>
@@ -1469,6 +1568,55 @@ export const PracticePage = () => {
           </button>
         </aside>
       </div>
+      <section className="topic-progress-section">
+        <div className="topic-progress-heading">
+          <div>
+            <p className="page-label">Fremgang</p>
+
+            <h2>Hvordan du ligger an i temaene</h2>
+
+            <p>Oversikten er basert på alle lagrede øvingsøkter.</p>
+          </div>
+
+          <span>
+            {topicStatistics.filter((topic) => topic.totalQuestions > 0).length}{" "}
+            av {topicStatistics.length} temaer øvd på
+          </span>
+        </div>
+
+        <div className="topic-progress-grid">
+          {topicStatistics.map((topicStatistic) => (
+            <article key={topicStatistic.topic} className="topic-progress-card">
+              <div className="topic-progress-card-header">
+                <div>
+                  <strong>{topicStatistic.topic}</strong>
+
+                  <span>
+                    {topicStatistic.totalQuestions === 0
+                      ? "Ingen svar ennå"
+                      : `${topicStatistic.correctAnswers} av ${topicStatistic.totalQuestions} riktige`}
+                  </span>
+                </div>
+
+                <strong>
+                  {topicStatistic.totalQuestions === 0
+                    ? "–"
+                    : `${topicStatistic.accuracy}%`}
+                </strong>
+              </div>
+
+              <div className="topic-progress-bar">
+                <div
+                  className="topic-progress-bar-fill"
+                  style={{
+                    width: `${topicStatistic.accuracy}%`,
+                  }}
+                />
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
     </main>
   );
 };
