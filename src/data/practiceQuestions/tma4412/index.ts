@@ -14,6 +14,7 @@ import { rekursjonQuestions } from "./rekursjon";
 import { induktivtDefinerteMengderQuestions } from "./induktivtDefinerteMengder";
 import { delbarhetOgPrimtallQuestions } from "./delbarhetOgPrimtall";
 import { diofantiskeLigningerQuestions } from "./diofantiskeLigninger";
+import { modulaereInverserQuestions } from "./modulaereInverser";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -31,4 +32,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...induktivtDefinerteMengderQuestions,
   ...delbarhetOgPrimtallQuestions,
   ...diofantiskeLigningerQuestions,
+  ...modulaereInverserQuestions,
 ];
