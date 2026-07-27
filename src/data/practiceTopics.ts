@@ -18,7 +18,7 @@ export const practiceTopics = {
     "Diskrete logaritmer",
     "RSA",
     "Kombinatorikk",
-    "Grafer",
+    "Grafteori",
     "Trær",
     "Automater",
     "Regulære uttrykk",

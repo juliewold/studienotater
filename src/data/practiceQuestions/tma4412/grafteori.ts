@@ -4,7 +4,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-1",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "easy",
     tags: ["grafer", "teori"],
@@ -29,7 +29,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-2",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "easy",
     tags: ["rettede-grafer"],
@@ -54,7 +54,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-3",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "easy",
     tags: ["urettede-grafer"],
@@ -79,7 +79,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-4",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["grad"],
@@ -103,7 +103,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-5",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["isomorfi"],
@@ -128,7 +128,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-6",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "number-answer",
     difficulty: "medium",
     tags: ["komplette-grafer", "kanter"],
@@ -146,7 +146,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-7",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "number-answer",
     difficulty: "medium",
     tags: ["komplette-grafer"],
@@ -163,7 +163,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-8",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["komplette-grafer"],
@@ -183,7 +183,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-9",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["komplette-grafer"],
@@ -208,7 +208,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-10",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "number-answer",
     difficulty: "medium",
     tags: ["rettede-grafer"],
@@ -227,7 +227,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-11",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["rettede-grafer"],
@@ -246,7 +246,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-12",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["grad"],
@@ -270,7 +270,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-13",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["gradfølge"],
@@ -294,7 +294,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-14",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["isomorfi"],
@@ -314,7 +314,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-15",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["isomorfi", "eksamen"],
@@ -340,7 +340,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-16",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["telling-av-grafer"],
@@ -365,7 +365,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-17",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "number-answer",
     difficulty: "medium",
     tags: ["telling-av-grafer"],
@@ -383,7 +383,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-18",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "number-answer",
     difficulty: "medium",
     tags: ["telling-av-grafer"],
@@ -401,7 +401,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-19",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["telling-av-grafer"],
@@ -421,7 +421,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-20",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["telling-av-grafer"],
@@ -442,7 +442,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-21",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["rettede-grafer"],
@@ -463,7 +463,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-22",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["telling-av-grafer"],
@@ -488,7 +488,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-23",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["stack", "eksamen"],
@@ -513,7 +513,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-24",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["strategi"],
@@ -538,7 +538,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-25",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["oppsummering"],
@@ -563,7 +563,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-26",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["håndtrykkslemma", "grad"],
@@ -588,7 +588,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-27",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "number-answer",
     difficulty: "medium",
     tags: ["håndtrykkslemma"],
@@ -605,7 +605,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-28",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "medium",
     tags: ["grad"],
@@ -625,7 +625,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-29",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["gradfølge"],
@@ -645,7 +645,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-30",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["isomorfi"],
@@ -670,7 +670,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-31",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["isomorfi"],
@@ -696,7 +696,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-32",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["komplette-grafer"],
@@ -715,7 +715,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-33",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "number-answer",
     difficulty: "medium",
     tags: ["komplette-grafer"],
@@ -732,7 +732,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-34",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["eksamen"],
@@ -758,7 +758,7 @@ export const grafteoriQuestions: PracticeQuestion[] = [
   {
     id: "graf-35",
     subjectId: "tma4412",
-    topic: "Grafer",
+    topic: "Grafteori",
     type: "multiple-choice",
     difficulty: "hard",
     tags: ["oppsummering"],
