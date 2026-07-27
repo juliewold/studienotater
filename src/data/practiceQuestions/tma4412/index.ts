@@ -8,6 +8,8 @@ import { bevisteknikkerQuestions } from "./bevisteknikker";
 import { induksjonQuestions } from "./induksjon";
 import { gcdQuestions } from "./gcd";
 import { kongruensQuestions } from "./kongruens";
+import { kombinatorikkQuestions } from "./kombinatorikk";
+import { grafteoriQuestions } from "./grafteori";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -19,4 +21,6 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...induksjonQuestions,
   ...gcdQuestions,
   ...kongruensQuestions,
+  ...kombinatorikkQuestions,
+  ...grafteoriQuestions,
 ];
