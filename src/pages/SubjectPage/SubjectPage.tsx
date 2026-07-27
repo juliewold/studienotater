@@ -5,6 +5,7 @@ import { SubjectFeatureCard } from "../../components/SubjectFeatureCard/SubjectF
 
 export const SubjectPage = () => {
   const { subjectId } = useParams();
+
   const subject = subjects.find(
     (currentSubject) => currentSubject.id === subjectId,
   );
@@ -16,6 +17,7 @@ export const SubjectPage = () => {
       </main>
     );
   }
+
   return (
     <main className="subject-page">
       <Link to="/" className="back-link">
@@ -39,6 +41,12 @@ export const SubjectPage = () => {
           title="Flashcards"
           description="Repeter med flashcards"
           link={`/fag/${subject.id}/flashcards`}
+        />
+
+        <SubjectFeatureCard
+          title="Oppgaver"
+          description="Øv med flervalg og tallsvar"
+          link={`/fag/${subject.id}/oppgaver`}
         />
 
         <SubjectFeatureCard

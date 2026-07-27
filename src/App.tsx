@@ -42,6 +42,7 @@ import { AdminVideosPage } from "./pages/AdminVideosPage/AdminVideosPage";
 import { AdminExamsPage } from "./pages/AdminExamsPage/AdminExamsPage";
 import { AdminStudyPlansPage } from "./pages/AdminStudyPlansPage/AdminStudyPlansPage";
 import { FolderPage } from "./pages/FolderPage/FolderPage";
+import { PracticePage } from "./pages/PracticePage/PracticePage";
 
 function App() {
   return (
@@ -129,6 +130,15 @@ function App() {
           element={
             <ProtectedRoute>
               <FlashcardsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fag/:subjectId/oppgaver"
+          element={
+            <ProtectedRoute>
+              <PracticePage />
             </ProtectedRoute>
           }
         />
