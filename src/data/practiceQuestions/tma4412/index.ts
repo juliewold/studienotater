@@ -7,6 +7,7 @@ import { predikatlogikkQuestions } from "./predikatlogikk";
 import { bevisteknikkerQuestions } from "./bevisteknikker";
 import { induksjonQuestions } from "./induksjon";
 import { gcdQuestions } from "./gcd";
+import { kongruensQuestions } from "./kongruens";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -17,4 +18,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...bevisteknikkerQuestions,
   ...induksjonQuestions,
   ...gcdQuestions,
+  ...kongruensQuestions,
 ];
