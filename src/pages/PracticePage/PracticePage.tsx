@@ -6,6 +6,7 @@ import {
   practiceQuestions,
   type PracticeQuestion,
 } from "../../data/practiceQuestions";
+import { MathText } from "../../components/MathText/MathText";
 
 type QuestionType = "mixed" | "multiple-choice" | "number-answer";
 
@@ -234,7 +235,9 @@ export const PracticePage = () => {
             />
           </div>
 
-          <h1>{currentQuestion.question}</h1>
+          <h1>
+            <MathText>{currentQuestion.question}</MathText>
+          </h1>
 
           {currentQuestion.type === "multiple-choice" && (
             <div className="answer-options">
@@ -254,7 +257,9 @@ export const PracticePage = () => {
                     onChange={() => setSelectedOption(option)}
                   />
 
-                  <span>{option}</span>
+                  <span>
+                    <MathText>{option}</MathText>
+                  </span>
                 </label>
               ))}
             </div>
@@ -287,10 +292,15 @@ export const PracticePage = () => {
               </strong>
 
               {!answerIsCorrect && (
-                <p>Riktig svar: {currentQuestion.correctAnswer}</p>
+                <p>
+                  Riktig svar:{" "}
+                  <MathText>{String(currentQuestion.correctAnswer)}</MathText>
+                </p>
               )}
 
-              <p>{currentQuestion.explanation}</p>
+              <p>
+                <MathText>{currentQuestion.explanation}</MathText>
+              </p>
             </div>
           )}
 
