@@ -18,6 +18,7 @@ import { modulaereInverserQuestions } from "./modulaereInverser";
 import { kinesiskeRestteoremQuestions } from "./kinesiskeRestteorem";
 import { diskreteLogaritmerQuestions } from "./diskreteLogaritmer";
 import { rsaQuestions } from "./rsa";
+import { traerQuestions } from "./traer";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -39,4 +40,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...kinesiskeRestteoremQuestions,
   ...diskreteLogaritmerQuestions,
   ...rsaQuestions,
+  ...traerQuestions,
 ];
