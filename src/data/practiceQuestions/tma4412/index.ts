@@ -5,6 +5,7 @@ import { relasjonerQuestions } from "./relasjoner";
 import { utsagnslogikkQuestions } from "./utsagnslogikk";
 import { predikatlogikkQuestions } from "./predikatlogikk";
 import { bevisteknikkerQuestions } from "./bevisteknikker";
+import { induksjonQuestions } from "./induksjon";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -13,4 +14,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...utsagnslogikkQuestions,
   ...predikatlogikkQuestions,
   ...bevisteknikkerQuestions,
+  ...induksjonQuestions,
 ];
