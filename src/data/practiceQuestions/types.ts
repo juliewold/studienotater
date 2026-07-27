@@ -3,6 +3,11 @@ export type QuestionDifficulty =
   | "medium"
   | "hard";
 
+export type ExamFrequency =
+  | "low"
+  | "medium"
+  | "high";
+
 export type BasePracticeQuestion = {
   id: string;
   subjectId: string;
@@ -12,7 +17,7 @@ export type BasePracticeQuestion = {
   // Metadata (valgfrie)
   tags?: string[];
   estimatedTime?: number;
-  examFrequency?: "low" | "medium" | "high";
+  examFrequency?: ExamFrequency;
 };
 
 export type MultipleChoiceQuestion =
