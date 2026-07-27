@@ -17,6 +17,7 @@ import { diofantiskeLigningerQuestions } from "./diofantiskeLigninger";
 import { modulaereInverserQuestions } from "./modulaereInverser";
 import { kinesiskeRestteoremQuestions } from "./kinesiskeRestteorem";
 import { diskreteLogaritmerQuestions } from "./diskreteLogaritmer";
+import { rsaQuestions } from "./rsa";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -37,4 +38,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...modulaereInverserQuestions,
   ...kinesiskeRestteoremQuestions,
   ...diskreteLogaritmerQuestions,
+  ...rsaQuestions,
 ];
