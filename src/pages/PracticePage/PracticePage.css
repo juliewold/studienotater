@@ -1170,3 +1170,195 @@
     padding: 0 1.15rem 1.15rem;
   }
 }
+
+/* -------------------------------------------------- */
+/* Påbegynt økt */
+/* -------------------------------------------------- */
+
+.active-session-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+  padding: 1.25rem 1.4rem;
+  background:
+    linear-gradient(
+      135deg,
+      #f4f5ff,
+      #ffffff
+    );
+  border: 1px solid #d9dcfa;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.045);
+}
+
+.active-session-information {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.active-session-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  background: #676ec8;
+  color: #ffffff;
+  border-radius: 13px;
+}
+
+.active-session-information .page-label {
+  margin: 0 0 0.2rem;
+  color: #676ec8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.active-session-information h2 {
+  margin: 0;
+  color: #1d2939;
+  font-size: 1.1rem;
+}
+
+.active-session-information p {
+  margin: 0.35rem 0 0.2rem;
+  color: #475467;
+  font-size: 0.9rem;
+}
+
+.active-session-information span {
+  color: #667085;
+  font-size: 0.78rem;
+}
+
+.active-session-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.active-session-continue {
+  width: auto;
+  min-height: 42px;
+  margin: 0;
+  padding: 0.7rem 1rem;
+}
+
+.active-session-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 42px;
+}
+
+/* -------------------------------------------------- */
+/* Administrer statistikk */
+/* -------------------------------------------------- */
+
+.practice-data-management {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.practice-data-management summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  color: #475467;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.practice-data-management summary::-webkit-details-marker {
+  display: none;
+}
+
+.practice-data-management summary svg {
+  transition: transform 0.18s ease;
+}
+
+.practice-data-management[open]
+  summary svg {
+  transform: rotate(180deg);
+}
+
+.practice-data-management-content {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0 0 1rem;
+}
+
+.practice-reset-topic {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.practice-reset-topic label {
+  color: #667085;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.practice-reset-topic select {
+  width: 100%;
+  padding: 0.7rem 0.75rem;
+  background: #ffffff;
+  color: #344054;
+  border: 1px solid #d0d5dd;
+  border-radius: 9px;
+  outline: none;
+  font: inherit;
+  font-size: 0.84rem;
+}
+
+.practice-reset-topic select:focus {
+  border-color: #7c83db;
+  box-shadow: 0 0 0 3px rgba(124, 131, 219, 0.12);
+}
+
+.reset-data-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.reset-all-data-button {
+  color: #b42318;
+  border-color: #fecdca;
+}
+
+.reset-all-data-button:hover {
+  background: #fef3f2;
+  border-color: #fda29b;
+}
+
+@media (max-width: 700px) {
+  .active-session-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .active-session-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .active-session-continue,
+  .active-session-delete {
+    width: 100%;
+  }
+}

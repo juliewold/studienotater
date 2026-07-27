@@ -67,53 +67,145 @@ const isStoredPracticeSession = (
   );
 };
 
-export const getPracticeSessions = (): StoredPracticeSession[] => {
-  try {
-    const storedValue = localStorage.getItem(PRACTICE_SESSIONS_KEY);
-
-    if (!storedValue) {
-      return [];
-    }
-
-    const parsedValue: unknown = JSON.parse(storedValue);
-
-    if (!Array.isArray(parsedValue)) {
-      return [];
-    }
-
-    return parsedValue.filter(isStoredPracticeSession);
-  } catch (error) {
-    console.error("Kunne ikke hente lagrede øvingsøkter:", error);
-
-    return [];
-  }
-};
-
-export const savePracticeSession = (session: StoredPracticeSession) => {
-  try {
-    const currentSessions = getPracticeSessions();
-
-    const updatedSessions = [session, ...currentSessions];
-
-    localStorage.setItem(
-      PRACTICE_SESSIONS_KEY,
-      JSON.stringify(updatedSessions),
-    );
-  } catch (error) {
-    console.error("Kunne ikke lagre øvingsøkten:", error);
-  }
-};
-
-export const getPracticeSessionsForSubject = (subjectId: string) => {
-  return getPracticeSessions().filter(
-    (session) => session.subjectId === subjectId,
+const writePracticeSessions = (
+  sessions: StoredPracticeSession[],
+) => {
+  localStorage.setItem(
+    PRACTICE_SESSIONS_KEY,
+    JSON.stringify(sessions),
   );
+};
+
+export const getPracticeSessions =
+  (): StoredPracticeSession[] => {
+    try {
+      const storedValue = localStorage.getItem(
+        PRACTICE_SESSIONS_KEY,
+      );
+
+      if (!storedValue) {
+        return [];
+      }
+
+      const parsedValue: unknown =
+        JSON.parse(storedValue);
+
+      if (!Array.isArray(parsedValue)) {
+        return [];
+      }
+
+      return parsedValue.filter(
+        isStoredPracticeSession,
+      );
+    } catch (error) {
+      console.error(
+        "Kunne ikke hente lagrede øvingsøkter:",
+        error,
+      );
+
+      return [];
+    }
+  };
+
+export const savePracticeSession = (
+  session: StoredPracticeSession,
+) => {
+  try {
+    const currentSessions =
+      getPracticeSessions();
+
+    const updatedSessions = [
+      session,
+      ...currentSessions,
+    ];
+
+    writePracticeSessions(updatedSessions);
+  } catch (error) {
+    console.error(
+      "Kunne ikke lagre øvingsøkten:",
+      error,
+    );
+  }
+};
+
+export const getPracticeSessionsForSubject = (
+  subjectId: string,
+) => {
+  return getPracticeSessions().filter(
+    (session) =>
+      session.subjectId === subjectId,
+  );
+};
+
+export const clearPracticeSessionsForTopic = (
+  subjectId: string,
+  topic: string,
+) => {
+  try {
+    const updatedSessions = getPracticeSessions()
+      .map((session) => {
+        if (session.subjectId !== subjectId) {
+          return session;
+        }
+
+        const remainingAnswers =
+          session.answers.filter(
+            (answer) => answer.topic !== topic,
+          );
+
+        return {
+          ...session,
+          totalQuestions:
+            remainingAnswers.length,
+          correctAnswers:
+            remainingAnswers.filter(
+              (answer) => answer.correct,
+            ).length,
+          answers: remainingAnswers,
+        };
+      })
+      .filter(
+        (session) =>
+          session.totalQuestions > 0,
+      );
+
+    writePracticeSessions(updatedSessions);
+  } catch (error) {
+    console.error(
+      "Kunne ikke nullstille temaet:",
+      error,
+    );
+  }
+};
+
+export const clearPracticeSessionsForSubject = (
+  subjectId: string,
+) => {
+  try {
+    const remainingSessions =
+      getPracticeSessions().filter(
+        (session) =>
+          session.subjectId !== subjectId,
+      );
+
+    writePracticeSessions(remainingSessions);
+  } catch (error) {
+    console.error(
+      "Kunne ikke nullstille faget:",
+      error,
+    );
+  }
 };
 
 export const clearPracticeSessions = () => {
   try {
-    localStorage.removeItem(PRACTICE_SESSIONS_KEY);
+    localStorage.removeItem(
+      PRACTICE_SESSIONS_KEY,
+    );
   } catch (error) {
-    console.error("Kunne ikke slette øvingshistorikken:", error);
+    console.error(
+      "Kunne ikke slette øvingshistorikken:",
+      error,
+    );
   }
 };

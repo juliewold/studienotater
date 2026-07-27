@@ -1,6 +1,6 @@
 import "./PracticePage.css";
 import { Link, useParams } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
   Check,
@@ -17,8 +17,9 @@ import {
   XCircle,
   Brain,
   ChevronDown,
+  History,
+  Trash2,
 } from "lucide-react";
-
 import { practiceTopics } from "../../data/practiceTopics";
 import {
   practiceQuestions,
@@ -27,10 +28,20 @@ import {
 import { MathText } from "../../components/MathText/MathText";
 import { getPracticeStatistics } from "../../services/practice/practiceStatistics";
 import {
+  clearPracticeSessions,
+  clearPracticeSessionsForSubject,
+  clearPracticeSessionsForTopic,
   savePracticeSession,
   type StoredPracticeAnswer,
 } from "../../services/practice/practiceStorage";
-
+import {
+  clearActivePracticeSession,
+  clearAllActivePracticeSessions,
+  getActivePracticeSession,
+  saveActivePracticeSession,
+  type ActivePracticeMode,
+  type StoredActivePracticeSession,
+} from "../../services/practice/practiceActiveSession";
 import { getIncorrectQuestionIds } from "../../services/practice/practiceMistakes";
 
 type QuestionType = "mixed" | "multiple-choice" | "number-answer";
@@ -115,7 +126,64 @@ export const PracticePage = () => {
     Set<string>
   >(new Set());
 
+  const [activeSession, setActiveSession] =
+    useState<StoredActivePracticeSession | null>(null);
+
+  const [practiceMode, setPracticeMode] =
+    useState<ActivePracticeMode>("standard");
+
+  const [resetTopic, setResetTopic] = useState("");
+
+  useEffect(() => {
+    if (!subjectId) {
+      setActiveSession(null);
+      return;
+    }
+
+    setActiveSession(getActivePracticeSession(subjectId));
+  }, [subjectId]);
+
+  useEffect(() => {
+    setResetTopic(topics[0] ?? "");
+  }, [subjectId]);
+
   const currentQuestion = sessionQuestions[currentQuestionIndex];
+
+  useEffect(() => {
+    if (stage !== "session" || !subjectId || sessionQuestions.length === 0) {
+      return;
+    }
+
+    const updatedActiveSession: StoredActivePracticeSession = {
+      subjectId,
+      questionIds: sessionQuestions.map((question) => question.id),
+      currentQuestionIndex,
+      selectedOption,
+      numberAnswer,
+      isAnswerChecked,
+      correctAnswers,
+      answers: sessionAnswers,
+      startedAt: sessionStartedAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      mode: practiceMode,
+    };
+
+    saveActivePracticeSession(updatedActiveSession);
+
+    setActiveSession(updatedActiveSession);
+  }, [
+    stage,
+    subjectId,
+    sessionQuestions,
+    currentQuestionIndex,
+    selectedOption,
+    numberAnswer,
+    isAnswerChecked,
+    correctAnswers,
+    sessionAnswers,
+    sessionStartedAt,
+    practiceMode,
+  ]);
 
   const availableQuestions = useMemo(() => {
     return practiceQuestions.filter((question) => {
@@ -239,6 +307,7 @@ export const PracticePage = () => {
     setSelectedOption("");
     setNumberAnswer("");
     setIsAnswerChecked(false);
+    setPracticeMode("standard");
     setStage("session");
     setExpandedResultQuestions(new Set());
   };
@@ -259,6 +328,7 @@ export const PracticePage = () => {
     setSelectedOption("");
     setNumberAnswer("");
     setIsAnswerChecked(false);
+    setPracticeMode("mistakes");
     setStage("session");
     setExpandedResultQuestions(new Set());
   };
@@ -336,6 +406,11 @@ export const PracticePage = () => {
         setStatisticsVersion((currentVersion) => currentVersion + 1);
       }
 
+      if (subjectId) {
+        clearActivePracticeSession(subjectId);
+        setActiveSession(null);
+      }
+
       setCorrectAnswers(finalCorrectAnswers);
       setStage("result");
       return;
@@ -374,6 +449,120 @@ export const PracticePage = () => {
 
       return updatedExpandedQuestions;
     });
+  };
+
+  const handleContinueActiveSession = () => {
+    if (!activeSession || !subjectId) {
+      return;
+    }
+
+    const restoredQuestions = activeSession.questionIds
+      .map((questionId) =>
+        practiceQuestions.find(
+          (question) =>
+            question.id === questionId && question.subjectId === subjectId,
+        ),
+      )
+      .filter(
+        (question): question is PracticeQuestion => question !== undefined,
+      );
+
+    if (restoredQuestions.length === 0) {
+      clearActivePracticeSession(subjectId);
+      setActiveSession(null);
+      return;
+    }
+
+    const safeQuestionIndex = Math.min(
+      activeSession.currentQuestionIndex,
+      restoredQuestions.length - 1,
+    );
+
+    setSessionQuestions(restoredQuestions);
+    setCurrentQuestionIndex(safeQuestionIndex);
+    setSelectedOption(activeSession.selectedOption);
+    setNumberAnswer(activeSession.numberAnswer);
+    setIsAnswerChecked(activeSession.isAnswerChecked);
+    setCorrectAnswers(activeSession.correctAnswers);
+    setSessionAnswers(activeSession.answers);
+    setCompletedAnswers([]);
+    setSessionStartedAt(activeSession.startedAt);
+    setPracticeMode(activeSession.mode);
+    setExpandedResultQuestions(new Set());
+    setStage("session");
+  };
+
+  const handleDeleteActiveSession = () => {
+    if (!subjectId) {
+      return;
+    }
+
+    const shouldDelete = window.confirm(
+      "Vil du slette den påbegynte økten? Svarene i denne økten vil ikke bli lagret i statistikken.",
+    );
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    clearActivePracticeSession(subjectId);
+    setActiveSession(null);
+  };
+
+  const handleResetTopic = () => {
+    if (!subjectId || !resetTopic) {
+      return;
+    }
+
+    const shouldReset = window.confirm(
+      `Vil du nullstille all statistikk for temaet «${resetTopic}»?`,
+    );
+
+    if (!shouldReset) {
+      return;
+    }
+
+    clearPracticeSessionsForTopic(subjectId, resetTopic);
+
+    setStatisticsVersion((currentVersion) => currentVersion + 1);
+  };
+
+  const handleResetSubject = () => {
+    if (!subjectId) {
+      return;
+    }
+
+    const shouldReset = window.confirm(
+      "Vil du nullstille all oppgavestatistikk og den påbegynte økten for dette faget?",
+    );
+
+    if (!shouldReset) {
+      return;
+    }
+
+    clearPracticeSessionsForSubject(subjectId);
+    clearActivePracticeSession(subjectId);
+
+    setActiveSession(null);
+
+    setStatisticsVersion((currentVersion) => currentVersion + 1);
+  };
+
+  const handleResetEverything = () => {
+    const shouldReset = window.confirm(
+      "Vil du slette all oppgavehistorikk og alle påbegynte økter i alle fag? Dette kan ikke angres.",
+    );
+
+    if (!shouldReset) {
+      return;
+    }
+
+    clearPracticeSessions();
+    clearAllActivePracticeSessions();
+
+    setActiveSession(null);
+
+    setStatisticsVersion((currentVersion) => currentVersion + 1);
   };
 
   if (stage === "session" && currentQuestion) {
@@ -729,6 +918,55 @@ export const PracticePage = () => {
           </p>
         </div>
       </section>
+
+      {activeSession && (
+        <section className="active-session-card">
+          <div className="active-session-information">
+            <div className="active-session-icon">
+              <History size={22} />
+            </div>
+
+            <div>
+              <p className="page-label">Påbegynt økt</p>
+
+              <h2>Fortsett der du slapp</h2>
+
+              <p>
+                Du har fullført {activeSession.answers.length} av{" "}
+                {activeSession.questionIds.length} oppgaver.
+              </p>
+
+              <span>
+                Sist lagret{" "}
+                {new Date(activeSession.updatedAt).toLocaleString("nb-NO", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+              </span>
+            </div>
+          </div>
+
+          <div className="active-session-actions">
+            <button
+              type="button"
+              className="start-practice-button active-session-continue"
+              onClick={handleContinueActiveSession}
+            >
+              <Play size={18} />
+              Fortsett økten
+            </button>
+
+            <button
+              type="button"
+              className="secondary-button active-session-delete"
+              onClick={handleDeleteActiveSession}
+            >
+              <Trash2 size={17} />
+              Slett økten
+            </button>
+          </div>
+        </section>
+      )}
 
       <div className="practice-setup-layout">
         <div className="practice-settings">
@@ -1165,6 +1403,57 @@ export const PracticePage = () => {
               <strong>{statistics.bestSession}%</strong>
             </div>
           </div>
+
+          <details className="practice-data-management">
+            <summary>
+              <span>Administrer statistikk</span>
+              <ChevronDown size={17} />
+            </summary>
+
+            <div className="practice-data-management-content">
+              <div className="practice-reset-topic">
+                <label htmlFor="reset-practice-topic">Nullstill ett tema</label>
+
+                <select
+                  id="reset-practice-topic"
+                  value={resetTopic}
+                  onChange={(event) => setResetTopic(event.target.value)}
+                >
+                  {topics.map((topic) => (
+                    <option key={topic} value={topic}>
+                      {topic}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  className="secondary-button reset-data-button"
+                  disabled={!resetTopic}
+                  onClick={handleResetTopic}
+                >
+                  Nullstill valgt tema
+                </button>
+              </div>
+
+              <button
+                type="button"
+                className="secondary-button reset-data-button"
+                onClick={handleResetSubject}
+              >
+                Nullstill hele faget
+              </button>
+
+              <button
+                type="button"
+                className="secondary-button reset-data-button reset-all-data-button"
+                onClick={handleResetEverything}
+              >
+                <Trash2 size={16} />
+                Slett all oppgavehistorikk
+              </button>
+            </div>
+          </details>
 
           <button
             type="button"
