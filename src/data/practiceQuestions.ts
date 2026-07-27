@@ -1,8 +1,11 @@
+export type QuestionDifficulty = "easy" | "medium" | "hard";
+
 export type MultipleChoiceQuestion = {
   id: string;
   subjectId: string;
   topic: string;
   type: "multiple-choice";
+  difficulty: QuestionDifficulty;
   question: string;
   options: string[];
   correctAnswer: string;
@@ -14,14 +17,13 @@ export type NumberAnswerQuestion = {
   subjectId: string;
   topic: string;
   type: "number-answer";
+  difficulty: QuestionDifficulty;
   question: string;
   correctAnswer: number;
   explanation: string;
 };
 
-export type PracticeQuestion =
-  | MultipleChoiceQuestion
-  | NumberAnswerQuestion;
+export type PracticeQuestion = MultipleChoiceQuestion | NumberAnswerQuestion;
 
 export const practiceQuestions: PracticeQuestion[] = [
   {
@@ -29,8 +31,8 @@ export const practiceQuestions: PracticeQuestion[] = [
     subjectId: "tma4412",
     topic: "Mengder",
     type: "multiple-choice",
-    question:
-      "Hva er kardinaliteten til mengden {1, 2, 3, 4, 5}?",
+    difficulty: "easy",
+    question: "Hva er kardinaliteten til mengden {1, 2, 3, 4, 5}?",
     options: ["4", "5", "6", "7"],
     correctAnswer: "5",
     explanation:
@@ -41,6 +43,7 @@ export const practiceQuestions: PracticeQuestion[] = [
     subjectId: "tma4412",
     topic: "Mengder",
     type: "number-answer",
+    difficulty: "easy",
     question:
       "Hvor mange elementer har potensmengden til en mengde med 3 elementer?",
     correctAnswer: 8,
@@ -52,14 +55,9 @@ export const practiceQuestions: PracticeQuestion[] = [
     subjectId: "tma4412",
     topic: "Relasjoner",
     type: "multiple-choice",
-    question:
-      "Hvilken egenskap beskrives av utsagnet: For alle a gjelder aRa?",
-    options: [
-      "Refleksivitet",
-      "Symmetri",
-      "Antisymmetri",
-      "Transitivitet",
-    ],
+    difficulty: "easy",
+    question: "Hvilken egenskap beskrives av utsagnet: For alle a gjelder aRa?",
+    options: ["Refleksivitet", "Symmetri", "Antisymmetri", "Transitivitet"],
     correctAnswer: "Refleksivitet",
     explanation:
       "En relasjon er refleksiv når hvert element er relatert til seg selv.",
@@ -69,19 +67,19 @@ export const practiceQuestions: PracticeQuestion[] = [
     subjectId: "tma4412",
     topic: "GCD og Euklids algoritme",
     type: "number-answer",
+    difficulty: "easy",
     question: "Finn gcd(24, 36).",
     correctAnswer: 12,
-    explanation:
-      "Den største felles divisoren til 24 og 36 er 12.",
+    explanation: "Den største felles divisoren til 24 og 36 er 12.",
   },
   {
     id: "kongruens-1",
     subjectId: "tma4412",
     topic: "Kongruensregning",
     type: "number-answer",
+    difficulty: "easy",
     question: "Regn ut 17 mod 5.",
     correctAnswer: 2,
-    explanation:
-      "17 = 3 · 5 + 2, så resten er 2.",
+    explanation: "17 = 3 · 5 + 2, så resten er 2.",
   },
 ];
