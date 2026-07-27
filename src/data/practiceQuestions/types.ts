@@ -1,23 +1,37 @@
-export type QuestionDifficulty = "easy" | "medium" | "hard";
+export type QuestionDifficulty =
+  | "easy"
+  | "medium"
+  | "hard";
 
-type BasePracticeQuestion = {
+export type BasePracticeQuestion = {
   id: string;
   subjectId: string;
   topic: string;
   difficulty: QuestionDifficulty;
-  question: string;
-  explanation: string;
+
+  // Metadata (valgfrie)
+  tags?: string[];
+  estimatedTime?: number;
+  examFrequency?: "low" | "medium" | "high";
 };
 
-export type MultipleChoiceQuestion = BasePracticeQuestion & {
-  type: "multiple-choice";
-  options: string[];
-  correctAnswer: string;
-};
+export type MultipleChoiceQuestion =
+  BasePracticeQuestion & {
+    type: "multiple-choice";
+    question: string;
+    options: string[];
+    correctAnswer: string;
+    explanation: string;
+  };
 
-export type NumberAnswerQuestion = BasePracticeQuestion & {
-  type: "number-answer";
-  correctAnswer: number;
-};
+export type NumberAnswerQuestion =
+  BasePracticeQuestion & {
+    type: "number-answer";
+    question: string;
+    correctAnswer: number;
+    explanation: string;
+  };
 
-export type PracticeQuestion = MultipleChoiceQuestion | NumberAnswerQuestion;
+export type PracticeQuestion =
+  | MultipleChoiceQuestion
+  | NumberAnswerQuestion;
