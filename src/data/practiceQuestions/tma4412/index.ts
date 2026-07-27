@@ -15,6 +15,7 @@ import { induktivtDefinerteMengderQuestions } from "./induktivtDefinerteMengder"
 import { delbarhetOgPrimtallQuestions } from "./delbarhetOgPrimtall";
 import { diofantiskeLigningerQuestions } from "./diofantiskeLigninger";
 import { modulaereInverserQuestions } from "./modulaereInverser";
+import { kinesiskeRestteoremQuestions } from "./kinesiskeRestteorem";
 
 export const tma4412Questions: PracticeQuestion[] = [
   ...mengderQuestions,
@@ -33,4 +34,5 @@ export const tma4412Questions: PracticeQuestion[] = [
   ...delbarhetOgPrimtallQuestions,
   ...diofantiskeLigningerQuestions,
   ...modulaereInverserQuestions,
+  ...kinesiskeRestteoremQuestions,
 ];
