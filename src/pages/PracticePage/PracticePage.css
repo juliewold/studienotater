@@ -1596,3 +1596,35 @@
   font-size: 0.9rem;
   opacity: 0.7;
 }
+
+.topic-progress-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.topic-progress-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.topic-progress-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.topic-progress-group-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.topic-progress-group-header span {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.9rem;
+}

@@ -140,6 +140,18 @@ export const PracticePage = () => {
     });
   }, [subjectId, topics, statisticsVersion]);
 
+  const groupedTopicStatistics = topicGroups.map((group) => ({
+    ...group,
+    statistics: group.topics
+      .map((topic) =>
+        topicStatistics.find((statistic) => statistic.topic === topic),
+      )
+      .filter(
+        (statistic): statistic is (typeof topicStatistics)[number] =>
+          statistic !== undefined,
+      ),
+  }));
+
   const incorrectQuestionIds = useMemo(
     () => (subjectId ? getIncorrectQuestionIds(subjectId) : []),
     [subjectId, statisticsVersion],
@@ -1637,36 +1649,57 @@ export const PracticePage = () => {
           </span>
         </div>
 
-        <div className="topic-progress-grid">
-          {topicStatistics.map((topicStatistic) => (
-            <article key={topicStatistic.topic} className="topic-progress-card">
-              <div className="topic-progress-card-header">
-                <div>
-                  <strong>{topicStatistic.topic}</strong>
+        <div className="topic-progress-groups">
+          {groupedTopicStatistics.map((group) => (
+            <div key={group.title} className="topic-progress-group">
+              <div className="topic-progress-group-header">
+                <h3>{group.title}</h3>
 
-                  <span>
-                    {topicStatistic.totalQuestions === 0
-                      ? "Ingen svar ennå"
-                      : `${topicStatistic.correctAnswers} av ${topicStatistic.totalQuestions} riktige`}
-                  </span>
-                </div>
-
-                <strong>
-                  {topicStatistic.totalQuestions === 0
-                    ? "–"
-                    : `${topicStatistic.accuracy}%`}
-                </strong>
+                <span>
+                  {
+                    group.statistics.filter((topic) => topic.totalQuestions > 0)
+                      .length
+                  }{" "}
+                  av {group.statistics.length} øvd på
+                </span>
               </div>
 
-              <div className="topic-progress-bar">
-                <div
-                  className="topic-progress-bar-fill"
-                  style={{
-                    width: `${topicStatistic.accuracy}%`,
-                  }}
-                />
+              <div className="topic-progress-grid">
+                {group.statistics.map((topicStatistic) => (
+                  <article
+                    key={topicStatistic.topic}
+                    className="topic-progress-card"
+                  >
+                    <div className="topic-progress-card-header">
+                      <div>
+                        <strong>{topicStatistic.topic}</strong>
+
+                        <span>
+                          {topicStatistic.totalQuestions === 0
+                            ? "Ingen svar ennå"
+                            : `${topicStatistic.correctAnswers} av ${topicStatistic.totalQuestions} riktige`}
+                        </span>
+                      </div>
+
+                      <strong>
+                        {topicStatistic.totalQuestions === 0
+                          ? "–"
+                          : `${topicStatistic.accuracy}%`}
+                      </strong>
+                    </div>
+
+                    <div className="topic-progress-bar">
+                      <div
+                        className="topic-progress-bar-fill"
+                        style={{
+                          width: `${topicStatistic.accuracy}%`,
+                        }}
+                      />
+                    </div>
+                  </article>
+                ))}
               </div>
-            </article>
+            </div>
           ))}
         </div>
       </section>
