@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   XCircle,
   Brain,
+  ChevronDown,
 } from "lucide-react";
 
 import { practiceTopics } from "../../data/practiceTopics";
@@ -109,6 +110,10 @@ export const PracticePage = () => {
   const [completedAnswers, setCompletedAnswers] = useState<
     StoredPracticeAnswer[]
   >([]);
+
+  const [expandedResultQuestions, setExpandedResultQuestions] = useState<
+    Set<string>
+  >(new Set());
 
   const currentQuestion = sessionQuestions[currentQuestionIndex];
 
@@ -235,6 +240,7 @@ export const PracticePage = () => {
     setNumberAnswer("");
     setIsAnswerChecked(false);
     setStage("session");
+    setExpandedResultQuestions(new Set());
   };
 
   const handleStartMistakePractice = () => {
@@ -254,6 +260,7 @@ export const PracticePage = () => {
     setNumberAnswer("");
     setIsAnswerChecked(false);
     setStage("session");
+    setExpandedResultQuestions(new Set());
   };
 
   const isCurrentAnswerCorrect = () => {
@@ -352,6 +359,21 @@ export const PracticePage = () => {
     setNumberAnswer("");
     setIsAnswerChecked(false);
     setCorrectAnswers(0);
+    setExpandedResultQuestions(new Set());
+  };
+
+  const toggleResultQuestion = (questionId: string) => {
+    setExpandedResultQuestions((currentExpandedQuestions) => {
+      const updatedExpandedQuestions = new Set(currentExpandedQuestions);
+
+      if (updatedExpandedQuestions.has(questionId)) {
+        updatedExpandedQuestions.delete(questionId);
+      } else {
+        updatedExpandedQuestions.add(questionId);
+      }
+
+      return updatedExpandedQuestions;
+    });
   };
 
   if (stage === "session" && currentQuestion) {
@@ -550,7 +572,29 @@ export const PracticePage = () => {
                 <h2>Se gjennom oppgavene</h2>
               </div>
 
-              <span>{sessionQuestions.length} oppgaver</span>
+              <div className="result-review-actions">
+                <span>{sessionQuestions.length} oppgaver</span>
+
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() =>
+                    setExpandedResultQuestions(
+                      new Set(sessionQuestions.map((question) => question.id)),
+                    )
+                  }
+                >
+                  Åpne alle
+                </button>
+
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setExpandedResultQuestions(new Set())}
+                >
+                  Lukk alle
+                </button>
+              </div>
             </div>
 
             <div className="result-question-list">
@@ -561,6 +605,8 @@ export const PracticePage = () => {
 
                 const answerWasCorrect = storedAnswer?.correct ?? false;
 
+                const isExpanded = expandedResultQuestions.has(question.id);
+
                 return (
                   <article
                     key={question.id}
@@ -568,53 +614,80 @@ export const PracticePage = () => {
                       answerWasCorrect
                         ? "result-question-correct"
                         : "result-question-wrong"
-                    }`}
+                    } ${isExpanded ? "result-question-expanded" : ""}`}
                   >
-                    <div className="result-question-header">
-                      <div>
-                        {answerWasCorrect ? (
-                          <CheckCircle2 size={21} />
-                        ) : (
-                          <XCircle size={21} />
-                        )}
+                    <button
+                      type="button"
+                      className="result-question-toggle"
+                      aria-expanded={isExpanded}
+                      onClick={() => toggleResultQuestion(question.id)}
+                    >
+                      <div className="result-question-header">
+                        <div>
+                          {answerWasCorrect ? (
+                            <CheckCircle2 size={21} />
+                          ) : (
+                            <XCircle size={21} />
+                          )}
 
-                        <strong>Oppgave {index + 1}</strong>
+                          <strong>Oppgave {index + 1}</strong>
+                        </div>
+
+                        <div className="result-question-meta">
+                          <span>{question.topic}</span>
+
+                          {isExpanded ? (
+                            <ChevronDown size={19} />
+                          ) : (
+                            <ChevronRight size={19} />
+                          )}
+                        </div>
                       </div>
 
-                      <span>{question.topic}</span>
-                    </div>
+                      <h3>
+                        <MathText>{question.question}</MathText>
+                      </h3>
+                    </button>
 
-                    <h3>
-                      <MathText>{question.question}</MathText>
-                    </h3>
+                    {isExpanded && (
+                      <div className="result-question-content">
+                        <div className="result-answer-grid">
+                          <div
+                            className={
+                              answerWasCorrect
+                                ? "result-user-answer-correct"
+                                : "result-user-answer-wrong"
+                            }
+                          >
+                            <span>Ditt svar</span>
 
-                    <div className="result-answer-grid">
-                      <div>
-                        <span>Ditt svar</span>
+                            <strong>
+                              <MathText>
+                                {storedAnswer?.userAnswer || "Ikke besvart"}
+                              </MathText>
+                            </strong>
+                          </div>
 
-                        <strong>
-                          <MathText>
-                            {storedAnswer?.userAnswer || "Ikke besvart"}
-                          </MathText>
-                        </strong>
+                          <div className="result-correct-answer">
+                            <span>Riktig svar</span>
+
+                            <strong>
+                              <MathText>
+                                {String(question.correctAnswer)}
+                              </MathText>
+                            </strong>
+                          </div>
+                        </div>
+
+                        <div className="result-explanation">
+                          <strong>Forklaring</strong>
+
+                          <p>
+                            <MathText>{question.explanation}</MathText>
+                          </p>
+                        </div>
                       </div>
-
-                      <div>
-                        <span>Riktig svar</span>
-
-                        <strong>
-                          <MathText>{String(question.correctAnswer)}</MathText>
-                        </strong>
-                      </div>
-                    </div>
-
-                    <div className="result-explanation">
-                      <strong>Forklaring</strong>
-
-                      <p>
-                        <MathText>{question.explanation}</MathText>
-                      </p>
-                    </div>
+                    )}
                   </article>
                 );
               })}
