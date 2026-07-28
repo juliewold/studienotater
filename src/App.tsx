@@ -39,6 +39,7 @@ import { AdminPdfsPage } from "./pages/AdminPdfsPage/AdminPdfsPage";
 import { AdminNotesPage } from "./pages/AdminNotesPage/AdminNotesPage";
 import { AdminFlashcardsPage } from "./pages/AdminFlashcardsPage/AdminFlashcardsPage";
 import { AdminVideosPage } from "./pages/AdminVideosPage/AdminVideosPage";
+import { AdminVideoStructurePage } from "./pages/AdminVideoStructurePage/AdminVideoStructurePage";
 import { AdminExamsPage } from "./pages/AdminExamsPage/AdminExamsPage";
 import { AdminStudyPlansPage } from "./pages/AdminStudyPlansPage/AdminStudyPlansPage";
 import { FolderPage } from "./pages/FolderPage/FolderPage";
@@ -373,6 +374,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminVideosPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/video-struktur"
+          element={
+            <AdminRoute>
+              <AdminVideoStructurePage />
             </AdminRoute>
           }
         />

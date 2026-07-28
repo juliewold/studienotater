@@ -36,6 +36,12 @@ export const AdminPage = () => {
           <p>Legg til og administrer videoer.</p>
         </Link>
 
+        <Link to="/admin/video-struktur" className="admin-card">
+          <h2>Videostruktur</h2>
+
+          <p>Administrer temaer og undertemaer for videoer.</p>
+        </Link>
+
         <Link to="/admin/flashcards" className="admin-card">
           <h2>Flashcards</h2>
           <p>Legg til og administrer flashcards.</p>

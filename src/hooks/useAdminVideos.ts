@@ -1,48 +1,55 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type SyntheticEvent,
-} from "react";
+import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
 import { subjects } from "../data/subjects";
 import {
   createVideo,
   deleteVideo,
+  getVideoSubtopicsByTopic,
+  getVideoTopicsBySubject,
   getVideosBySubject,
   updateVideo,
   type DatabaseVideo,
+  type DatabaseVideoSubtopic,
+  type DatabaseVideoTopic,
 } from "../services/videosService";
 
 export const useAdminVideos = () => {
   const [subjectId, setSubjectId] = useState("");
-  const [topic, setTopic] = useState("");
-  const [subtopic, setSubtopic] = useState("");
+  const [topicId, setTopicId] = useState("");
+  const [subtopicId, setSubtopicId] = useState("");
+
   const [title, setTitle] = useState("");
   const [youtubeId, setYoutubeId] = useState("");
   const [sortOrder, setSortOrder] = useState("1");
 
-  const [editingVideo, setEditingVideo] =
-    useState<DatabaseVideo | null>(null);
+  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
 
-  const [uploadedVideos, setUploadedVideos] = useState<DatabaseVideo[]>(
-    [],
-  );
+  const [editingVideo, setEditingVideo] = useState<DatabaseVideo | null>(null);
+
+  const [uploadedVideos, setUploadedVideos] = useState<DatabaseVideo[]>([]);
+
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
+  const [isLoadingTopics, setIsLoadingTopics] = useState(false);
+  const [isLoadingSubtopics, setIsLoadingSubtopics] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [deletingVideoId, setDeletingVideoId] = useState<
-    string | null
-  >(null);
+
+  const [deletingVideoId, setDeletingVideoId] = useState<string | null>(null);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const resetForm = () => {
     setSubjectId("");
-    setTopic("");
-    setSubtopic("");
+    setTopicId("");
+    setSubtopicId("");
+
+    setTopics([]);
+    setSubtopics([]);
+
     setTitle("");
     setYoutubeId("");
     setSortOrder("1");
+
     setEditingVideo(null);
   };
 
@@ -52,22 +59,26 @@ export const useAdminVideos = () => {
 
     try {
       const videosBySubject = await Promise.all(
-        subjects.map((subject) =>
-          getVideosBySubject(subject.id),
-        ),
+        subjects.map((subject) => getVideosBySubject(subject.id)),
       );
 
       const allUploadedVideos = videosBySubject
         .flat()
         .sort((firstVideo, secondVideo) => {
-          const subjectComparison =
-            firstVideo.subjectId.localeCompare(
-              secondVideo.subjectId,
-              "nb",
-            );
+          const subjectComparison = firstVideo.subjectId.localeCompare(
+            secondVideo.subjectId,
+            "nb",
+          );
 
           if (subjectComparison !== 0) {
             return subjectComparison;
+          }
+
+          const topicOrderComparison =
+            firstVideo.topicOrder - secondVideo.topicOrder;
+
+          if (topicOrderComparison !== 0) {
+            return topicOrderComparison;
           }
 
           const topicComparison = firstVideo.topic.localeCompare(
@@ -79,11 +90,17 @@ export const useAdminVideos = () => {
             return topicComparison;
           }
 
-          const subtopicComparison =
-            firstVideo.subtopic.localeCompare(
-              secondVideo.subtopic,
-              "nb",
-            );
+          const subtopicOrderComparison =
+            firstVideo.subtopicOrder - secondVideo.subtopicOrder;
+
+          if (subtopicOrderComparison !== 0) {
+            return subtopicOrderComparison;
+          }
+
+          const subtopicComparison = firstVideo.subtopic.localeCompare(
+            secondVideo.subtopic,
+            "nb",
+          );
 
           if (subtopicComparison !== 0) {
             return subtopicComparison;
@@ -101,17 +118,77 @@ export const useAdminVideos = () => {
     }
   }, []);
 
+  const loadTopics = useCallback(async (selectedSubjectId: string) => {
+    if (!selectedSubjectId) {
+      setTopics([]);
+      return;
+    }
+
+    setIsLoadingTopics(true);
+
+    try {
+      const loadedTopics = await getVideoTopicsBySubject(selectedSubjectId);
+
+      setTopics(loadedTopics);
+    } catch (error) {
+      console.error("Kunne ikke hente temaer:", error);
+      setTopics([]);
+      setErrorMessage("Kunne ikke hente temaene.");
+    } finally {
+      setIsLoadingTopics(false);
+    }
+  }, []);
+
+  const loadSubtopics = useCallback(async (selectedTopicId: string) => {
+    if (!selectedTopicId) {
+      setSubtopics([]);
+      return;
+    }
+
+    setIsLoadingSubtopics(true);
+
+    try {
+      const loadedSubtopics = await getVideoSubtopicsByTopic(selectedTopicId);
+
+      setSubtopics(loadedSubtopics);
+    } catch (error) {
+      console.error("Kunne ikke hente undertemaer:", error);
+      setSubtopics([]);
+      setErrorMessage("Kunne ikke hente undertemaene.");
+    } finally {
+      setIsLoadingSubtopics(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadUploadedVideos();
   }, [loadUploadedVideos]);
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubjectChange = async (newSubjectId: string) => {
+    setSubjectId(newSubjectId);
+    setTopicId("");
+    setSubtopicId("");
+    setSubtopics([]);
+
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    await loadTopics(newSubjectId);
+  };
+
+  const handleTopicChange = async (newTopicId: string) => {
+    setTopicId(newTopicId);
+    setSubtopicId("");
+
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    await loadSubtopics(newTopicId);
+  };
+
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const trimmedTopic = topic.trim();
-    const trimmedSubtopic = subtopic.trim();
     const trimmedTitle = title.trim();
     const trimmedYoutubeId = youtubeId.trim();
     const parsedSortOrder = Number(sortOrder);
@@ -119,9 +196,34 @@ export const useAdminVideos = () => {
     setErrorMessage("");
     setSuccessMessage("");
 
+    if (!subjectId) {
+      setErrorMessage("Du må velge et fag.");
+      return;
+    }
+
+    if (!topicId) {
+      setErrorMessage("Du må velge et overordnet tema.");
+      return;
+    }
+
+    if (!subtopicId) {
+      setErrorMessage("Du må velge et undertema.");
+      return;
+    }
+
+    if (!trimmedTitle) {
+      setErrorMessage("Du må skrive inn en videotittel.");
+      return;
+    }
+
+    if (!trimmedYoutubeId) {
+      setErrorMessage("Du må skrive inn en YouTube-ID.");
+      return;
+    }
+
     if (!Number.isInteger(parsedSortOrder) || parsedSortOrder < 1) {
       setErrorMessage(
-        "Rekkefølgen må være et heltall som er 1 eller høyere.",
+        "Video-rekkefølgen må være et heltall som er 1 eller høyere.",
       );
       return;
     }
@@ -132,8 +234,7 @@ export const useAdminVideos = () => {
       if (editingVideo) {
         await updateVideo(
           editingVideo.id,
-          trimmedTopic,
-          trimmedSubtopic,
+          subtopicId,
           trimmedTitle,
           trimmedYoutubeId,
           parsedSortOrder,
@@ -147,8 +248,7 @@ export const useAdminVideos = () => {
 
       await createVideo(
         subjectId,
-        trimmedTopic,
-        trimmedSubtopic,
+        subtopicId,
         trimmedTitle,
         trimmedYoutubeId,
         parsedSortOrder,
@@ -175,17 +275,31 @@ export const useAdminVideos = () => {
     }
   };
 
-  const handleEdit = (video: DatabaseVideo) => {
+  const handleEdit = async (video: DatabaseVideo) => {
     setEditingVideo(video);
+
     setSubjectId(video.subjectId);
-    setTopic(video.topic);
-    setSubtopic(video.subtopic);
+    setTopicId(video.topicId);
+    setSubtopicId(video.subtopicId);
+
     setTitle(video.title);
     setYoutubeId(video.youtubeId);
     setSortOrder(String(video.sortOrder));
 
     setErrorMessage("");
     setSuccessMessage("");
+
+    try {
+      const loadedTopics = await getVideoTopicsBySubject(video.subjectId);
+
+      const loadedSubtopics = await getVideoSubtopicsByTopic(video.topicId);
+
+      setTopics(loadedTopics);
+      setSubtopics(loadedSubtopics);
+    } catch (error) {
+      console.error("Kunne ikke hente temaer ved redigering:", error);
+      setErrorMessage("Kunne ikke hente temaene for videoen.");
+    }
 
     window.scrollTo({
       top: 0,
@@ -216,9 +330,7 @@ export const useAdminVideos = () => {
       await deleteVideo(video.id);
 
       setUploadedVideos((currentVideos) =>
-        currentVideos.filter(
-          (currentVideo) => currentVideo.id !== video.id,
-        ),
+        currentVideos.filter((currentVideo) => currentVideo.id !== video.id),
       );
 
       if (editingVideo?.id === video.id) {
@@ -236,13 +348,11 @@ export const useAdminVideos = () => {
 
   return {
     subjectId,
-    setSubjectId,
+    topicId,
+    subtopicId,
 
-    topic,
-    setTopic,
-
-    subtopic,
-    setSubtopic,
+    topics,
+    subtopics,
 
     title,
     setTitle,
@@ -257,11 +367,17 @@ export const useAdminVideos = () => {
 
     uploadedVideos,
     isLoadingVideos,
+    isLoadingTopics,
+    isLoadingSubtopics,
     isSaving,
     deletingVideoId,
 
     errorMessage,
     successMessage,
+
+    handleSubjectChange,
+    handleTopicChange,
+    setSubtopicId,
 
     handleSubmit,
     handleEdit,

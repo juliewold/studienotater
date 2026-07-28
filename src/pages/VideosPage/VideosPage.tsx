@@ -9,11 +9,13 @@ import { ResourceProgress } from "../../components/ResourceProgress/ResourceProg
 
 type SubtopicGroup = {
   subtopic: string;
+  subtopicOrder: number;
   videos: DatabaseVideo[];
 };
 
 type TopicGroup = {
   topic: string;
+  topicOrder: number;
   subtopics: SubtopicGroup[];
 };
 
@@ -57,36 +59,84 @@ export const VideosPage = () => {
   const groupedVideos = useMemo<TopicGroup[]>(() => {
     const topics = new Map<
       string,
-      Map<string, DatabaseVideo[]>
+      {
+        topicOrder: number;
+        subtopics: Map<
+          string,
+          {
+            subtopicOrder: number;
+            videos: DatabaseVideo[];
+          }
+        >;
+      }
     >();
 
     videos.forEach((video) => {
-      const topicGroup =
-        topics.get(video.topic) ??
-        new Map<string, DatabaseVideo[]>();
+      const topicGroup = topics.get(video.topic) ?? {
+        topicOrder: video.topicOrder,
+        subtopics: new Map(),
+      };
 
-      const subtopicVideos =
-        topicGroup.get(video.subtopic) ?? [];
+      const subtopicGroup = topicGroup.subtopics.get(
+        video.subtopic,
+      ) ?? {
+        subtopicOrder: video.subtopicOrder,
+        videos: [],
+      };
 
-      subtopicVideos.push(video);
-      topicGroup.set(video.subtopic, subtopicVideos);
+      subtopicGroup.videos.push(video);
+
+      topicGroup.subtopics.set(
+        video.subtopic,
+        subtopicGroup,
+      );
+
       topics.set(video.topic, topicGroup);
     });
 
-    return Array.from(topics.entries()).map(
-      ([topic, subtopicMap]) => ({
+    return Array.from(topics.entries())
+      .map(([topic, topicGroup]) => ({
         topic,
-        subtopics: Array.from(subtopicMap.entries()).map(
-          ([subtopic, subtopicVideos]) => ({
+        topicOrder: topicGroup.topicOrder,
+        subtopics: Array.from(
+          topicGroup.subtopics.entries(),
+        )
+          .map(([subtopic, subtopicGroup]) => ({
             subtopic,
-            videos: [...subtopicVideos].sort(
+            subtopicOrder: subtopicGroup.subtopicOrder,
+            videos: [...subtopicGroup.videos].sort(
               (firstVideo, secondVideo) =>
                 firstVideo.sortOrder - secondVideo.sortOrder,
             ),
+          }))
+          .sort((firstSubtopic, secondSubtopic) => {
+            const orderComparison =
+              firstSubtopic.subtopicOrder -
+              secondSubtopic.subtopicOrder;
+
+            if (orderComparison !== 0) {
+              return orderComparison;
+            }
+
+            return firstSubtopic.subtopic.localeCompare(
+              secondSubtopic.subtopic,
+              "nb",
+            );
           }),
-        ),
-      }),
-    );
+      }))
+      .sort((firstTopic, secondTopic) => {
+        const orderComparison =
+          firstTopic.topicOrder - secondTopic.topicOrder;
+
+        if (orderComparison !== 0) {
+          return orderComparison;
+        }
+
+        return firstTopic.topic.localeCompare(
+          secondTopic.topic,
+          "nb",
+        );
+      });
   }, [videos]);
 
   return (
