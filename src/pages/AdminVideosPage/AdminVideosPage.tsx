@@ -10,11 +10,17 @@ export const AdminVideosPage = () => {
     topic,
     setTopic,
 
+    subtopic,
+    setSubtopic,
+
     title,
     setTitle,
 
     youtubeId,
     setYoutubeId,
+
+    sortOrder,
+    setSortOrder,
 
     editingVideo,
 
@@ -81,14 +87,25 @@ export const AdminVideosPage = () => {
               ))}
             </select>
 
-            <label htmlFor="video-topic">Tema</label>
+            <label htmlFor="video-topic">Overordnet tema</label>
 
             <input
               id="video-topic"
               type="text"
               value={topic}
               onChange={(event) => setTopic(event.target.value)}
-              placeholder="For eksempel Mengdelære"
+              placeholder="For eksempel Tallteori"
+              required
+            />
+
+            <label htmlFor="video-subtopic">Undertema</label>
+
+            <input
+              id="video-subtopic"
+              type="text"
+              value={subtopic}
+              onChange={(event) => setSubtopic(event.target.value)}
+              placeholder="For eksempel GCD og Euklids algoritme"
               required
             />
 
@@ -99,7 +116,7 @@ export const AdminVideosPage = () => {
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="For eksempel Mengder og delmengder"
+              placeholder="For eksempel GCD - Euclidean Algorithm"
               required
             />
 
@@ -113,6 +130,23 @@ export const AdminVideosPage = () => {
               placeholder="For eksempel wbBY2tTqXDA"
               required
             />
+
+            <label htmlFor="video-sort-order">Rekkefølge</label>
+
+            <input
+              id="video-sort-order"
+              type="number"
+              min="1"
+              step="1"
+              value={sortOrder}
+              onChange={(event) => setSortOrder(event.target.value)}
+              required
+            />
+
+            <p className="admin-video-field-help">
+              Bruk 1 for første video, 2 for neste video og så videre
+              innenfor samme undertema.
+            </p>
 
             {errorMessage && (
               <p className="admin-video-message admin-video-error">
@@ -152,10 +186,16 @@ export const AdminVideosPage = () => {
         <section className="admin-video-card video-preview">
           <p className="preview-label">Forhåndsvisning</p>
 
-          <h2>{title.trim() || "Tittel på videoen"}</h2>
-
           <p className="video-preview-topic">
-            {topic.trim() || "Temaet vises her."}
+            {topic.trim() || "Overordnet tema"}
+          </p>
+
+          <h2>{subtopic.trim() || "Undertema"}</h2>
+
+          <h3>{title.trim() || "Tittel på videoen"}</h3>
+
+          <p className="video-preview-order">
+            Rekkefølge: {sortOrder || "1"}
           </p>
 
           {youtubeId.trim() ? (
@@ -187,9 +227,14 @@ export const AdminVideosPage = () => {
                 <div>
                   <h3>{video.title}</h3>
 
-                  <p>{video.topic}</p>
+                  <p>
+                    {video.topic} → {video.subtopic}
+                  </p>
 
-                  <span>{getSubjectLabel(video.subjectId)}</span>
+                  <span>
+                    {getSubjectLabel(video.subjectId)} · Rekkefølge{" "}
+                    {video.sortOrder}
+                  </span>
                 </div>
 
                 <div className="uploaded-video-actions">

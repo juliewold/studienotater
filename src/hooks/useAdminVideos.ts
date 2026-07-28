@@ -16,8 +16,10 @@ import {
 export const useAdminVideos = () => {
   const [subjectId, setSubjectId] = useState("");
   const [topic, setTopic] = useState("");
+  const [subtopic, setSubtopic] = useState("");
   const [title, setTitle] = useState("");
   const [youtubeId, setYoutubeId] = useState("");
+  const [sortOrder, setSortOrder] = useState("1");
 
   const [editingVideo, setEditingVideo] =
     useState<DatabaseVideo | null>(null);
@@ -37,8 +39,10 @@ export const useAdminVideos = () => {
   const resetForm = () => {
     setSubjectId("");
     setTopic("");
+    setSubtopic("");
     setTitle("");
     setYoutubeId("");
+    setSortOrder("1");
     setEditingVideo(null);
   };
 
@@ -55,9 +59,38 @@ export const useAdminVideos = () => {
 
       const allUploadedVideos = videosBySubject
         .flat()
-        .sort((firstVideo, secondVideo) =>
-          firstVideo.title.localeCompare(secondVideo.title, "nb"),
-        );
+        .sort((firstVideo, secondVideo) => {
+          const subjectComparison =
+            firstVideo.subjectId.localeCompare(
+              secondVideo.subjectId,
+              "nb",
+            );
+
+          if (subjectComparison !== 0) {
+            return subjectComparison;
+          }
+
+          const topicComparison = firstVideo.topic.localeCompare(
+            secondVideo.topic,
+            "nb",
+          );
+
+          if (topicComparison !== 0) {
+            return topicComparison;
+          }
+
+          const subtopicComparison =
+            firstVideo.subtopic.localeCompare(
+              secondVideo.subtopic,
+              "nb",
+            );
+
+          if (subtopicComparison !== 0) {
+            return subtopicComparison;
+          }
+
+          return firstVideo.sortOrder - secondVideo.sortOrder;
+        });
 
       setUploadedVideos(allUploadedVideos);
     } catch (error) {
@@ -78,20 +111,32 @@ export const useAdminVideos = () => {
     event.preventDefault();
 
     const trimmedTopic = topic.trim();
+    const trimmedSubtopic = subtopic.trim();
     const trimmedTitle = title.trim();
     const trimmedYoutubeId = youtubeId.trim();
+    const parsedSortOrder = Number(sortOrder);
 
-    setIsSaving(true);
     setErrorMessage("");
     setSuccessMessage("");
+
+    if (!Number.isInteger(parsedSortOrder) || parsedSortOrder < 1) {
+      setErrorMessage(
+        "Rekkefølgen må være et heltall som er 1 eller høyere.",
+      );
+      return;
+    }
+
+    setIsSaving(true);
 
     try {
       if (editingVideo) {
         await updateVideo(
           editingVideo.id,
           trimmedTopic,
+          trimmedSubtopic,
           trimmedTitle,
           trimmedYoutubeId,
+          parsedSortOrder,
         );
 
         resetForm();
@@ -103,8 +148,10 @@ export const useAdminVideos = () => {
       await createVideo(
         subjectId,
         trimmedTopic,
+        trimmedSubtopic,
         trimmedTitle,
         trimmedYoutubeId,
+        parsedSortOrder,
       );
 
       resetForm();
@@ -132,8 +179,10 @@ export const useAdminVideos = () => {
     setEditingVideo(video);
     setSubjectId(video.subjectId);
     setTopic(video.topic);
+    setSubtopic(video.subtopic);
     setTitle(video.title);
     setYoutubeId(video.youtubeId);
+    setSortOrder(String(video.sortOrder));
 
     setErrorMessage("");
     setSuccessMessage("");
@@ -192,11 +241,17 @@ export const useAdminVideos = () => {
     topic,
     setTopic,
 
+    subtopic,
+    setSubtopic,
+
     title,
     setTitle,
 
     youtubeId,
     setYoutubeId,
+
+    sortOrder,
+    setSortOrder,
 
     editingVideo,
 

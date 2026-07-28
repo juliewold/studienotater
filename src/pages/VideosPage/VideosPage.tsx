@@ -7,6 +7,16 @@ import {
 } from "../../services/videosService";
 import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
 
+type SubtopicGroup = {
+  subtopic: string;
+  videos: DatabaseVideo[];
+};
+
+type TopicGroup = {
+  topic: string;
+  subtopics: SubtopicGroup[];
+};
+
 export const VideosPage = () => {
   const { subjectId } = useParams();
 
@@ -30,8 +40,7 @@ export const VideosPage = () => {
       setErrorMessage("");
 
       try {
-        const loadedVideos =
-          await getVideosBySubject(subjectId);
+        const loadedVideos = await getVideosBySubject(subjectId);
 
         setVideos(loadedVideos);
       } catch (error) {
@@ -45,19 +54,37 @@ export const VideosPage = () => {
     loadVideos();
   }, [subjectId]);
 
-  const groupedVideos = useMemo(() => {
-    const grouped = new Map<string, DatabaseVideo[]>();
+  const groupedVideos = useMemo<TopicGroup[]>(() => {
+    const topics = new Map<
+      string,
+      Map<string, DatabaseVideo[]>
+    >();
 
     videos.forEach((video) => {
-      const topicVideos = grouped.get(video.topic) ?? [];
-      topicVideos.push(video);
-      grouped.set(video.topic, topicVideos);
+      const topicGroup =
+        topics.get(video.topic) ??
+        new Map<string, DatabaseVideo[]>();
+
+      const subtopicVideos =
+        topicGroup.get(video.subtopic) ?? [];
+
+      subtopicVideos.push(video);
+      topicGroup.set(video.subtopic, subtopicVideos);
+      topics.set(video.topic, topicGroup);
     });
 
-    return Array.from(grouped.entries()).map(
-      ([topic, topicVideos]) => ({
+    return Array.from(topics.entries()).map(
+      ([topic, subtopicMap]) => ({
         topic,
-        videos: topicVideos,
+        subtopics: Array.from(subtopicMap.entries()).map(
+          ([subtopic, subtopicVideos]) => ({
+            subtopic,
+            videos: [...subtopicVideos].sort(
+              (firstVideo, secondVideo) =>
+                firstVideo.sortOrder - secondVideo.sortOrder,
+            ),
+          }),
+        ),
       }),
     );
   }, [videos]);
@@ -91,50 +118,61 @@ export const VideosPage = () => {
             >
               <h2>{topicGroup.topic}</h2>
 
-              <div className="video-grid">
-                {topicGroup.videos.map((video) => {
-                  const isActive =
-                    activeVideoId === video.id;
+              <div className="video-subtopics">
+                {topicGroup.subtopics.map((subtopicGroup) => (
+                  <section
+                    key={`${topicGroup.topic}-${subtopicGroup.subtopic}`}
+                    className="video-subtopic-section"
+                  >
+                    <h3>{subtopicGroup.subtopic}</h3>
 
-                  return (
-                    <div
-                      key={video.id}
-                      className="video-card"
-                    >
-                      {isActive ? (
-                        <iframe
-                          src={`https://www.youtube.com/embed/${video.youtubeId}`}
-                          title={video.title}
-                          allowFullScreen
-                        />
-                      ) : (
-                        <button
-                          type="button"
-                          className="video-thumbnail-button"
-                          onClick={() =>
-                            setActiveVideoId(video.id)
-                          }
-                        >
-                          <img
-                            src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
-                            alt={video.title}
-                          />
+                    <div className="video-grid">
+                      {subtopicGroup.videos.map((video) => {
+                        const isActive =
+                          activeVideoId === video.id;
 
-                          <span className="play-button">
-                            ▶
-                          </span>
-                        </button>
-                      )}
+                        return (
+                          <div
+                            key={video.id}
+                            className="video-card"
+                          >
+                            {isActive ? (
+                              <iframe
+                                src={`https://www.youtube.com/embed/${video.youtubeId}`}
+                                title={video.title}
+                                allowFullScreen
+                              />
+                            ) : (
+                              <button
+                                type="button"
+                                className="video-thumbnail-button"
+                                onClick={() =>
+                                  setActiveVideoId(video.id)
+                                }
+                              >
+                                <img
+                                  src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                                  alt={video.title}
+                                />
 
-                      <h3>{video.title}</h3>
+                                <span className="play-button">
+                                  ▶
+                                </span>
+                              </button>
+                            )}
 
-                      <ResourceProgress
-                        resourceId={`video-${subjectId}-database-${video.youtubeId}`}
-                        resourceType="sett"
-                      />
+                            <h4>{video.title}</h4>
+
+                            <ResourceProgress
+                              resourceId={`video-${subjectId}-database-${video.youtubeId}`}
+                              resourceType="sett"
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
+                  </section>
+                ))}
               </div>
             </section>
           ))}

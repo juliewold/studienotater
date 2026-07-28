@@ -1,11 +1,34 @@
 .video-topics {
   display: grid;
-  gap: 48px;
+  gap: 56px;
   margin-top: 40px;
 }
 
-.video-topic-section h2 {
-  margin-bottom: 18px;
+.video-topic-section {
+  display: grid;
+  gap: 28px;
+}
+
+.video-topic-section > h2 {
+  margin: 0;
+  font-size: 1.7rem;
+  color: #17142a;
+}
+
+.video-subtopics {
+  display: grid;
+  gap: 40px;
+}
+
+.video-subtopic-section {
+  display: grid;
+  gap: 18px;
+}
+
+.video-subtopic-section > h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #39344f;
 }
 
 .video-grid {
@@ -21,14 +44,16 @@
   padding: 0;
   overflow: hidden;
   text-align: left;
-  cursor: pointer;
   color: inherit;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .video-card:hover {
   transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
 }
 
 .video-card iframe {
@@ -59,27 +84,57 @@
   position: absolute;
   top: 50%;
   left: 50%;
-
   transform: translate(-50%, -50%);
-
-  background: #ff0000;
-  color: white;
 
   width: 64px;
   height: 44px;
-
-  border-radius: 14px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
+  border-radius: 14px;
+  background: #ff0000;
+  color: white;
   font-size: 1.3rem;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
-.video-card h3 {
+.video-thumbnail-button:hover .play-button {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: #d90000;
+}
+
+.video-card h4 {
   margin: 0;
-  padding: 18px 20px 22px;
+  padding: 18px 20px 12px;
   font-size: 1rem;
+  line-height: 1.45;
   color: #17142a;
+}
+
+.video-card .resource-progress {
+  padding: 0 20px 22px;
+}
+
+@media (max-width: 700px) {
+  .video-topics {
+    gap: 44px;
+    margin-top: 32px;
+  }
+
+  .video-topic-section > h2 {
+    font-size: 1.45rem;
+  }
+
+  .video-subtopics {
+    gap: 32px;
+  }
+
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
 }
