@@ -1571,29 +1571,35 @@ export const PracticePage = () => {
           <hr className="practice-divider" />
 
           <div className="practice-stats">
-            <h3>Din statistikk</h3>
-
-            <div className="practice-stat">
-              <span>Økter</span>
-              <strong>{statistics.totalSessions}</strong>
+            <div className="practice-stats-header">
+              <div>
+                <p className="practice-stats-label">Progresjon</p>
+                <h3>Din statistikk</h3>
+              </div>
             </div>
 
-            <div className="practice-stat">
-              <span>Besvarte oppgaver</span>
-              <strong>{statistics.totalQuestions}</strong>
-            </div>
+            <div className="practice-stats-grid">
+              <article className="practice-stat-card">
+                <strong>{statistics.totalSessions}</strong>
+                <span>Økter</span>
+              </article>
 
-            <div className="practice-stat">
-              <span>Treffprosent</span>
-              <strong>{statistics.accuracy}%</strong>
-            </div>
+              <article className="practice-stat-card">
+                <strong>{statistics.totalQuestions}</strong>
+                <span>Besvarte oppgaver</span>
+              </article>
 
-            <div className="practice-stat">
-              <span>Beste økt</span>
-              <strong>{statistics.bestSession}%</strong>
+              <article className="practice-stat-card">
+                <strong>{statistics.accuracy}%</strong>
+                <span>Treffprosent</span>
+              </article>
+
+              <article className="practice-stat-card">
+                <strong>{statistics.bestSession}%</strong>
+                <span>Beste økt</span>
+              </article>
             </div>
           </div>
-
           <details className="practice-data-management">
             <summary>
               <span>Administrer statistikk</span>
