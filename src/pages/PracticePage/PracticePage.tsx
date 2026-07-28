@@ -34,6 +34,7 @@ import {
   getPracticeStatistics,
   getPracticeTopicStatistics,
 } from "../../services/practice/practiceStatistics";
+import { getTopicMasteryStatistics } from "../../services/practice/practiceQuestionProgress";
 import {
   clearPracticeSessions,
   clearPracticeSessionsForSubject,
@@ -50,6 +51,10 @@ import {
   type StoredActivePracticeSession,
 } from "../../services/practice/practiceActiveSession";
 import { getIncorrectQuestionIds } from "../../services/practice/practiceMistakes";
+import {
+  selectPracticeQuestions,
+  type PracticeSelectionMode,
+} from "../../services/practice/practiceQuestionSelection";
 
 type QuestionType = "mixed" | "multiple-choice" | "number-answer";
 
@@ -156,6 +161,26 @@ export const PracticePage = () => {
       ),
   }));
 
+  const groupedMasteryStatistics = useMemo(() => {
+    if (!subjectId) {
+      return [];
+    }
+
+    return topicGroups.map((group) => ({
+      ...group,
+      statistics: group.topics.map((topic) => {
+        const questionIds = practiceQuestions
+          .filter(
+            (question) =>
+              question.subjectId === subjectId && question.topic === topic,
+          )
+          .map((question) => question.id);
+
+        return getTopicMasteryStatistics(subjectId, topic, questionIds);
+      }),
+    }));
+  }, [subjectId, statisticsVersion]);
+
   const incorrectQuestionIds = useMemo(
     () => (subjectId ? getIncorrectQuestionIds(subjectId) : []),
     [subjectId, statisticsVersion],
@@ -172,6 +197,9 @@ export const PracticePage = () => {
   );
 
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+
+  const [selectionMode, setSelectionMode] =
+    useState<PracticeSelectionMode>("recommended");
 
   const [questionType, setQuestionType] = useState<QuestionType>("mixed");
 
@@ -289,10 +317,23 @@ export const PracticePage = () => {
     });
   }, [difficulty, questionType, selectedTopics, subjectId]);
 
+  const modeAvailableQuestions = useMemo(() => {
+    if (!subjectId) {
+      return [];
+    }
+
+    return selectPracticeQuestions({
+      subjectId,
+      questions: availableQuestions,
+      amount: availableQuestions.length,
+      mode: selectionMode,
+    });
+  }, [availableQuestions, selectionMode, subjectId, statisticsVersion]);
+
   const actualQuestionAmount =
     questionAmount === "all"
-      ? availableQuestions.length
-      : Math.min(questionAmount, availableQuestions.length);
+      ? modeAvailableQuestions.length
+      : Math.min(questionAmount, modeAvailableQuestions.length);
 
   const estimatedMinutes = Math.max(1, Math.round(actualQuestionAmount * 1.5));
 
@@ -308,6 +349,13 @@ export const PracticePage = () => {
     medium: "Middels",
     hard: "Vanskelig",
   }[difficulty];
+
+  const selectedModeLabel = {
+    recommended: "Anbefalt",
+    new: "Nye oppgaver",
+    review: "Repetisjon",
+    random: "Tilfeldig",
+  }[selectionMode];
 
   const toggleTopic = (topic: string) => {
     setSelectedTopics((currentTopics) =>
@@ -325,61 +373,26 @@ export const PracticePage = () => {
     setSelectedTopics([]);
   };
 
-  const shuffleQuestions = (questions: PracticeQuestion[]) => {
-    return [...questions].sort(() => Math.random() - 0.5);
-  };
-
-  const createBalancedSession = (
-    questions: PracticeQuestion[],
-    amount: QuestionAmount,
-  ) => {
-    const questionsByTopic = selectedTopics
-      .map((topic) => ({
-        topic,
-        questions: shuffleQuestions(
-          questions.filter((question) => question.topic === topic),
-        ),
-      }))
-      .filter((topicGroup) => topicGroup.questions.length > 0);
-
-    const balancedQuestions: PracticeQuestion[] = [];
-
-    let questionIndex = 0;
-
-    while (
-      questionsByTopic.some(
-        (topicGroup) => topicGroup.questions.length > questionIndex,
-      )
-    ) {
-      for (const topicGroup of questionsByTopic) {
-        const question = topicGroup.questions[questionIndex];
-
-        if (question) {
-          balancedQuestions.push(question);
-        }
-      }
-
-      questionIndex += 1;
-    }
-
-    const shuffledBalancedQuestions = shuffleQuestions(balancedQuestions);
-
-    if (amount === "all") {
-      return shuffledBalancedQuestions;
-    }
-
-    return shuffledBalancedQuestions.slice(0, amount);
-  };
-
   const handleStartPractice = () => {
-    if (selectedTopics.length === 0 || availableQuestions.length === 0) {
+    if (
+      !subjectId ||
+      selectedTopics.length === 0 ||
+      modeAvailableQuestions.length === 0
+    ) {
       return;
     }
 
-    const selectedQuestions = createBalancedSession(
-      availableQuestions,
-      questionAmount,
-    );
+    const amount =
+      questionAmount === "all"
+        ? modeAvailableQuestions.length
+        : Math.min(questionAmount, modeAvailableQuestions.length);
+
+    const selectedQuestions = selectPracticeQuestions({
+      subjectId,
+      questions: availableQuestions,
+      amount,
+      mode: selectionMode,
+    });
 
     setSessionQuestions(selectedQuestions);
     setCurrentQuestionIndex(0);
@@ -400,7 +413,9 @@ export const PracticePage = () => {
       return;
     }
 
-    const selectedQuestions = shuffleQuestions(incorrectQuestions);
+    const selectedQuestions = [...incorrectQuestions].sort(
+      () => Math.random() - 0.5,
+    );
 
     setSessionQuestions(selectedQuestions);
     setCurrentQuestionIndex(0);
@@ -1228,6 +1243,107 @@ export const PracticePage = () => {
               <div className="practice-step-number">2</div>
 
               <div>
+                <h2>Velg øvingsmodus</h2>
+                <p>Bestem hvordan oppgavene skal velges ut.</p>
+              </div>
+            </div>
+
+            <div className="option-grid practice-mode-grid">
+              <label
+                className={`option-card ${
+                  selectionMode === "recommended" ? "option-card-selected" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="selection-mode"
+                  checked={selectionMode === "recommended"}
+                  onChange={() => setSelectionMode("recommended")}
+                />
+
+                <div className="option-card-icon">
+                  <Sparkles size={21} />
+                </div>
+
+                <div>
+                  <strong>Anbefalt</strong>
+                  <span>Prioriterer nye oppgaver og det du bør repetere</span>
+                </div>
+              </label>
+
+              <label
+                className={`option-card ${
+                  selectionMode === "new" ? "option-card-selected" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="selection-mode"
+                  checked={selectionMode === "new"}
+                  onChange={() => setSelectionMode("new")}
+                />
+
+                <div className="option-card-icon">
+                  <BookOpen size={21} />
+                </div>
+
+                <div>
+                  <strong>Nye oppgaver</strong>
+                  <span>Viser bare oppgaver du ikke har besvart før</span>
+                </div>
+              </label>
+
+              <label
+                className={`option-card ${
+                  selectionMode === "review" ? "option-card-selected" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="selection-mode"
+                  checked={selectionMode === "review"}
+                  onChange={() => setSelectionMode("review")}
+                />
+
+                <div className="option-card-icon">
+                  <Brain size={21} />
+                </div>
+
+                <div>
+                  <strong>Repetisjon</strong>
+                  <span>Viser oppgaver der det siste svaret var feil</span>
+                </div>
+              </label>
+
+              <label
+                className={`option-card ${
+                  selectionMode === "random" ? "option-card-selected" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="selection-mode"
+                  checked={selectionMode === "random"}
+                  onChange={() => setSelectionMode("random")}
+                />
+
+                <div className="option-card-icon">
+                  <RotateCcw size={21} />
+                </div>
+
+                <div>
+                  <strong>Tilfeldig</strong>
+                  <span>Alle passende oppgaver har lik sjanse</span>
+                </div>
+              </label>
+            </div>
+          </section>
+
+          <section className="practice-section">
+            <div className="practice-section-title">
+              <div className="practice-step-number">3</div>
+
+              <div>
                 <h2>Velg oppgavetype</h2>
 
                 <p>Bland oppgavetyper eller fokuser på én type.</p>
@@ -1307,7 +1423,7 @@ export const PracticePage = () => {
 
           <section className="practice-section">
             <div className="practice-section-title">
-              <div className="practice-step-number">3</div>
+              <div className="practice-step-number">4</div>
 
               <div>
                 <h2>Velg vanskelighetsgrad</h2>
@@ -1393,7 +1509,7 @@ export const PracticePage = () => {
 
           <section className="practice-section">
             <div className="practice-section-title">
-              <div className="practice-step-number">4</div>
+              <div className="practice-step-number">5</div>
 
               <div>
                 <h2>Velg lengde på økten</h2>
@@ -1436,9 +1552,9 @@ export const PracticePage = () => {
 
                 <strong>Alle</strong>
                 <span>
-                  {availableQuestions.length > 0
-                    ? `${availableQuestions.length} oppgaver`
-                    : "tilgjengelige"}
+                  {modeAvailableQuestions.length > 0
+                    ? `${modeAvailableQuestions.length} oppgaver`
+                    : "ingen tilgjengelige"}
                 </span>
               </label>
             </div>
@@ -1458,6 +1574,15 @@ export const PracticePage = () => {
           </div>
 
           <div className="practice-summary-list">
+            <div className="practice-summary-row">
+              <div>
+                <Sparkles size={18} />
+                <span>Øvingsmodus</span>
+              </div>
+
+              <strong>{selectedModeLabel}</strong>
+            </div>
+
             <div className="practice-summary-row">
               <div>
                 <SlidersHorizontal size={18} />
@@ -1510,29 +1635,31 @@ export const PracticePage = () => {
             </p>
           )}
 
-          {selectedTopics.length > 0 && availableQuestions.length === 0 && (
+          {selectedTopics.length > 0 && modeAvailableQuestions.length === 0 && (
             <p className="practice-warning">
-              Det finnes ingen oppgaver som passer til dette utvalget ennå.
+              Det finnes ingen oppgaver som passer til temaene, filtrene og
+              øvingsmodusen du har valgt.
             </p>
           )}
 
-          {selectedTopics.length > 0 && availableQuestions.length > 0 && (
+          {selectedTopics.length > 0 && modeAvailableQuestions.length > 0 && (
             <div className="available-question-count">
               <Check size={17} />
 
               <span>
-                {availableQuestions.length} oppgaver passer til valgene dine.
+                {modeAvailableQuestions.length} oppgaver passer til valgene
+                dine.
               </span>
             </div>
           )}
 
           {questionAmount !== "all" &&
-            availableQuestions.length > 0 &&
-            availableQuestions.length < questionAmount && (
+            modeAvailableQuestions.length > 0 &&
+            modeAvailableQuestions.length < questionAmount && (
               <p className="practice-info">
                 Du har valgt {questionAmount} oppgaver, men bare{" "}
-                {availableQuestions.length} passer. Økten vil derfor inneholde{" "}
-                {availableQuestions.length}.
+                {modeAvailableQuestions.length} passer. Økten vil derfor
+                inneholde {modeAvailableQuestions.length}.
               </p>
             )}
 
@@ -1655,7 +1782,7 @@ export const PracticePage = () => {
             type="button"
             className="start-practice-button practice-summary-start"
             disabled={
-              selectedTopics.length === 0 || availableQuestions.length === 0
+              selectedTopics.length === 0 || modeAvailableQuestions.length === 0
             }
             onClick={handleStartPractice}
           >
@@ -1697,39 +1824,78 @@ export const PracticePage = () => {
               </div>
 
               <div className="topic-progress-grid">
-                {group.statistics.map((topicStatistic) => (
-                  <article
-                    key={topicStatistic.topic}
-                    className="topic-progress-card"
-                  >
-                    <div className="topic-progress-card-header">
-                      <div>
-                        <strong>{topicStatistic.topic}</strong>
+                {groupedMasteryStatistics
+                  .find((g) => g.title === group.title)!
+                  .statistics.map((topicStatistic) => (
+                    <article
+                      key={topicStatistic.topic}
+                      className="topic-progress-card"
+                    >
+                      {(() => {
+                        const progressPercentage =
+                          topicStatistic.totalQuestions === 0
+                            ? 0
+                            : Math.round(
+                                ((topicStatistic.masteredQuestions +
+                                  topicStatistic.learningQuestions * 0.5) /
+                                  topicStatistic.totalQuestions) *
+                                  100,
+                              );
 
-                        <span>
-                          {topicStatistic.totalQuestions === 0
-                            ? "Ingen svar ennå"
-                            : `${topicStatistic.correctAnswers} av ${topicStatistic.totalQuestions} riktige`}
-                        </span>
-                      </div>
+                        return (
+                          <>
+                            <div className="topic-progress-card-header">
+                              <div>
+                                <strong>{topicStatistic.topic}</strong>
+                                <span>
+                                  {topicStatistic.totalQuestions} oppgaver
+                                </span>
+                              </div>
 
-                      <strong>
-                        {topicStatistic.totalQuestions === 0
-                          ? "–"
-                          : `${topicStatistic.accuracy}%`}
-                      </strong>
-                    </div>
+                              <strong>{progressPercentage}%</strong>
+                            </div>
 
-                    <div className="topic-progress-bar">
-                      <div
-                        className="topic-progress-bar-fill"
-                        style={{
-                          width: `${topicStatistic.accuracy}%`,
-                        }}
-                      />
-                    </div>
-                  </article>
-                ))}
+                            <div className="topic-progress-bar">
+                              <div
+                                className="topic-progress-bar-fill"
+                                style={{
+                                  width: `${progressPercentage}%`,
+                                }}
+                              />
+                            </div>
+
+                            <div className="topic-mastery-list">
+                              <div>
+                                <span>🆕 Nye</span>
+                                <strong>{topicStatistic.newQuestions}</strong>
+                              </div>
+
+                              <div>
+                                <span>📚 Læring</span>
+                                <strong>
+                                  {topicStatistic.learningQuestions}
+                                </strong>
+                              </div>
+
+                              <div>
+                                <span>🔁 Repetisjon</span>
+                                <strong>
+                                  {topicStatistic.reviewQuestions}
+                                </strong>
+                              </div>
+
+                              <div>
+                                <span>🏆 Mestret</span>
+                                <strong>
+                                  {topicStatistic.masteredQuestions}
+                                </strong>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </article>
+                  ))}
               </div>
             </div>
           ))}
