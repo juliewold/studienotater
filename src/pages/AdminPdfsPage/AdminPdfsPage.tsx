@@ -68,16 +68,6 @@ export const AdminPdfsPage = () => {
     handleDelete,
   } = useAdminPdfs();
 
-  const getSubjectLabel = (pdfSubjectId: string) => {
-    const subject = subjects.find(
-      (currentSubject) => currentSubject.id === pdfSubjectId,
-    );
-
-    return subject
-      ? `${subject.code} – ${subject.name}`
-      : pdfSubjectId.toUpperCase();
-  };
-
   const getCategoryLabel = (pdfCategory: string) => {
     return (
       categories.find((categoryOption) => categoryOption.value === pdfCategory)
@@ -251,10 +241,7 @@ export const AdminPdfsPage = () => {
         ) : (
           <div className="uploaded-pdf-subject-groups">
             {pdfsGroupedBySubject.map(({ subject, pdfs }) => (
-              <details
-                key={subject.id}
-                className="uploaded-pdf-subject-group"
-              >
+              <details key={subject.id} className="uploaded-pdf-subject-group">
                 <summary className="uploaded-pdf-subject-heading">
                   <div>
                     <h3>
