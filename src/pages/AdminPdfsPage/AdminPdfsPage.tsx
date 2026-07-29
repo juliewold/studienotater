@@ -85,6 +85,17 @@ export const AdminPdfsPage = () => {
     );
   };
 
+  const pdfsGroupedBySubject = subjects
+    .map((subject) => {
+      const pdfs = uploadedPdfs.filter((pdf) => pdf.subjectId === subject.id);
+
+      return {
+        subject,
+        pdfs,
+      };
+    })
+    .filter((group) => group.pdfs.length > 0);
+
   return (
     <main className="page-container">
       <p className="page-label">Administrasjon</p>
@@ -220,98 +231,162 @@ export const AdminPdfsPage = () => {
       </section>
 
       <section className="admin-pdf-card uploaded-pdfs-section">
-        <h2>Opplastede PDF-er</h2>
+        <div className="uploaded-pdfs-heading">
+          <div>
+            <h2>Opplastede PDF-er</h2>
+
+            {!isLoadingPdfs && (
+              <p>
+                {uploadedPdfs.length}{" "}
+                {uploadedPdfs.length === 1 ? "PDF" : "PDF-er"}
+              </p>
+            )}
+          </div>
+        </div>
 
         {isLoadingPdfs || isLoadingStructure ? (
           <p>Laster PDF-er...</p>
         ) : uploadedPdfs.length === 0 ? (
           <p>Ingen PDF-er er lastet opp gjennom adminpanelet ennå.</p>
         ) : (
-          <div className="uploaded-pdf-list">
-            {uploadedPdfs.map((pdf) => {
-              const pdfTopics = topics.filter(
-                (topic) => topic.subjectId === pdf.subjectId,
-              );
-
-              return (
-                <article key={pdf.id} className="uploaded-pdf-item">
+          <div className="uploaded-pdf-subject-groups">
+            {pdfsGroupedBySubject.map(({ subject, pdfs }) => (
+              <details
+                key={subject.id}
+                className="uploaded-pdf-subject-group"
+              >
+                <summary className="uploaded-pdf-subject-heading">
                   <div>
-                    <h3>{pdf.title}</h3>
-
-                    <p>{getSubjectLabel(pdf.subjectId)}</p>
-
-                    <span>{getCategoryLabel(pdf.category)}</span>
+                    <h3>
+                      {subject.code} – {subject.name}
+                    </h3>
 
                     <p>
-                      Tema: <strong>{pdf.topicName ?? "Ikke valgt"}</strong>
-                    </p>
-
-                    <p>
-                      Undertema:{" "}
-                      <strong>{pdf.subtopicName ?? "Ikke valgt"}</strong>
+                      {pdfs.length} {pdfs.length === 1 ? "PDF" : "PDF-er"}
                     </p>
                   </div>
 
-                  <div className="uploaded-pdf-actions">
-                    <label htmlFor={`pdf-subtopic-${pdf.id}`}>
-                      Koble til undertema
-                    </label>
+                  <span className="uploaded-pdf-subject-toggle">Åpne</span>
+                </summary>
 
-                    <select
-                      id={`pdf-subtopic-${pdf.id}`}
-                      value={pdf.subtopicId ?? ""}
-                      disabled={updatingPdfId === pdf.id}
-                      onChange={(event) =>
-                        handlePdfSubtopicChange(pdf.id, event.target.value)
-                      }
-                    >
-                      <option value="">Ikke koblet til tema</option>
+                <div className="uploaded-pdf-list">
+                  {pdfs.map((pdf) => {
+                    const pdfTopics = topics.filter(
+                      (topic) => topic.subjectId === pdf.subjectId,
+                    );
 
-                      {pdfTopics.map((topic) => {
-                        const topicSubtopics = subtopics.filter(
-                          (subtopic) => subtopic.topicId === topic.id,
-                        );
+                    return (
+                      <article key={pdf.id} className="uploaded-pdf-item">
+                        <div className="uploaded-pdf-information">
+                          <div className="uploaded-pdf-heading">
+                            <div className="uploaded-pdf-title-group">
+                              <h3>{pdf.title}</h3>
+                            </div>
 
-                        if (topicSubtopics.length === 0) {
-                          return null;
-                        }
+                            <span className="uploaded-pdf-category">
+                              {getCategoryLabel(pdf.category)}
+                            </span>
+                          </div>
 
-                        return (
-                          <optgroup key={topic.id} label={topic.name}>
-                            {topicSubtopics.map((subtopic) => (
-                              <option key={subtopic.id} value={subtopic.id}>
-                                {subtopic.name}
+                          <div className="uploaded-pdf-topic-status">
+                            <div className="uploaded-pdf-status-item">
+                              <span>Tema</span>
+
+                              <strong>{pdf.topicName ?? "Ikke valgt"}</strong>
+                            </div>
+
+                            <div className="uploaded-pdf-status-item">
+                              <span>Undertema</span>
+
+                              <strong>
+                                {pdf.subtopicName ?? "Ikke valgt"}
+                              </strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="uploaded-pdf-controls">
+                          <div className="uploaded-pdf-subtopic-field">
+                            <label htmlFor={`pdf-subtopic-${pdf.id}`}>
+                              Endre undertema
+                            </label>
+
+                            <select
+                              id={`pdf-subtopic-${pdf.id}`}
+                              value={pdf.subtopicId ?? ""}
+                              disabled={updatingPdfId === pdf.id}
+                              onChange={(event) =>
+                                handlePdfSubtopicChange(
+                                  pdf.id,
+                                  event.target.value,
+                                )
+                              }
+                            >
+                              <option value="">
+                                Ikke koblet til undertema
                               </option>
-                            ))}
-                          </optgroup>
-                        );
-                      })}
-                    </select>
 
-                    {updatingPdfId === pdf.id && <span>Oppdaterer...</span>}
+                              {pdfTopics.map((topic) => {
+                                const topicSubtopics = subtopics.filter(
+                                  (subtopic) => subtopic.topicId === topic.id,
+                                );
 
-                    <a
-                      href={pdf.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Åpne
-                    </a>
+                                if (topicSubtopics.length === 0) {
+                                  return null;
+                                }
 
-                    <button
-                      type="button"
-                      className="delete-pdf-button"
-                      disabled={
-                        deletingPdfId === pdf.id || updatingPdfId === pdf.id
-                      }
-                      onClick={() => handleDelete(pdf)}
-                    >
-                      {deletingPdfId === pdf.id ? "Sletter..." : "Slett"}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
+                                return (
+                                  <optgroup key={topic.id} label={topic.name}>
+                                    {topicSubtopics.map((subtopic) => (
+                                      <option
+                                        key={subtopic.id}
+                                        value={subtopic.id}
+                                      >
+                                        {subtopic.name}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                );
+                              })}
+                            </select>
+
+                            {updatingPdfId === pdf.id && (
+                              <span className="uploaded-pdf-updating">
+                                Oppdaterer...
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="uploaded-pdf-actions">
+                            <a
+                              href={pdf.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Åpne
+                            </a>
+
+                            <button
+                              type="button"
+                              className="delete-pdf-button"
+                              disabled={
+                                deletingPdfId === pdf.id ||
+                                updatingPdfId === pdf.id
+                              }
+                              onClick={() => handleDelete(pdf)}
+                            >
+                              {deletingPdfId === pdf.id
+                                ? "Sletter..."
+                                : "Slett"}
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </details>
+            ))}
           </div>
         )}
       </section>

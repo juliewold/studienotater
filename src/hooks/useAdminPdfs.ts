@@ -36,11 +36,13 @@ export const useAdminPdfs = () => {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+
   const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
 
   const [uploadedPdfs, setUploadedPdfs] = useState<DatabasePdf[]>([]);
 
   const [isLoadingPdfs, setIsLoadingPdfs] = useState(true);
+
   const [isLoadingStructure, setIsLoadingStructure] = useState(true);
 
   const [isUploading, setIsUploading] = useState(false);
