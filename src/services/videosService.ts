@@ -28,6 +28,21 @@ export type DatabaseVideo = {
   sortOrder: number;
 };
 
+type TopicRelation = {
+  id: string;
+  subject_id: string;
+  name: string;
+  sort_order: number;
+};
+
+type SubtopicRelation = {
+  id: string;
+  name: string;
+  sort_order: number;
+  topic_id: string;
+  topics: TopicRelation | TopicRelation[];
+};
+
 type VideoRow = {
   id: string;
   subject_id: string;
@@ -35,45 +50,7 @@ type VideoRow = {
   youtube_id: string;
   sort_order: number;
   subtopic_id: string;
-  video_subtopics:
-    | {
-        id: string;
-        name: string;
-        sort_order: number;
-        topic_id: string;
-        video_topics:
-          | {
-              id: string;
-              subject_id: string;
-              name: string;
-              sort_order: number;
-            }
-          | {
-              id: string;
-              subject_id: string;
-              name: string;
-              sort_order: number;
-            }[];
-      }
-    | {
-        id: string;
-        name: string;
-        sort_order: number;
-        topic_id: string;
-        video_topics:
-          | {
-              id: string;
-              subject_id: string;
-              name: string;
-              sort_order: number;
-            }
-          | {
-              id: string;
-              subject_id: string;
-              name: string;
-              sort_order: number;
-            }[];
-      }[];
+  subtopics: SubtopicRelation | SubtopicRelation[];
 };
 
 const getFirstRelation = <T>(relation: T | T[] | null): T | null => {
@@ -88,7 +65,7 @@ export async function getVideoTopicsBySubject(
   subjectId: string,
 ): Promise<DatabaseVideoTopic[]> {
   const { data, error } = await supabase
-    .from("video_topics")
+    .from("topics")
     .select("id, subject_id, name, sort_order")
     .eq("subject_id", subjectId)
     .order("sort_order", { ascending: true })
@@ -110,7 +87,7 @@ export async function getVideoSubtopicsByTopic(
   topicId: string,
 ): Promise<DatabaseVideoSubtopic[]> {
   const { data, error } = await supabase
-    .from("video_subtopics")
+    .from("subtopics")
     .select("id, topic_id, name, sort_order")
     .eq("topic_id", topicId)
     .order("sort_order", { ascending: true })
@@ -135,25 +112,25 @@ export async function getVideosBySubject(
     .from("videos")
     .select(
       `
-      id,
-      subject_id,
-      title,
-      youtube_id,
-      sort_order,
-      subtopic_id,
-      video_subtopics!inner (
         id,
-        name,
+        subject_id,
+        title,
+        youtube_id,
         sort_order,
-        topic_id,
-        video_topics!inner (
+        subtopic_id,
+        subtopics!inner (
           id,
-          subject_id,
           name,
-          sort_order
+          sort_order,
+          topic_id,
+          topics!inner (
+            id,
+            subject_id,
+            name,
+            sort_order
+          )
         )
-      )
-    `,
+      `,
     )
     .eq("subject_id", subjectId);
 
@@ -162,13 +139,13 @@ export async function getVideosBySubject(
   }
 
   const mappedVideos = ((data ?? []) as VideoRow[]).flatMap((video) => {
-    const subtopic = getFirstRelation(video.video_subtopics);
+    const subtopic = getFirstRelation(video.subtopics);
 
     if (!subtopic) {
       return [];
     }
 
-    const topic = getFirstRelation(subtopic.video_topics);
+    const topic = getFirstRelation(subtopic.topics);
 
     if (!topic) {
       return [];
@@ -221,7 +198,7 @@ export async function createVideoTopic(
   sortOrder: number,
 ): Promise<DatabaseVideoTopic> {
   const { data, error } = await supabase
-    .from("video_topics")
+    .from("topics")
     .insert({
       subject_id: subjectId,
       name,
@@ -248,7 +225,7 @@ export async function updateVideoTopic(
   sortOrder: number,
 ) {
   const { error } = await supabase
-    .from("video_topics")
+    .from("topics")
     .update({
       name,
       sort_order: sortOrder,
@@ -266,7 +243,7 @@ export async function createVideoSubtopic(
   sortOrder: number,
 ): Promise<DatabaseVideoSubtopic> {
   const { data, error } = await supabase
-    .from("video_subtopics")
+    .from("subtopics")
     .insert({
       topic_id: topicId,
       name,
@@ -293,7 +270,7 @@ export async function updateVideoSubtopic(
   sortOrder: number,
 ) {
   const { error } = await supabase
-    .from("video_subtopics")
+    .from("subtopics")
     .update({
       name,
       sort_order: sortOrder,
@@ -359,7 +336,7 @@ export async function getAllVideoSubtopicsBySubject(
   subjectId: string,
 ): Promise<DatabaseVideoSubtopic[]> {
   const { data: topics, error: topicsError } = await supabase
-    .from("video_topics")
+    .from("topics")
     .select("id")
     .eq("subject_id", subjectId);
 
@@ -374,7 +351,7 @@ export async function getAllVideoSubtopicsBySubject(
   }
 
   const { data, error } = await supabase
-    .from("video_subtopics")
+    .from("subtopics")
     .select("id, topic_id, name, sort_order")
     .in("topic_id", topicIds)
     .order("sort_order", { ascending: true })
@@ -393,7 +370,7 @@ export async function getAllVideoSubtopicsBySubject(
 }
 
 export async function deleteVideoTopic(id: string) {
-  const { error } = await supabase.from("video_topics").delete().eq("id", id);
+  const { error } = await supabase.from("topics").delete().eq("id", id);
 
   if (error) {
     throw error;
@@ -401,10 +378,7 @@ export async function deleteVideoTopic(id: string) {
 }
 
 export async function deleteVideoSubtopic(id: string) {
-  const { error } = await supabase
-    .from("video_subtopics")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("subtopics").delete().eq("id", id);
 
   if (error) {
     throw error;
