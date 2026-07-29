@@ -1,13 +1,29 @@
 import "./AdminPdfsPage.css";
+
 import { subjects } from "../../data/subjects";
 import { useAdminPdfs } from "../../hooks/useAdminPdfs";
 
 const categories = [
-  { value: "forelesninger", label: "Forelesninger" },
-  { value: "pensum", label: "Pensum" },
-  { value: "presentasjoner", label: "Presentasjoner" },
-  { value: "formler", label: "Formelark" },
-  { value: "eksamener", label: "Eksamener" },
+  {
+    value: "forelesninger",
+    label: "Forelesninger",
+  },
+  {
+    value: "pensum",
+    label: "Pensum",
+  },
+  {
+    value: "presentasjoner",
+    label: "Presentasjoner",
+  },
+  {
+    value: "formler",
+    label: "Formelark",
+  },
+  {
+    value: "eksamener",
+    label: "Eksamener",
+  },
 ];
 
 export const AdminPdfsPage = () => {
@@ -15,7 +31,8 @@ export const AdminPdfsPage = () => {
     fileInputRef,
 
     subjectId,
-    setSubjectId,
+    topicId,
+    subtopicId,
 
     title,
     setTitle,
@@ -25,15 +42,29 @@ export const AdminPdfsPage = () => {
 
     setPdfFile,
 
+    topics,
+    subtopics,
+    availableTopics,
+    availableSubtopics,
+
     uploadedPdfs,
+
     isLoadingPdfs,
+    isLoadingStructure,
     isUploading,
+
     deletingPdfId,
+    updatingPdfId,
 
     errorMessage,
     successMessage,
 
+    handleSubjectChange,
+    handleTopicChange,
+    setSubtopicId,
+
     handleSubmit,
+    handlePdfSubtopicChange,
     handleDelete,
   } = useAdminPdfs();
 
@@ -49,9 +80,8 @@ export const AdminPdfsPage = () => {
 
   const getCategoryLabel = (pdfCategory: string) => {
     return (
-      categories.find(
-        (categoryOption) => categoryOption.value === pdfCategory,
-      )?.label ?? pdfCategory
+      categories.find((categoryOption) => categoryOption.value === pdfCategory)
+        ?.label ?? pdfCategory
     );
   };
 
@@ -62,7 +92,7 @@ export const AdminPdfsPage = () => {
       <h1>Administrer PDF-er</h1>
 
       <p className="page-description">
-        Last opp PDF-er og knytt dem til riktig fag og kategori.
+        Last opp PDF-er og knytt dem til riktig fag, kategori og undertema.
       </p>
 
       <section className="admin-pdf-card">
@@ -74,7 +104,7 @@ export const AdminPdfsPage = () => {
           <select
             id="subject"
             value={subjectId}
-            onChange={(event) => setSubjectId(event.target.value)}
+            onChange={(event) => handleSubjectChange(event.target.value)}
             required
           >
             <option value="">Velg fag</option>
@@ -82,6 +112,54 @@ export const AdminPdfsPage = () => {
             {subjects.map((subject) => (
               <option key={subject.id} value={subject.id}>
                 {subject.code} – {subject.name}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="topic">Tema</label>
+
+          <select
+            id="topic"
+            value={topicId}
+            onChange={(event) => handleTopicChange(event.target.value)}
+            disabled={!subjectId || isLoadingStructure}
+            required
+          >
+            <option value="">
+              {!subjectId
+                ? "Velg fag først"
+                : availableTopics.length === 0
+                  ? "Ingen temaer i faget"
+                  : "Velg tema"}
+            </option>
+
+            {availableTopics.map((topic) => (
+              <option key={topic.id} value={topic.id}>
+                {topic.name}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="subtopic">Undertema</label>
+
+          <select
+            id="subtopic"
+            value={subtopicId}
+            onChange={(event) => setSubtopicId(event.target.value)}
+            disabled={!topicId || isLoadingStructure}
+            required
+          >
+            <option value="">
+              {!topicId
+                ? "Velg tema først"
+                : availableSubtopics.length === 0
+                  ? "Ingen undertemaer"
+                  : "Velg undertema"}
+            </option>
+
+            {availableSubtopics.map((subtopic) => (
+              <option key={subtopic.id} value={subtopic.id}>
+                {subtopic.name}
               </option>
             ))}
           </select>
@@ -108,10 +186,7 @@ export const AdminPdfsPage = () => {
             <option value="">Velg kategori</option>
 
             {categories.map((categoryOption) => (
-              <option
-                key={categoryOption.value}
-                value={categoryOption.value}
-              >
+              <option key={categoryOption.value} value={categoryOption.value}>
                 {categoryOption.label}
               </option>
             ))}
@@ -124,16 +199,12 @@ export const AdminPdfsPage = () => {
             id="pdfFile"
             type="file"
             accept="application/pdf"
-            onChange={(event) =>
-              setPdfFile(event.target.files?.[0] ?? null)
-            }
+            onChange={(event) => setPdfFile(event.target.files?.[0] ?? null)}
             required
           />
 
           {errorMessage && (
-            <p className="admin-pdf-message admin-pdf-error">
-              {errorMessage}
-            </p>
+            <p className="admin-pdf-message admin-pdf-error">{errorMessage}</p>
           )}
 
           {successMessage && (
@@ -151,44 +222,96 @@ export const AdminPdfsPage = () => {
       <section className="admin-pdf-card uploaded-pdfs-section">
         <h2>Opplastede PDF-er</h2>
 
-        {isLoadingPdfs ? (
+        {isLoadingPdfs || isLoadingStructure ? (
           <p>Laster PDF-er...</p>
         ) : uploadedPdfs.length === 0 ? (
           <p>Ingen PDF-er er lastet opp gjennom adminpanelet ennå.</p>
         ) : (
           <div className="uploaded-pdf-list">
-            {uploadedPdfs.map((pdf) => (
-              <article key={pdf.id} className="uploaded-pdf-item">
-                <div>
-                  <h3>{pdf.title}</h3>
+            {uploadedPdfs.map((pdf) => {
+              const pdfTopics = topics.filter(
+                (topic) => topic.subjectId === pdf.subjectId,
+              );
 
-                  <p>{getSubjectLabel(pdf.subjectId)}</p>
+              return (
+                <article key={pdf.id} className="uploaded-pdf-item">
+                  <div>
+                    <h3>{pdf.title}</h3>
 
-                  <span>{getCategoryLabel(pdf.category)}</span>
-                </div>
+                    <p>{getSubjectLabel(pdf.subjectId)}</p>
 
-                <div className="uploaded-pdf-actions">
-                  <a
-                    href={pdf.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Åpne
-                  </a>
+                    <span>{getCategoryLabel(pdf.category)}</span>
 
-                  <button
-                    type="button"
-                    className="delete-pdf-button"
-                    disabled={deletingPdfId === pdf.id}
-                    onClick={() => handleDelete(pdf)}
-                  >
-                    {deletingPdfId === pdf.id
-                      ? "Sletter..."
-                      : "Slett"}
-                  </button>
-                </div>
-              </article>
-            ))}
+                    <p>
+                      Tema: <strong>{pdf.topicName ?? "Ikke valgt"}</strong>
+                    </p>
+
+                    <p>
+                      Undertema:{" "}
+                      <strong>{pdf.subtopicName ?? "Ikke valgt"}</strong>
+                    </p>
+                  </div>
+
+                  <div className="uploaded-pdf-actions">
+                    <label htmlFor={`pdf-subtopic-${pdf.id}`}>
+                      Koble til undertema
+                    </label>
+
+                    <select
+                      id={`pdf-subtopic-${pdf.id}`}
+                      value={pdf.subtopicId ?? ""}
+                      disabled={updatingPdfId === pdf.id}
+                      onChange={(event) =>
+                        handlePdfSubtopicChange(pdf.id, event.target.value)
+                      }
+                    >
+                      <option value="">Ikke koblet til tema</option>
+
+                      {pdfTopics.map((topic) => {
+                        const topicSubtopics = subtopics.filter(
+                          (subtopic) => subtopic.topicId === topic.id,
+                        );
+
+                        if (topicSubtopics.length === 0) {
+                          return null;
+                        }
+
+                        return (
+                          <optgroup key={topic.id} label={topic.name}>
+                            {topicSubtopics.map((subtopic) => (
+                              <option key={subtopic.id} value={subtopic.id}>
+                                {subtopic.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        );
+                      })}
+                    </select>
+
+                    {updatingPdfId === pdf.id && <span>Oppdaterer...</span>}
+
+                    <a
+                      href={pdf.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Åpne
+                    </a>
+
+                    <button
+                      type="button"
+                      className="delete-pdf-button"
+                      disabled={
+                        deletingPdfId === pdf.id || updatingPdfId === pdf.id
+                      }
+                      onClick={() => handleDelete(pdf)}
+                    >
+                      {deletingPdfId === pdf.id ? "Sletter..." : "Slett"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </section>

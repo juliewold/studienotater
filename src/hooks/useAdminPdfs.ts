@@ -1,32 +1,53 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type SyntheticEvent,
 } from "react";
+
 import { subjects } from "../data/subjects";
 import { supabase } from "../lib/supabase";
+
 import {
   deletePdf,
-  getPdfsBySubject,
+  getAllPdfs,
+  updatePdfSubtopic,
   type DatabasePdf,
 } from "../services/pdfsService";
+
+import {
+  getVideoSubtopicsByTopic,
+  getVideoTopicsBySubject,
+  type DatabaseVideoSubtopic,
+  type DatabaseVideoTopic,
+} from "../services/videosService";
 
 export const useAdminPdfs = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [subjectId, setSubjectId] = useState("");
+  const [topicId, setTopicId] = useState("");
+  const [subtopicId, setSubtopicId] = useState("");
+
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
+  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+
   const [uploadedPdfs, setUploadedPdfs] = useState<DatabasePdf[]>([]);
+
   const [isLoadingPdfs, setIsLoadingPdfs] = useState(true);
+  const [isLoadingStructure, setIsLoadingStructure] = useState(true);
+
   const [isUploading, setIsUploading] = useState(false);
-  const [deletingPdfId, setDeletingPdfId] = useState<string | null>(
-    null,
-  );
+
+  const [deletingPdfId, setDeletingPdfId] = useState<string | null>(null);
+
+  const [updatingPdfId, setUpdatingPdfId] = useState<string | null>(null);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -36,35 +57,97 @@ export const useAdminPdfs = () => {
     setErrorMessage("");
 
     try {
-      const pdfsBySubject = await Promise.all(
-        subjects.map((subject) => getPdfsBySubject(subject.id)),
-      );
+      const loadedPdfs = await getAllPdfs();
 
-      const allUploadedPdfs = pdfsBySubject
-        .flat()
-        .sort((firstPdf, secondPdf) =>
-          firstPdf.title.localeCompare(secondPdf.title, "nb"),
+      const sortedPdfs = [...loadedPdfs].sort((firstPdf, secondPdf) => {
+        const subjectComparison = firstPdf.subjectId.localeCompare(
+          secondPdf.subjectId,
+          "nb",
         );
 
-      setUploadedPdfs(allUploadedPdfs);
+        if (subjectComparison !== 0) {
+          return subjectComparison;
+        }
+
+        return firstPdf.title.localeCompare(secondPdf.title, "nb");
+      });
+
+      setUploadedPdfs(sortedPdfs);
     } catch (error) {
       console.error("Kunne ikke hente opplastede PDF-er:", error);
+
       setErrorMessage("Kunne ikke hente de opplastede PDF-ene.");
     } finally {
       setIsLoadingPdfs(false);
     }
   }, []);
 
+  const loadTopicStructure = useCallback(async () => {
+    setIsLoadingStructure(true);
+    setErrorMessage("");
+
+    try {
+      const topicsBySubject = await Promise.all(
+        subjects.map((subject) => getVideoTopicsBySubject(subject.id)),
+      );
+
+      const loadedTopics = topicsBySubject.flat();
+
+      const subtopicsByTopic = await Promise.all(
+        loadedTopics.map((topic) => getVideoSubtopicsByTopic(topic.id)),
+      );
+
+      setTopics(loadedTopics);
+      setSubtopics(subtopicsByTopic.flat());
+    } catch (error) {
+      console.error("Kunne ikke hente temaer og undertemaer:", error);
+
+      setTopics([]);
+      setSubtopics([]);
+
+      setErrorMessage("Kunne ikke hente temaer og undertemaer.");
+    } finally {
+      setIsLoadingStructure(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadUploadedPdfs();
-  }, [loadUploadedPdfs]);
+    loadTopicStructure();
+  }, [loadTopicStructure, loadUploadedPdfs]);
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const availableTopics = useMemo(() => {
+    return topics.filter((topic) => topic.subjectId === subjectId);
+  }, [subjectId, topics]);
+
+  const availableSubtopics = useMemo(() => {
+    return subtopics.filter((subtopic) => subtopic.topicId === topicId);
+  }, [subtopics, topicId]);
+
+  const handleSubjectChange = (nextSubjectId: string) => {
+    setSubjectId(nextSubjectId);
+    setTopicId("");
+    setSubtopicId("");
+  };
+
+  const handleTopicChange = (nextTopicId: string) => {
+    setTopicId(nextTopicId);
+    setSubtopicId("");
+  };
+
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!pdfFile) {
+    if (
+      !subjectId ||
+      !topicId ||
+      !subtopicId ||
+      !title.trim() ||
+      !category ||
+      !pdfFile
+    ) {
+      setErrorMessage("Fyll ut alle feltene før du laster opp PDF-en.");
+
       return;
     }
 
@@ -77,8 +160,7 @@ export const useAdminPdfs = () => {
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9.-]/g, "");
 
-    const filePath =
-      `${subjectId}/${category}/${Date.now()}-${safeFileName}`;
+    const filePath = `${subjectId}/${category}/${Date.now()}-${safeFileName}`;
 
     try {
       const { error: uploadError } = await supabase.storage
@@ -89,21 +171,23 @@ export const useAdminPdfs = () => {
         throw uploadError;
       }
 
-      const { error: databaseError } = await supabase
-        .from("pdfs")
-        .insert({
-          subject_id: subjectId,
-          title: title.trim(),
-          category,
-          file_path: filePath,
-        });
+      const { error: databaseError } = await supabase.from("pdfs").insert({
+        subject_id: subjectId,
+        subtopic_id: subtopicId,
+        title: title.trim(),
+        category,
+        file_path: filePath,
+      });
 
       if (databaseError) {
         await supabase.storage.from("pdfs").remove([filePath]);
+
         throw databaseError;
       }
 
       setSubjectId("");
+      setTopicId("");
+      setSubtopicId("");
       setTitle("");
       setCategory("");
       setPdfFile(null);
@@ -113,12 +197,41 @@ export const useAdminPdfs = () => {
       }
 
       await loadUploadedPdfs();
+
       setSuccessMessage("PDF-en ble lastet opp.");
     } catch (error) {
       console.error("Kunne ikke laste opp PDF:", error);
+
       setErrorMessage("Kunne ikke laste opp PDF-en.");
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handlePdfSubtopicChange = async (
+    pdfId: string,
+    nextSubtopicId: string,
+  ) => {
+    setUpdatingPdfId(pdfId);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      await updatePdfSubtopic(pdfId, nextSubtopicId || null);
+
+      await loadUploadedPdfs();
+
+      setSuccessMessage(
+        nextSubtopicId
+          ? "Temakoblingen ble oppdatert."
+          : "Temakoblingen ble fjernet.",
+      );
+    } catch (error) {
+      console.error("Kunne ikke oppdatere PDF-ens undertema:", error);
+
+      setErrorMessage("Kunne ikke oppdatere temakoblingen.");
+    } finally {
+      setUpdatingPdfId(null);
     }
   };
 
@@ -139,14 +252,13 @@ export const useAdminPdfs = () => {
       await deletePdf(pdf.id, pdf.filePath);
 
       setUploadedPdfs((currentPdfs) =>
-        currentPdfs.filter(
-          (currentPdf) => currentPdf.id !== pdf.id,
-        ),
+        currentPdfs.filter((currentPdf) => currentPdf.id !== pdf.id),
       );
 
       setSuccessMessage("PDF-en ble slettet.");
     } catch (error) {
       console.error("Kunne ikke slette PDF:", error);
+
       setErrorMessage("Kunne ikke slette PDF-en.");
     } finally {
       setDeletingPdfId(null);
@@ -157,7 +269,8 @@ export const useAdminPdfs = () => {
     fileInputRef,
 
     subjectId,
-    setSubjectId,
+    topicId,
+    subtopicId,
 
     title,
     setTitle,
@@ -167,15 +280,29 @@ export const useAdminPdfs = () => {
 
     setPdfFile,
 
+    topics,
+    subtopics,
+    availableTopics,
+    availableSubtopics,
+
     uploadedPdfs,
+
     isLoadingPdfs,
+    isLoadingStructure,
     isUploading,
+
     deletingPdfId,
+    updatingPdfId,
 
     errorMessage,
     successMessage,
 
+    handleSubjectChange,
+    handleTopicChange,
+    setSubtopicId,
+
     handleSubmit,
+    handlePdfSubtopicChange,
     handleDelete,
   };
 };
