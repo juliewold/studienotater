@@ -1,7 +1,9 @@
 import "./SubjectPage.css";
 import { Link, useParams } from "react-router-dom";
+
 import { subjects } from "../../data/subjects";
 import { SubjectFeatureCard } from "../../components/SubjectFeatureCard/SubjectFeatureCard";
+import { useSubjectProgress } from "../../hooks/useSubjectProgress";
 
 export const SubjectPage = () => {
   const { subjectId } = useParams();
@@ -9,6 +11,9 @@ export const SubjectPage = () => {
   const subject = subjects.find(
     (currentSubject) => currentSubject.id === subjectId,
   );
+
+  const { subjectProgress, isLoading, errorMessage } =
+    useSubjectProgress(subjectId);
 
   if (!subject) {
     return (
@@ -29,6 +34,82 @@ export const SubjectPage = () => {
       <h1>{subject.code}</h1>
 
       <p className="subject-page-name">{subject.name}</p>
+
+      <section className="subject-progress-card">
+        <div className="subject-progress-header">
+          <div>
+            <p className="subject-progress-label">Din progresjon</p>
+
+            <h2>Hvordan du ligger an i faget</h2>
+          </div>
+
+          {!isLoading && !errorMessage && (
+            <strong className="subject-progress-percentage">
+              {subjectProgress.progress} %
+            </strong>
+          )}
+        </div>
+
+        {isLoading ? (
+          <p className="subject-progress-status">Laster progresjon...</p>
+        ) : errorMessage ? (
+          <p className="subject-progress-error">{errorMessage}</p>
+        ) : (
+          <>
+            <div className="subject-progress-bar">
+              <div
+                className="subject-progress-fill"
+                style={{
+                  width: `${subjectProgress.progress}%`,
+                }}
+              />
+            </div>
+
+            <div className="subject-progress-summary">
+              <p>
+                <strong>{subjectProgress.completed}</strong> av{" "}
+                <strong>{subjectProgress.total}</strong> ressurser fullført
+              </p>
+
+              {subjectProgress.averageRating > 0 && (
+                <p>
+                  Forståelse:{" "}
+                  <span className="subject-progress-stars">
+                    {"★".repeat(subjectProgress.averageRating)}
+                  </span>
+                </p>
+              )}
+            </div>
+
+            <div className="subject-progress-categories">
+              <div className="subject-progress-category">
+                <span>Forelesningsnotater</span>
+
+                <strong>
+                  {subjectProgress.pdfCompleted} / {subjectProgress.pdfTotal}
+                </strong>
+              </div>
+
+              <div className="subject-progress-category">
+                <span>Notater</span>
+
+                <strong>
+                  {subjectProgress.noteCompleted} / {subjectProgress.noteTotal}
+                </strong>
+              </div>
+
+              <div className="subject-progress-category">
+                <span>Videoer</span>
+
+                <strong>
+                  {subjectProgress.videoCompleted} /{" "}
+                  {subjectProgress.videoTotal}
+                </strong>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
 
       <div className="subject-features-grid">
         <SubjectFeatureCard
@@ -73,6 +154,58 @@ export const SubjectPage = () => {
           link={`/fag/${subject.id}/studieplan`}
         />
       </div>
+
+      {!isLoading &&
+        !errorMessage &&
+        subjectProgress.topicProgress.length > 0 && (
+          <section className="subject-topic-progress">
+            <div className="subject-topic-progress-header">
+              <div>
+                <p className="subject-progress-label">Temaoversikt</p>
+
+                <h2>Progresjon per tema</h2>
+              </div>
+
+              <p>Foreløpig basert på videoer</p>
+            </div>
+
+            <div className="subject-topic-progress-list">
+              {subjectProgress.topicProgress.map((topic) => (
+                <article
+                  key={topic.topicId}
+                  className="subject-topic-progress-item"
+                >
+                  <div className="subject-topic-progress-top">
+                    <div>
+                      <h3>{topic.topicName}</h3>
+
+                      <p>
+                        {topic.completed} av {topic.total} videoer fullført
+                      </p>
+                    </div>
+
+                    <strong>{topic.progress} %</strong>
+                  </div>
+
+                  <div className="subject-topic-progress-bar">
+                    <div
+                      className="subject-topic-progress-fill"
+                      style={{
+                        width: `${topic.progress}%`,
+                      }}
+                    />
+                  </div>
+
+                  {topic.averageRating > 0 && (
+                    <p className="subject-topic-progress-rating">
+                      Forståelse: <span>{"★".repeat(topic.averageRating)}</span>
+                    </p>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
     </main>
   );
 };
