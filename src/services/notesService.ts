@@ -6,6 +6,12 @@ export type DatabaseNote = {
   id: string;
   subjectId: string;
   folderId: string | null;
+
+  subtopicId: string | null;
+  subtopicName: string | null;
+  topicId: string | null;
+  topicName: string | null;
+
   slug: string;
   title: string;
   description: string;
@@ -16,6 +22,7 @@ export type DatabaseNote = {
 type CreateNoteInput = {
   subjectId: string;
   folderId?: string | null;
+  subtopicId?: string | null;
   slug: string;
   title: string;
   description: string;
@@ -29,22 +36,80 @@ type UpdateNoteInput = {
   content: string;
   contentJson?: NoteContentJson;
   folderId?: string | null;
+  subtopicId?: string | null;
 };
 
-function mapDatabaseNote(note: {
+type TopicRelation = {
+  id: string;
+  name: string;
+  subject_id: string;
+};
+
+type SubtopicRelation = {
+  id: string;
+  name: string;
+  topic_id: string;
+  topics: TopicRelation | TopicRelation[] | null;
+};
+
+type NoteRow = {
   id: string;
   subject_id: string;
   folder_id: string | null;
+  subtopic_id: string | null;
   slug: string;
   title: string;
   description: string;
   content: string | null;
   content_json: NoteContentJson;
-}): DatabaseNote {
+  subtopics: SubtopicRelation | SubtopicRelation[] | null;
+};
+
+const noteSelect = `
+  id,
+  subject_id,
+  folder_id,
+  subtopic_id,
+  slug,
+  title,
+  description,
+  content,
+  content_json,
+  subtopics (
+    id,
+    name,
+    topic_id,
+    topics (
+      id,
+      name,
+      subject_id
+    )
+  )
+`;
+
+const getFirstRelation = <T>(relation: T | T[] | null): T | null => {
+  if (Array.isArray(relation)) {
+    return relation[0] ?? null;
+  }
+
+  return relation;
+};
+
+function mapDatabaseNote(note: NoteRow): DatabaseNote {
+  const subtopic = getFirstRelation(note.subtopics);
+
+  const topic = subtopic ? getFirstRelation(subtopic.topics) : null;
+
   return {
     id: note.id,
     subjectId: note.subject_id,
     folderId: note.folder_id,
+
+    subtopicId: note.subtopic_id,
+    subtopicName: subtopic?.name ?? null,
+    topicId: topic?.id ?? null,
+    topicName: topic?.name ?? null,
+
     slug: note.slug,
     title: note.title,
     description: note.description,
@@ -58,15 +123,17 @@ export async function getNotesBySubject(
 ): Promise<DatabaseNote[]> {
   const { data, error } = await supabase
     .from("notes")
-    .select("*")
+    .select(noteSelect)
     .eq("subject_id", subjectId)
-    .order("created_at", { ascending: true });
+    .order("created_at", {
+      ascending: true,
+    });
 
   if (error) {
     throw error;
   }
 
-  return (data ?? []).map(mapDatabaseNote);
+  return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
 }
 
 export async function getNotesByFolder(
@@ -75,16 +142,18 @@ export async function getNotesByFolder(
 ): Promise<DatabaseNote[]> {
   const { data, error } = await supabase
     .from("notes")
-    .select("*")
+    .select(noteSelect)
     .eq("subject_id", subjectId)
     .eq("folder_id", folderId)
-    .order("created_at", { ascending: true });
+    .order("created_at", {
+      ascending: true,
+    });
 
   if (error) {
     throw error;
   }
 
-  return (data ?? []).map(mapDatabaseNote);
+  return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
 }
 
 export async function moveAllNotesOutOfFolder(folderId: string): Promise<void> {
@@ -105,22 +174,24 @@ export async function getNotesWithoutFolder(
 ): Promise<DatabaseNote[]> {
   const { data, error } = await supabase
     .from("notes")
-    .select("*")
+    .select(noteSelect)
     .eq("subject_id", subjectId)
     .is("folder_id", null)
-    .order("created_at", { ascending: true });
+    .order("created_at", {
+      ascending: true,
+    });
 
   if (error) {
     throw error;
   }
 
-  return (data ?? []).map(mapDatabaseNote);
+  return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
 }
 
 export async function getNoteById(id: string): Promise<DatabaseNote | null> {
   const { data, error } = await supabase
     .from("notes")
-    .select("*")
+    .select(noteSelect)
     .eq("id", id)
     .maybeSingle();
 
@@ -128,7 +199,11 @@ export async function getNoteById(id: string): Promise<DatabaseNote | null> {
     throw error;
   }
 
-  return data ? mapDatabaseNote(data) : null;
+  if (!data) {
+    return null;
+  }
+
+  return mapDatabaseNote(data as NoteRow);
 }
 
 export async function getNoteBySlug(
@@ -137,7 +212,7 @@ export async function getNoteBySlug(
 ): Promise<DatabaseNote | null> {
   const { data, error } = await supabase
     .from("notes")
-    .select("*")
+    .select(noteSelect)
     .eq("subject_id", subjectId)
     .eq("slug", slug)
     .maybeSingle();
@@ -146,12 +221,17 @@ export async function getNoteBySlug(
     throw error;
   }
 
-  return data ? mapDatabaseNote(data) : null;
+  if (!data) {
+    return null;
+  }
+
+  return mapDatabaseNote(data as NoteRow);
 }
 
 export async function createNote({
   subjectId,
   folderId = null,
+  subtopicId = null,
   slug,
   title,
   description,
@@ -163,25 +243,33 @@ export async function createNote({
     .insert({
       subject_id: subjectId,
       folder_id: folderId,
+      subtopic_id: subtopicId,
       slug,
       title,
       description,
       content,
       content_json: contentJson,
     })
-    .select()
+    .select(noteSelect)
     .single();
 
   if (error) {
     throw error;
   }
 
-  return mapDatabaseNote(data);
+  return mapDatabaseNote(data as NoteRow);
 }
 
 export async function updateNote(
   id: string,
-  { title, description, content, contentJson, folderId }: UpdateNoteInput,
+  {
+    title,
+    description,
+    content,
+    contentJson,
+    folderId,
+    subtopicId,
+  }: UpdateNoteInput,
 ): Promise<DatabaseNote> {
   const updates: {
     title: string;
@@ -189,6 +277,7 @@ export async function updateNote(
     content: string;
     content_json?: NoteContentJson;
     folder_id?: string | null;
+    subtopic_id?: string | null;
   } = {
     title,
     description,
@@ -203,18 +292,22 @@ export async function updateNote(
     updates.folder_id = folderId;
   }
 
+  if (subtopicId !== undefined) {
+    updates.subtopic_id = subtopicId;
+  }
+
   const { data, error } = await supabase
     .from("notes")
     .update(updates)
     .eq("id", id)
-    .select()
+    .select(noteSelect)
     .single();
 
   if (error) {
     throw error;
   }
 
-  return mapDatabaseNote(data);
+  return mapDatabaseNote(data as NoteRow);
 }
 
 export async function updateNoteTitle(
@@ -225,6 +318,22 @@ export async function updateNoteTitle(
     .from("notes")
     .update({
       title,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function updateNoteSubtopic(
+  id: string,
+  subtopicId: string | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from("notes")
+    .update({
+      subtopic_id: subtopicId,
     })
     .eq("id", id);
 

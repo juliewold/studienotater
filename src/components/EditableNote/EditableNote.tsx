@@ -5,6 +5,12 @@ import { Check, Edit3, LoaderCircle } from "lucide-react";
 import { NoteEditor } from "../NoteEditor/NoteEditor";
 
 import { updateNote, type DatabaseNote } from "../../services/notesService";
+import {
+  getVideoTopicsBySubject,
+  getVideoSubtopicsByTopic,
+  type DatabaseVideoTopic,
+  type DatabaseVideoSubtopic,
+} from "../../services/videosService";
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
 type EditableNoteProps = {
@@ -20,6 +26,8 @@ type NoteDraft = {
   title: string;
   description: string;
   content: string;
+  topicId: string;
+  subtopicId: string;
 };
 
 export const EditableNote = ({
@@ -33,6 +41,15 @@ export const EditableNote = ({
   const [title, setTitle] = useState(note.title);
   const [description, setDescription] = useState(note.description);
   const [content, setContent] = useState(note.content);
+  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+
+  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+
+  const [selectedTopicId, setSelectedTopicId] = useState(note.topicId ?? "");
+
+  const [selectedSubtopicId, setSelectedSubtopicId] = useState(
+    note.subtopicId ?? "",
+  );
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
 
@@ -42,6 +59,8 @@ export const EditableNote = ({
     title: note.title,
     description: note.description,
     content: note.content,
+    topicId: note.topicId ?? "",
+    subtopicId: note.subtopicId ?? "",
   });
 
   useEffect(() => {
@@ -52,18 +71,59 @@ export const EditableNote = ({
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
+    setSelectedTopicId(note.topicId ?? "");
+    setSelectedSubtopicId(note.subtopicId ?? "");
 
     lastSavedDraft.current = {
       title: note.title,
       description: note.description,
       content: note.content,
+      topicId: note.topicId ?? "",
+      subtopicId: note.subtopicId ?? "",
     };
   }, [isEditing, note]);
+
+  useEffect(() => {
+    const loadTopics = async () => {
+      try {
+        const loadedTopics = await getVideoTopicsBySubject(note.subjectId);
+
+        setTopics(loadedTopics);
+      } catch (error) {
+        console.error("Kunne ikke hente temaer:", error);
+      }
+    };
+
+    loadTopics();
+  }, [note.subjectId]);
+
+  useEffect(() => {
+    const loadSubtopics = async () => {
+      if (!selectedTopicId) {
+        setSubtopics([]);
+        return;
+      }
+
+      try {
+        const loadedSubtopics = await getVideoSubtopicsByTopic(selectedTopicId);
+
+        setSubtopics(loadedSubtopics);
+      } catch (error) {
+        console.error("Kunne ikke hente undertemaer:", error);
+
+        setSubtopics([]);
+      }
+    };
+
+    loadSubtopics();
+  }, [selectedTopicId]);
 
   const getCurrentDraft = (): NoteDraft => ({
     title: title.trim(),
     description: description.trim(),
     content,
+    topicId: selectedTopicId,
+    subtopicId: selectedSubtopicId,
   });
 
   const hasUnsavedChanges = (draft: NoteDraft) => {
@@ -72,13 +132,27 @@ export const EditableNote = ({
     return (
       draft.title !== savedDraft.title ||
       draft.description !== savedDraft.description ||
-      draft.content !== savedDraft.content
+      draft.content !== savedDraft.content ||
+      draft.topicId !== savedDraft.topicId ||
+      draft.subtopicId !== savedDraft.subtopicId
     );
   };
 
   const saveDraft = async (draft: NoteDraft): Promise<boolean> => {
     if (!draft.title) {
       setErrorMessage("Notatet må ha en tittel.");
+      setSaveStatus("error");
+      return false;
+    }
+
+    if (!draft.topicId) {
+      setErrorMessage("Du må velge et tema.");
+      setSaveStatus("error");
+      return false;
+    }
+
+    if (!draft.subtopicId) {
+      setErrorMessage("Du må velge et undertema.");
       setSaveStatus("error");
       return false;
     }
@@ -97,12 +171,15 @@ export const EditableNote = ({
         description: draft.description,
         content: draft.content,
         contentJson: note.contentJson,
+        subtopicId: draft.subtopicId,
       });
 
       lastSavedDraft.current = {
         title: updatedNote.title,
         description: updatedNote.description,
         content: updatedNote.content,
+        topicId: updatedNote.topicId ?? "",
+        subtopicId: updatedNote.subtopicId ?? "",
       };
 
       onNoteUpdated(updatedNote);
@@ -139,17 +216,28 @@ export const EditableNote = ({
     return () => {
       window.clearTimeout(autosaveTimer);
     };
-  }, [title, description, content, isEditing]);
+  }, [
+    title,
+    description,
+    content,
+    selectedTopicId,
+    selectedSubtopicId,
+    isEditing,
+  ]);
 
   const handleStartEditing = () => {
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
+    setSelectedTopicId(note.topicId ?? "");
+    setSelectedSubtopicId(note.subtopicId ?? "");
 
     lastSavedDraft.current = {
       title: note.title,
       description: note.description,
       content: note.content,
+      topicId: note.topicId ?? "",
+      subtopicId: note.subtopicId ?? "",
     };
 
     setErrorMessage("");
@@ -225,6 +313,48 @@ export const EditableNote = ({
           </p>
         )}
 
+        <div className="editable-note-classification">
+          <label htmlFor="editable-note-topic">Tema</label>
+
+          <select
+            id="editable-note-topic"
+            value={selectedTopicId}
+            onChange={(event) => {
+              setSelectedTopicId(event.target.value);
+              setSelectedSubtopicId("");
+              setErrorMessage("");
+            }}
+          >
+            <option value="">Velg tema</option>
+
+            {topics.map((topic) => (
+              <option key={topic.id} value={topic.id}>
+                {topic.name}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="editable-note-subtopic">Undertema</label>
+
+          <select
+            id="editable-note-subtopic"
+            value={selectedSubtopicId}
+            onChange={(event) => {
+              setSelectedSubtopicId(event.target.value);
+              setErrorMessage("");
+            }}
+            disabled={!selectedTopicId}
+          >
+            <option value="">Velg undertema</option>
+
+            {subtopics.map((subtopic) => (
+              <option key={subtopic.id} value={subtopic.id}>
+                {subtopic.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="editable-note-document-header">
           <input
             type="text"
@@ -272,6 +402,14 @@ export const EditableNote = ({
         <p className="editable-note-message editable-note-error">
           {errorMessage}
         </p>
+      )}
+
+      {(note.topicName || note.subtopicName) && (
+        <div className="editable-note-classification-display">
+          {note.topicName && <span>Tema: {note.topicName}</span>}
+
+          {note.subtopicName && <span>Undertema: {note.subtopicName}</span>}
+        </div>
       )}
 
       <div className="editable-note-document-header">

@@ -16,6 +16,11 @@ import {
   type DatabaseNote,
 } from "../../services/notesService";
 
+import {
+  getVideoSubtopicsByTopic,
+  type DatabaseVideoSubtopic,
+} from "../../services/videosService";
+
 import { NoteCard } from "../../components/NoteCard/NoteCard";
 
 export const FolderPage = () => {
@@ -24,10 +29,23 @@ export const FolderPage = () => {
   const { isAdmin } = useContext(AuthContext);
 
   const [folder, setFolder] = useState<NoteFolder | null>(null);
+
   const [notes, setNotes] = useState<DatabaseNote[]>([]);
 
+  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+
+  const [isCreateNoteModalOpen, setIsCreateNoteModalOpen] = useState(false);
+
+  const [newNoteTitle, setNewNoteTitle] = useState("");
+
+  const [selectedSubtopicId, setSelectedSubtopicId] = useState("");
+
+  const [noteModalError, setNoteModalError] = useState("");
+
   const [isLoading, setIsLoading] = useState(true);
+
   const [isCreatingNote, setIsCreatingNote] = useState(false);
+
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -51,10 +69,20 @@ export const FolderPage = () => {
 
         const loadedNotes = await getNotesByFolder(subjectId, folderId);
 
+        let loadedSubtopics: DatabaseVideoSubtopic[] = [];
+
+        if (loadedFolder.topicId) {
+          loadedSubtopics = await getVideoSubtopicsByTopic(
+            loadedFolder.topicId,
+          );
+        }
+
         setFolder(loadedFolder);
         setNotes(loadedNotes);
+        setSubtopics(loadedSubtopics);
       } catch (error) {
         console.error("Kunne ikke hente mappen:", error);
+
         setError("Kunne ikke hente mappen.");
       } finally {
         setIsLoading(false);
@@ -74,33 +102,57 @@ export const FolderPage = () => {
       .replace(/^-+|-+$/g, "");
   };
 
+  const openCreateNoteModal = () => {
+    setNewNoteTitle("");
+    setSelectedSubtopicId("");
+    setNoteModalError("");
+    setIsCreateNoteModalOpen(true);
+  };
+
+  const closeCreateNoteModal = () => {
+    if (isCreatingNote) {
+      return;
+    }
+
+    setIsCreateNoteModalOpen(false);
+    setNewNoteTitle("");
+    setSelectedSubtopicId("");
+    setNoteModalError("");
+  };
+
   const handleCreateNote = async () => {
     if (!subjectId || !folderId) {
       return;
     }
 
-    const title = window.prompt("Hva skal notatet hete?");
-
-    const trimmedTitle = title?.trim();
+    const trimmedTitle = newNoteTitle.trim();
 
     if (!trimmedTitle) {
+      setNoteModalError("Du må skrive inn en tittel.");
+      return;
+    }
+
+    if (!selectedSubtopicId) {
+      setNoteModalError("Du må velge et undertema.");
       return;
     }
 
     const slug = createSlug(trimmedTitle);
 
     if (!slug) {
-      setError("Notatet må ha en gyldig tittel.");
+      setNoteModalError("Notatet må ha en gyldig tittel.");
       return;
     }
 
     setIsCreatingNote(true);
+    setNoteModalError("");
     setError("");
 
     try {
       const newNote = await createNote({
         subjectId,
         folderId,
+        subtopicId: selectedSubtopicId,
         slug,
         title: trimmedTitle,
         description: "",
@@ -110,11 +162,16 @@ export const FolderPage = () => {
 
       setNotes((currentNotes) => [...currentNotes, newNote]);
 
+      setIsCreateNoteModalOpen(false);
+      setNewNoteTitle("");
+      setSelectedSubtopicId("");
+      setNoteModalError("");
+
       navigate(`/fag/${subjectId}/notater/${newNote.slug}`);
     } catch (error) {
       console.error("Kunne ikke opprette notat:", error);
 
-      setError(
+      setNoteModalError(
         "Kunne ikke opprette notatet. Det kan allerede finnes et notat med samme adresse.",
       );
     } finally {
@@ -155,14 +212,19 @@ export const FolderPage = () => {
       <div className="folder-page-header">
         <div>
           <p className="notes-label">Mappe</p>
+
           <h1>📁 {folder.name}</h1>
+
+          {folder.topicName && (
+            <p className="folder-topic-name">Tema: {folder.topicName}</p>
+          )}
         </div>
 
         {isAdmin && (
           <button
             type="button"
             className="new-folder-button"
-            onClick={handleCreateNote}
+            onClick={openCreateNoteModal}
             disabled={isCreatingNote}
           >
             <Plus size={20} />
@@ -185,14 +247,10 @@ export const FolderPage = () => {
               subjectId={subjectId!}
               descriptionFallback="Klikk for å åpne notatet."
               onNoteChanged={(change) => {
-                if (
-                  change.type === "moved" ||
-                  change.type === "deleted"
-                ) {
+                if (change.type === "moved" || change.type === "deleted") {
                   setNotes((currentNotes) =>
                     currentNotes.filter(
-                      (currentNote) =>
-                        currentNote.id !== note.id,
+                      (currentNote) => currentNote.id !== note.id,
                     ),
                   );
 
@@ -214,6 +272,98 @@ export const FolderPage = () => {
               }}
             />
           ))}
+        </div>
+      )}
+
+      {isCreateNoteModalOpen && (
+        <div
+          className="folder-modal-backdrop"
+          onMouseDown={closeCreateNoteModal}
+        >
+          <section
+            className="folder-modal"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="folder-modal-header">
+              <div>
+                <p className="folder-modal-label">Nytt notat</p>
+
+                <h2>Opprett notat</h2>
+              </div>
+            </div>
+
+            <div className="folder-modal-form">
+              <label htmlFor="new-note-title">Notattittel</label>
+
+              <input
+                id="new-note-title"
+                type="text"
+                value={newNoteTitle}
+                onChange={(event) => {
+                  setNewNoteTitle(event.target.value);
+
+                  if (noteModalError) {
+                    setNoteModalError("");
+                  }
+                }}
+                disabled={isCreatingNote}
+                autoFocus
+              />
+
+              <label htmlFor="new-note-subtopic">Undertema</label>
+
+              <select
+                id="new-note-subtopic"
+                value={selectedSubtopicId}
+                onChange={(event) => {
+                  setSelectedSubtopicId(event.target.value);
+
+                  if (noteModalError) {
+                    setNoteModalError("");
+                  }
+                }}
+                disabled={isCreatingNote}
+              >
+                <option value="">Velg undertema</option>
+
+                {subtopics.map((subtopic) => (
+                  <option key={subtopic.id} value={subtopic.id}>
+                    {subtopic.name}
+                  </option>
+                ))}
+              </select>
+
+              {subtopics.length === 0 && (
+                <p className="folder-modal-error">
+                  Dette temaet har ingen undertemaer ennå.
+                </p>
+              )}
+
+              {noteModalError && (
+                <p className="folder-modal-error">{noteModalError}</p>
+              )}
+
+              <div className="folder-modal-actions">
+                <button
+                  type="button"
+                  className="folder-modal-cancel-button"
+                  onClick={closeCreateNoteModal}
+                  disabled={isCreatingNote}
+                >
+                  Avbryt
+                </button>
+
+                <button
+                  type="button"
+                  className="folder-modal-submit-button"
+                  onClick={handleCreateNote}
+                  disabled={isCreatingNote || subtopics.length === 0}
+                >
+                  {isCreatingNote ? "Oppretter..." : "Opprett notat"}
+                </button>
+              </div>
+            </div>
+          </section>
         </div>
       )}
     </main>

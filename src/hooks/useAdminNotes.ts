@@ -1,5 +1,13 @@
-import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type SyntheticEvent,
+} from "react";
+
 import { subjects } from "../data/subjects";
+
 import {
   createNote,
   deleteNote,
@@ -8,17 +16,36 @@ import {
   type DatabaseNote,
 } from "../services/notesService";
 
+import {
+  getVideoSubtopicsByTopic,
+  getVideoTopicsBySubject,
+  type DatabaseVideoSubtopic,
+  type DatabaseVideoTopic,
+} from "../services/videosService";
+
 export const useAdminNotes = () => {
   const [subjectId, setSubjectId] = useState("");
+  const [topicId, setTopicId] = useState("");
+  const [subtopicId, setSubtopicId] = useState("");
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
 
+  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+
+  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+
   const [editingNote, setEditingNote] = useState<DatabaseNote | null>(null);
 
   const [uploadedNotes, setUploadedNotes] = useState<DatabaseNote[]>([]);
+
   const [isLoadingNotes, setIsLoadingNotes] = useState(true);
+
+  const [isLoadingStructure, setIsLoadingStructure] = useState(true);
+
   const [isSaving, setIsSaving] = useState(false);
+
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,9 +63,13 @@ export const useAdminNotes = () => {
 
   const resetForm = () => {
     setSubjectId("");
+    setTopicId("");
+    setSubtopicId("");
+
     setTitle("");
     setDescription("");
     setContent("");
+
     setEditingNote(null);
   };
 
@@ -53,22 +84,81 @@ export const useAdminNotes = () => {
 
       const allUploadedNotes = notesBySubject
         .flat()
-        .sort((firstNote, secondNote) =>
-          firstNote.title.localeCompare(secondNote.title, "nb"),
-        );
+        .sort((firstNote, secondNote) => {
+          const subjectComparison = firstNote.subjectId.localeCompare(
+            secondNote.subjectId,
+            "nb",
+          );
+
+          if (subjectComparison !== 0) {
+            return subjectComparison;
+          }
+
+          return firstNote.title.localeCompare(secondNote.title, "nb");
+        });
 
       setUploadedNotes(allUploadedNotes);
     } catch (error) {
       console.error("Kunne ikke hente notater:", error);
+
       setErrorMessage("Kunne ikke hente notatene.");
     } finally {
       setIsLoadingNotes(false);
     }
   }, []);
 
+  const loadTopicStructure = useCallback(async () => {
+    setIsLoadingStructure(true);
+    setErrorMessage("");
+
+    try {
+      const topicsBySubject = await Promise.all(
+        subjects.map((subject) => getVideoTopicsBySubject(subject.id)),
+      );
+
+      const loadedTopics = topicsBySubject.flat();
+
+      const subtopicsByTopic = await Promise.all(
+        loadedTopics.map((topic) => getVideoSubtopicsByTopic(topic.id)),
+      );
+
+      setTopics(loadedTopics);
+      setSubtopics(subtopicsByTopic.flat());
+    } catch (error) {
+      console.error("Kunne ikke hente temaer og undertemaer:", error);
+
+      setTopics([]);
+      setSubtopics([]);
+
+      setErrorMessage("Kunne ikke hente temaer og undertemaer.");
+    } finally {
+      setIsLoadingStructure(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadUploadedNotes();
-  }, [loadUploadedNotes]);
+    loadTopicStructure();
+  }, [loadTopicStructure, loadUploadedNotes]);
+
+  const availableTopics = useMemo(() => {
+    return topics.filter((topic) => topic.subjectId === subjectId);
+  }, [subjectId, topics]);
+
+  const availableSubtopics = useMemo(() => {
+    return subtopics.filter((subtopic) => subtopic.topicId === topicId);
+  }, [subtopics, topicId]);
+
+  const handleSubjectChange = (nextSubjectId: string) => {
+    setSubjectId(nextSubjectId);
+    setTopicId("");
+    setSubtopicId("");
+  };
+
+  const handleTopicChange = (nextTopicId: string) => {
+    setTopicId(nextTopicId);
+    setSubtopicId("");
+  };
 
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -76,6 +166,18 @@ export const useAdminNotes = () => {
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
     const trimmedContent = content.trim();
+
+    if (
+      !subjectId ||
+      !topicId ||
+      !subtopicId ||
+      !trimmedTitle ||
+      !trimmedDescription
+    ) {
+      setErrorMessage("Fyll ut fag, tema, undertema, tittel og beskrivelse.");
+
+      return;
+    }
 
     setIsSaving(true);
     setErrorMessage("");
@@ -87,11 +189,14 @@ export const useAdminNotes = () => {
           title: trimmedTitle,
           description: trimmedDescription,
           content: trimmedContent,
+          subtopicId,
         });
 
         resetForm();
         await loadUploadedNotes();
+
         setSuccessMessage("Notatet ble oppdatert.");
+
         return;
       }
 
@@ -99,19 +204,22 @@ export const useAdminNotes = () => {
 
       if (!slug) {
         setErrorMessage("Notatet må ha en gyldig tittel.");
+
         return;
       }
 
       await createNote({
         subjectId,
+        subtopicId,
         slug,
         title: trimmedTitle,
         description: trimmedDescription,
         content: trimmedContent,
       });
-      
+
       resetForm();
       await loadUploadedNotes();
+
       setSuccessMessage("Notatet ble opprettet.");
     } catch (error) {
       console.error(
@@ -133,7 +241,11 @@ export const useAdminNotes = () => {
 
   const handleEdit = (note: DatabaseNote) => {
     setEditingNote(note);
+
     setSubjectId(note.subjectId);
+    setTopicId(note.topicId ?? "");
+    setSubtopicId(note.subtopicId ?? "");
+
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
@@ -180,6 +292,7 @@ export const useAdminNotes = () => {
       setSuccessMessage("Notatet ble slettet.");
     } catch (error) {
       console.error("Kunne ikke slette notat:", error);
+
       setErrorMessage("Kunne ikke slette notatet.");
     } finally {
       setDeletingNoteId(null);
@@ -188,7 +301,8 @@ export const useAdminNotes = () => {
 
   return {
     subjectId,
-    setSubjectId,
+    topicId,
+    subtopicId,
 
     title,
     setTitle,
@@ -199,15 +313,27 @@ export const useAdminNotes = () => {
     content,
     setContent,
 
+    topics,
+    subtopics,
+    availableTopics,
+    availableSubtopics,
+
     editingNote,
 
     uploadedNotes,
+
     isLoadingNotes,
+    isLoadingStructure,
     isSaving,
+
     deletingNoteId,
 
     errorMessage,
     successMessage,
+
+    handleSubjectChange,
+    handleTopicChange,
+    setSubtopicId,
 
     handleSubmit,
     handleEdit,

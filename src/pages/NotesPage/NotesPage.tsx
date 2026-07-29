@@ -21,6 +21,10 @@ import { useProgress } from "../../hooks/useProgress";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 import { FolderCard } from "../../components/FolderCard/FolderCard";
 import { NoteCard } from "../../components/NoteCard/NoteCard";
+import {
+  getVideoTopicsBySubject,
+  type DatabaseVideoTopic,
+} from "../../services/videosService";
 
 export const NotesPage = () => {
   const { subjectId } = useParams();
@@ -46,6 +50,10 @@ export const NotesPage = () => {
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
 
   const [folderName, setFolderName] = useState("");
+
+  const [topicId, setTopicId] = useState("");
+
+  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
 
   const [folderModalError, setFolderModalError] = useState("");
 
@@ -136,6 +144,25 @@ export const NotesPage = () => {
   }, [subjectId]);
 
   useEffect(() => {
+    const loadTopics = async () => {
+      if (!subjectId) {
+        setTopics([]);
+        return;
+      }
+
+      try {
+        const loadedTopics = await getVideoTopicsBySubject(subjectId);
+
+        setTopics(loadedTopics);
+      } catch (error) {
+        console.error("Kunne ikke hente temaer:", error);
+      }
+    };
+
+    loadTopics();
+  }, [subjectId]);
+
+  useEffect(() => {
     if (!isFolderModalOpen) {
       return;
     }
@@ -158,6 +185,7 @@ export const NotesPage = () => {
   }, [isFolderModalOpen]);
 
   const openFolderModal = () => {
+    setTopicId("");
     setFolderName("");
     setFolderModalError("");
     setIsFolderModalOpen(true);
@@ -168,6 +196,7 @@ export const NotesPage = () => {
       return;
     }
 
+    setTopicId("");
     setIsFolderModalOpen(false);
     setFolderName("");
     setFolderModalError("");
@@ -185,12 +214,21 @@ export const NotesPage = () => {
       return;
     }
 
+    if (!topicId) {
+      setFolderModalError("Du må velge et tema.");
+      return;
+    }
+
     setIsCreatingFolder(true);
     setFolderModalError("");
     setFoldersError("");
 
     try {
-      const newFolder = await createNoteFolder(subjectId, trimmedFolderName);
+      const newFolder = await createNoteFolder(
+        subjectId,
+        trimmedFolderName,
+        topicId,
+      );
 
       setFolders((currentFolders) => [...currentFolders, newFolder]);
 
@@ -416,6 +454,30 @@ export const NotesPage = () => {
                 placeholder="For eksempel Forelesninger"
                 disabled={isCreatingFolder}
               />
+
+              <label htmlFor="folder-topic">Tema</label>
+
+              <select
+                id="folder-topic"
+                value={topicId}
+                onChange={(event) => {
+                  setTopicId(event.target.value);
+
+                  if (folderModalError) {
+                    setFolderModalError("");
+                  }
+                }}
+                disabled={isCreatingFolder}
+                required
+              >
+                <option value="">Velg tema</option>
+
+                {topics.map((topic) => (
+                  <option key={topic.id} value={topic.id}>
+                    {topic.name}
+                  </option>
+                ))}
+              </select>
 
               {folderModalError && (
                 <p className="folder-modal-error">{folderModalError}</p>

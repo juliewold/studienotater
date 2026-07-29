@@ -1,12 +1,14 @@
 import "./AdminNotesPage.css";
+
+import { NoteEditor } from "../../components/NoteEditor/NoteEditor";
 import { subjects } from "../../data/subjects";
 import { useAdminNotes } from "../../hooks/useAdminNotes";
-import { NoteEditor } from "../../components/NoteEditor/NoteEditor";
 
 export const AdminNotesPage = () => {
   const {
     subjectId,
-    setSubjectId,
+    topicId,
+    subtopicId,
 
     title,
     setTitle,
@@ -17,15 +19,25 @@ export const AdminNotesPage = () => {
     content,
     setContent,
 
+    availableTopics,
+    availableSubtopics,
+
     editingNote,
 
     uploadedNotes,
+
     isLoadingNotes,
+    isLoadingStructure,
     isSaving,
+
     deletingNoteId,
 
     errorMessage,
     successMessage,
+
+    handleSubjectChange,
+    handleTopicChange,
+    setSubtopicId,
 
     handleSubmit,
     handleEdit,
@@ -63,7 +75,7 @@ export const AdminNotesPage = () => {
             <select
               id="note-subject"
               value={subjectId}
-              onChange={(event) => setSubjectId(event.target.value)}
+              onChange={(event) => handleSubjectChange(event.target.value)}
               disabled={Boolean(editingNote)}
               required
             >
@@ -81,6 +93,58 @@ export const AdminNotesPage = () => {
                 Faget kan ikke endres når et notat redigeres.
               </p>
             )}
+          </div>
+
+          <div className="admin-note-field">
+            <label htmlFor="note-topic">Tema</label>
+
+            <select
+              id="note-topic"
+              value={topicId}
+              onChange={(event) => handleTopicChange(event.target.value)}
+              disabled={!subjectId || isLoadingStructure}
+              required
+            >
+              <option value="">
+                {!subjectId
+                  ? "Velg fag først"
+                  : availableTopics.length === 0
+                    ? "Ingen temaer i faget"
+                    : "Velg tema"}
+              </option>
+
+              {availableTopics.map((topic) => (
+                <option key={topic.id} value={topic.id}>
+                  {topic.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="admin-note-field">
+            <label htmlFor="note-subtopic">Undertema</label>
+
+            <select
+              id="note-subtopic"
+              value={subtopicId}
+              onChange={(event) => setSubtopicId(event.target.value)}
+              disabled={!topicId || isLoadingStructure}
+              required
+            >
+              <option value="">
+                {!topicId
+                  ? "Velg tema først"
+                  : availableSubtopics.length === 0
+                    ? "Ingen undertemaer"
+                    : "Velg undertema"}
+              </option>
+
+              {availableSubtopics.map((subtopic) => (
+                <option key={subtopic.id} value={subtopic.id}>
+                  {subtopic.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="admin-note-document-header">
@@ -149,7 +213,7 @@ export const AdminNotesPage = () => {
       <section className="admin-note-card uploaded-notes-section">
         <h2>Opprettede notater</h2>
 
-        {isLoadingNotes ? (
+        {isLoadingNotes || isLoadingStructure ? (
           <p>Laster notater...</p>
         ) : uploadedNotes.length === 0 ? (
           <p>Ingen notater er opprettet gjennom adminpanelet ennå.</p>
@@ -163,6 +227,15 @@ export const AdminNotesPage = () => {
                   <p>{note.description}</p>
 
                   <span>{getSubjectLabel(note.subjectId)}</span>
+
+                  <p>
+                    Tema: <strong>{note.topicName ?? "Ikke valgt"}</strong>
+                  </p>
+
+                  <p>
+                    Undertema:{" "}
+                    <strong>{note.subtopicName ?? "Ikke valgt"}</strong>
+                  </p>
                 </div>
 
                 <div className="uploaded-note-actions">
