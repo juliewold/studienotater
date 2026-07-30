@@ -14,6 +14,7 @@ import {
 import {
   createNoteFolder,
   getNoteFoldersBySubject,
+  updateNoteFolderTopic,
   type NoteFolder,
 } from "../../services/noteFoldersService";
 
@@ -342,12 +343,37 @@ export const NotesPage = () => {
       const updatedNotes = [...existingNotes];
 
       for (const topic of loadedTopics) {
+        const normalizeName = (value: string) =>
+          value.trim().toLocaleLowerCase("nb");
+
         let folder = updatedFolders.find(
-          (currentFolder) =>
-            currentFolder.topicId === topic.id ||
-            currentFolder.name.trim().toLowerCase() ===
-              topic.name.trim().toLowerCase(),
+          (currentFolder) => currentFolder.topicId === topic.id,
         );
+
+        if (!folder) {
+          folder = updatedFolders.find(
+            (currentFolder) =>
+              normalizeName(currentFolder.name) === normalizeName(topic.name),
+          );
+
+          if (folder && folder.topicId === null) {
+            await updateNoteFolderTopic(folder.id, topic.id);
+
+            const linkedFolder: NoteFolder = {
+              ...folder,
+              topicId: topic.id,
+              topicName: topic.name,
+            };
+
+            updatedFolders[
+              updatedFolders.findIndex(
+                (currentFolder) => currentFolder.id === folder?.id,
+              )
+            ] = linkedFolder;
+
+            folder = linkedFolder;
+          }
+        }
 
         if (!folder) {
           folder = await createNoteFolder(subjectId, topic.name, topic.id);
