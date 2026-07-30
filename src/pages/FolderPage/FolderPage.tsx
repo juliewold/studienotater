@@ -21,7 +21,7 @@ import {
   type DatabaseSubtopic,
 } from "../../services/subjectStructureService";
 
-import { NoteCard } from "../../components/NoteCard/NoteCard";
+import { FolderNoteCard } from "../../components/FolderNoteCard/FolderNoteCard";
 
 export const FolderPage = () => {
   const { subjectId, folderId } = useParams();
@@ -72,9 +72,7 @@ export const FolderPage = () => {
         let loadedSubtopics: DatabaseSubtopic[] = [];
 
         if (loadedFolder.topicId) {
-          loadedSubtopics = await getSubtopicsByTopic(
-            loadedFolder.topicId,
-          );
+          loadedSubtopics = await getSubtopicsByTopic(loadedFolder.topicId);
         }
 
         setFolder(loadedFolder);
@@ -239,13 +237,12 @@ export const FolderPage = () => {
       {notes.length === 0 ? (
         <p>Denne mappen er tom.</p>
       ) : (
-        <div className="notes-list">
+        <div className="folder-notes-grid">
           {notes.map((note) => (
-            <NoteCard
+            <FolderNoteCard
               key={note.id}
               note={note}
               subjectId={subjectId!}
-              descriptionFallback="Klikk for å åpne notatet."
               onNoteChanged={(change) => {
                 if (change.type === "moved" || change.type === "deleted") {
                   setNotes((currentNotes) =>
