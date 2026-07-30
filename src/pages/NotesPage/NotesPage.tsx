@@ -1,5 +1,5 @@
 import "./NotesPage.css";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart, Plus, Sparkles, X } from "lucide-react";
 
@@ -92,6 +92,47 @@ export const NotesPage = () => {
   const { isFavorite, toggleFavorite, isLoadingFavorites } = useFavorites();
 
   const { getProgress, isLoadingProgress } = useProgress();
+
+  const normalizeName = (value: string) => value.trim().toLocaleLowerCase("nb");
+
+  const sortedFolders = useMemo(() => {
+    const getTopicForFolder = (folder: NoteFolder) => {
+      if (folder.topicId) {
+        const topicById = topics.find((topic) => topic.id === folder.topicId);
+
+        if (topicById) {
+          return topicById;
+        }
+      }
+
+      return topics.find(
+        (topic) => normalizeName(topic.name) === normalizeName(folder.name),
+      );
+    };
+
+    return [...folders].sort((folderA, folderB) => {
+      const topicA = getTopicForFolder(folderA);
+      const topicB = getTopicForFolder(folderB);
+
+      if (topicA && topicB) {
+        if (topicA.sortOrder !== topicB.sortOrder) {
+          return topicA.sortOrder - topicB.sortOrder;
+        }
+
+        return topicA.name.localeCompare(topicB.name, "nb");
+      }
+
+      if (topicA && !topicB) {
+        return -1;
+      }
+
+      if (!topicA && topicB) {
+        return 1;
+      }
+
+      return folderA.name.localeCompare(folderB.name, "nb");
+    });
+  }, [folders, topics]);
 
   useEffect(() => {
     const loadNotes = async () => {
@@ -457,7 +498,7 @@ export const NotesPage = () => {
 
       {!isLoadingFolders && folders.length > 0 && (
         <div className="notes-folders">
-          {folders.map((folder) => (
+          {sortedFolders.map((folder) => (
             <FolderCard
               key={folder.id}
               folder={folder}
