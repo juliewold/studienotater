@@ -21,16 +21,25 @@ import {
   type DatabaseSubtopic,
 } from "../../services/subjectStructureService";
 
+import { getAllProgress, type Progress } from "../../services/progressService";
+
 import { FolderNoteCard } from "../../components/FolderNoteCard/FolderNoteCard";
 
 export const FolderPage = () => {
   const { subjectId, folderId } = useParams();
   const navigate = useNavigate();
-  const { isAdmin } = useContext(AuthContext);
+
+  const { user, isAdmin } = useContext(AuthContext);
+
+  const userId = user?.id;
 
   const [folder, setFolder] = useState<NoteFolder | null>(null);
 
   const [notes, setNotes] = useState<DatabaseNote[]>([]);
+
+  const [progressByNoteId, setProgressByNoteId] = useState<
+    Record<string, Progress>
+  >({});
 
   const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
@@ -75,9 +84,33 @@ export const FolderPage = () => {
           loadedSubtopics = await getSubtopicsByTopic(loadedFolder.topicId);
         }
 
+        const loadedProgressByNoteId: Record<string, Progress> = {};
+
+        if (userId) {
+          const allProgress = await getAllProgress(userId);
+
+          for (const note of loadedNotes) {
+            const resourceId = `note-${subjectId}-database-${note.slug}`;
+
+            const noteProgress = allProgress.find(
+              (progressItem) =>
+                progressItem.itemType === "resource" &&
+                progressItem.itemId === resourceId,
+            );
+
+            if (noteProgress) {
+              loadedProgressByNoteId[note.id] = {
+                completed: noteProgress.completed,
+                rating: noteProgress.rating,
+              };
+            }
+          }
+        }
+
         setFolder(loadedFolder);
         setNotes(loadedNotes);
         setSubtopics(loadedSubtopics);
+        setProgressByNoteId(loadedProgressByNoteId);
       } catch (error) {
         console.error("Kunne ikke hente mappen:", error);
 
@@ -88,7 +121,7 @@ export const FolderPage = () => {
     };
 
     loadData();
-  }, [subjectId, folderId]);
+  }, [subjectId, folderId, userId]);
 
   const createSlug = (value: string) => {
     return value
@@ -243,6 +276,12 @@ export const FolderPage = () => {
               key={note.id}
               note={note}
               subjectId={subjectId!}
+              progress={
+                progressByNoteId[note.id] ?? {
+                  completed: false,
+                  rating: 0,
+                }
+              }
               onNoteChanged={(change) => {
                 if (change.type === "moved" || change.type === "deleted") {
                   setNotes((currentNotes) =>
@@ -250,6 +289,16 @@ export const FolderPage = () => {
                       (currentNote) => currentNote.id !== note.id,
                     ),
                   );
+
+                  setProgressByNoteId((currentProgress) => {
+                    const updatedProgress = {
+                      ...currentProgress,
+                    };
+
+                    delete updatedProgress[note.id];
+
+                    return updatedProgress;
+                  });
 
                   return;
                 }
