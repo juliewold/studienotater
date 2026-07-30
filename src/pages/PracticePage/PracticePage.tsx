@@ -69,48 +69,51 @@ export const PracticePage = () => {
 
   const topics = practiceTopics[subjectId as keyof typeof practiceTopics] ?? [];
 
-  const topicGroups = [
-    {
-      title: "📘 Mengder og logikk",
-      topics: [
-        "Mengder",
-        "Relasjoner",
-        "Funksjoner",
-        "Utsagnslogikk",
-        "Predikatlogikk",
-        "Bevisteknikker",
-      ],
-    },
-    {
-      title: "🔁 Rekursjon og induksjon",
-      topics: ["Rekursjon", "Induksjon", "Induktivt definerte mengder"],
-    },
-    {
-      title: "🔢 Tallteori",
-      topics: [
-        "Delbarhet og primtall",
-        "GCD og Euklids algoritme",
-        "Diofantiske ligninger",
-        "Kongruensregning",
-        "Modulære inverser",
-        "Kinesisk restteorem",
-        "Diskrete logaritmer",
-        "RSA",
-      ],
-    },
-    {
-      title: "🎲 Kombinatorikk",
-      topics: ["Kombinatorikk"],
-    },
-    {
-      title: "📈 Grafteori",
-      topics: ["Grafteori", "Trær"],
-    },
-    {
-      title: "🤖 Tilstandsmaskiner og regulære språk",
-      topics: ["Automater", "Regulære uttrykk"],
-    },
-  ];
+  const topicGroups =
+    subjectId === "tma4412"
+      ? [
+          {
+            title: "📘 Mengder og logikk",
+            topics: [
+              "Mengder",
+              "Relasjoner",
+              "Funksjoner",
+              "Utsagnslogikk",
+              "Predikatlogikk",
+              "Bevisteknikker",
+            ],
+          },
+          {
+            title: "🔁 Rekursjon og induksjon",
+            topics: ["Rekursjon", "Induksjon", "Induktivt definerte mengder"],
+          },
+          {
+            title: "🔢 Tallteori",
+            topics: [
+              "Delbarhet og primtall",
+              "GCD og Euklids algoritme",
+              "Diofantiske ligninger",
+              "Kongruensregning",
+              "Modulære inverser",
+              "Kinesisk restteorem",
+              "Diskrete logaritmer",
+              "RSA",
+            ],
+          },
+          {
+            title: "🎲 Kombinatorikk",
+            topics: ["Kombinatorikk"],
+          },
+          {
+            title: "📈 Grafteori",
+            topics: ["Grafteori", "Trær"],
+          },
+          {
+            title: "🤖 Tilstandsmaskiner og regulære språk",
+            topics: ["Automater", "Regulære uttrykk"],
+          },
+        ]
+      : [];
 
   const [statisticsVersion, setStatisticsVersion] = useState(0);
 
