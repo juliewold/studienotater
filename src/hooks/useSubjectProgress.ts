@@ -11,7 +11,7 @@ import {
 
 import { useProgress } from "./useProgress";
 
-export type VideoTopicProgress = {
+export type TopicProgress = {
   topicId: string;
   topicName: string;
   topicOrder: number;
@@ -36,7 +36,23 @@ export type SubjectProgress = {
   videoCompleted: number;
   videoTotal: number;
 
-  topicProgress: VideoTopicProgress[];
+  topicProgress: TopicProgress[];
+};
+
+type TopicResource = {
+  topicId?: string | null;
+  topicName?: string | null;
+  topic?: string | null;
+  topicOrder?: number | null;
+};
+
+type GroupedTopic = {
+  topicId: string;
+  topicName: string;
+  topicOrder: number;
+  completed: number;
+  total: number;
+  ratings: number[];
 };
 
 const emptyProgress: SubjectProgress = {
@@ -55,6 +71,16 @@ const emptyProgress: SubjectProgress = {
   videoTotal: 0,
 
   topicProgress: [],
+};
+
+const getTopicInformation = (resource: unknown) => {
+  const topicResource = resource as TopicResource;
+
+  return {
+    topicId: topicResource.topicId ?? "",
+    topicName: topicResource.topicName ?? topicResource.topic ?? "Uten tema",
+    topicOrder: topicResource.topicOrder ?? 0,
+  };
 };
 
 export const useSubjectProgress = (subjectId: string | undefined) => {
@@ -112,13 +138,18 @@ export const useSubjectProgress = (subjectId: string | undefined) => {
       return emptyProgress;
     }
 
-    const pdfProgress = pdfs.map((pdf) =>
-      getProgress(`pdf-${subjectId}-database-${pdf.id}`, "resource"),
-    );
+    const pdfProgress = pdfs.map((pdf) => ({
+      pdf,
+      progress: getProgress(`pdf-${subjectId}-database-${pdf.id}`, "resource"),
+    }));
 
-    const noteProgress = notes.map((note) =>
-      getProgress(`note-${subjectId}-database-${note.slug}`, "resource"),
-    );
+    const noteProgress = notes.map((note) => ({
+      note,
+      progress: getProgress(
+        `note-${subjectId}-database-${note.slug}`,
+        "resource",
+      ),
+    }));
 
     const videoProgress = videos.map((video) => ({
       video,
@@ -129,11 +160,11 @@ export const useSubjectProgress = (subjectId: string | undefined) => {
     }));
 
     const completedPdfs = pdfProgress.filter(
-      (progress) => progress.completed,
+      ({ progress }) => progress.completed,
     ).length;
 
     const completedNotes = noteProgress.filter(
-      (progress) => progress.completed,
+      ({ progress }) => progress.completed,
     ).length;
 
     const completedVideos = videoProgress.filter(
@@ -141,8 +172,8 @@ export const useSubjectProgress = (subjectId: string | undefined) => {
     ).length;
 
     const ratings = [
-      ...pdfProgress.map((progress) => progress.rating),
-      ...noteProgress.map((progress) => progress.rating),
+      ...pdfProgress.map(({ progress }) => progress.rating),
+      ...noteProgress.map(({ progress }) => progress.rating),
       ...videoProgress.map(({ progress }) => progress.rating),
     ].filter((rating) => rating > 0);
 
@@ -159,23 +190,25 @@ export const useSubjectProgress = (subjectId: string | undefined) => {
 
     const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
 
-    const groupedTopics = new Map<
-      string,
-      {
-        topicId: string;
-        topicName: string;
-        topicOrder: number;
-        completed: number;
-        total: number;
-        ratings: number[];
-      }
-    >();
+    const groupedTopics = new Map<string, GroupedTopic>();
 
-    videoProgress.forEach(({ video, progress }) => {
-      const currentTopic = groupedTopics.get(video.topicId) ?? {
-        topicId: video.topicId,
-        topicName: video.topic,
-        topicOrder: video.topicOrder,
+    const addResourceToTopic = (
+      resource: unknown,
+      resourceProgress: {
+        completed: boolean;
+        rating: number;
+      },
+    ) => {
+      const { topicId, topicName, topicOrder } = getTopicInformation(resource);
+
+      if (!topicId) {
+        return;
+      }
+
+      const currentTopic = groupedTopics.get(topicId) ?? {
+        topicId,
+        topicName,
+        topicOrder,
         completed: 0,
         total: 0,
         ratings: [],
@@ -183,15 +216,27 @@ export const useSubjectProgress = (subjectId: string | undefined) => {
 
       currentTopic.total += 1;
 
-      if (progress.completed) {
+      if (resourceProgress.completed) {
         currentTopic.completed += 1;
       }
 
-      if (progress.rating > 0) {
-        currentTopic.ratings.push(progress.rating);
+      if (resourceProgress.rating > 0) {
+        currentTopic.ratings.push(resourceProgress.rating);
       }
 
-      groupedTopics.set(video.topicId, currentTopic);
+      groupedTopics.set(topicId, currentTopic);
+    };
+
+    pdfProgress.forEach(({ pdf, progress }) => {
+      addResourceToTopic(pdf, progress);
+    });
+
+    noteProgress.forEach(({ note, progress }) => {
+      addResourceToTopic(note, progress);
+    });
+
+    videoProgress.forEach(({ video, progress }) => {
+      addResourceToTopic(video, progress);
     });
 
     const topicProgress = Array.from(groupedTopics.values())

@@ -166,7 +166,7 @@ export const SubjectPage = () => {
                 <h2>Progresjon per tema</h2>
               </div>
 
-              <p>Foreløpig basert på videoer</p>
+              <p>Basert på notater, videoer og forelesningsnotater</p>
             </div>
 
             <div className="subject-topic-progress-list">
@@ -180,7 +180,7 @@ export const SubjectPage = () => {
                       <h3>{topic.topicName}</h3>
 
                       <p>
-                        {topic.completed} av {topic.total} videoer fullført
+                        {topic.completed} av {topic.total} ressurser fullført
                       </p>
                     </div>
 
