@@ -36,10 +36,10 @@ export const AdminPage = () => {
           <p>Legg til og administrer videoer.</p>
         </Link>
 
-        <Link to="/admin/video-struktur" className="admin-card">
-          <h2>Videostruktur</h2>
+        <Link to="/admin/subject-struktur" className="admin-card">
+          <h2>Fagstruktur</h2>
 
-          <p>Administrer temaer og undertemaer for videoer.</p>
+          <p>Administrer temaer og undertemaer.</p>
         </Link>
 
         <Link to="/admin/flashcards" className="admin-card">

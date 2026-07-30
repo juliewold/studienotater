@@ -500,7 +500,7 @@ export const AdminSubjectStructurePage = () => {
         og flashcards.
       </p>
 
-      <section className="video-structure-subject-card">
+      <section className="subject-structure-subject-card">
         <label htmlFor="structure-subject">Velg fag</label>
 
         <select
@@ -519,31 +519,31 @@ export const AdminSubjectStructurePage = () => {
       </section>
 
       {errorMessage && (
-        <p className="video-structure-message video-structure-error">
+        <p className="subject-structure-message subject-structure-error">
           {errorMessage}
         </p>
       )}
 
       {successMessage && (
-        <p className="video-structure-message video-structure-success">
+        <p className="subject-structure-message subject-structure-success">
           {successMessage}
         </p>
       )}
 
       {!subjectId ? (
-        <section className="video-structure-empty-card">
+        <section className="subject-structure-empty-card">
           Velg et fag for å se og redigere fagstrukturen.
         </section>
       ) : isLoading ? (
-        <section className="video-structure-empty-card">
+        <section className="subject-structure-empty-card">
           Laster fagstruktur...
         </section>
       ) : (
-        <div className="video-structure-layout">
-          <section className="video-structure-card">
-            <div className="video-structure-header">
+        <div className="subject-structure-layout">
+          <section className="subject-structure-card">
+            <div className="subject-structure-header">
               <div>
-                <p className="video-structure-card-label">Nivå 1</p>
+                <p className="subject-structure-card-label">Nivå 1</p>
 
                 <h2>Temaer</h2>
               </div>
@@ -555,7 +555,7 @@ export const AdminSubjectStructurePage = () => {
 
             {topicFormOpen && (
               <form
-                className="video-structure-form"
+                className="subject-structure-form"
                 onSubmit={handleTopicSubmit}
               >
                 <h3>
@@ -587,7 +587,7 @@ export const AdminSubjectStructurePage = () => {
                   required
                 />
 
-                <div className="video-structure-form-actions">
+                <div className="subject-structure-form-actions">
                   <button type="submit" disabled={isSavingTopic}>
                     {isSavingTopic
                       ? "Lagrer..."
@@ -598,7 +598,7 @@ export const AdminSubjectStructurePage = () => {
 
                   <button
                     type="button"
-                    className="video-structure-cancel-button"
+                    className="subject-structure-cancel-button"
                     onClick={resetTopicForm}
                     disabled={isSavingTopic}
                   >
@@ -609,26 +609,26 @@ export const AdminSubjectStructurePage = () => {
             )}
 
             {sortedTopics.length === 0 ? (
-              <p className="video-structure-empty-text">
+              <p className="subject-structure-empty-text">
                 Dette faget har ingen temaer ennå.
               </p>
             ) : (
-              <div className="video-topic-list">
+              <div className="subject-topic-list">
                 {sortedTopics.map((topic) => (
                   <article
                     key={topic.id}
-                    className={`video-topic-item ${
+                    className={`subject-topic-item ${
                       selectedTopicId === topic.id
-                        ? "video-topic-item-selected"
+                        ? "subject-topic-item-selected"
                         : ""
                     }`}
                   >
                     <button
                       type="button"
-                      className="video-topic-select-button"
+                      className="subject-topic-select-button"
                       onClick={() => setSelectedTopicId(topic.id)}
                     >
-                      <span className="video-structure-order-number">
+                      <span className="subject-structure-order-number">
                         {topic.sortOrder}
                       </span>
 
@@ -641,7 +641,7 @@ export const AdminSubjectStructurePage = () => {
                       </span>
                     </button>
 
-                    <div className="video-structure-item-actions">
+                    <div className="subject-structure-item-actions">
                       <button
                         type="button"
                         onClick={() => openEditTopicForm(topic)}
@@ -651,7 +651,7 @@ export const AdminSubjectStructurePage = () => {
 
                       <button
                         type="button"
-                        className="video-structure-delete-button"
+                        className="subject-structure-delete-button"
                         disabled={deletingTopicId === topic.id}
                         onClick={() => handleDeleteTopic(topic)}
                       >
@@ -664,10 +664,10 @@ export const AdminSubjectStructurePage = () => {
             )}
           </section>
 
-          <section className="video-structure-card">
-            <div className="video-structure-header">
+          <section className="subject-structure-card">
+            <div className="subject-structure-header">
               <div>
-                <p className="video-structure-card-label">Nivå 2</p>
+                <p className="subject-structure-card-label">Nivå 2</p>
 
                 <h2>Undertemaer</h2>
               </div>
@@ -682,12 +682,12 @@ export const AdminSubjectStructurePage = () => {
             </div>
 
             {!selectedTopic ? (
-              <p className="video-structure-empty-text">
+              <p className="subject-structure-empty-text">
                 Velg et tema fra listen for å administrere undertemaene.
               </p>
             ) : (
               <>
-                <div className="selected-video-topic">
+                <div className="selected-subject-topic">
                   <span>Valgt tema</span>
 
                   <strong>
@@ -697,7 +697,7 @@ export const AdminSubjectStructurePage = () => {
 
                 {subtopicFormOpen && (
                   <form
-                    className="video-structure-form"
+                    className="subject-structure-form"
                     onSubmit={handleSubtopicSubmit}
                   >
                     <h3>
@@ -751,7 +751,7 @@ export const AdminSubjectStructurePage = () => {
                       required
                     />
 
-                    <div className="video-structure-form-actions">
+                    <div className="subject-structure-form-actions">
                       <button type="submit" disabled={isSavingSubtopic}>
                         {isSavingSubtopic
                           ? "Lagrer..."
@@ -762,7 +762,7 @@ export const AdminSubjectStructurePage = () => {
 
                       <button
                         type="button"
-                        className="video-structure-cancel-button"
+                        className="subject-structure-cancel-button"
                         onClick={resetSubtopicForm}
                         disabled={isSavingSubtopic}
                       >
@@ -773,25 +773,25 @@ export const AdminSubjectStructurePage = () => {
                 )}
 
                 {getSubtopicsForTopic(selectedTopic.id).length === 0 ? (
-                  <p className="video-structure-empty-text">
+                  <p className="subject-structure-empty-text">
                     Dette temaet har ingen undertemaer ennå.
                   </p>
                 ) : (
-                  <div className="video-subtopic-list">
+                  <div className="subject-subtopic-list">
                     {getSubtopicsForTopic(selectedTopic.id).map((subtopic) => (
                       <article
                         key={subtopic.id}
-                        className="video-subtopic-item"
+                        className="subject-subtopic-item"
                       >
-                        <div className="video-structure-item-information">
-                          <span className="video-structure-order-number">
+                        <div className="subject-structure-item-information">
+                          <span className="subject-structure-order-number">
                             {subtopic.sortOrder}
                           </span>
 
                           <strong>{subtopic.name}</strong>
                         </div>
 
-                        <div className="video-structure-item-actions">
+                        <div className="subject-structure-item-actions">
                           <button
                             type="button"
                             onClick={() => openEditSubtopicForm(subtopic)}
@@ -801,7 +801,7 @@ export const AdminSubjectStructurePage = () => {
 
                           <button
                             type="button"
-                            className="video-structure-delete-button"
+                            className="subject-structure-delete-button"
                             disabled={deletingSubtopicId === subtopic.id}
                             onClick={() => handleDeleteSubtopic(subtopic)}
                           >

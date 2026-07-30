@@ -379,7 +379,7 @@ function App() {
         />
 
         <Route
-          path="/admin/video-struktur"
+          path="/admin/subject-struktur"
           element={
             <AdminRoute>
               <AdminSubjectStructurePage />
