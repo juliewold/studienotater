@@ -3,6 +3,13 @@ import { supabase } from "../lib/supabase";
 export type DatabaseFlashcard = {
   id: string;
   subjectId: string;
+
+  topicId: string;
+  topicName: string;
+
+  subtopicId: string;
+  subtopicName: string;
+
   slug: string;
   question: string;
   answer: string;
@@ -13,7 +20,20 @@ export async function getFlashcardsBySubject(
 ): Promise<DatabaseFlashcard[]> {
   const { data, error } = await supabase
     .from("flashcards")
-    .select("*")
+    .select(
+      `
+  *,
+  subtopics (
+    id,
+    name,
+    topic_id,
+    topics (
+      id,
+      name
+    )
+  )
+`,
+    )
     .eq("subject_id", subjectId)
     .order("created_at", { ascending: true });
 
@@ -24,6 +44,15 @@ export async function getFlashcardsBySubject(
   return (data ?? []).map((flashcard) => ({
     id: flashcard.id,
     subjectId: flashcard.subject_id,
+
+    topicId: flashcard.subtopics?.topics?.id ?? "",
+
+    topicName: flashcard.subtopics?.topics?.name ?? "",
+
+    subtopicId: flashcard.subtopics?.id ?? "",
+
+    subtopicName: flashcard.subtopics?.name ?? "",
+
     slug: flashcard.slug,
     question: flashcard.question,
     answer: flashcard.answer,
@@ -32,12 +61,14 @@ export async function getFlashcardsBySubject(
 
 export async function createFlashcard(
   subjectId: string,
+  subtopicId: string,
   slug: string,
   question: string,
   answer: string,
 ) {
   const { error } = await supabase.from("flashcards").insert({
     subject_id: subjectId,
+    subtopic_id: subtopicId,
     slug,
     question,
     answer,
@@ -50,12 +81,14 @@ export async function createFlashcard(
 
 export async function updateFlashcard(
   id: string,
+  subtopicId: string,
   question: string,
   answer: string,
 ) {
   const { error } = await supabase
     .from("flashcards")
     .update({
+      subtopic_id: subtopicId,
       question,
       answer,
     })
@@ -67,10 +100,7 @@ export async function updateFlashcard(
 }
 
 export async function deleteFlashcard(id: string) {
-  const { error } = await supabase
-    .from("flashcards")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("flashcards").delete().eq("id", id);
 
   if (error) {
     throw error;

@@ -7,6 +7,18 @@ export const AdminFlashcardsPage = () => {
     subjectId,
     setSubjectId,
 
+    topicId,
+    setTopicId,
+
+    subtopicId,
+    setSubtopicId,
+
+    topics,
+    subtopics,
+
+    isLoadingTopics,
+    isLoadingSubtopics,
+
     question,
     setQuestion,
 
@@ -31,8 +43,7 @@ export const AdminFlashcardsPage = () => {
 
   const getSubjectLabel = (flashcardSubjectId: string) => {
     const subject = subjects.find(
-      (currentSubject) =>
-        currentSubject.id === flashcardSubjectId,
+      (currentSubject) => currentSubject.id === flashcardSubjectId,
     );
 
     return subject
@@ -53,23 +64,16 @@ export const AdminFlashcardsPage = () => {
       <div className="admin-flashcards-layout">
         <section className="admin-flashcard-card">
           <h2>
-            {editingFlashcard
-              ? "Rediger flashcard"
-              : "Opprett nytt flashcard"}
+            {editingFlashcard ? "Rediger flashcard" : "Opprett nytt flashcard"}
           </h2>
 
-          <form
-            className="admin-flashcard-form"
-            onSubmit={handleSubmit}
-          >
+          <form className="admin-flashcard-form" onSubmit={handleSubmit}>
             <label htmlFor="flashcard-subject">Fag</label>
 
             <select
               id="flashcard-subject"
               value={subjectId}
-              onChange={(event) =>
-                setSubjectId(event.target.value)
-              }
+              onChange={(event) => setSubjectId(event.target.value)}
               disabled={Boolean(editingFlashcard)}
               required
             >
@@ -82,14 +86,54 @@ export const AdminFlashcardsPage = () => {
               ))}
             </select>
 
+            <label htmlFor="flashcard-topic">Tema</label>
+
+            <select
+              id="flashcard-topic"
+              value={topicId}
+              onChange={(event) => setTopicId(event.target.value)}
+              disabled={!subjectId || isLoadingTopics}
+              required
+            >
+              <option value="">
+                {isLoadingTopics ? "Laster temaer..." : "Velg tema"}
+              </option>
+
+              {topics.map((topic) => (
+                <option key={topic.id} value={topic.id}>
+                  {topic.name}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="flashcard-subtopic">Undertema</label>
+
+            <select
+              id="flashcard-subtopic"
+              value={subtopicId}
+              onChange={(event) => setSubtopicId(event.target.value)}
+              disabled={!topicId || isLoadingSubtopics}
+              required
+            >
+              <option value="">
+                {isLoadingSubtopics
+                  ? "Laster undertemaer..."
+                  : "Velg undertema"}
+              </option>
+
+              {subtopics.map((subtopic) => (
+                <option key={subtopic.id} value={subtopic.id}>
+                  {subtopic.name}
+                </option>
+              ))}
+            </select>
+
             <label htmlFor="flashcard-question">Spørsmål</label>
 
             <textarea
               id="flashcard-question"
               value={question}
-              onChange={(event) =>
-                setQuestion(event.target.value)
-              }
+              onChange={(event) => setQuestion(event.target.value)}
               rows={5}
               required
             />
@@ -99,9 +143,7 @@ export const AdminFlashcardsPage = () => {
             <textarea
               id="flashcard-answer"
               value={answer}
-              onChange={(event) =>
-                setAnswer(event.target.value)
-              }
+              onChange={(event) => setAnswer(event.target.value)}
               rows={7}
               required
             />
@@ -145,9 +187,11 @@ export const AdminFlashcardsPage = () => {
           <p className="preview-label">Forhåndsvisning</p>
 
           <h2>Spørsmål</h2>
+
           <p>{question.trim() || "Spørsmålet vises her."}</p>
 
           <h2>Svar</h2>
+
           <p>{answer.trim() || "Svaret vises her."}</p>
         </section>
       </div>
@@ -158,22 +202,21 @@ export const AdminFlashcardsPage = () => {
         {isLoadingFlashcards ? (
           <p>Laster flashcards...</p>
         ) : uploadedFlashcards.length === 0 ? (
-          <p>
-            Ingen flashcards er opprettet gjennom adminpanelet ennå.
-          </p>
+          <p>Ingen flashcards er opprettet gjennom adminpanelet ennå.</p>
         ) : (
           <div className="uploaded-flashcard-list">
             {uploadedFlashcards.map((flashcard) => (
-              <article
-                key={flashcard.id}
-                className="uploaded-flashcard-item"
-              >
+              <article key={flashcard.id} className="uploaded-flashcard-item">
                 <div>
                   <h3>{flashcard.question}</h3>
+
                   <p>{flashcard.answer}</p>
-                  <span>
-                    {getSubjectLabel(flashcard.subjectId)}
-                  </span>
+
+                  <span>{getSubjectLabel(flashcard.subjectId)}</span>
+
+                  <span>{flashcard.topicName}</span>
+
+                  <span>{flashcard.subtopicName}</span>
                 </div>
 
                 <div className="uploaded-flashcard-actions">
@@ -188,9 +231,7 @@ export const AdminFlashcardsPage = () => {
                   <button
                     type="button"
                     className="delete-flashcard-button"
-                    disabled={
-                      deletingFlashcardId === flashcard.id
-                    }
+                    disabled={deletingFlashcardId === flashcard.id}
                     onClick={() => handleDelete(flashcard)}
                   >
                     {deletingFlashcardId === flashcard.id

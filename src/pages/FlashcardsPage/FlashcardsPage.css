@@ -1,49 +1,338 @@
-.flashcards-grid {
-  display: grid;
-  gap: 20px;
-
-  margin-top: 30px;
+.flashcards-error {
+  color: #dc2626;
 }
 
-.flashcards-grid {
-  display: grid;
-  gap: 20px;
+.flashcard-all-practice-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+
   margin-top: 32px;
-}
-
-.flashcard {
-  border: none;
-  background: white;
-  text-align: left;
-  cursor: pointer;
-
   padding: 32px;
-  border-radius: 24px;
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+  border: 1px solid rgba(139, 92, 246, 0.14);
+  border-radius: 26px;
+
+  background: linear-gradient(135deg, #ffffff 0%, #faf7ff 100%);
+
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.08);
 }
 
-.flashcard:hover {
-  transform: translateY(-4px);
-}
-
-.flashcard-label {
-  margin: 0 0 12px;
-  color: #8b5cf6;
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.flashcard h3 {
-  margin: 0;
-  font-size: 1.2rem;
+.flashcard-all-practice-card h2 {
+  margin: 6px 0 10px;
   color: #17142a;
 }
 
-.flashcard p {
+.flashcard-all-practice-card p {
   margin: 0;
+  color: #6b7280;
 }
 
+.flashcard-topics {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+
+  margin-top: 36px;
+}
+
+.flashcard-topic-section {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  padding: 28px;
+  border-radius: 26px;
+
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.flashcard-topic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+}
+
+.flashcard-topic-header h2 {
+  margin: 5px 0 8px;
+  color: #17142a;
+}
+
+.flashcard-topic-header p:not(.flashcard-topic-label) {
+  margin: 0;
+  color: #6b7280;
+}
+
+.flashcard-topic-label,
+.flashcard-subtopic-label {
+  margin: 0;
+
+  color: #8b5cf6;
+
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.flashcard-subtopics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.flashcard-subtopic-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+
+  padding: 22px;
+  border-radius: 20px;
+
+  background: #ffffff;
+  border: 1px solid rgba(23, 20, 42, 0.07);
+
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.04);
+}
+
+.flashcard-subtopic-card h3 {
+  margin: 5px 0 8px;
+  color: #17142a;
+  font-size: 1.05rem;
+}
+
+.flashcard-subtopic-card span {
+  color: #6b7280;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.flashcard-primary-button,
+.flashcard-secondary-button,
+.flashcard-end-practice {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.flashcard-primary-button {
+  flex-shrink: 0;
+
+  padding: 13px 20px;
+  border-radius: 14px;
+
+  color: #ffffff;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+
+  box-shadow: 0 8px 18px rgba(139, 92, 246, 0.22);
+}
+
+.flashcard-primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 11px 24px rgba(139, 92, 246, 0.28);
+}
+
+.flashcard-secondary-button {
+  flex-shrink: 0;
+
+  padding: 11px 16px;
+  border-radius: 13px;
+
+  color: #7c3aed;
+  background: #f4edff;
+}
+
+.flashcard-secondary-button:hover {
+  transform: translateY(-2px);
+  background: #ede1ff;
+}
+
+.flashcard-primary-button:disabled,
+.flashcard-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+  box-shadow: none;
+}
+
+.flashcard-end-practice {
+  padding: 0;
+  margin-bottom: 28px;
+
+  color: #7c3aed;
+  background: transparent;
+}
+
+.flashcard-end-practice:hover {
+  transform: translateX(-3px);
+}
+
+.flashcard-practice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+}
+
+.flashcard-practice-header h1 {
+  margin-bottom: 0;
+}
+
+.flashcard-practice-progress {
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.flashcard-progress-track {
+  width: 100%;
+  height: 10px;
+
+  margin-top: 22px;
+  overflow: hidden;
+
+  border-radius: 999px;
+  background: #ebe7f2;
+}
+
+.flashcard-progress-bar {
+  height: 100%;
+  border-radius: inherit;
+
+  background: linear-gradient(90deg, #8b5cf6, #c084fc);
+
+  transition: width 0.25s ease;
+}
+
+.flashcard-practice-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  width: min(100%, 760px);
+  min-height: 370px;
+
+  margin: 42px auto 0;
+  padding: 46px;
+
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  border-radius: 30px;
+
+  cursor: pointer;
+  text-align: left;
+
+  color: #17142a;
+  background: #ffffff;
+
+  box-shadow: 0 18px 45px rgba(65, 42, 115, 0.1);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.flashcard-practice-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow: 0 24px 55px rgba(65, 42, 115, 0.14);
+}
+
+.flashcard-practice-card-flipped {
+  background: linear-gradient(145deg, #ffffff, #faf5ff);
+}
+
+.flashcard-label {
+  margin: 0 0 24px;
+
+  color: #8b5cf6;
+
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flashcard-practice-card h2 {
+  margin: auto 0;
+
+  color: #17142a;
+
+  font-size: clamp(1.5rem, 3vw, 2.15rem);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.flashcard-hint {
+  display: block;
+
+  margin-top: 34px;
+
+  color: #8b8b99;
+  font-size: 0.9rem;
+}
+
+.flashcard-practice-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+
+  width: min(100%, 760px);
+  margin: 26px auto 0;
+}
+
+@media (max-width: 800px) {
+  .flashcard-all-practice-card,
+  .flashcard-topic-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .flashcard-subtopics {
+    grid-template-columns: 1fr;
+  }
+
+  .flashcard-subtopic-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .flashcard-primary-button,
+  .flashcard-secondary-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .flashcard-topic-section {
+    padding: 20px;
+  }
+
+  .flashcard-practice-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .flashcard-practice-card {
+    min-height: 320px;
+    padding: 30px 24px;
+  }
+
+  .flashcard-practice-navigation {
+    flex-direction: column-reverse;
+  }
+
+  .flashcard-practice-navigation button {
+    width: 100%;
+  }
+}

@@ -1,10 +1,7 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type SyntheticEvent,
-} from "react";
+import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
+
 import { subjects } from "../data/subjects";
+
 import {
   createFlashcard,
   deleteFlashcard,
@@ -13,8 +10,30 @@ import {
   type DatabaseFlashcard,
 } from "../services/flashcardsService";
 
+import {
+  getVideoSubtopicsByTopic,
+  getVideoTopicsBySubject,
+} from "../services/videosService";
+
+type TopicOption = Awaited<ReturnType<typeof getVideoTopicsBySubject>>[number];
+
+type SubtopicOption = Awaited<
+  ReturnType<typeof getVideoSubtopicsByTopic>
+>[number];
+
 export const useAdminFlashcards = () => {
   const [subjectId, setSubjectId] = useState("");
+
+  const [topicId, setTopicId] = useState("");
+  const [subtopicId, setSubtopicId] = useState("");
+
+  const [topics, setTopics] = useState<TopicOption[]>([]);
+  const [subtopics, setSubtopics] = useState<SubtopicOption[]>([]);
+
+  const [isLoadingTopics, setIsLoadingTopics] = useState(false);
+
+  const [isLoadingSubtopics, setIsLoadingSubtopics] = useState(false);
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
 
@@ -24,11 +43,14 @@ export const useAdminFlashcards = () => {
   const [uploadedFlashcards, setUploadedFlashcards] = useState<
     DatabaseFlashcard[]
   >([]);
+
   const [isLoadingFlashcards, setIsLoadingFlashcards] = useState(true);
+
   const [isSaving, setIsSaving] = useState(false);
-  const [deletingFlashcardId, setDeletingFlashcardId] = useState<
-    string | null
-  >(null);
+
+  const [deletingFlashcardId, setDeletingFlashcardId] = useState<string | null>(
+    null,
+  );
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -45,10 +67,87 @@ export const useAdminFlashcards = () => {
 
   const resetForm = () => {
     setSubjectId("");
+    setTopicId("");
+    setSubtopicId("");
+
+    setTopics([]);
+    setSubtopics([]);
+
     setQuestion("");
     setAnswer("");
+
     setEditingFlashcard(null);
   };
+
+  useEffect(() => {
+    const loadTopics = async () => {
+      if (!subjectId) {
+        setTopics([]);
+        setTopicId("");
+        return;
+      }
+
+      setIsLoadingTopics(true);
+
+      try {
+        const loadedTopics = await getVideoTopicsBySubject(subjectId);
+
+        setTopics(loadedTopics);
+
+        setTopicId((currentTopicId) =>
+          loadedTopics.some((topic) => topic.id === currentTopicId)
+            ? currentTopicId
+            : "",
+        );
+      } catch (error) {
+        console.error("Kunne ikke hente temaer:", error);
+
+        setTopics([]);
+        setTopicId("");
+
+        setErrorMessage("Kunne ikke hente temaene.");
+      } finally {
+        setIsLoadingTopics(false);
+      }
+    };
+
+    loadTopics();
+  }, [subjectId]);
+
+  useEffect(() => {
+    const loadSubtopics = async () => {
+      if (!topicId) {
+        setSubtopics([]);
+        setSubtopicId("");
+        return;
+      }
+
+      setIsLoadingSubtopics(true);
+
+      try {
+        const loadedSubtopics = await getVideoSubtopicsByTopic(topicId);
+
+        setSubtopics(loadedSubtopics);
+
+        setSubtopicId((currentSubtopicId) =>
+          loadedSubtopics.some((subtopic) => subtopic.id === currentSubtopicId)
+            ? currentSubtopicId
+            : "",
+        );
+      } catch (error) {
+        console.error("Kunne ikke hente undertemaer:", error);
+
+        setSubtopics([]);
+        setSubtopicId("");
+
+        setErrorMessage("Kunne ikke hente undertemaene.");
+      } finally {
+        setIsLoadingSubtopics(false);
+      }
+    };
+
+    loadSubtopics();
+  }, [topicId]);
 
   const loadUploadedFlashcards = useCallback(async () => {
     setIsLoadingFlashcards(true);
@@ -56,23 +155,19 @@ export const useAdminFlashcards = () => {
 
     try {
       const flashcardsBySubject = await Promise.all(
-        subjects.map((subject) =>
-          getFlashcardsBySubject(subject.id),
-        ),
+        subjects.map((subject) => getFlashcardsBySubject(subject.id)),
       );
 
       const allUploadedFlashcards = flashcardsBySubject
         .flat()
         .sort((firstFlashcard, secondFlashcard) =>
-          firstFlashcard.question.localeCompare(
-            secondFlashcard.question,
-            "nb",
-          ),
+          firstFlashcard.question.localeCompare(secondFlashcard.question, "nb"),
         );
 
       setUploadedFlashcards(allUploadedFlashcards);
     } catch (error) {
       console.error("Kunne ikke hente flashcards:", error);
+
       setErrorMessage("Kunne ikke hente flashcards.");
     } finally {
       setIsLoadingFlashcards(false);
@@ -83,29 +178,56 @@ export const useAdminFlashcards = () => {
     loadUploadedFlashcards();
   }, [loadUploadedFlashcards]);
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedQuestion = question.trim();
     const trimmedAnswer = answer.trim();
 
-    setIsSaving(true);
     setErrorMessage("");
     setSuccessMessage("");
+
+    if (!subjectId) {
+      setErrorMessage("Du må velge et fag.");
+      return;
+    }
+
+    if (!topicId) {
+      setErrorMessage("Du må velge et tema.");
+      return;
+    }
+
+    if (!subtopicId) {
+      setErrorMessage("Du må velge et undertema.");
+      return;
+    }
+
+    if (!trimmedQuestion) {
+      setErrorMessage("Du må skrive inn et spørsmål.");
+      return;
+    }
+
+    if (!trimmedAnswer) {
+      setErrorMessage("Du må skrive inn et svar.");
+      return;
+    }
+
+    setIsSaving(true);
 
     try {
       if (editingFlashcard) {
         await updateFlashcard(
           editingFlashcard.id,
+          subtopicId,
           trimmedQuestion,
           trimmedAnswer,
         );
 
         resetForm();
         await loadUploadedFlashcards();
+
         setSuccessMessage("Flashcardet ble oppdatert.");
+
         return;
       }
 
@@ -113,11 +235,13 @@ export const useAdminFlashcards = () => {
 
       if (!slug) {
         setErrorMessage("Flashcardet må ha et gyldig spørsmål.");
+
         return;
       }
 
       await createFlashcard(
         subjectId,
+        subtopicId,
         slug,
         trimmedQuestion,
         trimmedAnswer,
@@ -125,6 +249,7 @@ export const useAdminFlashcards = () => {
 
       resetForm();
       await loadUploadedFlashcards();
+
       setSuccessMessage("Flashcardet ble opprettet.");
     } catch (error) {
       console.error(
@@ -146,7 +271,11 @@ export const useAdminFlashcards = () => {
 
   const handleEdit = (flashcard: DatabaseFlashcard) => {
     setEditingFlashcard(flashcard);
+
     setSubjectId(flashcard.subjectId);
+    setTopicId(flashcard.topicId);
+    setSubtopicId(flashcard.subtopicId);
+
     setQuestion(flashcard.question);
     setAnswer(flashcard.answer);
 
@@ -161,6 +290,7 @@ export const useAdminFlashcards = () => {
 
   const cancelEdit = () => {
     resetForm();
+
     setErrorMessage("");
     setSuccessMessage("");
   };
@@ -183,8 +313,7 @@ export const useAdminFlashcards = () => {
 
       setUploadedFlashcards((currentFlashcards) =>
         currentFlashcards.filter(
-          (currentFlashcard) =>
-            currentFlashcard.id !== flashcard.id,
+          (currentFlashcard) => currentFlashcard.id !== flashcard.id,
         ),
       );
 
@@ -195,6 +324,7 @@ export const useAdminFlashcards = () => {
       setSuccessMessage("Flashcardet ble slettet.");
     } catch (error) {
       console.error("Kunne ikke slette flashcard:", error);
+
       setErrorMessage("Kunne ikke slette flashcardet.");
     } finally {
       setDeletingFlashcardId(null);
@@ -204,6 +334,18 @@ export const useAdminFlashcards = () => {
   return {
     subjectId,
     setSubjectId,
+
+    topicId,
+    setTopicId,
+
+    subtopicId,
+    setSubtopicId,
+
+    topics,
+    subtopics,
+
+    isLoadingTopics,
+    isLoadingSubtopics,
 
     question,
     setQuestion,
