@@ -10,6 +10,7 @@ export type DatabaseExam = {
   examFilePath: string | null;
   solutionFilePath: string | null;
   mySolutionFilePath: string | null;
+  createdAt: string;
 };
 
 function mapDatabaseExam(exam: {
@@ -22,6 +23,7 @@ function mapDatabaseExam(exam: {
   exam_file_path: string | null;
   solution_file_path: string | null;
   my_solution_file_path: string | null;
+  created_at: string;
 }): DatabaseExam {
   return {
     id: exam.id,
@@ -33,6 +35,7 @@ function mapDatabaseExam(exam: {
     examFilePath: exam.exam_file_path,
     solutionFilePath: exam.solution_file_path,
     mySolutionFilePath: exam.my_solution_file_path,
+    createdAt: exam.created_at,
   };
 }
 
@@ -44,6 +47,19 @@ export async function getExamsBySubject(
     .select("*")
     .eq("subject_id", subjectId)
     .order("year", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map(mapDatabaseExam);
+}
+
+export async function getAllExams(): Promise<DatabaseExam[]> {
+  const { data, error } = await supabase
+    .from("exams")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   if (error) {
     throw error;

@@ -7,6 +7,7 @@ export type DatabasePdf = {
   category: string;
   filePath: string;
   fileUrl: string;
+  createdAt: string;
 
   subtopicId: string | null;
   subtopicName: string | null;
@@ -33,6 +34,7 @@ type PdfRow = {
   title: string;
   category: string;
   file_path: string;
+  created_at: string;
   subtopic_id: string | null;
   subtopics: SubtopicRelation | SubtopicRelation[] | null;
 };
@@ -43,6 +45,7 @@ const pdfSelect = `
   title,
   category,
   file_path,
+  created_at,
   subtopic_id,
   subtopics (
     id,
@@ -80,6 +83,7 @@ const mapPdf = (pdf: PdfRow): DatabasePdf => {
     category: pdf.category,
     filePath: pdf.file_path,
     fileUrl: publicUrlData.publicUrl,
+    createdAt: pdf.created_at,
 
     subtopicId: subtopic?.id ?? null,
     subtopicName: subtopic?.name ?? null,
