@@ -17,11 +17,11 @@ import {
 } from "../services/notesService";
 
 import {
-  getVideoSubtopicsByTopic,
-  getVideoTopicsBySubject,
-  type DatabaseVideoSubtopic,
-  type DatabaseVideoTopic,
-} from "../services/videosService";
+  getTopicsBySubject,
+  getSubtopicsByTopic,
+  type DatabaseTopic,
+  type DatabaseSubtopic,
+} from "../services/subjectStructureService";
 
 export const useAdminNotes = () => {
   const [subjectId, setSubjectId] = useState("");
@@ -32,9 +32,9 @@ export const useAdminNotes = () => {
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
 
-  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
 
-  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+  const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [editingNote, setEditingNote] = useState<DatabaseNote | null>(null);
 
@@ -113,13 +113,13 @@ export const useAdminNotes = () => {
 
     try {
       const topicsBySubject = await Promise.all(
-        subjects.map((subject) => getVideoTopicsBySubject(subject.id)),
+        subjects.map((subject) => getTopicsBySubject(subject.id)),
       );
 
       const loadedTopics = topicsBySubject.flat();
 
       const subtopicsByTopic = await Promise.all(
-        loadedTopics.map((topic) => getVideoSubtopicsByTopic(topic.id)),
+        loadedTopics.map((topic) => getSubtopicsByTopic(topic.id)),
       );
 
       setTopics(loadedTopics);

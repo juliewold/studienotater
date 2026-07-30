@@ -6,11 +6,11 @@ import { NoteEditor } from "../NoteEditor/NoteEditor";
 
 import { updateNote, type DatabaseNote } from "../../services/notesService";
 import {
-  getVideoTopicsBySubject,
-  getVideoSubtopicsByTopic,
-  type DatabaseVideoTopic,
-  type DatabaseVideoSubtopic,
-} from "../../services/videosService";
+  getTopicsBySubject,
+  getSubtopicsByTopic,
+  type DatabaseTopic,
+  type DatabaseSubtopic,
+} from "../../services/subjectStructureService";
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
 type EditableNoteProps = {
@@ -41,9 +41,9 @@ export const EditableNote = ({
   const [title, setTitle] = useState(note.title);
   const [description, setDescription] = useState(note.description);
   const [content, setContent] = useState(note.content);
-  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
 
-  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+  const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [selectedTopicId, setSelectedTopicId] = useState(note.topicId ?? "");
 
@@ -86,7 +86,7 @@ export const EditableNote = ({
   useEffect(() => {
     const loadTopics = async () => {
       try {
-        const loadedTopics = await getVideoTopicsBySubject(note.subjectId);
+        const loadedTopics = await getTopicsBySubject(note.subjectId);
 
         setTopics(loadedTopics);
       } catch (error) {
@@ -105,7 +105,7 @@ export const EditableNote = ({
       }
 
       try {
-        const loadedSubtopics = await getVideoSubtopicsByTopic(selectedTopicId);
+        const loadedSubtopics = await getSubtopicsByTopic(selectedTopicId);
 
         setSubtopics(loadedSubtopics);
       } catch (error) {

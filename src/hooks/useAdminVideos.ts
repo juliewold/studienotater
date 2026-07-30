@@ -3,14 +3,17 @@ import { subjects } from "../data/subjects";
 import {
   createVideo,
   deleteVideo,
-  getVideoSubtopicsByTopic,
-  getVideoTopicsBySubject,
   getVideosBySubject,
   updateVideo,
   type DatabaseVideo,
-  type DatabaseVideoSubtopic,
-  type DatabaseVideoTopic,
 } from "../services/videosService";
+
+import {
+  getSubtopicsByTopic,
+  getTopicsBySubject,
+  type DatabaseSubtopic,
+  type DatabaseTopic,
+} from "../services/subjectStructureService";
 
 export const useAdminVideos = () => {
   const [subjectId, setSubjectId] = useState("");
@@ -21,8 +24,8 @@ export const useAdminVideos = () => {
   const [youtubeId, setYoutubeId] = useState("");
   const [sortOrder, setSortOrder] = useState("1");
 
-  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
-  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
+  const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [editingVideo, setEditingVideo] = useState<DatabaseVideo | null>(null);
 
@@ -127,7 +130,7 @@ export const useAdminVideos = () => {
     setIsLoadingTopics(true);
 
     try {
-      const loadedTopics = await getVideoTopicsBySubject(selectedSubjectId);
+      const loadedTopics = await getTopicsBySubject(selectedSubjectId);
 
       setTopics(loadedTopics);
     } catch (error) {
@@ -148,7 +151,7 @@ export const useAdminVideos = () => {
     setIsLoadingSubtopics(true);
 
     try {
-      const loadedSubtopics = await getVideoSubtopicsByTopic(selectedTopicId);
+      const loadedSubtopics = await getSubtopicsByTopic(selectedTopicId);
 
       setSubtopics(loadedSubtopics);
     } catch (error) {
@@ -290,9 +293,9 @@ export const useAdminVideos = () => {
     setSuccessMessage("");
 
     try {
-      const loadedTopics = await getVideoTopicsBySubject(video.subjectId);
+      const loadedTopics = await getTopicsBySubject(video.subjectId);
 
-      const loadedSubtopics = await getVideoSubtopicsByTopic(video.topicId);
+      const loadedSubtopics = await getSubtopicsByTopic(video.topicId);
 
       setTopics(loadedTopics);
       setSubtopics(loadedSubtopics);

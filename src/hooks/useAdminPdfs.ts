@@ -18,11 +18,11 @@ import {
 } from "../services/pdfsService";
 
 import {
-  getVideoSubtopicsByTopic,
-  getVideoTopicsBySubject,
-  type DatabaseVideoSubtopic,
-  type DatabaseVideoTopic,
-} from "../services/videosService";
+  getTopicsBySubject,
+  getSubtopicsByTopic,
+  type DatabaseTopic,
+  type DatabaseSubtopic,
+} from "../services/subjectStructureService";
 
 export const useAdminPdfs = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,9 +35,9 @@ export const useAdminPdfs = () => {
   const [category, setCategory] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
-  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
 
-  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+  const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [uploadedPdfs, setUploadedPdfs] = useState<DatabasePdf[]>([]);
 
@@ -90,13 +90,13 @@ export const useAdminPdfs = () => {
 
     try {
       const topicsBySubject = await Promise.all(
-        subjects.map((subject) => getVideoTopicsBySubject(subject.id)),
+        subjects.map((subject) => getTopicsBySubject(subject.id)),
       );
 
       const loadedTopics = topicsBySubject.flat();
 
       const subtopicsByTopic = await Promise.all(
-        loadedTopics.map((topic) => getVideoSubtopicsByTopic(topic.id)),
+        loadedTopics.map((topic) => getSubtopicsByTopic(topic.id)),
       );
 
       setTopics(loadedTopics);

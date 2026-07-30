@@ -22,9 +22,9 @@ import { AuthContext } from "../../context/AuthContext/AuthContext";
 import { FolderCard } from "../../components/FolderCard/FolderCard";
 import { NoteCard } from "../../components/NoteCard/NoteCard";
 import {
-  getVideoTopicsBySubject,
-  type DatabaseVideoTopic,
-} from "../../services/videosService";
+  getTopicsBySubject,
+  type DatabaseTopic,
+} from "../../services/subjectStructureService";
 
 export const NotesPage = () => {
   const { subjectId } = useParams();
@@ -53,7 +53,7 @@ export const NotesPage = () => {
 
   const [topicId, setTopicId] = useState("");
 
-  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
 
   const [folderModalError, setFolderModalError] = useState("");
 
@@ -151,7 +151,7 @@ export const NotesPage = () => {
       }
 
       try {
-        const loadedTopics = await getVideoTopicsBySubject(subjectId);
+        const loadedTopics = await getTopicsBySubject(subjectId);
 
         setTopics(loadedTopics);
       } catch (error) {

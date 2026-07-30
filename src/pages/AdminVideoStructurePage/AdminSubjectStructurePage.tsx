@@ -1,4 +1,4 @@
-import "./AdminVideoStructurePage.css";
+import "./AdminSubjectStructurePage.css";
 import {
   useCallback,
   useEffect,
@@ -8,26 +8,26 @@ import {
 } from "react";
 import { subjects } from "../../data/subjects";
 import {
-  createVideoSubtopic,
-  createVideoTopic,
-  deleteVideoSubtopic,
-  deleteVideoTopic,
-  getAllVideoSubtopicsBySubject,
-  getVideoTopicsBySubject,
-  updateVideoSubtopic,
-  updateVideoTopic,
-  type DatabaseVideoSubtopic,
-  type DatabaseVideoTopic,
-} from "../../services/videosService";
+  createSubtopic,
+  createTopic,
+  deleteSubtopic,
+  deleteTopic,
+  getAllSubtopicsBySubject,
+  getTopicsBySubject,
+  updateSubtopic,
+  updateTopic,
+  type DatabaseSubtopic,
+  type DatabaseTopic,
+} from "../../services/subjectStructureService";
 
 type StructureFormMode = "create" | "edit";
 
-export const AdminVideoStructurePage = () => {
+export const AdminSubjectStructurePage = () => {
   const [subjectId, setSubjectId] = useState("");
 
-  const [topics, setTopics] = useState<DatabaseVideoTopic[]>([]);
+  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
 
-  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+  const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [selectedTopicId, setSelectedTopicId] = useState("");
 
@@ -134,8 +134,8 @@ export const AdminVideoStructurePage = () => {
 
     try {
       const [loadedTopics, loadedSubtopics] = await Promise.all([
-        getVideoTopicsBySubject(currentSubjectId),
-        getAllVideoSubtopicsBySubject(currentSubjectId),
+        getTopicsBySubject(currentSubjectId),
+        getAllSubtopicsBySubject(currentSubjectId),
       ]);
 
       setTopics(loadedTopics);
@@ -198,7 +198,7 @@ export const AdminVideoStructurePage = () => {
     setSuccessMessage("");
   };
 
-  const openEditTopicForm = (topic: DatabaseVideoTopic) => {
+  const openEditTopicForm = (topic: DatabaseTopic) => {
     resetSubtopicForm();
 
     setTopicFormOpen(true);
@@ -255,7 +255,7 @@ export const AdminVideoStructurePage = () => {
 
     try {
       if (topicFormMode === "edit" && editingTopicId) {
-        await updateVideoTopic(editingTopicId, trimmedName, parsedSortOrder);
+        await updateTopic(editingTopicId, trimmedName, parsedSortOrder);
 
         await loadStructure(subjectId);
         resetTopicForm();
@@ -264,7 +264,7 @@ export const AdminVideoStructurePage = () => {
         return;
       }
 
-      const createdTopic = await createVideoTopic(
+      const createdTopic = await createTopic(
         subjectId,
         trimmedName,
         parsedSortOrder,
@@ -320,7 +320,7 @@ export const AdminVideoStructurePage = () => {
     setSuccessMessage("");
   };
 
-  const openEditSubtopicForm = (subtopic: DatabaseVideoSubtopic) => {
+  const openEditSubtopicForm = (subtopic: DatabaseSubtopic) => {
     resetTopicForm();
 
     setSubtopicFormOpen(true);
@@ -384,11 +384,7 @@ export const AdminVideoStructurePage = () => {
 
     try {
       if (subtopicFormMode === "edit" && editingSubtopicId) {
-        await updateVideoSubtopic(
-          editingSubtopicId,
-          trimmedName,
-          parsedSortOrder,
-        );
+        await updateSubtopic(editingSubtopicId, trimmedName, parsedSortOrder);
 
         await loadStructure(subjectId);
         resetSubtopicForm();
@@ -397,7 +393,7 @@ export const AdminVideoStructurePage = () => {
         return;
       }
 
-      await createVideoSubtopic(subtopicTopicId, trimmedName, parsedSortOrder);
+      await createSubtopic(subtopicTopicId, trimmedName, parsedSortOrder);
 
       await loadStructure(subjectId);
       resetSubtopicForm();
@@ -416,12 +412,12 @@ export const AdminVideoStructurePage = () => {
     }
   };
 
-  const handleDeleteTopic = async (topic: DatabaseVideoTopic) => {
+  const handleDeleteTopic = async (topic: DatabaseTopic) => {
     const topicSubtopics = getSubtopicsForTopic(topic.id);
 
     const warning =
       topicSubtopics.length > 0
-        ? `Temaet «${topic.name}» har ${topicSubtopics.length} undertema. Hvis du sletter temaet, slettes også alle undertemaene og alle videoene i dem.\n\nEr du helt sikker?`
+        ? `Temaet «${topic.name}» har ${topicSubtopics.length} undertema. Hvis du sletter temaet, slettes også alle undertemaene og alt innhold som er knyttet til dem.\n\nEr du helt sikker?`
         : `Er du sikker på at du vil slette temaet «${topic.name}»?`;
 
     const shouldDelete = window.confirm(warning);
@@ -435,7 +431,7 @@ export const AdminVideoStructurePage = () => {
     setSuccessMessage("");
 
     try {
-      await deleteVideoTopic(topic.id);
+      await deleteTopic(topic.id);
 
       if (selectedTopicId === topic.id) {
         setSelectedTopicId("");
@@ -461,9 +457,9 @@ export const AdminVideoStructurePage = () => {
     }
   };
 
-  const handleDeleteSubtopic = async (subtopic: DatabaseVideoSubtopic) => {
+  const handleDeleteSubtopic = async (subtopic: DatabaseSubtopic) => {
     const shouldDelete = window.confirm(
-      `Hvis du sletter undertemaet «${subtopic.name}», slettes også alle videoene i undertemaet.\n\nEr du helt sikker?`,
+      `Hvis du sletter undertemaet «${subtopic.name}», slettes også alt innhold som er knyttet til undertemaet.\n\nEr du helt sikker?`,
     );
 
     if (!shouldDelete) {
@@ -475,7 +471,7 @@ export const AdminVideoStructurePage = () => {
     setSuccessMessage("");
 
     try {
-      await deleteVideoSubtopic(subtopic.id);
+      await deleteSubtopic(subtopic.id);
 
       if (editingSubtopicId === subtopic.id) {
         resetSubtopicForm();
@@ -483,7 +479,7 @@ export const AdminVideoStructurePage = () => {
 
       await loadStructure(subjectId);
 
-      setSuccessMessage("Undertemaet og videoene i det ble slettet.");
+      setSuccessMessage("Undertemaet og innholdet i det ble slettet.");
     } catch (error) {
       console.error("Kunne ikke slette undertema:", error);
 
@@ -497,10 +493,11 @@ export const AdminVideoStructurePage = () => {
     <main className="page-container">
       <p className="page-label">Administrasjon</p>
 
-      <h1>Videostruktur</h1>
+      <h1>Fagstruktur</h1>
 
       <p className="page-description">
-        Administrer overordnede temaer, undertemaer og rekkefølgen de vises i.
+        Administrer temaer og undertemaer som brukes av videoer, PDF-er, notater
+        og flashcards.
       </p>
 
       <section className="video-structure-subject-card">
@@ -535,11 +532,11 @@ export const AdminVideoStructurePage = () => {
 
       {!subjectId ? (
         <section className="video-structure-empty-card">
-          Velg et fag for å se og redigere videostrukturen.
+          Velg et fag for å se og redigere fagstrukturen.
         </section>
       ) : isLoading ? (
         <section className="video-structure-empty-card">
-          Laster videostruktur...
+          Laster fagstruktur...
         </section>
       ) : (
         <div className="video-structure-layout">

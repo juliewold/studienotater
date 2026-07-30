@@ -17,9 +17,9 @@ import {
 } from "../../services/notesService";
 
 import {
-  getVideoSubtopicsByTopic,
-  type DatabaseVideoSubtopic,
-} from "../../services/videosService";
+  getSubtopicsByTopic,
+  type DatabaseSubtopic,
+} from "../../services/subjectStructureService";
 
 import { NoteCard } from "../../components/NoteCard/NoteCard";
 
@@ -32,7 +32,7 @@ export const FolderPage = () => {
 
   const [notes, setNotes] = useState<DatabaseNote[]>([]);
 
-  const [subtopics, setSubtopics] = useState<DatabaseVideoSubtopic[]>([]);
+  const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [isCreateNoteModalOpen, setIsCreateNoteModalOpen] = useState(false);
 
@@ -69,10 +69,10 @@ export const FolderPage = () => {
 
         const loadedNotes = await getNotesByFolder(subjectId, folderId);
 
-        let loadedSubtopics: DatabaseVideoSubtopic[] = [];
+        let loadedSubtopics: DatabaseSubtopic[] = [];
 
         if (loadedFolder.topicId) {
-          loadedSubtopics = await getVideoSubtopicsByTopic(
+          loadedSubtopics = await getSubtopicsByTopic(
             loadedFolder.topicId,
           );
         }

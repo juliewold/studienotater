@@ -11,14 +11,14 @@ import {
 } from "../services/flashcardsService";
 
 import {
-  getVideoSubtopicsByTopic,
-  getVideoTopicsBySubject,
-} from "../services/videosService";
+  getSubtopicsByTopic,
+  getTopicsBySubject,
+} from "../services/subjectStructureService";
 
-type TopicOption = Awaited<ReturnType<typeof getVideoTopicsBySubject>>[number];
+type TopicOption = Awaited<ReturnType<typeof getTopicsBySubject>>[number];
 
 type SubtopicOption = Awaited<
-  ReturnType<typeof getVideoSubtopicsByTopic>
+  ReturnType<typeof getSubtopicsByTopic>
 >[number];
 
 export const useAdminFlashcards = () => {
@@ -90,7 +90,7 @@ export const useAdminFlashcards = () => {
       setIsLoadingTopics(true);
 
       try {
-        const loadedTopics = await getVideoTopicsBySubject(subjectId);
+        const loadedTopics = await getTopicsBySubject(subjectId);
 
         setTopics(loadedTopics);
 
@@ -125,7 +125,7 @@ export const useAdminFlashcards = () => {
       setIsLoadingSubtopics(true);
 
       try {
-        const loadedSubtopics = await getVideoSubtopicsByTopic(topicId);
+        const loadedSubtopics = await getSubtopicsByTopic(topicId);
 
         setSubtopics(loadedSubtopics);
 
