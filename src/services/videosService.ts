@@ -1,19 +1,5 @@
 import { supabase } from "../lib/supabase";
 
-export type DatabaseVideoTopic = {
-  id: string;
-  subjectId: string;
-  name: string;
-  sortOrder: number;
-};
-
-export type DatabaseVideoSubtopic = {
-  id: string;
-  topicId: string;
-  name: string;
-  sortOrder: number;
-};
-
 export type DatabaseVideo = {
   id: string;
   subjectId: string;
@@ -60,50 +46,6 @@ const getFirstRelation = <T>(relation: T | T[] | null): T | null => {
 
   return relation;
 };
-
-export async function getVideoTopicsBySubject(
-  subjectId: string,
-): Promise<DatabaseVideoTopic[]> {
-  const { data, error } = await supabase
-    .from("topics")
-    .select("id, subject_id, name, sort_order")
-    .eq("subject_id", subjectId)
-    .order("sort_order", { ascending: true })
-    .order("name", { ascending: true });
-
-  if (error) {
-    throw error;
-  }
-
-  return (data ?? []).map((topic) => ({
-    id: topic.id,
-    subjectId: topic.subject_id,
-    name: topic.name,
-    sortOrder: topic.sort_order,
-  }));
-}
-
-export async function getVideoSubtopicsByTopic(
-  topicId: string,
-): Promise<DatabaseVideoSubtopic[]> {
-  const { data, error } = await supabase
-    .from("subtopics")
-    .select("id, topic_id, name, sort_order")
-    .eq("topic_id", topicId)
-    .order("sort_order", { ascending: true })
-    .order("name", { ascending: true });
-
-  if (error) {
-    throw error;
-  }
-
-  return (data ?? []).map((subtopic) => ({
-    id: subtopic.id,
-    topicId: subtopic.topic_id,
-    name: subtopic.name,
-    sortOrder: subtopic.sort_order,
-  }));
-}
 
 export async function getVideosBySubject(
   subjectId: string,
@@ -192,96 +134,6 @@ export async function getVideosBySubject(
   });
 }
 
-export async function createVideoTopic(
-  subjectId: string,
-  name: string,
-  sortOrder: number,
-): Promise<DatabaseVideoTopic> {
-  const { data, error } = await supabase
-    .from("topics")
-    .insert({
-      subject_id: subjectId,
-      name,
-      sort_order: sortOrder,
-    })
-    .select("id, subject_id, name, sort_order")
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return {
-    id: data.id,
-    subjectId: data.subject_id,
-    name: data.name,
-    sortOrder: data.sort_order,
-  };
-}
-
-export async function updateVideoTopic(
-  id: string,
-  name: string,
-  sortOrder: number,
-) {
-  const { error } = await supabase
-    .from("topics")
-    .update({
-      name,
-      sort_order: sortOrder,
-    })
-    .eq("id", id);
-
-  if (error) {
-    throw error;
-  }
-}
-
-export async function createVideoSubtopic(
-  topicId: string,
-  name: string,
-  sortOrder: number,
-): Promise<DatabaseVideoSubtopic> {
-  const { data, error } = await supabase
-    .from("subtopics")
-    .insert({
-      topic_id: topicId,
-      name,
-      sort_order: sortOrder,
-    })
-    .select("id, topic_id, name, sort_order")
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return {
-    id: data.id,
-    topicId: data.topic_id,
-    name: data.name,
-    sortOrder: data.sort_order,
-  };
-}
-
-export async function updateVideoSubtopic(
-  id: string,
-  name: string,
-  sortOrder: number,
-) {
-  const { error } = await supabase
-    .from("subtopics")
-    .update({
-      name,
-      sort_order: sortOrder,
-    })
-    .eq("id", id);
-
-  if (error) {
-    throw error;
-  }
-}
-
 export async function createVideo(
   subjectId: string,
   subtopicId: string,
@@ -326,59 +178,6 @@ export async function updateVideo(
 
 export async function deleteVideo(id: string) {
   const { error } = await supabase.from("videos").delete().eq("id", id);
-
-  if (error) {
-    throw error;
-  }
-}
-
-export async function getAllVideoSubtopicsBySubject(
-  subjectId: string,
-): Promise<DatabaseVideoSubtopic[]> {
-  const { data: topics, error: topicsError } = await supabase
-    .from("topics")
-    .select("id")
-    .eq("subject_id", subjectId);
-
-  if (topicsError) {
-    throw topicsError;
-  }
-
-  const topicIds = (topics ?? []).map((topic) => topic.id);
-
-  if (topicIds.length === 0) {
-    return [];
-  }
-
-  const { data, error } = await supabase
-    .from("subtopics")
-    .select("id, topic_id, name, sort_order")
-    .in("topic_id", topicIds)
-    .order("sort_order", { ascending: true })
-    .order("name", { ascending: true });
-
-  if (error) {
-    throw error;
-  }
-
-  return (data ?? []).map((subtopic) => ({
-    id: subtopic.id,
-    topicId: subtopic.topic_id,
-    name: subtopic.name,
-    sortOrder: subtopic.sort_order,
-  }));
-}
-
-export async function deleteVideoTopic(id: string) {
-  const { error } = await supabase.from("topics").delete().eq("id", id);
-
-  if (error) {
-    throw error;
-  }
-}
-
-export async function deleteVideoSubtopic(id: string) {
-  const { error } = await supabase.from("subtopics").delete().eq("id", id);
 
   if (error) {
     throw error;
