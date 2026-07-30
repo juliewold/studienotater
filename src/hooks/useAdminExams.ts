@@ -18,6 +18,7 @@ import {
 export const useAdminExams = () => {
   const examFileInputRef = useRef<HTMLInputElement>(null);
   const solutionFileInputRef = useRef<HTMLInputElement>(null);
+  const mySolutionFileInputRef = useRef<HTMLInputElement>(null);
 
   const [subjectId, setSubjectId] = useState("");
   const [title, setTitle] = useState("");
@@ -27,6 +28,7 @@ export const useAdminExams = () => {
 
   const [examFile, setExamFile] = useState<File | null>(null);
   const [solutionFile, setSolutionFile] = useState<File | null>(null);
+  const [mySolutionFile, setMySolutionFile] = useState<File | null>(null);
 
   const [editingExam, setEditingExam] = useState<DatabaseExam | null>(null);
 
@@ -47,6 +49,10 @@ export const useAdminExams = () => {
     if (solutionFileInputRef.current) {
       solutionFileInputRef.current.value = "";
     }
+
+    if (mySolutionFileInputRef.current) {
+      mySolutionFileInputRef.current.value = "";
+    }
   };
 
   const resetForm = () => {
@@ -57,6 +63,7 @@ export const useAdminExams = () => {
     setRelevantTasks("");
     setExamFile(null);
     setSolutionFile(null);
+    setMySolutionFile(null);
     setEditingExam(null);
     resetFileInputs();
   };
@@ -104,7 +111,7 @@ export const useAdminExams = () => {
 
   const uploadExamFile = async (
     file: File,
-    fileType: "oppgavesett" | "losningsforslag",
+    fileType: "oppgavesett" | "losningsforslag" | "min-besvarelse",
   ) => {
     const safeFileName = createSafeFileName(file.name);
     const safeSemester = createSafeFileName(semester);
@@ -163,6 +170,7 @@ export const useAdminExams = () => {
     try {
       let examFilePath = editingExam?.examFilePath ?? null;
       let solutionFilePath = editingExam?.solutionFilePath ?? null;
+      let mySolutionFilePath = editingExam?.mySolutionFilePath ?? null;
 
       if (examFile) {
         const uploadedExamPath = await uploadExamFile(examFile, "oppgavesett");
@@ -181,6 +189,16 @@ export const useAdminExams = () => {
         solutionFilePath = uploadedSolutionPath;
       }
 
+      if (mySolutionFile) {
+        const uploadedMySolutionPath = await uploadExamFile(
+          mySolutionFile,
+          "min-besvarelse",
+        );
+
+        newlyUploadedPaths.push(uploadedMySolutionPath);
+        mySolutionFilePath = uploadedMySolutionPath;
+      }
+
       if (editingExam) {
         await updateExam(
           editingExam.id,
@@ -190,6 +208,7 @@ export const useAdminExams = () => {
           parsedRelevantTasks,
           examFilePath,
           solutionFilePath,
+          mySolutionFilePath,
         );
 
         const replacedPaths: string[] = [];
@@ -210,6 +229,14 @@ export const useAdminExams = () => {
           replacedPaths.push(editingExam.solutionFilePath);
         }
 
+        if (
+          mySolutionFile &&
+          editingExam.mySolutionFilePath &&
+          editingExam.mySolutionFilePath !== mySolutionFilePath
+        ) {
+          replacedPaths.push(editingExam.mySolutionFilePath);
+        }
+
         await removeFiles(replacedPaths);
 
         resetForm();
@@ -226,6 +253,7 @@ export const useAdminExams = () => {
         parsedRelevantTasks,
         examFilePath,
         solutionFilePath,
+        mySolutionFilePath,
       );
 
       resetForm();
@@ -259,14 +287,14 @@ export const useAdminExams = () => {
     setTitle(exam.title);
     setSemester(exam.semester);
     setYear(String(exam.year));
+    setRelevantTasks(exam.relevantTasks.join(", "));
     setExamFile(null);
     setSolutionFile(null);
+    setMySolutionFile(null);
     resetFileInputs();
 
     setErrorMessage("");
     setSuccessMessage("");
-
-    setRelevantTasks(exam.relevantTasks.join(", "));
 
     window.scrollTo({
       top: 0,
@@ -294,9 +322,11 @@ export const useAdminExams = () => {
     setSuccessMessage("");
 
     try {
-      const filePaths = [exam.examFilePath, exam.solutionFilePath].filter(
-        (filePath): filePath is string => Boolean(filePath),
-      );
+      const filePaths = [
+        exam.examFilePath,
+        exam.solutionFilePath,
+        exam.mySolutionFilePath,
+      ].filter((filePath): filePath is string => Boolean(filePath));
 
       await deleteExam(exam.id);
       await removeFiles(filePaths);
@@ -331,6 +361,7 @@ export const useAdminExams = () => {
   return {
     examFileInputRef,
     solutionFileInputRef,
+    mySolutionFileInputRef,
 
     subjectId,
     setSubjectId,
@@ -349,6 +380,7 @@ export const useAdminExams = () => {
 
     setExamFile,
     setSolutionFile,
+    setMySolutionFile,
 
     editingExam,
 

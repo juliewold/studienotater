@@ -13,6 +13,7 @@ export const AdminExamsPage = () => {
   const {
     examFileInputRef,
     solutionFileInputRef,
+    mySolutionFileInputRef,
 
     subjectId: previousExamSubjectId,
     setSubjectId: setPreviousExamSubjectId,
@@ -31,6 +32,7 @@ export const AdminExamsPage = () => {
 
     setExamFile,
     setSolutionFile,
+    setMySolutionFile,
 
     editingExam,
 
@@ -237,10 +239,22 @@ export const AdminExamsPage = () => {
               }
             />
 
-            {editingExam?.solutionFilePath && (
+            <label htmlFor="my-solution-file">Min besvarelse</label>
+
+            <input
+              ref={mySolutionFileInputRef}
+              id="my-solution-file"
+              type="file"
+              accept="application/pdf"
+              onChange={(event) =>
+                setMySolutionFile(event.target.files?.[0] ?? null)
+              }
+            />
+
+            {editingExam?.mySolutionFilePath && (
               <p className="admin-exam-help">
-                Det finnes allerede et løsningsforslag. Velg en ny fil bare
-                dersom du vil erstatte den.
+                Det finnes allerede en besvarelse. Velg en ny fil bare dersom du
+                vil erstatte den.
               </p>
             )}
 
@@ -293,6 +307,7 @@ export const AdminExamsPage = () => {
               {uploadedExams.map((exam) => {
                 const examFileUrl = getFileUrl(exam.examFilePath);
                 const solutionFileUrl = getFileUrl(exam.solutionFilePath);
+                const mySolutionFileUrl = getFileUrl(exam.mySolutionFilePath);
 
                 return (
                   <article key={exam.id} className="uploaded-exam-item">
@@ -315,6 +330,13 @@ export const AdminExamsPage = () => {
                           Løsningsforslag:{" "}
                           {exam.solutionFilePath ? "Lastet opp" : "Ikke valgt"}
                         </span>
+
+                        <span>
+                          Min besvarelse:{" "}
+                          {exam.mySolutionFilePath
+                            ? "Lastet opp"
+                            : "Ikke valgt"}
+                        </span>
                       </div>
                     </div>
 
@@ -336,6 +358,16 @@ export const AdminExamsPage = () => {
                           rel="noopener noreferrer"
                         >
                           Løsning
+                        </a>
+                      )}
+
+                      {mySolutionFileUrl && (
+                        <a
+                          href={mySolutionFileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Min besvarelse
                         </a>
                       )}
 

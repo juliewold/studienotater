@@ -58,11 +58,19 @@ export const ExamViewerPage = () => {
     );
   }
 
-  const isSolution = fileId === "solution";
+  const filePath =
+    fileId === "solution"
+      ? exam?.solutionFilePath
+      : fileId === "my-solution"
+        ? exam?.mySolutionFilePath
+        : exam?.examFilePath;
 
-  const filePath = isSolution ? exam?.solutionFilePath : exam?.examFilePath;
-
-  const fileTitle = isSolution ? "Løsningsforslag" : "Oppgavesett";
+  const fileTitle =
+    fileId === "solution"
+      ? "Løsningsforslag"
+      : fileId === "my-solution"
+        ? "Min besvarelse"
+        : "Oppgavesett";
 
   let fileUrl = "";
 

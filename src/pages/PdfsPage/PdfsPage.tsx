@@ -23,10 +23,6 @@ const categories = [
     id: "formler",
     title: "Formelark",
   },
-  {
-    id: "eksamener",
-    title: "Eksamener jeg har løst",
-  },
 ];
 
 export const PdfsPage = () => {

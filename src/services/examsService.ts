@@ -9,6 +9,7 @@ export type DatabaseExam = {
   relevantTasks: string[];
   examFilePath: string | null;
   solutionFilePath: string | null;
+  mySolutionFilePath: string | null;
 };
 
 function mapDatabaseExam(exam: {
@@ -20,6 +21,7 @@ function mapDatabaseExam(exam: {
   relevant_tasks: string[] | null;
   exam_file_path: string | null;
   solution_file_path: string | null;
+  my_solution_file_path: string | null;
 }): DatabaseExam {
   return {
     id: exam.id,
@@ -30,6 +32,7 @@ function mapDatabaseExam(exam: {
     relevantTasks: exam.relevant_tasks ?? [],
     examFilePath: exam.exam_file_path,
     solutionFilePath: exam.solution_file_path,
+    mySolutionFilePath: exam.my_solution_file_path,
   };
 }
 
@@ -57,6 +60,7 @@ export async function createExam(
   relevantTasks: string[],
   examFilePath: string | null,
   solutionFilePath: string | null,
+  mySolutionFilePath: string | null,
 ): Promise<void> {
   const { error } = await supabase.from("exams").insert({
     subject_id: subjectId,
@@ -66,6 +70,7 @@ export async function createExam(
     relevant_tasks: relevantTasks,
     exam_file_path: examFilePath,
     solution_file_path: solutionFilePath,
+    my_solution_file_path: mySolutionFilePath,
   });
 
   if (error) {
@@ -81,6 +86,7 @@ export async function updateExam(
   relevantTasks: string[],
   examFilePath: string | null,
   solutionFilePath: string | null,
+  mySolutionFilePath: string | null,
 ): Promise<void> {
   const { error } = await supabase
     .from("exams")
@@ -91,6 +97,7 @@ export async function updateExam(
       relevant_tasks: relevantTasks,
       exam_file_path: examFilePath,
       solution_file_path: solutionFilePath,
+      my_solution_file_path: mySolutionFilePath,
     })
     .eq("id", id);
 
@@ -100,10 +107,7 @@ export async function updateExam(
 }
 
 export async function deleteExam(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("exams")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("exams").delete().eq("id", id);
 
   if (error) {
     throw error;

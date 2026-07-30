@@ -20,10 +20,6 @@ const categories = [
     value: "formler",
     label: "Formelark",
   },
-  {
-    value: "eksamener",
-    label: "Eksamener",
-  },
 ];
 
 export const AdminPdfsPage = () => {
