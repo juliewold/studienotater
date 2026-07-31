@@ -1,5 +1,6 @@
 import type { Editor } from "@tiptap/react";
 import {
+  BadgeCheck,
   BookOpen,
   Braces,
   Code2,
@@ -20,7 +21,8 @@ export type SlashCalloutType =
   | "definition"
   | "tip"
   | "theorem"
-  | "example";
+  | "example"
+  | "exam";
 
 export type SlashCommandActions = {
   openMathDialog: (type: "inline" | "block") => void;
@@ -34,10 +36,7 @@ export type SlashCommandItem = {
   searchTerms: string[];
   icon: typeof Heading1;
   calloutType?: SlashCalloutType;
-  command: (
-    editor: Editor,
-    actions: SlashCommandActions,
-  ) => void;
+  command: (editor: Editor, actions: SlashCommandActions) => void;
 };
 
 export const slashCommands: SlashCommandItem[] = [
@@ -154,6 +153,16 @@ export const slashCommands: SlashCommandItem[] = [
     },
   },
   {
+    title: "Dette må du kunne til eksamen",
+    description: "Sett inn en boks med det viktigste til eksamen",
+    searchTerms: ["eksamen", "må kunne", "huskeliste", "exam", "callout"],
+    icon: BadgeCheck,
+    calloutType: "exam",
+    command: (_editor, actions) => {
+      actions.insertCallout("exam");
+    },
+  },
+  {
     title: "Tabell",
     description: "Sett inn en tabell med 3 kolonner og 3 rader",
     searchTerms: ["tabell", "rader", "kolonner"],
@@ -190,9 +199,7 @@ export const slashCommands: SlashCommandItem[] = [
   },
 ];
 
-export const filterSlashCommands = (
-  query: string,
-): SlashCommandItem[] => {
+export const filterSlashCommands = (query: string): SlashCommandItem[] => {
   const normalizedQuery = query.trim().toLowerCase();
 
   if (!normalizedQuery) {
@@ -200,11 +207,7 @@ export const filterSlashCommands = (
   }
 
   return slashCommands.filter((item) => {
-    const searchableText = [
-      item.title,
-      item.description,
-      ...item.searchTerms,
-    ]
+    const searchableText = [item.title, item.description, ...item.searchTerms]
       .join(" ")
       .toLowerCase();
 

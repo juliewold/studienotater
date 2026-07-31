@@ -3,11 +3,7 @@ import { ReactNodeViewRenderer } from "@tiptap/react";
 
 import { CalloutNodeView } from "./CalloutNodeView";
 
-export type CalloutType =
-  | "definition"
-  | "tip"
-  | "theorem"
-  | "example";
+export type CalloutType = "definition" | "tip" | "theorem" | "example" | "exam";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -35,8 +31,7 @@ export const Callout = Node.create({
         default: "definition",
 
         parseHTML: (element) =>
-          element.getAttribute("data-callout-type") ??
-          "definition",
+          element.getAttribute("data-callout-type") ?? "definition",
 
         renderHTML: (attributes) => ({
           "data-callout-type": attributes.type,

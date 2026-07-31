@@ -4,6 +4,7 @@ import {
   type NodeViewProps,
 } from "@tiptap/react";
 import {
+  BadgeCheck,
   BookOpen,
   Lightbulb,
   Puzzle,
@@ -33,6 +34,11 @@ const calloutInformation = {
     title: "Eksempel",
     icon: Puzzle,
   },
+
+  exam: {
+    title: "Dette må du kunne til eksamen",
+    icon: BadgeCheck,
+  },
 } satisfies Record<
   CalloutType,
   {
@@ -47,15 +53,12 @@ export const CalloutNodeView = ({
   updateAttributes,
   deleteNode,
 }: NodeViewProps) => {
-  const type =
-    (node.attrs.type as CalloutType) ?? "definition";
+  const type = (node.attrs.type as CalloutType) ?? "definition";
 
   const callout = calloutInformation[type];
   const Icon = callout.icon;
 
-  const handleTypeChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
+  const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     updateAttributes({
       type: event.target.value as CalloutType,
     });
@@ -66,14 +69,8 @@ export const CalloutNodeView = ({
   };
 
   return (
-    <NodeViewWrapper
-      className="note-callout"
-      data-callout-type={type}
-    >
-      <div
-        className="note-callout-header"
-        contentEditable={false}
-      >
+    <NodeViewWrapper className="note-callout" data-callout-type={type}>
+      <div className="note-callout-header" contentEditable={false}>
         <div className="note-callout-heading">
           <Icon size={18} />
 
@@ -91,19 +88,15 @@ export const CalloutNodeView = ({
               }}
               aria-label="Endre callout-type"
             >
-              <option value="definition">
-                Definisjon
-              </option>
+              <option value="definition">Definisjon</option>
 
               <option value="tip">Tips</option>
 
-              <option value="theorem">
-                Teorem
-              </option>
+              <option value="theorem">Teorem</option>
 
-              <option value="example">
-                Eksempel
-              </option>
+              <option value="example">Eksempel</option>
+
+              <option value="exam">Dette må du kunne til eksamen</option>
             </select>
 
             <button

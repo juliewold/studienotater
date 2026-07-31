@@ -22,6 +22,7 @@ import {
   Table2,
   Trash2,
   Undo2,
+  BadgeCheck,
   BookOpen,
   Lightbulb,
   Puzzle,
@@ -280,6 +281,14 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           event.preventDefault();
 
           currentEditor.chain().focus().insertCallout("example").run();
+
+          return true;
+        }
+
+        if (event.altKey && key === "x") {
+          event.preventDefault();
+
+          currentEditor.chain().focus().insertCallout("exam").run();
 
           return true;
         }
@@ -855,6 +864,14 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           title="Sett inn eksempel (Ctrl/Cmd + Alt + E)"
         >
           <Puzzle size={18} />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleInsertCallout("exam")}
+          title="Dette må du kunne til eksamen (Ctrl/Cmd + Alt + X)"
+        >
+          <BadgeCheck size={18} />
         </button>
 
         <button
