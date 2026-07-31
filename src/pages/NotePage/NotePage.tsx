@@ -6,6 +6,8 @@ import { subjects } from "../../data/subjects";
 
 import { getNoteBySlug, type DatabaseNote } from "../../services/notesService";
 
+import { getOrderedNotes } from "../../services/noteNavigationService";
+
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 
 import { EditableNote } from "../../components/EditableNote/EditableNote";
@@ -17,6 +19,11 @@ export const NotePage = () => {
   const { isAdmin } = useContext(AuthContext);
 
   const [note, setNote] = useState<DatabaseNote | null>(null);
+
+  const [previousNote, setPreviousNote] = useState<DatabaseNote | null>(null);
+
+  const [nextNote, setNextNote] = useState<DatabaseNote | null>(null);
+
   const [isLoadingNote, setIsLoadingNote] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -28,15 +35,22 @@ export const NotePage = () => {
     const loadNote = async () => {
       if (!subjectId || !noteId) {
         setNote(null);
+        setPreviousNote(null);
+        setNextNote(null);
         setIsLoadingNote(false);
         return;
       }
 
       setIsLoadingNote(true);
       setErrorMessage("");
+      setPreviousNote(null);
+      setNextNote(null);
 
       try {
-        const loadedNote = await getNoteBySlug(subjectId, noteId);
+        const [loadedNote, orderedNotes] = await Promise.all([
+          getNoteBySlug(subjectId, noteId),
+          getOrderedNotes(subjectId),
+        ]);
 
         if (!loadedNote) {
           setNote(null);
@@ -45,8 +59,27 @@ export const NotePage = () => {
         }
 
         setNote(loadedNote);
+
+        const currentIndex = orderedNotes.findIndex(
+          (currentNote) => currentNote.id === loadedNote.id,
+        );
+
+        setPreviousNote(
+          currentIndex > 0 ? orderedNotes[currentIndex - 1] : null,
+        );
+
+        setNextNote(
+          currentIndex < orderedNotes.length - 1
+            ? orderedNotes[currentIndex + 1]
+            : null,
+        );
       } catch (error) {
         console.error("Kunne ikke hente notat:", error);
+
+        setNote(null);
+        setPreviousNote(null);
+        setNextNote(null);
+
         setErrorMessage("Kunne ikke hente notatet.");
       } finally {
         setIsLoadingNote(false);
@@ -86,19 +119,40 @@ export const NotePage = () => {
 
   return (
     <main className="note-page">
-      <Link to={backUrl} className="back-link">
-        ← Tilbake
-      </Link>
+      <div className="note-page-topbar">
+        <Link to={backUrl} className="back-link">
+          ← Tilbake
+        </Link>
 
+        <nav className="note-navigation" aria-label="Navigasjon mellom notater">
+          {previousNote && (
+            <Link
+              to={`/fag/${subject.id}/notater/${previousNote.slug}`}
+              className="note-navigation-button"
+              title={previousNote.title}
+            >
+              ← Forrige
+            </Link>
+          )}
+
+          {nextNote && (
+            <Link
+              to={`/fag/${subject.id}/notater/${nextNote.slug}`}
+              className="note-navigation-button"
+              title={nextNote.title}
+            >
+              Neste →
+            </Link>
+          )}
+        </nav>
+      </div>
       <EditableNote
         note={note}
         subjectCode={subject.code}
         isAdmin={isAdmin}
         onNoteUpdated={setNote}
-      />
-
+      />{" "}
       <hr className="note-page-divider" />
-
       <ResourceProgress resourceId={resourceId} />
     </main>
   );

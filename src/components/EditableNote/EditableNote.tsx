@@ -45,6 +45,11 @@ export const EditableNote = ({
 
   const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
+  const [currentTopic, setCurrentTopic] = useState<DatabaseTopic | null>(null);
+
+  const [currentSubtopic, setCurrentSubtopic] =
+    useState<DatabaseSubtopic | null>(null);
+
   const [selectedTopicId, setSelectedTopicId] = useState(note.topicId ?? "");
 
   const [selectedSubtopicId, setSelectedSubtopicId] = useState(
@@ -117,6 +122,33 @@ export const EditableNote = ({
 
     loadSubtopics();
   }, [selectedTopicId]);
+
+  useEffect(() => {
+    const topic = topics.find((topic) => topic.id === note.topicId) ?? null;
+
+    setCurrentTopic(topic);
+
+    if (!topic || !note.subtopicId) {
+      setCurrentSubtopic(null);
+      return;
+    }
+
+    const loadCurrentSubtopic = async () => {
+      try {
+        const loadedSubtopics = await getSubtopicsByTopic(topic.id);
+
+        const subtopic =
+          loadedSubtopics.find((subtopic) => subtopic.id === note.subtopicId) ??
+          null;
+
+        setCurrentSubtopic(subtopic);
+      } catch {
+        setCurrentSubtopic(null);
+      }
+    };
+
+    void loadCurrentSubtopic();
+  }, [topics, note.topicId, note.subtopicId]);
 
   const getCurrentDraft = (): NoteDraft => ({
     title: title.trim(),
@@ -406,9 +438,18 @@ export const EditableNote = ({
 
       {(note.topicName || note.subtopicName) && (
         <div className="editable-note-classification-display">
-          {note.topicName && <span>Tema: {note.topicName}</span>}
+          {currentTopic && (
+            <span>
+              Tema {currentTopic.sortOrder}: {currentTopic.name}
+            </span>
+          )}
 
-          {note.subtopicName && <span>Undertema: {note.subtopicName}</span>}
+          {currentTopic && currentSubtopic && (
+            <span>
+              Undertema {currentTopic.sortOrder}.{currentSubtopic.sortOrder}:{" "}
+              {currentSubtopic.name}
+            </span>
+          )}
         </div>
       )}
 

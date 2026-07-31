@@ -35,3 +35,66 @@
   border: none;
   border-top: 1px solid rgba(155, 110, 232, 0.12);
 }
+
+.note-page-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.note-page-topbar .back-link {
+  margin: 0;
+}
+
+.note-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.note-navigation-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+  padding: 0.65rem 1rem;
+
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.75);
+  color: #7c3aed;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.note-navigation-button:hover {
+  background: white;
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .note-page-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .note-navigation {
+    width: 100%;
+  }
+
+  .note-navigation-button {
+    flex: 1;
+  }
+}
