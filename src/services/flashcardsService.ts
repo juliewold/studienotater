@@ -59,6 +59,45 @@ export async function getFlashcardsBySubject(
   }));
 }
 
+export async function getAllFlashcards(): Promise<DatabaseFlashcard[]> {
+  const { data, error } = await supabase
+    .from("flashcards")
+    .select(
+      `
+        *,
+        subtopics (
+          id,
+          name,
+          topic_id,
+          topics (
+            id,
+            name
+          )
+        )
+      `,
+    )
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map((flashcard) => ({
+    id: flashcard.id,
+    subjectId: flashcard.subject_id,
+
+    topicId: flashcard.subtopics?.topics?.id ?? "",
+    topicName: flashcard.subtopics?.topics?.name ?? "",
+
+    subtopicId: flashcard.subtopics?.id ?? "",
+    subtopicName: flashcard.subtopics?.name ?? "",
+
+    slug: flashcard.slug,
+    question: flashcard.question,
+    answer: flashcard.answer,
+  }));
+}
+
 export async function createFlashcard(
   subjectId: string,
   subtopicId: string,

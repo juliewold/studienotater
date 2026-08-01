@@ -136,6 +136,21 @@ export async function getNotesBySubject(
   return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
 }
 
+export async function getAllNotes(): Promise<DatabaseNote[]> {
+  const { data, error } = await supabase
+    .from("notes")
+    .select(noteSelect)
+    .order("created_at", {
+      ascending: true,
+    });
+
+  if (error) {
+    throw error;
+  }
+
+  return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
+}
+
 export async function getNotesByFolder(
   subjectId: string,
   folderId: string,

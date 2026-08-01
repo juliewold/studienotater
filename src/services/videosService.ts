@@ -47,40 +47,8 @@ const getFirstRelation = <T>(relation: T | T[] | null): T | null => {
   return relation;
 };
 
-export async function getVideosBySubject(
-  subjectId: string,
-): Promise<DatabaseVideo[]> {
-  const { data, error } = await supabase
-    .from("videos")
-    .select(
-      `
-        id,
-        subject_id,
-        title,
-        youtube_id,
-        sort_order,
-        subtopic_id,
-        subtopics!inner (
-          id,
-          name,
-          sort_order,
-          topic_id,
-          topics!inner (
-            id,
-            subject_id,
-            name,
-            sort_order
-          )
-        )
-      `,
-    )
-    .eq("subject_id", subjectId);
-
-  if (error) {
-    throw error;
-  }
-
-  const mappedVideos = ((data ?? []) as VideoRow[]).flatMap((video) => {
+const mapVideos = (rows: VideoRow[]): DatabaseVideo[] => {
+  const mappedVideos = rows.flatMap((video) => {
     const subtopic = getFirstRelation(video.subtopics);
 
     if (!subtopic) {
@@ -132,6 +100,73 @@ export async function getVideosBySubject(
 
     return firstVideo.title.localeCompare(secondVideo.title, "nb");
   });
+};
+
+export async function getVideosBySubject(
+  subjectId: string,
+): Promise<DatabaseVideo[]> {
+  const { data, error } = await supabase
+    .from("videos")
+    .select(
+      `
+        id,
+        subject_id,
+        title,
+        youtube_id,
+        sort_order,
+        subtopic_id,
+        subtopics!inner (
+          id,
+          name,
+          sort_order,
+          topic_id,
+          topics!inner (
+            id,
+            subject_id,
+            name,
+            sort_order
+          )
+        )
+      `,
+    )
+    .eq("subject_id", subjectId);
+
+  if (error) {
+    throw error;
+  }
+
+  return mapVideos((data ?? []) as VideoRow[]);
+}
+
+export async function getAllVideos(): Promise<DatabaseVideo[]> {
+  const { data, error } = await supabase.from("videos").select(
+    `
+        id,
+        subject_id,
+        title,
+        youtube_id,
+        sort_order,
+        subtopic_id,
+        subtopics!inner (
+          id,
+          name,
+          sort_order,
+          topic_id,
+          topics!inner (
+            id,
+            subject_id,
+            name,
+            sort_order
+          )
+        )
+      `,
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return mapVideos((data ?? []) as VideoRow[]);
 }
 
 export async function createVideo(

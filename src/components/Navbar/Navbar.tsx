@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 import { supabase } from "../../lib/supabase";
+import { GlobalSearch } from "../GlobalSearch/GlobalSearch";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -38,8 +39,7 @@ export const Navbar = () => {
     loadUsername();
   }, [user]);
 
-  const displayName =
-    username || user?.email?.split("@")[0] || "Profil";
+  const displayName = username || user?.email?.split("@")[0] || "Profil";
 
   const handleSignOut = async () => {
     await signOut();
@@ -105,10 +105,7 @@ export const Navbar = () => {
       </nav>
 
       <div className="nav-actions">
-        <button
-          className="icon-button"
-          aria-label="Bytt tema"
-        >
+        <button className="icon-button" aria-label="Bytt tema">
           ☾
         </button>
 
@@ -119,9 +116,7 @@ export const Navbar = () => {
             <>
               <button
                 className="profile-button"
-                onClick={() =>
-                  setProfileMenuOpen(!profileMenuOpen)
-                }
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
               >
                 {displayName}
               </button>
@@ -133,9 +128,7 @@ export const Navbar = () => {
                   <NavLink
                     to="/profil"
                     className="profile-menu-link"
-                    onClick={() =>
-                      setProfileMenuOpen(false)
-                    }
+                    onClick={() => setProfileMenuOpen(false)}
                   >
                     Min profil
                   </NavLink>
@@ -143,9 +136,7 @@ export const Navbar = () => {
                   <NavLink
                     to="/FavoritesPage"
                     className="profile-menu-link"
-                    onClick={() =>
-                      setProfileMenuOpen(false)
-                    }
+                    onClick={() => setProfileMenuOpen(false)}
                   >
                     Favoritter
                   </NavLink>
@@ -153,9 +144,7 @@ export const Navbar = () => {
                   <NavLink
                     to="/innstillinger"
                     className="profile-menu-link"
-                    onClick={() =>
-                      setProfileMenuOpen(false)
-                    }
+                    onClick={() => setProfileMenuOpen(false)}
                   >
                     Innstillinger
                   </NavLink>
@@ -170,10 +159,7 @@ export const Navbar = () => {
               )}
             </>
           ) : (
-            <Link
-              to="/logg-inn"
-              className="profile-button"
-            >
+            <Link to="/logg-inn" className="profile-button">
               Logg inn
             </Link>
           )}
@@ -185,9 +171,7 @@ export const Navbar = () => {
             setMenuOpen(!menuOpen);
             setProfileMenuOpen(false);
           }}
-          aria-label={
-            menuOpen ? "Lukk meny" : "Åpne meny"
-          }
+          aria-label={menuOpen ? "Lukk meny" : "Åpne meny"}
         >
           {menuOpen ? "×" : "☰"}
         </button>
@@ -196,10 +180,7 @@ export const Navbar = () => {
       {menuOpen && (
         <div className="menu-overlay">
           <div className="menu-top">
-            <input
-              type="text"
-              placeholder="Hva leter du etter?"
-            />
+            <GlobalSearch onNavigate={() => setMenuOpen(false)} />
           </div>
 
           <div className="menu-grid">
@@ -210,9 +191,7 @@ export const Navbar = () => {
                 to="/"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Hjem
@@ -222,9 +201,7 @@ export const Navbar = () => {
                 to="/fagplan"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Fagplan
@@ -234,9 +211,7 @@ export const Navbar = () => {
                 to="/notater"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Notater
@@ -246,9 +221,7 @@ export const Navbar = () => {
                 to="/flashcards"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Flashcards
@@ -258,9 +231,7 @@ export const Navbar = () => {
                 to="/videoer"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Videoer
@@ -270,9 +241,7 @@ export const Navbar = () => {
                 to="/pdfs"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Forelesningsnotater
@@ -282,9 +251,7 @@ export const Navbar = () => {
                 to="/programmering"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Programmering
@@ -298,9 +265,7 @@ export const Navbar = () => {
                 to="/semesterstart"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Semesterstart
@@ -310,9 +275,7 @@ export const Navbar = () => {
                 to="/klassetrinn"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Klassetrinn
@@ -336,9 +299,7 @@ export const Navbar = () => {
                 to="/eksamen"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  isActive
-                    ? "menu-link active-menu-link"
-                    : "menu-link"
+                  isActive ? "menu-link active-menu-link" : "menu-link"
                 }
               >
                 Eksamensnedtelling
@@ -385,9 +346,7 @@ export const Navbar = () => {
                 <>
                   <NavLink
                     to="/logg-inn"
-                    onClick={() =>
-                      setMenuOpen(false)
-                    }
+                    onClick={() => setMenuOpen(false)}
                     className="menu-link"
                   >
                     Logg inn
@@ -395,9 +354,7 @@ export const Navbar = () => {
 
                   <NavLink
                     to="/registrer"
-                    onClick={() =>
-                      setMenuOpen(false)
-                    }
+                    onClick={() => setMenuOpen(false)}
                     className="menu-link"
                   >
                     Registrer deg
