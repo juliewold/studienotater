@@ -10,6 +10,7 @@ export type GlobalSearchResult = {
   type: GlobalSearchResultType;
   title: string;
   description: string;
+  snippet: string;
   path: string;
   subjectId: string;
   searchableText: string;
@@ -33,6 +34,38 @@ const normalizeText = (value: string): string => {
     .replace(/[\u0300-\u036f]/g, "");
 };
 
+const createSnippet = (text: string, query: string): string => {
+  if (!text) {
+    return "";
+  }
+
+  const cleanText = removeHtml(text);
+
+  const normalizedText = normalizeText(cleanText);
+  const normalizedQuery = normalizeText(query);
+
+  const index = normalizedText.indexOf(normalizedQuery);
+
+  if (index === -1) {
+    return cleanText.slice(0, 120);
+  }
+
+  const start = Math.max(0, index - 45);
+  const end = Math.min(cleanText.length, index + query.length + 45);
+
+  let snippet = cleanText.slice(start, end);
+
+  if (start > 0) {
+    snippet = "…" + snippet;
+  }
+
+  if (end < cleanText.length) {
+    snippet += "…";
+  }
+
+  return snippet;
+};
+
 const joinSearchableText = (
   values: Array<string | null | undefined>,
 ): string => {
@@ -46,6 +79,7 @@ const mapNoteToSearchResult = (note: DatabaseNote): GlobalSearchResult => {
     title: note.title,
     description:
       note.description || note.subtopicName || note.topicName || "Notat",
+    snippet: "",
     path: `/fag/${note.subjectId}/notater/${note.slug}`,
     subjectId: note.subjectId,
     searchableText: joinSearchableText([
@@ -66,6 +100,7 @@ const mapFlashcardToSearchResult = (
     type: "flashcard",
     title: flashcard.question,
     description: flashcard.subtopicName || flashcard.topicName || "Flashcard",
+    snippet: "",
     path: `/fag/${flashcard.subjectId}/flashcards`,
     subjectId: flashcard.subjectId,
     searchableText: joinSearchableText([
@@ -83,6 +118,7 @@ const mapVideoToSearchResult = (video: DatabaseVideo): GlobalSearchResult => {
     type: "video",
     title: video.title,
     description: video.subtopic || video.topic || "Video",
+    snippet: "",
     path: `/fag/${video.subjectId}/videoer`,
     subjectId: video.subjectId,
     searchableText: joinSearchableText([
@@ -100,6 +136,7 @@ const mapPdfToSearchResult = (pdf: DatabasePdf): GlobalSearchResult => {
     title: pdf.title,
     description:
       pdf.subtopicName || pdf.topicName || pdf.category || "Forelesningsnotat",
+    snippet: "",
     path: `/fag/${pdf.subjectId}/pdfs/${pdf.id}`,
     subjectId: pdf.subjectId,
     searchableText: joinSearchableText([
@@ -185,5 +222,8 @@ export function searchGlobalItems(
       );
     })
     .slice(0, 12)
-    .map(({ result }) => result);
+    .map(({ result }) => ({
+      ...result,
+      snippet: createSnippet(result.searchableText, query),
+    }));
 }

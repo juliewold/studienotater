@@ -91,3 +91,14 @@
   color: #756c82;
   text-align: center;
 }
+
+.search-snippet {
+  display: -webkit-box;
+  margin-top: 5px;
+  overflow: hidden;
+  color: #51495e;
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}

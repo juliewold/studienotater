@@ -75,6 +75,10 @@ export const GlobalSearch = ({ onNavigate }: Props) => {
                   <div className="search-title">{result.title}</div>
 
                   <div className="search-description">{result.description}</div>
+
+                  {result.snippet && (
+                    <div className="search-snippet">{result.snippet}</div>
+                  )}
                 </div>
               </Link>
             ))
