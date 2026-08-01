@@ -197,11 +197,6 @@ export const FolderPage = () => {
       return;
     }
 
-    if (!selectedSubtopicId) {
-      setNoteModalError("Du må velge et undertema.");
-      return;
-    }
-
     const slug = createSlug(trimmedTitle);
 
     if (!slug) {
@@ -217,7 +212,7 @@ export const FolderPage = () => {
       const newNote = await createNote({
         subjectId,
         folderId,
-        subtopicId: selectedSubtopicId,
+        subtopicId: selectedSubtopicId || null,
         slug,
         title: trimmedTitle,
         description: "",
@@ -404,7 +399,7 @@ export const FolderPage = () => {
                 }}
                 disabled={isCreatingNote}
               >
-                <option value="">Velg undertema</option>
+                <option value="">Ingen undertema</option>
 
                 {subtopics.map((subtopic) => (
                   <option key={subtopic.id} value={subtopic.id}>
@@ -437,7 +432,7 @@ export const FolderPage = () => {
                   type="button"
                   className="folder-modal-submit-button"
                   onClick={handleCreateNote}
-                  disabled={isCreatingNote || subtopics.length === 0}
+                  disabled={isCreatingNote}
                 >
                   {isCreatingNote ? "Oppretter..." : "Opprett notat"}
                 </button>
