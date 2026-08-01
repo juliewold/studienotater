@@ -183,12 +183,6 @@ export const EditableNote = ({
       return false;
     }
 
-    if (!draft.subtopicId) {
-      setErrorMessage("Du må velge et undertema.");
-      setSaveStatus("error");
-      return false;
-    }
-
     if (!hasUnsavedChanges(draft)) {
       setSaveStatus("saved");
       return true;
@@ -203,7 +197,7 @@ export const EditableNote = ({
         description: draft.description,
         content: draft.content,
         contentJson: note.contentJson,
-        subtopicId: draft.subtopicId,
+        subtopicId: draft.subtopicId || null,
       });
 
       lastSavedDraft.current = {
@@ -377,7 +371,7 @@ export const EditableNote = ({
             }}
             disabled={!selectedTopicId}
           >
-            <option value="">Velg undertema</option>
+            <option value="">Ingen undertema</option>
 
             {subtopics.map((subtopic) => (
               <option key={subtopic.id} value={subtopic.id}>
