@@ -397,7 +397,7 @@ export const FolderPage = () => {
                     setNoteModalError("");
                   }
                 }}
-                disabled={isCreatingNote}
+                disabled={isCreatingNote || !folder.topicId}
               >
                 <option value="">Ingen undertema</option>
 
@@ -408,7 +408,7 @@ export const FolderPage = () => {
                 ))}
               </select>
 
-              {subtopics.length === 0 && (
+              {folder.topicId && subtopics.length === 0 && (
                 <p className="folder-modal-error">
                   Dette temaet har ingen undertemaer ennå.
                 </p>

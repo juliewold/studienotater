@@ -280,11 +280,6 @@ export const NotesPage = () => {
       return;
     }
 
-    if (!topicId) {
-      setFolderModalError("Du må velge et tema.");
-      return;
-    }
-
     setIsCreatingFolder(true);
     setFolderModalError("");
     setFoldersError("");
@@ -293,7 +288,7 @@ export const NotesPage = () => {
       const newFolder = await createNoteFolder(
         subjectId,
         trimmedFolderName,
-        topicId,
+        topicId || null,
       );
 
       setFolders((currentFolders) => [...currentFolders, newFolder]);
@@ -703,9 +698,8 @@ export const NotesPage = () => {
                   }
                 }}
                 disabled={isCreatingFolder}
-                required
               >
-                <option value="">Velg tema</option>
+                <option value="">Ingen tema</option>
 
                 {topics.map((topic) => (
                   <option key={topic.id} value={topic.id}>
