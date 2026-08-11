@@ -118,9 +118,18 @@ export const ExamViewerPage = () => {
         <div className="exam-workspace-pdf">
           <iframe
             className="exam-viewer"
-            src={fileUrl}
+            src={`${fileUrl}#view=FitH`}
             title={`${examTitle} – ${fileTitle}`}
           />
+
+          <a
+            className="exam-mobile-pdf-link"
+            href={fileUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Åpne PDF i fullskjerm
+          </a>
         </div>
       </div>
     </main>
