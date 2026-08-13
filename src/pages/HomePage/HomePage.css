@@ -39,3 +39,63 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .year-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .year-section {
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .year-section h2 {
+    margin-bottom: 14px;
+    font-size: 1.4rem;
+  }
+
+  .year-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .subjects-section {
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .subjects-section h2 {
+    margin-bottom: 14px;
+    font-size: 1.4rem;
+  }
+
+  .subjects-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .year-grid {
+    grid-template-columns: 1fr;
+  }
+}
