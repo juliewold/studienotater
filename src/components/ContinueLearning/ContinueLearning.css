@@ -23,7 +23,10 @@
   color: inherit;
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .recent-card:hover {
@@ -32,6 +35,7 @@
 
 .recent-type {
   margin: 0 0 12px;
+
   color: #8b5cf6;
   font-weight: 600;
   font-size: 0.9rem;
@@ -39,17 +43,53 @@
 
 .recent-card h3 {
   margin: 0;
+
   font-size: 1.1rem;
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 1024px) {
   .recent-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
+  .continue-learning {
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .continue-learning h2 {
+    margin-bottom: 14px;
+
+    font-size: 1.4rem;
+  }
+
   .recent-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .recent-card {
+    padding: 18px;
+
+    border-radius: 20px;
+  }
+
+  .recent-card:hover {
+    transform: none;
+  }
+
+  .recent-type {
+    margin-bottom: 8px;
+
+    font-size: 0.85rem;
+  }
+
+  .recent-card h3 {
+    font-size: 1rem;
   }
 }

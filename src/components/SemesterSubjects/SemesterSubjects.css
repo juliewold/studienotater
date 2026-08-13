@@ -8,11 +8,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
 
   margin-bottom: 20px;
 }
 
 .semester-subjects-header a {
+  flex-shrink: 0;
+
   text-decoration: none;
 
   background: #b38bf3;
@@ -32,11 +35,13 @@
 
 .semester-subjects-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
 }
 
 .semester-subject-card {
+  min-width: 0;
+
   background: white;
   border-radius: 24px;
   padding: 24px;
@@ -45,6 +50,7 @@
   color: inherit;
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+
   transition: transform 0.2s ease;
 }
 
@@ -54,16 +60,59 @@
 
 .semester-subject-card h3 {
   margin: 8px 0 0;
+
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 1024px) {
   .semester-subjects-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
+  .semester-subjects {
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .semester-subjects-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+
+    margin-bottom: 14px;
+  }
+
+  .semester-subjects-header h2 {
+    margin: 0;
+
+    font-size: 1.4rem;
+  }
+
+  .semester-subjects-header a {
+    padding: 9px 15px;
+
+    font-size: 0.9rem;
+  }
+
   .semester-subjects-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .semester-subject-card {
+    padding: 18px;
+
+    border-radius: 20px;
+  }
+
+  .semester-subject-card:hover {
+    transform: none;
+  }
+
+  .semester-subject-card h3 {
+    font-size: 1rem;
   }
 }

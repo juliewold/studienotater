@@ -13,13 +13,36 @@
 
 .footer-content h3 {
   margin: 0 0 12px;
+
+  line-height: 1.3;
 }
 
 .footer-content p {
   margin: 0;
+
+  line-height: 1.5;
 }
 
 .footer-copy {
   margin-top: 16px !important;
   opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+  .footer {
+    margin-top: 48px;
+    padding: 36px 16px;
+  }
+
+  .footer-content h3 {
+    font-size: 1.1rem;
+  }
+
+  .footer-content p {
+    font-size: 0.95rem;
+  }
+
+  .footer-copy {
+    margin-top: 12px !important;
+  }
 }
