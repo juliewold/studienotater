@@ -7,6 +7,7 @@ import {
   FileText,
   GraduationCap,
   ClipboardList,
+  ListChecks,
   ChevronRight,
 } from "lucide-react";
 
@@ -25,26 +26,32 @@ export const SubjectFeatureCard = ({
     switch (title) {
       case "Notater":
         return <BookOpen size={24} />;
+
       case "Flashcards":
         return <Brain size={24} />;
+
+      case "Oppgaver":
+        return <ListChecks size={24} />;
+
       case "Videoer":
         return <Video size={24} />;
+
       case "Tidligere eksamener":
         return <GraduationCap size={24} />;
+
       case "Forelesningsnotater":
         return <FileText size={24} />;
+
       case "Pensum":
         return <ClipboardList size={24} />;
+
       default:
         return <BookOpen size={24} />;
     }
   };
-
   return (
     <Link to={link} className="subject-feature-card">
-      <div className="subject-feature-icon">
-        {getIcon()}
-      </div>
+      <div className="subject-feature-icon">{getIcon()}</div>
 
       <h3>{title}</h3>
 

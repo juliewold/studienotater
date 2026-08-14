@@ -64,3 +64,39 @@
 .subject-feature-card:hover .subject-feature-link {
   gap: 10px;
 }
+
+@media (max-width: 600px) {
+  .subject-feature-card {
+    gap: 10px;
+    padding: 18px;
+
+    border-radius: 20px;
+  }
+
+  .subject-feature-icon {
+    width: 44px;
+    height: 44px;
+
+    border-radius: 14px;
+  }
+
+  .subject-feature-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .subject-feature-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .subject-feature-card p {
+    line-height: 1.4;
+    font-size: 0.95rem;
+  }
+
+  .subject-feature-link {
+    margin-top: 4px;
+
+    font-size: 0.95rem;
+  }
+}
