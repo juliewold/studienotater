@@ -95,19 +95,51 @@
 @media (max-width: 800px) {
   .exam-list {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
 @media (max-width: 700px) {
+  .exam-list {
+    margin-top: 1.5rem;
+  }
+
   .exam-section {
-    padding: 1.2rem;
+    padding: 1rem;
+
+    border-radius: 18px;
+  }
+
+  .exam-section:hover {
+    transform: none;
   }
 
   .exam-section h2 {
-    font-size: 1.4rem;
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .exam-meta {
+    margin: 0.3rem 0 1rem;
+
+    font-size: 0.9rem;
   }
 
   .exam-row {
-    padding: 0.9rem 1rem;
+    padding: 0.85rem 0.95rem;
+
+    border-radius: 12px;
+  }
+
+  .exam-row:hover {
+    transform: none;
+  }
+
+  .exam-row span:first-child {
+    font-size: 0.95rem;
+  }
+
+  .exam-arrow {
+    font-size: 1.15rem;
   }
 }
