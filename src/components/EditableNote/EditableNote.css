@@ -55,8 +55,8 @@
   color: var(--text, #1f2937);
 }
 
-.editable-note-edit-button:hover,
-.editable-note-save-button:hover,
+.editable-note-edit-button:hover
+.editable-note-save-button:hover
 .editable-note-cancel-button:hover {
   transform: translateY(-1px);
 }
@@ -411,5 +411,66 @@
 
   .editable-note-classification label:not(:first-child) {
     margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .editable-note-topbar {
+    margin-bottom: 1.25rem;
+  }
+
+  .editable-note-toolbar {
+    margin-bottom: 1.25rem;
+  }
+
+  .editable-note-document-header {
+    margin-bottom: 1.25rem;
+    padding: 0;
+  }
+
+  .editable-note-title,
+  .editable-note-title-input {
+    font-size: 2.25rem;
+    line-height: 1.05;
+  }
+
+  .editable-note-description,
+  .editable-note-description-input {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .editable-note-description-input {
+    margin-top: 0.6rem;
+  }
+
+  .editable-note-classification {
+    margin: 0.9rem 0 1.1rem;
+  }
+
+  .editable-note-classification-display {
+    gap: 0.45rem;
+    margin: 0.75rem 0 1rem;
+  }
+
+  .editable-note-classification-display span {
+    min-height: 30px;
+    padding: 0.3rem 0.65rem;
+
+    font-size: 0.8rem;
+  }
+
+  .editable-note-content {
+    padding: 0.75rem 0 4rem;
+
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .editable-note-edit-button,
+  .editable-note-save-button,
+  .editable-note-cancel-button {
+    min-height: 40px;
+    padding: 0.55rem 0.75rem;
   }
 }

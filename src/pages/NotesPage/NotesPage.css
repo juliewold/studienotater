@@ -406,39 +406,131 @@
 
 @media (max-width: 650px) {
   .notes-page {
-    margin: 32px auto;
-    padding: 0 20px;
+    margin: 24px auto 48px;
+    padding: 0 16px;
   }
 
   .notes-header {
     flex-direction: column;
+    gap: 16px;
+
+    margin-top: 24px;
+  }
+
+  .notes-header h1 {
+    font-size: 2rem;
+    line-height: 1.15;
+  }
+
+  .notes-header p:last-child {
+    font-size: 0.95rem;
+    line-height: 1.4;
   }
 
   .notes-header-actions {
     width: 100%;
     flex-direction: column;
+    gap: 10px;
   }
 
   .generate-structure-button,
   .new-folder-button {
     width: 100%;
+    min-height: 46px;
+  }
+
+  .structure-message {
+    margin-top: 16px;
+    padding: 12px 14px;
+
+    font-size: 0.9rem;
   }
 
   .notes-folders {
     grid-template-columns: 1fr;
+    gap: 12px;
+
+    margin-top: 24px;
+  }
+
+  .notes-list {
+    gap: 12px;
+
+    margin-top: 24px;
+  }
+
+  .note-card-wrapper .note-card {
+    padding-right: 58px;
+  }
+
+  .favorite-button {
+    top: 14px;
+    right: 14px;
+
+    width: 36px;
+    height: 36px;
+  }
+
+  .note-progress-preview {
+    flex-wrap: wrap;
+    gap: 8px;
+
+    font-size: 0.9rem;
+  }
+
+  .notes-error-message {
+    margin-top: 16px;
+
+    font-size: 0.9rem;
+  }
+
+  .folder-modal-backdrop {
+    padding: 16px;
+    align-items: center;
   }
 
   .folder-modal {
-    padding: 22px;
+    width: 100%;
+    max-height: calc(100dvh - 32px);
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    overflow-y: auto;
+  }
+
+  .folder-modal-header {
+    gap: 12px;
+
+    margin-bottom: 20px;
+  }
+
+  .folder-modal-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .folder-modal-form input,
+  .folder-modal-form select {
+    min-height: 46px;
   }
 
   .folder-modal-actions {
     flex-direction: column-reverse;
+    gap: 10px;
+
+    margin-top: 18px;
   }
 
   .folder-modal-cancel-button,
   .folder-modal-submit-button {
     width: 100%;
+    min-height: 46px;
+  }
+
+  .folder-delete-text,
+  .folder-delete-info {
+    font-size: 0.9rem;
   }
 }
 
