@@ -1,5 +1,6 @@
 import "./NoteMenu.css";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { FolderInput, MoreVertical, Pencil, Trash2, X } from "lucide-react";
 import {
   getNoteFoldersBySubject,
@@ -140,6 +141,7 @@ export const NoteMenu = ({
       await moveNoteToFolder(noteId, selectedFolderId);
 
       setIsMoveModalOpen(false);
+
       onNoteChanged({
         type: "moved",
       });
@@ -167,6 +169,7 @@ export const NoteMenu = ({
       await updateNoteTitle(noteId, trimmedTitle);
 
       setIsRenameModalOpen(false);
+
       onNoteChanged({
         type: "renamed",
         title: trimmedTitle,
@@ -191,6 +194,7 @@ export const NoteMenu = ({
       await deleteNote(noteId);
 
       setIsDeleteModalOpen(false);
+
       onNoteChanged({
         type: "deleted",
       });
@@ -267,207 +271,212 @@ export const NoteMenu = ({
         )}
       </div>
 
-      {isMoveModalOpen && (
-        <div className="note-modal-overlay" onClick={closeMoveModal}>
-          <div
-            className="note-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="note-move-title"
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-          >
-            <div className="note-modal-header">
-              <h2 id="note-move-title">Flytt notat</h2>
-
-              <button
-                type="button"
-                className="note-modal-close-button"
-                aria-label="Lukk"
-                onClick={closeMoveModal}
+      {createPortal(
+        <>
+          {isMoveModalOpen && (
+            <div className="note-modal-overlay" onClick={closeMoveModal}>
+              <div
+                className="note-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="note-move-title"
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
               >
-                <X size={20} />
-              </button>
+                <div className="note-modal-header">
+                  <h2 id="note-move-title">Flytt notat</h2>
+
+                  <button
+                    type="button"
+                    className="note-modal-close-button"
+                    aria-label="Lukk"
+                    onClick={closeMoveModal}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {isLoadingFolders ? (
+                  <p className="note-modal-message">Henter mapper...</p>
+                ) : (
+                  <div className="note-move-options">
+                    <label className="note-move-option">
+                      <input
+                        type="radio"
+                        name={`folder-${noteId}`}
+                        checked={selectedFolderId === null}
+                        onChange={() => setSelectedFolderId(null)}
+                      />
+
+                      <span>Ingen mappe</span>
+                    </label>
+
+                    {folders.map((folder) => (
+                      <label key={folder.id} className="note-move-option">
+                        <input
+                          type="radio"
+                          name={`folder-${noteId}`}
+                          checked={selectedFolderId === folder.id}
+                          onChange={() => setSelectedFolderId(folder.id)}
+                        />
+
+                        <span>{folder.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                <div className="note-modal-actions">
+                  <button
+                    type="button"
+                    className="note-modal-cancel-button"
+                    onClick={closeMoveModal}
+                  >
+                    Avbryt
+                  </button>
+
+                  <button
+                    type="button"
+                    className="note-modal-submit-button"
+                    disabled={isLoadingFolders || isMoving}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      void handleMove();
+                    }}
+                  >
+                    {isMoving ? "Flytter..." : "Flytt"}
+                  </button>
+                </div>
+              </div>
             </div>
+          )}
 
-            {isLoadingFolders ? (
-              <p className="note-modal-message">Henter mapper...</p>
-            ) : (
-              <div className="note-move-options">
-                <label className="note-move-option">
+          {isRenameModalOpen && (
+            <div className="note-modal-overlay" onClick={closeRenameModal}>
+              <form
+                className="note-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="note-rename-title"
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+                onSubmit={(event) => {
+                  event.preventDefault();
+
+                  void handleRename();
+                }}
+              >
+                <div className="note-modal-header">
+                  <h2 id="note-rename-title">Gi notatet nytt navn</h2>
+
+                  <button
+                    type="button"
+                    className="note-modal-close-button"
+                    aria-label="Lukk"
+                    onClick={closeRenameModal}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <label className="note-rename-label">
+                  Navn på notatet
                   <input
-                    type="radio"
-                    name={`folder-${noteId}`}
-                    checked={selectedFolderId === null}
-                    onChange={() => setSelectedFolderId(null)}
+                    type="text"
+                    value={newTitle}
+                    autoFocus
+                    maxLength={100}
+                    onChange={(event) => setNewTitle(event.target.value)}
                   />
-
-                  <span>Ingen mappe</span>
                 </label>
 
-                {folders.map((folder) => (
-                  <label key={folder.id} className="note-move-option">
-                    <input
-                      type="radio"
-                      name={`folder-${noteId}`}
-                      checked={selectedFolderId === folder.id}
-                      onChange={() => setSelectedFolderId(folder.id)}
-                    />
+                <div className="note-modal-actions">
+                  <button
+                    type="button"
+                    className="note-modal-cancel-button"
+                    onClick={closeRenameModal}
+                  >
+                    Avbryt
+                  </button>
 
-                    <span>{folder.name}</span>
-                  </label>
-                ))}
-              </div>
-            )}
+                  <button
+                    type="submit"
+                    className="note-modal-submit-button"
+                    disabled={
+                      isRenaming ||
+                      !newTitle.trim() ||
+                      newTitle.trim() === noteTitle
+                    }
+                  >
+                    {isRenaming ? "Lagrer..." : "Lagre"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
-            <div className="note-modal-actions">
-              <button
-                type="button"
-                className="note-modal-cancel-button"
-                onClick={closeMoveModal}
-              >
-                Avbryt
-              </button>
-
-              <button
-                type="button"
-                className="note-modal-submit-button"
-                disabled={isLoadingFolders || isMoving}
+          {isDeleteModalOpen && (
+            <div className="note-modal-overlay" onClick={closeDeleteModal}>
+              <div
+                className="note-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="note-delete-title"
                 onClick={(event) => {
-                  event.preventDefault();
                   event.stopPropagation();
-
-                  void handleMove();
                 }}
               >
-                {isMoving ? "Flytter..." : "Flytt"}
-              </button>
+                <div className="note-modal-header">
+                  <h2 id="note-delete-title">Slett notat</h2>
+
+                  <button
+                    type="button"
+                    className="note-modal-close-button"
+                    aria-label="Lukk"
+                    onClick={closeDeleteModal}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <p className="note-modal-message">
+                  Er du sikker på at du vil slette
+                  <strong> «{noteTitle}»</strong>?
+                </p>
+
+                <p className="note-delete-warning">
+                  Denne handlingen kan ikke angres.
+                </p>
+
+                <div className="note-modal-actions">
+                  <button
+                    type="button"
+                    className="note-modal-cancel-button"
+                    onClick={closeDeleteModal}
+                  >
+                    Avbryt
+                  </button>
+
+                  <button
+                    type="button"
+                    className="note-modal-delete-button"
+                    disabled={isDeleting}
+                    onClick={() => {
+                      void handleDelete();
+                    }}
+                  >
+                    {isDeleting ? "Sletter..." : "Slett"}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {isRenameModalOpen && (
-        <div className="note-modal-overlay" onClick={closeRenameModal}>
-          <form
-            className="note-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="note-rename-title"
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-            onSubmit={(event) => {
-              event.preventDefault();
-
-              void handleRename();
-            }}
-          >
-            <div className="note-modal-header">
-              <h2 id="note-rename-title">Gi notatet nytt navn</h2>
-
-              <button
-                type="button"
-                className="note-modal-close-button"
-                aria-label="Lukk"
-                onClick={closeRenameModal}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <label className="note-rename-label">
-              Navn på notatet
-              <input
-                type="text"
-                value={newTitle}
-                autoFocus
-                maxLength={100}
-                onChange={(event) => setNewTitle(event.target.value)}
-              />
-            </label>
-
-            <div className="note-modal-actions">
-              <button
-                type="button"
-                className="note-modal-cancel-button"
-                onClick={closeRenameModal}
-              >
-                Avbryt
-              </button>
-
-              <button
-                type="submit"
-                className="note-modal-submit-button"
-                disabled={
-                  isRenaming ||
-                  !newTitle.trim() ||
-                  newTitle.trim() === noteTitle
-                }
-              >
-                {isRenaming ? "Lagrer..." : "Lagre"}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {isDeleteModalOpen && (
-        <div className="note-modal-overlay" onClick={closeDeleteModal}>
-          <div
-            className="note-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="note-delete-title"
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-          >
-            <div className="note-modal-header">
-              <h2 id="note-delete-title">Slett notat</h2>
-
-              <button
-                type="button"
-                className="note-modal-close-button"
-                aria-label="Lukk"
-                onClick={closeDeleteModal}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <p className="note-modal-message">
-              Er du sikker på at du vil slette
-              <strong> «{noteTitle}»</strong>?
-            </p>
-
-            <p className="note-delete-warning">
-              Denne handlingen kan ikke angres.
-            </p>
-
-            <div className="note-modal-actions">
-              <button
-                type="button"
-                className="note-modal-cancel-button"
-                onClick={closeDeleteModal}
-              >
-                Avbryt
-              </button>
-
-              <button
-                type="button"
-                className="note-modal-delete-button"
-                disabled={isDeleting}
-                onClick={() => {
-                  void handleDelete();
-                }}
-              >
-                {isDeleting ? "Sletter..." : "Slett"}
-              </button>
-            </div>
-          </div>
-        </div>
+          )}
+        </>,
+        document.body,
       )}
     </>
   );

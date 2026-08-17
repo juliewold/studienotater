@@ -83,8 +83,8 @@
 }
 
 .note-modal {
-  width: 100%;
-  max-width: 440px;
+  width: min(440px, calc(100vw - 40px));
+  box-sizing: border-box;
 
   padding: 24px;
 
@@ -173,6 +173,7 @@
 
 .note-rename-label input {
   width: 100%;
+  box-sizing: border-box;
   padding: 12px 14px;
 
   border: 1px solid #d8d8d8;
@@ -189,6 +190,7 @@
 
 .note-delete-warning {
   margin: 10px 0 0;
+
   color: #c62828;
   font-size: 0.9rem;
 }
@@ -231,4 +233,19 @@
 .note-modal-delete-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media (max-width: 500px) {
+  .note-modal-overlay {
+    padding: 16px;
+  }
+
+  .note-modal {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .note-modal-actions {
+    flex-wrap: wrap;
+  }
 }

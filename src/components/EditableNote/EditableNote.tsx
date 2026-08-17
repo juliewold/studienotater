@@ -177,12 +177,6 @@ export const EditableNote = ({
       return false;
     }
 
-    if (!draft.topicId) {
-      setErrorMessage("Du må velge et tema.");
-      setSaveStatus("error");
-      return false;
-    }
-
     if (!hasUnsavedChanges(draft)) {
       setSaveStatus("saved");
       return true;
@@ -351,7 +345,7 @@ export const EditableNote = ({
               setErrorMessage("");
             }}
           >
-            <option value="">Velg tema</option>
+            <option value="">Ingen tema</option>
 
             {topics.map((topic) => (
               <option key={topic.id} value={topic.id}>
