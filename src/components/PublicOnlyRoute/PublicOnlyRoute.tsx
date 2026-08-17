@@ -1,14 +1,12 @@
-import { useContext } from "react";
+import { useContext, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 
 type PublicOnlyRouteProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-export const PublicOnlyRoute = ({
-  children,
-}: PublicOnlyRouteProps) => {
+export const PublicOnlyRoute = ({ children }: PublicOnlyRouteProps) => {
   const { user, isLoading } = useContext(AuthContext);
 
   if (isLoading) {

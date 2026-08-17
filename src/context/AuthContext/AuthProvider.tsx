@@ -1,33 +1,13 @@
-import {
-  createContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
+
 import { supabase } from "../../lib/supabase";
-
-type UserRole = "user" | "admin";
-
-type AuthContextType = {
-  user: User | null;
-  role: UserRole | null;
-  isAdmin: boolean;
-  isLoading: boolean;
-  signOut: () => Promise<void>;
-};
+import { AuthContext } from "./AuthContext";
+import type { UserRole } from "./types";
 
 type AuthProviderProps = {
   children: ReactNode;
 };
-
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  role: null,
-  isAdmin: false,
-  isLoading: true,
-  signOut: async () => {},
-});
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
