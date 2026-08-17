@@ -296,6 +296,16 @@ export const Navbar = () => {
               <h3>PLANLEGGING</h3>
 
               <NavLink
+                to="/kalender"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive ? "menu-link active-menu-link" : "menu-link"
+                }
+              >
+                Kalender
+              </NavLink>
+
+              <NavLink
                 to="/eksamen"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>

@@ -44,6 +44,7 @@ import { AdminExamsPage } from "./pages/AdminExamsPage/AdminExamsPage";
 import { AdminStudyPlansPage } from "./pages/AdminStudyPlansPage/AdminStudyPlansPage";
 import { FolderPage } from "./pages/FolderPage/FolderPage";
 import { PracticePage } from "./pages/PracticePage/PracticePage";
+import { CalendarPage } from "./pages/CalendarPage/CalendarPage";
 
 function App() {
   return (
@@ -248,6 +249,15 @@ function App() {
           element={
             <ProtectedRoute>
               <ExamOverviewPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/kalender"
+          element={
+            <ProtectedRoute>
+              <CalendarPage />
             </ProtectedRoute>
           }
         />
