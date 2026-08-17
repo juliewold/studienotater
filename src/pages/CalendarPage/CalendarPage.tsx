@@ -70,15 +70,20 @@ const recurrenceOptions: {
   },
 ];
 
-const weekDays = [
-  "Mandag",
-  "Tirsdag",
-  "Onsdag",
-  "Torsdag",
-  "Fredag",
-  "Lørdag",
-  "Søndag",
-];
+const weekDays = ["Man.", "Tir.", "Ons.", "Tor.", "Fre.", "Lør.", "Søn."];
+
+const weekHours = Array.from({ length: 14 }, (_, index) => index + 8);
+
+const WEEK_HOUR_HEIGHT = 56;
+
+const getScheduleTop = (date: Date) => {
+  const scheduleStartHour = 8;
+
+  const hoursFromStart =
+    date.getHours() - scheduleStartHour + date.getMinutes() / 60;
+
+  return hoursFromStart * WEEK_HOUR_HEIGHT;
+};
 
 type CalendarOccurrence = {
   id: string;
@@ -155,6 +160,30 @@ const addDays = (date: Date, amount: number) => {
   const result = new Date(date);
 
   result.setDate(result.getDate() + amount);
+
+  return result;
+};
+
+const startOfWeek = (date: Date) => {
+  const result = new Date(date);
+
+  const day = result.getDay();
+
+  const daysSinceMonday = day === 0 ? 6 : day - 1;
+
+  result.setDate(result.getDate() - daysSinceMonday);
+
+  result.setHours(0, 0, 0, 0);
+
+  return result;
+};
+
+const endOfWeek = (date: Date) => {
+  const result = startOfWeek(date);
+
+  result.setDate(result.getDate() + 6);
+
+  result.setHours(23, 59, 59, 999);
 
   return result;
 };
@@ -266,6 +295,14 @@ export const CalendarPage = () => {
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
 
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [calendarView, setCalendarView] = useState<"month" | "week" | "day">(
+    "month",
+  );
+
+  const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date()));
+
+  const [currentDay, setCurrentDay] = useState(() => new Date());
 
   const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
 
@@ -400,6 +437,38 @@ export const CalendarPage = () => {
 
     return result;
   }, [occurrences]);
+
+  const weekOccurrencesByDate = useMemo(() => {
+    const weekOccurrences = expandCalendarEvents(
+      visibleEvents,
+      startOfWeek(currentWeek),
+      endOfWeek(currentWeek),
+    );
+
+    const result: Record<string, CalendarOccurrence[]> = {};
+
+    weekOccurrences.forEach((occurrence) => {
+      const key = getDateKey(occurrence.start);
+
+      if (!result[key]) {
+        result[key] = [];
+      }
+
+      result[key].push(occurrence);
+    });
+
+    return result;
+  }, [visibleEvents, currentWeek]);
+
+  const dayOccurrences = useMemo(() => {
+    const dayStart = new Date(currentDay);
+    dayStart.setHours(0, 0, 0, 0);
+
+    const dayEnd = new Date(currentDay);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    return expandCalendarEvents(visibleEvents, dayStart, dayEnd);
+  }, [visibleEvents, currentDay]);
 
   const getSubjectCode = (subjectId: string | null) => {
     if (!subjectId) {
@@ -959,8 +1028,18 @@ export const CalendarPage = () => {
               <button
                 type="button"
                 className="calendar-navigation-button"
-                aria-label="Forrige måned"
-                onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}
+                aria-label={
+                  calendarView === "week" ? "Forrige uke" : "Forrige måned"
+                }
+                onClick={() => {
+                  if (calendarView === "day") {
+                    setCurrentDay(addDays(currentDay, -1));
+                  } else if (calendarView === "week") {
+                    setCurrentWeek(addDays(currentWeek, -7));
+                  } else {
+                    setCurrentMonth(addMonths(currentMonth, -1));
+                  }
+                }}
               >
                 <ChevronLeft size={19} />
               </button>
@@ -968,7 +1047,15 @@ export const CalendarPage = () => {
               <button
                 type="button"
                 className="calendar-today-button"
-                onClick={() => setCurrentMonth(startOfMonth(new Date()))}
+                onClick={() => {
+                  if (calendarView === "day") {
+                    setCurrentDay(new Date());
+                  } else if (calendarView === "week") {
+                    setCurrentWeek(startOfWeek(new Date()));
+                  } else {
+                    setCurrentMonth(startOfMonth(new Date()));
+                  }
+                }}
               >
                 I dag
               </button>
@@ -976,107 +1063,321 @@ export const CalendarPage = () => {
               <button
                 type="button"
                 className="calendar-navigation-button"
-                aria-label="Neste måned"
-                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                aria-label={
+                  calendarView === "week" ? "Neste uke" : "Neste måned"
+                }
+                onClick={() => {
+                  if (calendarView === "day") {
+                    setCurrentDay(addDays(currentDay, 1));
+                  } else if (calendarView === "week") {
+                    setCurrentWeek(addDays(currentWeek, 7));
+                  } else {
+                    setCurrentMonth(addMonths(currentMonth, 1));
+                  }
+                }}
               >
                 <ChevronRight size={19} />
               </button>
             </div>
 
             <h2>
-              {currentMonth.toLocaleDateString("nb-NO", {
-                month: "long",
-                year: "numeric",
-              })}
+              {calendarView === "day"
+                ? currentDay.toLocaleDateString("nb-NO", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })
+                : calendarView === "week"
+                  ? `${currentWeek.toLocaleDateString("nb-NO", {
+                      day: "numeric",
+                      month: "long",
+                    })} – ${endOfWeek(currentWeek).toLocaleDateString("nb-NO", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}`
+                  : currentMonth.toLocaleDateString("nb-NO", {
+                      month: "long",
+                      year: "numeric",
+                    })}
             </h2>
-
             <div className="calendar-view-switcher">
               <button
                 type="button"
-                className="calendar-view-button calendar-view-button-active"
+                className={
+                  calendarView === "month"
+                    ? "calendar-view-button calendar-view-button-active"
+                    : "calendar-view-button"
+                }
+                onClick={() => setCalendarView("month")}
               >
                 Måned
               </button>
 
-              <button type="button" className="calendar-view-button" disabled>
+              <button
+                type="button"
+                className={
+                  calendarView === "week"
+                    ? "calendar-view-button calendar-view-button-active"
+                    : "calendar-view-button"
+                }
+                onClick={() => setCalendarView("week")}
+              >
                 Uke
               </button>
 
-              <button type="button" className="calendar-view-button" disabled>
+              <button
+                type="button"
+                className={
+                  calendarView === "day"
+                    ? "calendar-view-button calendar-view-button-active"
+                    : "calendar-view-button"
+                }
+                onClick={() => setCalendarView("day")}
+              >
                 Dag
               </button>
             </div>
           </div>
 
-          <div className="calendar-weekdays">
-            {weekDays.map((weekDay) => (
-              <div key={weekDay}>{weekDay}</div>
-            ))}
-          </div>
+          {calendarView === "month" && (
+            <>
+              <div className="calendar-weekdays">
+                {weekDays.map((weekDay) => (
+                  <div key={weekDay}>{weekDay}</div>
+                ))}
+              </div>
 
-          <div className="calendar-month-grid">
-            {calendarDays.map((day) => {
-              const dateKey = getDateKey(day);
+              <div className="calendar-month-grid">
+                {calendarDays.map((day) => {
+                  const dateKey = getDateKey(day);
 
-              const dayOccurrences = occurrencesByDate[dateKey] ?? [];
+                  const dayOccurrences = occurrencesByDate[dateKey] ?? [];
 
-              const isCurrentMonth =
-                day.getMonth() === currentMonth.getMonth() &&
-                day.getFullYear() === currentMonth.getFullYear();
+                  const isCurrentMonth =
+                    day.getMonth() === currentMonth.getMonth() &&
+                    day.getFullYear() === currentMonth.getFullYear();
 
-              const isToday = isSameDay(day, new Date());
+                  const isToday = isSameDay(day, new Date());
 
-              return (
-                <div
-                  key={dateKey}
-                  className={`calendar-day ${
-                    isCurrentMonth ? "" : "calendar-day-outside"
-                  }`}
-                >
-                  <div className="calendar-day-header">
-                    <span
+                  return (
+                    <div
+                      key={dateKey}
+                      className={`calendar-day ${
+                        isCurrentMonth ? "" : "calendar-day-outside"
+                      }`}
+                    >
+                      <div className="calendar-day-header">
+                        <span
+                          className={
+                            isToday
+                              ? "calendar-day-number calendar-day-number-today"
+                              : "calendar-day-number"
+                          }
+                        >
+                          {day.getDate()}
+                        </span>
+                      </div>
+
+                      <div className="calendar-day-events">
+                        {dayOccurrences.map((occurrence) => (
+                          <button
+                            key={occurrence.id}
+                            type="button"
+                            className={`calendar-event calendar-event-${occurrence.eventType}`}
+                            title={`${getSubjectCode(
+                              occurrence.subjectId,
+                            )} – ${occurrence.title}`}
+                            onClick={() => setSelectedOccurrence(occurrence)}
+                          >
+                            {!occurrence.allDay && (
+                              <span className="calendar-event-time">
+                                {formatTime(occurrence.start)}
+                              </span>
+                            )}
+
+                            <span className="calendar-event-subject">
+                              {getSubjectCode(occurrence.subjectId)}
+                            </span>
+
+                            <strong>{occurrence.title}</strong>
+
+                            <span className="calendar-event-type">
+                              {getEventTypeLabel(occurrence.eventType)}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </section>
+      )}
+
+      {calendarView === "week" && (
+        <section className="calendar-card">
+          <div className="calendar-week-schedule">
+            <div className="calendar-week-time-column">
+              <div className="calendar-week-time-spacer" />
+
+              {weekHours.map((hour) => (
+                <div key={hour} className="calendar-week-time-label">
+                  {String(hour).padStart(2, "0")}
+                  :00
+                </div>
+              ))}
+            </div>
+
+            <div className="calendar-week-schedule-content">
+              <div className="calendar-week-view">
+                {Array.from({ length: 7 }, (_, index) =>
+                  addDays(currentWeek, index),
+                ).map((day) => (
+                  <div key={getDateKey(day)} className="calendar-week-day">
+                    <span>
+                      {day.toLocaleDateString("nb-NO", {
+                        weekday: "short",
+                      })}
+                    </span>
+
+                    <strong
                       className={
-                        isToday
-                          ? "calendar-day-number calendar-day-number-today"
-                          : "calendar-day-number"
+                        isSameDay(day, new Date())
+                          ? "calendar-week-day-number calendar-week-day-number-today"
+                          : "calendar-week-day-number"
                       }
                     >
                       {day.getDate()}
-                    </span>
+                    </strong>
+
+                    <div className="calendar-week-day-schedule">
+                      {(weekOccurrencesByDate[getDateKey(day)] ?? []).map(
+                        (occurrence) => {
+                          const eventTop = getScheduleTop(occurrence.start);
+
+                          const eventHeight = occurrence.end
+                            ? Math.max(
+                                getScheduleTop(occurrence.end) - eventTop,
+                                36,
+                              )
+                            : 44;
+
+                          return (
+                            <button
+                              key={occurrence.id}
+                              type="button"
+                              className={`calendar-week-event calendar-event-${occurrence.eventType}`}
+                              style={{
+                                top: `${eventTop}px`,
+                                height: `${eventHeight}px`,
+                              }}
+                              onClick={() => setSelectedOccurrence(occurrence)}
+                            >
+                              {!occurrence.allDay && (
+                                <span className="calendar-event-time">
+                                  {occurrence.end
+                                    ? `${formatTime(occurrence.start)}–${formatTime(occurrence.end)}`
+                                    : formatTime(occurrence.start)}
+                                </span>
+                              )}
+
+                              <span className="calendar-event-subject">
+                                {getSubjectCode(occurrence.subjectId)}
+                              </span>
+
+                              <strong>{occurrence.title}</strong>
+                            </button>
+                          );
+                        },
+                      )}
+                    </div>
                   </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
-                  <div className="calendar-day-events">
-                    {dayOccurrences.map((occurrence) => (
-                      <button
-                        key={occurrence.id}
-                        type="button"
-                        className={`calendar-event calendar-event-${occurrence.eventType}`}
-                        title={`${getSubjectCode(occurrence.subjectId)} – ${
-                          occurrence.title
-                        }`}
-                        onClick={() => setSelectedOccurrence(occurrence)}
-                      >
-                        {!occurrence.allDay && (
-                          <span className="calendar-event-time">
-                            {formatTime(occurrence.start)}
-                          </span>
-                        )}
+      {calendarView === "day" && (
+        <section className="calendar-card">
+          <div className="calendar-day-schedule">
+            <div className="calendar-week-time-column">
+              <div className="calendar-week-time-spacer" />
 
-                        <span className="calendar-event-subject">
-                          {getSubjectCode(occurrence.subjectId)}
-                        </span>
-
-                        <strong>{occurrence.title}</strong>
-
-                        <span className="calendar-event-type">
-                          {getEventTypeLabel(occurrence.eventType)}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
+              {weekHours.map((hour) => (
+                <div key={hour} className="calendar-week-time-label">
+                  {String(hour).padStart(2, "0")}:00
                 </div>
-              );
-            })}
+              ))}
+            </div>
+
+            <div className="calendar-day-schedule-content">
+              <div className="calendar-day-schedule-header">
+                <span>
+                  {currentDay.toLocaleDateString("nb-NO", {
+                    weekday: "long",
+                  })}
+                </span>
+
+                <strong
+                  className={
+                    isSameDay(currentDay, new Date())
+                      ? "calendar-week-day-number calendar-week-day-number-today"
+                      : "calendar-week-day-number"
+                  }
+                >
+                  {currentDay.getDate()}
+                </strong>
+              </div>
+
+              <div className="calendar-day-timeline">
+                {dayOccurrences.map((occurrence) => {
+                  const eventTop = getScheduleTop(occurrence.start);
+
+                  const eventHeight = occurrence.end
+                    ? Math.max(getScheduleTop(occurrence.end) - eventTop, 36)
+                    : 44;
+
+                  return (
+                    <button
+                      key={occurrence.id}
+                      type="button"
+                      className={`calendar-day-event calendar-event-${occurrence.eventType}`}
+                      style={{
+                        top: `${eventTop}px`,
+                        height: `${eventHeight}px`,
+                      }}
+                      onClick={() => setSelectedOccurrence(occurrence)}
+                    >
+                      <span className="calendar-event-time">
+                        {occurrence.end
+                          ? `${formatTime(occurrence.start)}–${formatTime(
+                              occurrence.end,
+                            )}`
+                          : formatTime(occurrence.start)}
+                      </span>
+
+                      <span className="calendar-event-subject">
+                        {getSubjectCode(occurrence.subjectId)}
+                      </span>
+
+                      <strong>{occurrence.title}</strong>
+
+                      {occurrence.location && (
+                        <span className="calendar-day-event-location">
+                          {occurrence.location}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </section>
       )}
