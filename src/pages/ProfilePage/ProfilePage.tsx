@@ -1,10 +1,5 @@
 import "./ProfilePage.css";
-import {
-  useContext,
-  useEffect,
-  useState,
-  type SyntheticEvent,
-} from "react";
+import { useContext, useEffect, useState, type SyntheticEvent } from "react";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 import { supabase } from "../../lib/supabase";
 
@@ -56,9 +51,7 @@ export const ProfilePage = () => {
     loadProfile();
   }, [user]);
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!user) {
@@ -120,9 +113,7 @@ export const ProfilePage = () => {
           <div>
             <h2>{fullName || username}</h2>
             <p>{user?.email}</p>
-            <span>
-              {isAdmin ? "Administrator" : "Vanlig bruker"}
-            </span>
+            <span>{isAdmin ? "Administrator" : "Vanlig bruker"}</span>
           </div>
         </div>
 
@@ -154,12 +145,7 @@ export const ProfilePage = () => {
           />
 
           <label htmlFor="email">E-post</label>
-          <input
-            id="email"
-            type="email"
-            value={user?.email ?? ""}
-            disabled
-          />
+          <input id="email" type="email" value={user?.email ?? ""} disabled />
 
           {errorMessage && (
             <p className="profile-message profile-message-error">

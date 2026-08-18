@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useState,
-  type SyntheticEvent,
-} from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../components/AuthLayout/AuthLayout";
 import { supabase } from "../../lib/supabase";
@@ -15,8 +11,7 @@ export const UpdatePasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isPreparingSession, setIsPreparingSession] =
-    useState(true);
+  const [isPreparingSession, setIsPreparingSession] = useState(true);
 
   useEffect(() => {
     const prepareRecoverySession = async () => {
@@ -73,14 +68,9 @@ export const UpdatePasswordPage = () => {
           }
         }
       } catch (error) {
-        console.error(
-          "Kunne ikke opprette recovery-session:",
-          error,
-        );
+        console.error("Kunne ikke opprette recovery-session:", error);
 
-        setErrorMessage(
-          "Kunne ikke åpne tilbakestillingslenken.",
-        );
+        setErrorMessage("Kunne ikke åpne tilbakestillingslenken.");
       } finally {
         setIsPreparingSession(false);
       }
@@ -89,9 +79,7 @@ export const UpdatePasswordPage = () => {
     prepareRecoverySession();
   }, []);
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage("");
 
@@ -109,9 +97,7 @@ export const UpdatePasswordPage = () => {
     if (error) {
       console.error("Kunne ikke oppdatere passord:", error);
 
-      setErrorMessage(
-        "Kunne ikke oppdatere passordet. Lenken kan ha utløpt.",
-      );
+      setErrorMessage("Kunne ikke oppdatere passordet. Lenken kan ha utløpt.");
       setIsLoading(false);
       return;
     }
@@ -125,20 +111,14 @@ export const UpdatePasswordPage = () => {
 
   if (isPreparingSession) {
     return (
-      <AuthLayout
-        label="Velg nytt passord"
-        title="Oppdater passord"
-      >
+      <AuthLayout label="Velg nytt passord" title="Oppdater passord">
         <p>Laster tilbakestillingslenken...</p>
       </AuthLayout>
     );
   }
 
   return (
-    <AuthLayout
-      label="Velg nytt passord"
-      title="Oppdater passord"
-    >
+    <AuthLayout label="Velg nytt passord" title="Oppdater passord">
       <form className="auth-form" onSubmit={handleSubmit}>
         <label htmlFor="password">Nytt passord</label>
 
@@ -153,36 +133,25 @@ export const UpdatePasswordPage = () => {
           required
         />
 
-        <label htmlFor="confirmPassword">
-          Bekreft passord
-        </label>
+        <label htmlFor="confirmPassword">Bekreft passord</label>
 
         <input
           id="confirmPassword"
           type="password"
           placeholder="Gjenta passord"
           value={confirmPassword}
-          onChange={(event) =>
-            setConfirmPassword(event.target.value)
-          }
+          onChange={(event) => setConfirmPassword(event.target.value)}
           autoComplete="new-password"
           minLength={6}
           required
         />
 
         {errorMessage && (
-          <p className="auth-message auth-message-error">
-            {errorMessage}
-          </p>
+          <p className="auth-message auth-message-error">{errorMessage}</p>
         )}
 
-        <button
-          type="submit"
-          disabled={isLoading || Boolean(errorMessage)}
-        >
-          {isLoading
-            ? "Oppdaterer..."
-            : "Oppdater passord"}
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Oppdaterer..." : "Oppdater passord"}
         </button>
       </form>
     </AuthLayout>

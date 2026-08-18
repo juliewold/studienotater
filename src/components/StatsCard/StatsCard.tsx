@@ -1,4 +1,4 @@
-import "./StatsCard.css"
+import "./StatsCard.css";
 
 type StatsCardProps = {
   title: string;

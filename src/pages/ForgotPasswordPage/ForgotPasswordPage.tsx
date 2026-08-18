@@ -10,9 +10,7 @@ export const ForgotPasswordPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setErrorMessage("");
@@ -38,10 +36,7 @@ export const ForgotPasswordPage = () => {
   };
 
   return (
-    <AuthLayout
-      label="Tilbakestill passord"
-      title="Glemt passord?"
-    >
+    <AuthLayout label="Tilbakestill passord" title="Glemt passord?">
       <form className="auth-form" onSubmit={handleSubmit}>
         <label htmlFor="email">E-post</label>
 
@@ -51,25 +46,20 @@ export const ForgotPasswordPage = () => {
           placeholder="navn@eksempel.no"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
           required
         />
 
         {errorMessage && (
-          <p className="auth-message auth-message-error">
-            {errorMessage}
-          </p>
+          <p className="auth-message auth-message-error">{errorMessage}</p>
         )}
 
         {successMessage && (
-          <p className="auth-message auth-message-success">
-            {successMessage}
-          </p>
+          <p className="auth-message auth-message-success">{successMessage}</p>
         )}
 
         <button type="submit" disabled={isLoading}>
-          {isLoading
-            ? "Sender e-post..."
-            : "Send tilbakestillingslenke"}
+          {isLoading ? "Sender e-post..." : "Send tilbakestillingslenke"}
         </button>
       </form>
 
