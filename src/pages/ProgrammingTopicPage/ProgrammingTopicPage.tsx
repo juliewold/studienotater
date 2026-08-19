@@ -4,11 +4,13 @@ import "./ProgrammingTopicPage.css";
 import { javascriptOverview } from "../../data/programming/javascript/overview";
 import { LessonRenderer } from "../../components/lesson/LessonRenderer/LessonRenderer";
 import { typescriptOverview } from "../../data/programming/typescript/overview";
+import { javaOverview } from "../../data/programming/java/overview";
 
 const programmingData = {
   python: pythonOverview,
   javascript: javascriptOverview,
   typescript: typescriptOverview,
+  java: javaOverview,
 };
 
 export function ProgrammingTopicPage() {
