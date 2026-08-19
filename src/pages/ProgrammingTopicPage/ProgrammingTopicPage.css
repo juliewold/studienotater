@@ -56,11 +56,20 @@
 
 .programming-sidebar {
   position: sticky;
+
   top: 120px;
+
   align-self: start;
+
+  max-height: calc(100vh - 144px);
+  overflow-y: auto;
+
   background: white;
+
   border-radius: 24px;
+
   padding: 24px;
+
   box-shadow: 0 10px 30px rgba(120, 100, 180, 0.12);
 }
 
