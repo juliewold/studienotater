@@ -36,6 +36,7 @@ import { javaExceptionHandling } from "./unntakshandtering";
 import { javaCustomExceptions } from "./egendefinerte-unntak";
 import { javaCheckedAndUncheckedExceptions } from "./checked-og-unchecked";
 import { javaOptional } from "./optional";
+import { javaSummary } from "./oppsummering";
 
 export const javaOverview: ProgrammingTopic = {
   id: "java",
@@ -82,5 +83,6 @@ export const javaOverview: ProgrammingTopic = {
     javaCustomExceptions,
     javaCheckedAndUncheckedExceptions,
     javaOptional,
+    javaSummary,
   ],
 };
