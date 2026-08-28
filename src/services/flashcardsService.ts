@@ -13,6 +13,7 @@ export type DatabaseFlashcard = {
   slug: string;
   question: string;
   answer: string;
+  createdAt: string;
 };
 
 export async function getFlashcardsBySubject(
@@ -56,6 +57,7 @@ export async function getFlashcardsBySubject(
     slug: flashcard.slug,
     question: flashcard.question,
     answer: flashcard.answer,
+    createdAt: flashcard.created_at,
   }));
 }
 
@@ -95,6 +97,7 @@ export async function getAllFlashcards(): Promise<DatabaseFlashcard[]> {
     slug: flashcard.slug,
     question: flashcard.question,
     answer: flashcard.answer,
+    createdAt: flashcard.created_at,
   }));
 }
 

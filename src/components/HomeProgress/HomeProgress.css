@@ -5,126 +5,128 @@
 }
 
 .home-progress-header {
-  margin-bottom: 20px;
-}
-
-.home-progress-label {
-  margin: 0 0 8px;
-
-  color: #8b5cf6;
-  font-weight: 700;
+  margin-bottom: 14px;
 }
 
 .home-progress h2 {
   margin: 0;
-}
 
-.home-progress-header a {
-  text-decoration: none;
-
-  background: #b38bf3;
-  color: white;
-
-  padding: 10px 18px;
-  border-radius: 999px;
-
-  font-weight: 600;
+  font-size: 1.45rem;
+  line-height: 1.2;
 }
 
 .home-progress-list {
   display: grid;
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 
 .home-progress-item {
-  display: block;
+  display: flex;
+  flex-direction: column;
 
   min-width: 0;
-  padding: 16px;
-  border-radius: 24px;
+  padding: 14px 16px;
 
+  border: 1px solid #ece7f5;
+  border-radius: 16px;
   background: white;
-  color: inherit;
 
+  color: inherit;
   text-decoration: none;
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.home-progress-info {
+.home-progress-item:hover {
+  transform: translateY(-1px);
+
+  border-color: #d8ccf5;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.045);
+}
+
+.home-progress-top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
+  align-items: center;
+  gap: 12px;
 
-  margin-bottom: 16px;
+  margin-bottom: 5px;
 }
 
-.home-progress-info div {
-  display: grid;
-  gap: 4px;
-
-  min-width: 0;
+.home-progress-top strong {
+  font-size: 0.95rem;
 }
 
-.home-progress-info strong {
-  font-size: 1rem;
-}
-
-.home-progress-info span {
-  color: #6b647c;
-
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-
-.home-progress-info p {
+.home-progress-top span {
   flex-shrink: 0;
 
-  margin: 0;
+  color: #8b5cf6;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.home-progress-count {
+  margin: 0 0 8px;
 
   color: #6b647c;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
 .home-progress-details {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 4px 10px;
 
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 
   color: #6b647c;
+  font-size: 0.75rem;
   font-weight: 600;
-  font-size: 0.9rem;
 }
 
 .home-progress-bar {
-  height: 12px;
-
-  background: #eee7fb;
-  border-radius: 999px;
+  height: 6px;
 
   overflow: hidden;
+
+  border-radius: 999px;
+  background: #eee7fb;
 }
 
 .home-progress-fill {
   height: 100%;
 
-  background: #b38bf3;
   border-radius: 999px;
+  background: #b38bf3;
 
   transition: width 0.3s ease;
 }
 
-.home-progress-percent {
-  margin: 10px 0 0;
+.home-progress-rating {
+  margin: 7px 0 0;
 
   color: #6b647c;
+  font-size: 0.76rem;
   font-weight: 600;
 }
 
-/* Mobil */
+@media (max-width: 900px) {
+  .home-progress {
+    max-width: none;
+  }
+
+  .home-progress-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
 @media (max-width: 600px) {
   .home-progress {
     margin: 24px auto;
@@ -132,67 +134,37 @@
   }
 
   .home-progress-header {
-    margin-bottom: 14px;
-  }
-
-  .home-progress-label {
-    margin-bottom: 6px;
-
-    font-size: 0.9rem;
+    margin-bottom: 12px;
   }
 
   .home-progress h2 {
-    font-size: 1.4rem;
-    line-height: 1.25;
+    font-size: 1.3rem;
   }
 
   .home-progress-list {
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .home-progress-item {
-    padding: 18px;
+    padding: 14px;
 
-    border-radius: 20px;
+    border-radius: 15px;
   }
 
-  .home-progress-info {
-    flex-direction: column;
-    gap: 8px;
-
-    margin-bottom: 14px;
+  .home-progress-top {
+    margin-bottom: 4px;
   }
 
-  .home-progress-info strong {
-    font-size: 0.95rem;
-  }
-
-  .home-progress-info span {
-    font-size: 0.95rem;
-  }
-
-  .home-progress-info p {
-    font-size: 0.9rem;
+  .home-progress-count {
+    margin-bottom: 7px;
   }
 
   .home-progress-details {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 5px;
-
-    margin-bottom: 14px;
-
-    font-size: 0.85rem;
+    margin-bottom: 9px;
   }
 
-  .home-progress-bar {
-    height: 10px;
-  }
-
-  .home-progress-percent {
-    margin-top: 8px;
-
-    font-size: 0.85rem;
-    line-height: 1.4;
+  .home-progress-rating {
+    font-size: 0.75rem;
   }
 }

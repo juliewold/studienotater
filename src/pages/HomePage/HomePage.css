@@ -40,6 +40,27 @@
   gap: 16px;
 }
 
+/* Dashboard */
+.home-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+.home-dashboard-grid .upcoming-tasks,
+.home-dashboard-grid .home-progress {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
 @media (max-width: 900px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -47,6 +68,10 @@
 
   .year-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .home-dashboard-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -87,6 +112,16 @@
   .subjects-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .home-dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 24px;
+
+    max-width: 1280px;
+    margin: 32px auto;
+    padding: 0 24px;
   }
 }
 
