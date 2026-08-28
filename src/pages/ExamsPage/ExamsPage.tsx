@@ -5,7 +5,7 @@ import {
   getExamsBySubject,
   type DatabaseExam,
 } from "../../services/examsService";
-import { ExamProgressOverview } from "../../components/ExamProgressOverview/ExamProgressOverview";
+import { ExamProgressOverview } from "../../components/exams/ExamProgressOverview/ExamProgressOverview";
 
 export const ExamsPage = () => {
   const { subjectId } = useParams();

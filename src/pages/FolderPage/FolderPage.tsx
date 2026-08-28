@@ -23,7 +23,7 @@ import {
 
 import { getAllProgress, type Progress } from "../../services/progressService";
 
-import { FolderNoteCard } from "../../components/FolderNoteCard/FolderNoteCard";
+import { FolderNoteCard } from "../../components/notes/FolderNoteCard/FolderNoteCard";
 
 export const FolderPage = () => {
   const { subjectId, folderId } = useParams();

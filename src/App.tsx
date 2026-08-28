@@ -1,7 +1,7 @@
 import { LoginPage } from "./pages/LoginPage/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage/RegisterPage";
 import { HashRouter, Routes, Route } from "react-router-dom";
-import { Navbar } from "./components/Navbar/Navbar";
+import { Navbar } from "./components/layout/Navbar/Navbar";
 import { HomePage } from "./pages/HomePage/HomePage";
 import { SubjectPage } from "./pages/SubjectPage/SubjectPage";
 import { NotesPage } from "./pages/NotesPage/NotesPage";
@@ -25,8 +25,8 @@ import { ProgrammingTopicPage } from "./pages/ProgrammingTopicPage/ProgrammingTo
 import { AboutPage } from "./pages/AboutPage/AboutPage";
 import { FavoritesPage } from "./pages/FavoritesPage/FavoritesPage";
 import { ExamViewerPage } from "./pages/ExamViewerPage/ExamViewerPage";
-import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
-import { PublicOnlyRoute } from "./components/PublicOnlyRoute/PublicOnlyRoute";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute/ProtectedRoute";
+import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute/PublicOnlyRoute";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage/ForgotPasswordPage";
 import { UpdatePasswordPage } from "./pages/UpdatePasswordPage/UpdatePasswordPage";
 import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
@@ -34,7 +34,7 @@ import { YearsPage } from "./pages/YearsPage/YearsPage";
 import { SemesterPlanPage } from "./pages/SemesterPlanPage/SemesterPlanPage";
 import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
 import { AdminPage } from "./pages/AdminPage/AdminPage";
-import { AdminRoute } from "./components/AdminRoute/AdminRoute";
+import { AdminRoute } from "./components/auth/AdminRoute/AdminRoute";
 import { AdminPdfsPage } from "./pages/AdminPdfsPage/AdminPdfsPage";
 import { AdminNotesPage } from "./pages/AdminNotesPage/AdminNotesPage";
 import { AdminFlashcardsPage } from "./pages/AdminFlashcardsPage/AdminFlashcardsPage";

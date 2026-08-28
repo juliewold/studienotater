@@ -21,8 +21,8 @@ import {
 import { useFavorites } from "../../hooks/useFavorites";
 import { useProgress } from "../../hooks/useProgress";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
-import { FolderCard } from "../../components/FolderCard/FolderCard";
-import { NoteCard } from "../../components/NoteCard/NoteCard";
+import { FolderCard } from "../../components/notes/FolderCard/FolderCard";
+import { NoteCard } from "../../components/notes/NoteCard/NoteCard";
 import {
   getAllSubtopicsBySubject,
   getTopicsBySubject,

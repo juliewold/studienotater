@@ -10,8 +10,8 @@ import { getOrderedNotes } from "../../services/noteNavigationService";
 
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 
-import { EditableNote } from "../../components/EditableNote/EditableNote";
-import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
+import { EditableNote } from "../../components/notes/EditableNote/EditableNote";
+import { ResourceProgress } from "../../components/progress/ResourceProgress/ResourceProgress";
 
 export const NotePage = () => {
   const { subjectId, noteId } = useParams();

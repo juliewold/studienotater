@@ -1,4 +1,4 @@
-import { CodeBlock } from "../../../components/CodeBlock/CodeBlock";
+import { CodeBlock } from "../../common/CodeBlock/CodeBlock";
 import "./LessonCode.css";
 
 type LessonCodeProps = {

@@ -1,6 +1,6 @@
 import "./AdminNotesPage.css";
 
-import { NoteEditor } from "../../components/NoteEditor/NoteEditor";
+import { NoteEditor } from "../../components/notes/NoteEditor/NoteEditor";
 import { subjects } from "../../data/subjects";
 import { useAdminNotes } from "../../hooks/useAdminNotes";
 

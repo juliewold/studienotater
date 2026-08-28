@@ -1,10 +1,10 @@
 import "./HomePage.css";
-import { Footer } from "../../components/Footer/Footer";
-import { HomeProgress } from "../../components/HomeProgress/HomeProgress";
-import { SemesterSubjects } from "../../components/SemesterSubjects/SemesterSubjects";
-import { ExamOverview } from "../../components/ExamOverview/ExamOverview";
-import { WeeklyUpdates } from "../../components/WeeklyUpdates/WeeklyUpdates";
-import { UpcomingTasks } from "../../components/UpcomingTasks/UpcomingTasks";
+import { Footer } from "../../components/layout/Footer/Footer";
+import { HomeProgress } from "../../components/home/HomeProgress/HomeProgress";
+import { SemesterSubjects } from "../../components/subjects/SemesterSubjects/SemesterSubjects";
+import { ExamOverview } from "../../components/exams/ExamOverview/ExamOverview";
+import { WeeklyUpdates } from "../../components/home/WeeklyUpdates/WeeklyUpdates";
+import { UpcomingTasks } from "../../components/home/UpcomingTasks/UpcomingTasks";
 
 export const HomePage = () => {
   return (

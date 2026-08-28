@@ -5,7 +5,7 @@ import {
   getVideosBySubject,
   type DatabaseVideo,
 } from "../../services/videosService";
-import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
+import { ResourceProgress } from "../../components/progress/ResourceProgress/ResourceProgress";
 
 type SubtopicGroup = {
   subtopic: string;

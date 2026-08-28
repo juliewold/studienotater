@@ -2,7 +2,7 @@ import "./YearPage.css";
 
 import { Link, useParams } from "react-router-dom";
 
-import { SubjectCard } from "../../components/SubjectCard/SubjectCard";
+import { SubjectCard } from "../../components/subjects/SubjectCard/SubjectCard";
 import { subjects } from "../../data/subjects";
 
 export const YearPage = () => {

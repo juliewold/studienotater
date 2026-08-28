@@ -6,7 +6,7 @@ import {
   type DatabaseExam,
 } from "../../services/examsService";
 import { supabase } from "../../lib/supabase";
-import { ExamTaskTracker } from "../../components/ExamTaskTracker/ExamTaskTracker";
+import { ExamTaskTracker } from "../../components/exams/ExamTaskTracker/ExamTaskTracker";
 
 export const ExamViewerPage = () => {
   const { subjectId, examId, fileId } = useParams();

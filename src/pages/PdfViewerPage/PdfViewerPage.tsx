@@ -5,7 +5,7 @@ import {
   getPdfById,
   type DatabasePdf,
 } from "../../services/pdfsService";
-import { ResourceProgress } from "../../components/ResourceProgress/ResourceProgress";
+import { ResourceProgress } from "../../components/progress/ResourceProgress/ResourceProgress";
 
 export const PdfViewerPage = () => {
   const { subjectId, pdfId } = useParams();

@@ -1,6 +1,6 @@
 import "./StudyPlanPage.css";
 import { Link, useParams } from "react-router-dom";
-import { BookProgressCard } from "../../components/BookProgressCard/BookProgressCard";
+import { BookProgressCard } from "../../components/progress/BookProgressCard/BookProgressCard";
 import { tma4412Book } from "../../data/books/tma4412Book";
 import { useStudyPlan } from "../../hooks/useStudyPlan";
 

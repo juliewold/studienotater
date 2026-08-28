@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { subjects } from "../../data/subjects";
-import { SubjectFeatureCard } from "../../components/SubjectFeatureCard/SubjectFeatureCard";
+import { SubjectFeatureCard } from "../../components/subjects/SubjectFeatureCard/SubjectFeatureCard";
 import { useSubjectProgress } from "../../hooks/useSubjectProgress";
 
 const INITIAL_VISIBLE_TOPICS = 4;

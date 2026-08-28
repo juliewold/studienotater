@@ -29,7 +29,7 @@ import {
   practiceQuestions,
   type PracticeQuestion,
 } from "../../data/practiceQuestions";
-import { MathText } from "../../components/MathText/MathText";
+import { MathText } from "../../components/common/MathText/MathText";
 import {
   getPracticeStatistics,
   getPracticeTopicStatistics,

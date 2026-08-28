@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from "react";
 import { Link } from "react-router-dom";
-import { AuthLayout } from "../../components/AuthLayout/AuthLayout";
+import { AuthLayout } from "../../components/auth/AuthLayout/AuthLayout";
 import { supabase } from "../../lib/supabase";
 import "./ForgotPasswordPage.css";
 

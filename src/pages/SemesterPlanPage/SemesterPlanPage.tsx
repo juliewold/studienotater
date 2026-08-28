@@ -1,7 +1,7 @@
 import "./SemesterPlanPage.css";
 import { Link } from "react-router-dom";
 
-import { SubjectCard } from "../../components/SubjectCard/SubjectCard";
+import { SubjectCard } from "../../components/subjects/SubjectCard/SubjectCard";
 import { subjects } from "../../data/subjects";
 import { useSemesterSubjects } from "../../hooks/useSemesterSubjects";
 
