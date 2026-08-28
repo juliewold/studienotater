@@ -24,7 +24,7 @@ import {
   History,
   Trash2,
 } from "lucide-react";
-import { practiceTopics } from "../../../data/practiceTopics";
+import { practiceTopics } from "../../../data/practiceQuestions/practiceTopics";
 import {
   practiceQuestions,
   type PracticeQuestion,
