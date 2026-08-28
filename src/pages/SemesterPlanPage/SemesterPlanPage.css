@@ -25,64 +25,55 @@
   gap: 1.25rem;
 }
 
-.subject-card {
+.custom-subject-card {
   display: flex;
   flex-direction: column;
-  min-height: 190px;
-  padding: 1.5rem;
-  border: 1px solid rgba(167, 116, 255, 0.15);
-  border-radius: 22px;
+
+  min-height: 180px;
+
+  padding: 24px;
+
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #d1d5db;
+  border-radius: 20px;
+
   background: #ffffff;
-  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
-  color: inherit;
-  text-decoration: none;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
 }
 
-a.subject-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(167, 116, 255, 0.4);
-  box-shadow: 0 16px 36px rgba(52, 38, 84, 0.1);
-}
+.custom-subject-card .subject-code {
+  margin: 0 0 8px;
 
-.subject-code {
-  margin: 0 0 0.75rem;
-  color: #9b6ee8;
-  font-size: 0.9rem;
+  color: #6b7280;
+
+  font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
 }
 
-.subject-card h2 {
+.custom-subject-card h2 {
   margin: 0;
-  font-size: 1.25rem;
-  line-height: 1.4;
-}
 
-.open-subject,
-.custom-subject-label {
-  margin-top: auto;
-  padding-top: 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.open-subject {
-  color: #8b5ed7;
+  font-size: 1.1rem;
+  line-height: 1.35;
 }
 
 .custom-subject-label {
-  color: #777;
+  margin: auto 0 0;
+
+  padding-top: 20px;
+
+  color: #6b7280;
+  font-size: 0.9rem;
 }
 
 .empty-plan {
   padding: 2rem;
+
   border: 1px solid rgba(167, 116, 255, 0.15);
   border-radius: 22px;
+
   background: #ffffff;
+
   box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
 }
 
@@ -97,12 +88,17 @@ a.subject-card:hover {
 
 .semester-start-link {
   display: inline-block;
+
   padding: 0.8rem 1.2rem;
+
   border-radius: 12px;
+
   background: #9b6ee8;
   color: #ffffff;
+
   font-weight: 600;
   text-decoration: none;
+
   transition:
     transform 0.2s ease,
     opacity 0.2s ease;

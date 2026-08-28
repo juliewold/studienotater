@@ -1,24 +1,197 @@
 .subject-card {
-  background: white;
-  border-radius: 20px;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 180px;
+
   padding: 24px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #d1d5db;
+  border-radius: 20px;
 
   text-decoration: none;
   color: inherit;
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .subject-card:hover {
   transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.07);
+}
+
+.subject-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  margin-bottom: 16px;
+
+  border-radius: 14px;
+
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.subject-card .subject-code {
+  margin: 0 0 8px;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  color: #6b7280;
 }
 
 .subject-card h3 {
-  margin: 8px 0;
+  margin: 0;
+
+  font-size: 1.1rem;
+  line-height: 1.35;
 }
 
 .subject-year {
-  color: #6b647c;
-  margin: 0;
+  margin: auto 0 0;
+
+  padding-top: 20px;
+
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Purple */
+
+.subject-card-purple {
+  border-left-color: #8b5cf6;
+}
+
+.subject-card-purple .subject-code {
+  color: #7c3aed;
+}
+
+.subject-card-purple .subject-card-icon {
+  background: #f3ecff;
+  color: #7c3aed;
+}
+
+/* Pink */
+
+.subject-card-pink {
+  border-left-color: #ec4899;
+}
+
+.subject-card-pink .subject-code {
+  color: #db2777;
+}
+
+.subject-card-pink .subject-card-icon {
+  background: #fff0f5;
+  color: #db2777;
+}
+
+/* Green */
+
+.subject-card-green {
+  border-left-color: #4ade80;
+}
+
+.subject-card-green .subject-code {
+  color: #2f9e55;
+}
+
+.subject-card-green .subject-card-icon {
+  background: #eefaf1;
+  color: #2f9e55;
+}
+
+/* Blue */
+
+.subject-card-blue {
+  border-left-color: #60a5fa;
+}
+
+.subject-card-blue .subject-code {
+  color: #2563eb;
+}
+
+.subject-card-blue .subject-card-icon {
+  background: #eef6ff;
+  color: #2563eb;
+}
+
+/* Orange */
+
+.subject-card-orange {
+  border-left-color: #fb923c;
+}
+
+.subject-card-orange .subject-code {
+  color: #ea580c;
+}
+
+.subject-card-orange .subject-card-icon {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+/* Teal */
+
+.subject-card-teal {
+  border-left-color: #2dd4bf;
+}
+
+.subject-card-teal .subject-code {
+  color: #0d9488;
+}
+
+.subject-card-teal .subject-card-icon {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+/* Red */
+
+.subject-card-red {
+  border-left-color: #fb7185;
+}
+
+.subject-card-red .subject-code {
+  color: #e11d48;
+}
+
+.subject-card-red .subject-card-icon {
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+/* Yellow */
+
+.subject-card-yellow {
+  border-left-color: #facc15;
+}
+
+.subject-card-yellow .subject-code {
+  color: #ca8a04;
+}
+
+.subject-card-yellow .subject-card-icon {
+  background: #fefce8;
+  color: #ca8a04;
+}
+
+/* Default */
+
+.subject-card-default {
+  border-left-color: #d1d5db;
 }
