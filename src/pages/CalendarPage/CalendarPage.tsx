@@ -76,6 +76,8 @@ const weekHours = Array.from({ length: 14 }, (_, index) => index + 8);
 
 const WEEK_HOUR_HEIGHT = 56;
 
+const DEFAULT_EVENT_DURATION_MINUTES = 45;
+
 const getScheduleTop = (date: Date) => {
   const scheduleStartHour = 8;
 
@@ -83,6 +85,21 @@ const getScheduleTop = (date: Date) => {
     date.getHours() - scheduleStartHour + date.getMinutes() / 60;
 
   return hoursFromStart * WEEK_HOUR_HEIGHT;
+};
+
+const getSubjectColorClass = (subjectId: string | null) => {
+  if (!subjectId) {
+    return "calendar-subject-general";
+  }
+
+  return `calendar-subject-${subjectId.toLowerCase()}`;
+};
+
+const hasEventDuration = (occurrence: CalendarOccurrence) => {
+  return (
+    occurrence.end !== null &&
+    occurrence.end.getTime() > occurrence.start.getTime()
+  );
 };
 
 type CalendarOccurrence = {
@@ -95,6 +112,109 @@ type CalendarOccurrence = {
   end: Date | null;
   allDay: boolean;
   location: string;
+};
+
+type PositionedCalendarOccurrence = {
+  occurrence: CalendarOccurrence;
+  columnIndex: number;
+  columnCount: number;
+};
+
+const getComparableOccurrenceEnd = (occurrence: CalendarOccurrence) => {
+  if (occurrence.end && occurrence.end.getTime() > occurrence.start.getTime()) {
+    return occurrence.end.getTime();
+  }
+
+  return (
+    occurrence.start.getTime() + DEFAULT_EVENT_DURATION_MINUTES * 60 * 1000
+  );
+};
+
+const positionOverlappingOccurrences = (
+  occurrences: CalendarOccurrence[],
+): PositionedCalendarOccurrence[] => {
+  const sortedOccurrences = [...occurrences].sort(
+    (firstOccurrence, secondOccurrence) =>
+      firstOccurrence.start.getTime() - secondOccurrence.start.getTime(),
+  );
+
+  const result: PositionedCalendarOccurrence[] = [];
+
+  let currentGroup: CalendarOccurrence[] = [];
+  let currentGroupEnd = 0;
+
+  const positionCurrentGroup = () => {
+    if (currentGroup.length === 0) {
+      return;
+    }
+
+    const columnEndTimes: number[] = [];
+
+    const positionedGroup = currentGroup.map((occurrence) => {
+      const occurrenceStart = occurrence.start.getTime();
+
+      let columnIndex = columnEndTimes.findIndex(
+        (columnEndTime) => columnEndTime <= occurrenceStart,
+      );
+
+      if (columnIndex === -1) {
+        columnIndex = columnEndTimes.length;
+        columnEndTimes.push(getComparableOccurrenceEnd(occurrence));
+      } else {
+        columnEndTimes[columnIndex] = getComparableOccurrenceEnd(occurrence);
+      }
+
+      return {
+        occurrence,
+        columnIndex,
+      };
+    });
+
+    const columnCount = columnEndTimes.length;
+
+    positionedGroup.forEach(({ occurrence, columnIndex }) => {
+      result.push({
+        occurrence,
+        columnIndex,
+        columnCount,
+      });
+    });
+
+    currentGroup = [];
+    currentGroupEnd = 0;
+  };
+
+  sortedOccurrences.forEach((occurrence) => {
+    const occurrenceStart = occurrence.start.getTime();
+    const occurrenceEnd = getComparableOccurrenceEnd(occurrence);
+
+    if (currentGroup.length > 0 && occurrenceStart >= currentGroupEnd) {
+      positionCurrentGroup();
+    }
+
+    currentGroup.push(occurrence);
+
+    currentGroupEnd = Math.max(currentGroupEnd, occurrenceEnd);
+  });
+
+  positionCurrentGroup();
+
+  return result;
+};
+
+const getOccurrenceHorizontalStyle = (
+  columnIndex: number,
+  columnCount: number,
+  edgeInset: number,
+) => {
+  const leftPercentage = (columnIndex / columnCount) * 100;
+
+  const rightPercentage = ((columnCount - columnIndex - 1) / columnCount) * 100;
+
+  return {
+    left: `calc(${leftPercentage}% + ${edgeInset}px)`,
+    right: `calc(${rightPercentage}% + ${edgeInset}px)`,
+  };
 };
 
 const createLocalDateTime = (date: string, time: string) => {
@@ -469,6 +589,11 @@ export const CalendarPage = () => {
 
     return expandCalendarEvents(visibleEvents, dayStart, dayEnd);
   }, [visibleEvents, currentDay]);
+
+  const positionedDayOccurrences = useMemo(
+    () => positionOverlappingOccurrences(dayOccurrences),
+    [dayOccurrences],
+  );
 
   const getSubjectCode = (subjectId: string | null) => {
     if (!subjectId) {
@@ -1102,6 +1227,7 @@ export const CalendarPage = () => {
                       year: "numeric",
                     })}
             </h2>
+
             <div className="calendar-view-switcher">
               <button
                 type="button"
@@ -1185,7 +1311,9 @@ export const CalendarPage = () => {
                           <button
                             key={occurrence.id}
                             type="button"
-                            className={`calendar-event calendar-event-${occurrence.eventType}`}
+                            className={`calendar-event calendar-event-${occurrence.eventType} ${getSubjectColorClass(
+                              occurrence.subjectId,
+                            )}`}
                             title={`${getSubjectCode(
                               occurrence.subjectId,
                             )} – ${occurrence.title}`}
@@ -1236,67 +1364,88 @@ export const CalendarPage = () => {
               <div className="calendar-week-view">
                 {Array.from({ length: 7 }, (_, index) =>
                   addDays(currentWeek, index),
-                ).map((day) => (
-                  <div key={getDateKey(day)} className="calendar-week-day">
-                    <span>
-                      {day.toLocaleDateString("nb-NO", {
-                        weekday: "short",
-                      })}
-                    </span>
+                ).map((day) => {
+                  const positionedOccurrences = positionOverlappingOccurrences(
+                    weekOccurrencesByDate[getDateKey(day)] ?? [],
+                  );
 
-                    <strong
-                      className={
-                        isSameDay(day, new Date())
-                          ? "calendar-week-day-number calendar-week-day-number-today"
-                          : "calendar-week-day-number"
-                      }
-                    >
-                      {day.getDate()}
-                    </strong>
+                  return (
+                    <div key={getDateKey(day)} className="calendar-week-day">
+                      <span>
+                        {day.toLocaleDateString("nb-NO", {
+                          weekday: "short",
+                        })}
+                      </span>
 
-                    <div className="calendar-week-day-schedule">
-                      {(weekOccurrencesByDate[getDateKey(day)] ?? []).map(
-                        (occurrence) => {
-                          const eventTop = getScheduleTop(occurrence.start);
+                      <strong
+                        className={
+                          isSameDay(day, new Date())
+                            ? "calendar-week-day-number calendar-week-day-number-today"
+                            : "calendar-week-day-number"
+                        }
+                      >
+                        {day.getDate()}
+                      </strong>
 
-                          const eventHeight = occurrence.end
-                            ? Math.max(
-                                getScheduleTop(occurrence.end) - eventTop,
-                                36,
-                              )
-                            : 44;
+                      <div className="calendar-week-day-schedule">
+                        {positionedOccurrences.map(
+                          ({ occurrence, columnIndex, columnCount }) => {
+                            const eventTop = getScheduleTop(occurrence.start);
 
-                          return (
-                            <button
-                              key={occurrence.id}
-                              type="button"
-                              className={`calendar-week-event calendar-event-${occurrence.eventType}`}
-                              style={{
-                                top: `${eventTop}px`,
-                                height: `${eventHeight}px`,
-                              }}
-                              onClick={() => setSelectedOccurrence(occurrence)}
-                            >
-                              {!occurrence.allDay && (
-                                <span className="calendar-event-time">
-                                  {occurrence.end
-                                    ? `${formatTime(occurrence.start)}–${formatTime(occurrence.end)}`
-                                    : formatTime(occurrence.start)}
+                            const eventHeight = hasEventDuration(occurrence)
+                              ? Math.max(
+                                  getScheduleTop(occurrence.end!) - eventTop,
+                                  36,
+                                )
+                              : 44;
+
+                            const horizontalStyle =
+                              getOccurrenceHorizontalStyle(
+                                columnIndex,
+                                columnCount,
+                                4,
+                              );
+
+                            return (
+                              <button
+                                key={occurrence.id}
+                                type="button"
+                                className={`calendar-week-event calendar-event-${occurrence.eventType} ${getSubjectColorClass(
+                                  occurrence.subjectId,
+                                )}`}
+                                style={{
+                                  top: `${eventTop}px`,
+                                  height: `${eventHeight}px`,
+                                  ...horizontalStyle,
+                                }}
+                                onClick={() =>
+                                  setSelectedOccurrence(occurrence)
+                                }
+                              >
+                                {!occurrence.allDay && (
+                                  <span className="calendar-event-time">
+                                    {columnCount > 1 ||
+                                    !hasEventDuration(occurrence)
+                                      ? formatTime(occurrence.start)
+                                      : `${formatTime(occurrence.start)}–${formatTime(
+                                          occurrence.end!,
+                                        )}`}
+                                  </span>
+                                )}
+
+                                <span className="calendar-event-subject">
+                                  {getSubjectCode(occurrence.subjectId)}
                                 </span>
-                              )}
 
-                              <span className="calendar-event-subject">
-                                {getSubjectCode(occurrence.subjectId)}
-                              </span>
-
-                              <strong>{occurrence.title}</strong>
-                            </button>
-                          );
-                        },
-                      )}
+                                <strong>{occurrence.title}</strong>
+                              </button>
+                            );
+                          },
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -1311,7 +1460,8 @@ export const CalendarPage = () => {
 
               {weekHours.map((hour) => (
                 <div key={hour} className="calendar-week-time-label">
-                  {String(hour).padStart(2, "0")}:00
+                  {String(hour).padStart(2, "0")}
+                  :00
                 </div>
               ))}
             </div>
@@ -1336,46 +1486,57 @@ export const CalendarPage = () => {
               </div>
 
               <div className="calendar-day-timeline">
-                {dayOccurrences.map((occurrence) => {
-                  const eventTop = getScheduleTop(occurrence.start);
+                {positionedDayOccurrences.map(
+                  ({ occurrence, columnIndex, columnCount }) => {
+                    const eventTop = getScheduleTop(occurrence.start);
 
-                  const eventHeight = occurrence.end
-                    ? Math.max(getScheduleTop(occurrence.end) - eventTop, 36)
-                    : 44;
+                    const eventHeight = hasEventDuration(occurrence)
+                      ? Math.max(getScheduleTop(occurrence.end!) - eventTop, 36)
+                      : 44;
 
-                  return (
-                    <button
-                      key={occurrence.id}
-                      type="button"
-                      className={`calendar-day-event calendar-event-${occurrence.eventType}`}
-                      style={{
-                        top: `${eventTop}px`,
-                        height: `${eventHeight}px`,
-                      }}
-                      onClick={() => setSelectedOccurrence(occurrence)}
-                    >
-                      <span className="calendar-event-time">
-                        {occurrence.end
-                          ? `${formatTime(occurrence.start)}–${formatTime(
-                              occurrence.end,
-                            )}`
-                          : formatTime(occurrence.start)}
-                      </span>
+                    const horizontalStyle = getOccurrenceHorizontalStyle(
+                      columnIndex,
+                      columnCount,
+                      10,
+                    );
 
-                      <span className="calendar-event-subject">
-                        {getSubjectCode(occurrence.subjectId)}
-                      </span>
-
-                      <strong>{occurrence.title}</strong>
-
-                      {occurrence.location && (
-                        <span className="calendar-day-event-location">
-                          {occurrence.location}
+                    return (
+                      <button
+                        key={occurrence.id}
+                        type="button"
+                        className={`calendar-day-event calendar-event-${occurrence.eventType} ${getSubjectColorClass(
+                          occurrence.subjectId,
+                        )}`}
+                        style={{
+                          top: `${eventTop}px`,
+                          height: `${eventHeight}px`,
+                          ...horizontalStyle,
+                        }}
+                        onClick={() => setSelectedOccurrence(occurrence)}
+                      >
+                        <span className="calendar-event-time">
+                          {hasEventDuration(occurrence)
+                            ? `${formatTime(occurrence.start)}–${formatTime(
+                                occurrence.end!,
+                              )}`
+                            : formatTime(occurrence.start)}
                         </span>
-                      )}
-                    </button>
-                  );
-                })}
+
+                        <span className="calendar-event-subject">
+                          {getSubjectCode(occurrence.subjectId)}
+                        </span>
+
+                        <strong>{occurrence.title}</strong>
+
+                        {occurrence.location && (
+                          <span className="calendar-day-event-location">
+                            {occurrence.location}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  },
+                )}
               </div>
             </div>
           </div>
