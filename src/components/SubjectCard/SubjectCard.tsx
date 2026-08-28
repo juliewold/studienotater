@@ -25,6 +25,7 @@ type SubjectCardProps = {
   year?: number;
   color?: string;
   icon?: string;
+  to?: string;
 };
 
 const getSubjectIcon = (icon: string | undefined) => {
@@ -71,11 +72,15 @@ export const SubjectCard = ({
   year,
   color = "default",
   icon,
+  to,
 }: SubjectCardProps) => {
   const Icon = getSubjectIcon(icon);
 
   return (
-    <Link to={`/fag/${id}`} className={`subject-card subject-card-${color}`}>
+    <Link
+      to={to ?? `/fag/${id}`}
+      className={`subject-card subject-card-${color}`}
+    >
       <div className="subject-card-icon">
         <Icon size={22} strokeWidth={2} />
       </div>

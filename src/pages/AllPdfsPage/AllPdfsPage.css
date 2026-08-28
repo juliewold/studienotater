@@ -1,38 +1,54 @@
+.all-pdfs-description {
+  max-width: 620px;
+  margin: 0.75rem 0 2rem;
+
+  color: #777183;
+
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.all-pdfs-years {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.all-pdfs-year {
+  min-width: 0;
+}
+
+.all-pdfs-year-title {
+  margin: 0 0 1.25rem;
+
+  color: #241f2d;
+
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
 .all-pdfs-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-
-  margin-top: 32px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
 }
 
-.pdf-subject-card {
-  display: block;
-  background: white;
-  border-radius: 20px;
-  padding: 24px;
-
-  text-decoration: none;
-  color: inherit;
-
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
+@media (max-width: 900px) {
+  .all-pdfs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.pdf-subject-card:hover {
-  transform: translateY(-4px);
-}
+@media (max-width: 600px) {
+  .all-pdfs-years {
+    gap: 2.5rem;
+  }
 
-.pdf-subject-card h3 {
-  margin: 8px 0;
-}
+  .all-pdfs-year-title {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
 
-.pdf-subject-card p:last-child {
-  margin: 0;
-  color: #6b647c;
-}
-
-@media (max-width: 768px) {
   .all-pdfs-grid {
     grid-template-columns: 1fr;
   }
