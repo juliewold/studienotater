@@ -126,6 +126,16 @@ const expandUpcomingEvent = (
   return occurrences;
 };
 
+const getSubjectColorClass = (subjectId: string) => {
+  const subject = subjects.find(
+    (currentSubject) => currentSubject.id === subjectId,
+  );
+
+  return subject?.color
+    ? `upcoming-task-${subject.color}`
+    : "upcoming-task-default";
+};
+
 export const UpcomingTasks = () => {
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
 
@@ -227,7 +237,10 @@ export const UpcomingTasks = () => {
             event.subjectId.toUpperCase();
 
           return (
-            <div key={event.id} className="upcoming-task">
+            <div
+              key={event.id}
+              className={`upcoming-task ${getSubjectColorClass(event.subjectId)}`}
+            >
               <div className="upcoming-task-content">
                 <span className="upcoming-task-code">{subjectCode}</span>
 
