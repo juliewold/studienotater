@@ -14,12 +14,17 @@
 
 .semester-subjects-header a {
   flex-shrink: 0;
-  text-decoration: none;
+
+  padding: 10px 18px;
+
+  border-radius: 999px;
+
   background: #b38bf3;
   color: white;
-  padding: 10px 18px;
-  border-radius: 999px;
+
   font-weight: 600;
+  text-decoration: none;
+
   transition: transform 0.2s ease;
 }
 
@@ -33,156 +38,49 @@
   gap: 20px;
 }
 
-.semester-subject-card {
+.semester-custom-subject-card {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 180px;
   min-width: 0;
 
-  background: white;
-  border-left: 4px solid #d1d5db;
-  border-radius: 24px;
   padding: 24px;
 
-  text-decoration: none;
-  color: inherit;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #d1d5db;
+  border-radius: 20px;
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  background: white;
 
-  transition: transform 0.2s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
 }
 
-.semester-subject-card:hover {
-  transform: translateY(-4px);
-}
+.semester-custom-subject-card .subject-code {
+  margin: 0 0 8px;
 
-.semester-subject-card .subject-code {
-  margin: 0;
+  color: #6b7280;
+
+  font-size: 0.85rem;
   font-weight: 700;
 }
 
-.semester-subject-card h3 {
-  margin: 8px 0 0;
-  line-height: 1.4;
+.semester-custom-subject-card h3 {
+  margin: 0;
+
+  font-size: 1.1rem;
+  line-height: 1.35;
+
   overflow-wrap: anywhere;
 }
 
-/* -------------------------------------------------- */
-/* Farger per fag */
-/* -------------------------------------------------- */
+.semester-custom-subject-label {
+  margin: auto 0 0;
 
-.semester-subject-purple {
-  border-left-color: #8b5cf6;
-}
+  padding-top: 20px;
 
-.semester-subject-purple .subject-code {
-  color: #7c3aed;
-}
-
-.semester-subject-pink {
-  border-left-color: #ec4899;
-}
-
-.semester-subject-pink .subject-code {
-  color: #db2777;
-}
-
-.semester-subject-green {
-  border-left-color: #4ade80;
-}
-
-.semester-subject-green .subject-code {
-  color: #2f9e55;
-}
-
-.semester-subject-blue {
-  border-left-color: #60a5fa;
-}
-
-.semester-subject-blue .subject-code {
-  color: #2563eb;
-}
-
-.semester-subject-orange {
-  border-left-color: #fb923c;
-}
-
-.semester-subject-orange .subject-code {
-  color: #ea580c;
-}
-
-.semester-subject-teal {
-  border-left-color: #2dd4bf;
-}
-
-.semester-subject-teal .subject-code {
-  color: #0d9488;
-}
-
-.semester-subject-red {
-  border-left-color: #fb7185;
-}
-
-.semester-subject-red .subject-code {
-  color: #e11d48;
-}
-
-.semester-subject-yellow {
-  border-left-color: #facc15;
-}
-
-.semester-subject-yellow .subject-code {
-  color: #ca8a04;
-}
-
-.semester-subject-default {
-  border-left-color: #d1d5db;
-}
-
-.semester-subject-default .subject-code {
   color: #6b7280;
-}
-
-.semester-subject-purple .semester-subject-icon {
-  background: #f3ecff;
-  color: #7c3aed;
-}
-
-.semester-subject-pink .semester-subject-icon {
-  background: #fff0f5;
-  color: #db2777;
-}
-
-.semester-subject-green .semester-subject-icon {
-  background: #eefaf1;
-  color: #2f9e55;
-}
-
-.semester-subject-blue .semester-subject-icon {
-  background: #eef6ff;
-  color: #2563eb;
-}
-
-.semester-subject-orange .semester-subject-icon {
-  background: #fff7ed;
-  color: #ea580c;
-}
-
-.semester-subject-teal .semester-subject-icon {
-  background: #f0fdfa;
-  color: #0d9488;
-}
-
-.semester-subject-red .semester-subject-icon {
-  background: #fff1f2;
-  color: #e11d48;
-}
-
-.semester-subject-yellow .semester-subject-icon {
-  background: #fefce8;
-  color: #ca8a04;
-}
-
-.semester-subject-default .semester-subject-icon {
-  background: #f3f4f6;
-  color: #6b7280;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 1024px) {
@@ -218,32 +116,4 @@
     grid-template-columns: 1fr;
     gap: 12px;
   }
-
-  .semester-subject-card {
-    padding: 18px;
-    border-radius: 20px;
-  }
-
-  .semester-subject-card:hover {
-    transform: none;
-  }
-
-  .semester-subject-card h3 {
-    font-size: 1rem;
-  }
-}
-
-.semester-subject-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 42px;
-  height: 42px;
-
-  margin-bottom: 14px;
-
-  border-radius: 14px;
-  background: #f3f4f6;
-  color: #6b7280;
 }

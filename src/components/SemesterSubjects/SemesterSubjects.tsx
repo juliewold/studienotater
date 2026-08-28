@@ -1,76 +1,9 @@
 import "./SemesterSubjects.css";
 import { Link } from "react-router-dom";
+
+import { SubjectCard } from "../SubjectCard/SubjectCard";
 import { subjects } from "../../data/subjects";
 import { useSemesterSubjects } from "../../hooks/useSemesterSubjects";
-import {
-  Binary,
-  Blocks,
-  BookOpen,
-  Braces,
-  ChartNoAxesColumnIncreasing,
-  CircuitBoard,
-  Code2,
-  Cpu,
-  Database,
-  FunctionSquare,
-  MousePointer2,
-  Network,
-  Sigma,
-  Terminal,
-  Wifi,
-} from "lucide-react";
-
-const getSubjectIcon = (icon: string | undefined) => {
-  switch (icon) {
-    case "code":
-      return Code2;
-
-    case "sigma":
-      return Sigma;
-
-    case "binary":
-      return Binary;
-
-    case "book-open":
-      return BookOpen;
-
-    case "braces":
-      return Braces;
-
-    case "mouse-pointer":
-      return MousePointer2;
-
-    case "function-square":
-      return FunctionSquare;
-
-    case "circuit-board":
-      return CircuitBoard;
-
-    case "network":
-      return Network;
-
-    case "cpu":
-      return Cpu;
-
-    case "chart":
-      return ChartNoAxesColumnIncreasing;
-
-    case "blocks":
-      return Blocks;
-
-    case "database":
-      return Database;
-
-    case "terminal":
-      return Terminal;
-
-    case "wifi":
-      return Wifi;
-
-    default:
-      return BookOpen;
-  }
-};
 
 export const SemesterSubjects = () => {
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
@@ -87,8 +20,12 @@ export const SemesterSubjects = () => {
         regularSubject?.code ??
         semesterSubject.subjectId.toUpperCase(),
       name: semesterSubject.customName ?? regularSubject?.name ?? "",
-      color: regularSubject?.color ?? "default",
+      year: regularSubject?.year,
+      color: regularSubject?.color,
       icon: regularSubject?.icon,
+      isCustom:
+        semesterSubject.customCode !== null &&
+        semesterSubject.customName !== null,
     };
   });
 
@@ -115,24 +52,28 @@ export const SemesterSubjects = () => {
         </p>
       ) : (
         <div className="semester-subjects-grid">
-          {displaySubjects.map((subject) => {
-            const Icon = getSubjectIcon(subject.icon);
-
-            return (
-              <Link
+          {displaySubjects.map((subject) =>
+            subject.isCustom ? (
+              <article
                 key={subject.id}
-                to={`/fag/${subject.id}`}
-                className={`semester-subject-card semester-subject-${subject.color}`}
+                className="semester-custom-subject-card"
               >
-                <div className="semester-subject-icon">
-                  <Icon size={22} strokeWidth={2} />
-                </div>
-
                 <p className="subject-code">{subject.code}</p>
                 <h3>{subject.name}</h3>
-              </Link>
-            );
-          })}
+                <p className="semester-custom-subject-label">Eget fag</p>
+              </article>
+            ) : (
+              <SubjectCard
+                key={subject.id}
+                id={subject.id}
+                code={subject.code}
+                name={subject.name}
+                year={subject.year}
+                color={subject.color}
+                icon={subject.icon}
+              />
+            ),
+          )}
         </div>
       )}
     </section>

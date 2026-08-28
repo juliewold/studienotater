@@ -1,5 +1,8 @@
 import "./YearPage.css";
+
 import { Link, useParams } from "react-router-dom";
+
+import { SubjectCard } from "../../components/SubjectCard/SubjectCard";
 import { subjects } from "../../data/subjects";
 
 export const YearPage = () => {
@@ -8,7 +11,7 @@ export const YearPage = () => {
   const yearNumber = Number(year);
 
   const yearSubjects = subjects.filter(
-    (subject) => subject.year === yearNumber
+    (subject) => subject.year === yearNumber,
   );
 
   return (
@@ -23,14 +26,14 @@ export const YearPage = () => {
 
       <div className="year-subjects-grid">
         {yearSubjects.map((subject) => (
-          <Link
+          <SubjectCard
             key={subject.id}
-            to={`/fag/${subject.id}`}
-            className="year-subject-card"
-          >
-            <p className="subject-code">{subject.code}</p>
-            <h3>{subject.name}</h3>
-          </Link>
+            id={subject.id}
+            code={subject.code}
+            name={subject.name}
+            color={subject.color}
+            icon={subject.icon}
+          />
         ))}
       </div>
     </main>
