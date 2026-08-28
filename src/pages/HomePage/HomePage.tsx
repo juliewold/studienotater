@@ -6,8 +6,6 @@ import { ExamOverview } from "../../components/ExamOverview/ExamOverview";
 import { WeeklyUpdates } from "../../components/WeeklyUpdates/WeeklyUpdates";
 import { UpcomingTasks } from "../../components/UpcomingTasks/UpcomingTasks";
 
-const years = [1, 2, 3, 4, 5];
-
 export const HomePage = () => {
   return (
     <>
