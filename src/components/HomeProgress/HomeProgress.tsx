@@ -160,6 +160,8 @@ export const HomeProgress = () => {
           regularSubject?.code ??
           subjectId.toUpperCase(),
 
+        color: regularSubject?.color ?? "default",
+
         completed,
         total,
         progress,
@@ -214,7 +216,7 @@ export const HomeProgress = () => {
           <Link
             key={subject.id}
             to={`/fag/${subject.id}`}
-            className="home-progress-item"
+            className={`home-progress-item home-progress-${subject.color}`}
           >
             <div className="home-progress-top">
               <strong>{subject.code}</strong>

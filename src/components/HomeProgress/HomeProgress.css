@@ -10,7 +10,6 @@
 
 .home-progress h2 {
   margin: 0;
-
   font-size: 1.45rem;
   line-height: 1.2;
 }
@@ -43,9 +42,7 @@
 
 .home-progress-item:hover {
   transform: translateY(-1px);
-
   border-color: #d8ccf5;
-
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.045);
 }
 
@@ -64,8 +61,6 @@
 
 .home-progress-top span {
   flex-shrink: 0;
-
-  color: #8b5cf6;
   font-size: 0.95rem;
   font-weight: 700;
 }
@@ -92,7 +87,6 @@
 
 .home-progress-bar {
   height: 6px;
-
   overflow: hidden;
 
   border-radius: 999px;
@@ -101,9 +95,7 @@
 
 .home-progress-fill {
   height: 100%;
-
   border-radius: 999px;
-  background: #b38bf3;
 
   transition: width 0.3s ease;
 }
@@ -114,6 +106,127 @@
   color: #6b647c;
   font-size: 0.76rem;
   font-weight: 600;
+}
+
+/* -------------------------------------------------- */
+/* Farger per fag */
+/* -------------------------------------------------- */
+
+.home-progress-purple .home-progress-top strong,
+.home-progress-purple .home-progress-top span {
+  color: #7c3aed;
+}
+
+.home-progress-purple .home-progress-fill {
+  background: #8b5cf6;
+}
+
+.home-progress-purple .home-progress-bar {
+  background: #ede9fe;
+}
+
+.home-progress-pink .home-progress-top strong,
+.home-progress-pink .home-progress-top span {
+  color: #db2777;
+}
+
+.home-progress-pink .home-progress-fill {
+  background: #ec4899;
+}
+
+.home-progress-pink .home-progress-bar {
+  background: #fce7f3;
+}
+
+.home-progress-green .home-progress-top strong,
+.home-progress-green .home-progress-top span {
+  color: #2f9e55;
+}
+
+.home-progress-green .home-progress-fill {
+  background: #4ade80;
+}
+
+.home-progress-green .home-progress-bar {
+  background: #dcfce7;
+}
+
+.home-progress-blue .home-progress-top strong,
+.home-progress-blue .home-progress-top span {
+  color: #2563eb;
+}
+
+.home-progress-blue .home-progress-fill {
+  background: #60a5fa;
+}
+
+.home-progress-blue .home-progress-bar {
+  background: #dbeafe;
+}
+
+.home-progress-orange .home-progress-top strong,
+.home-progress-orange .home-progress-top span {
+  color: #ea580c;
+}
+
+.home-progress-orange .home-progress-fill {
+  background: #fb923c;
+}
+
+.home-progress-orange .home-progress-bar {
+  background: #ffedd5;
+}
+
+.home-progress-teal .home-progress-top strong,
+.home-progress-teal .home-progress-top span {
+  color: #0d9488;
+}
+
+.home-progress-teal .home-progress-fill {
+  background: #2dd4bf;
+}
+
+.home-progress-teal .home-progress-bar {
+  background: #ccfbf1;
+}
+
+.home-progress-red .home-progress-top strong,
+.home-progress-red .home-progress-top span {
+  color: #e11d48;
+}
+
+.home-progress-red .home-progress-fill {
+  background: #fb7185;
+}
+
+.home-progress-red .home-progress-bar {
+  background: #ffe4e6;
+}
+
+.home-progress-yellow .home-progress-top strong,
+.home-progress-yellow .home-progress-top span {
+  color: #ca8a04;
+}
+
+.home-progress-yellow .home-progress-fill {
+  background: #facc15;
+}
+
+.home-progress-yellow .home-progress-bar {
+  background: #fef9c3;
+}
+
+.home-progress-default .home-progress-top strong,
+.home-progress-default .home-progress-top span {
+  color: #6b7280;
+}
+
+.home-progress-default .home-progress-fill {
+  background: #9ca3af;
+}
+
+.home-progress-default .home-progress-bar {
+  background: #f3f4f6;
 }
 
 @media (max-width: 900px) {
@@ -148,7 +261,6 @@
 
   .home-progress-item {
     padding: 14px;
-
     border-radius: 15px;
   }
 

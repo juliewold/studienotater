@@ -88,11 +88,13 @@ const getScheduleTop = (date: Date) => {
 };
 
 const getSubjectColorClass = (subjectId: string | null) => {
-  if (!subjectId) {
-    return "calendar-subject-general";
-  }
+  const subject = subjects.find(
+    (currentSubject) => currentSubject.id === subjectId,
+  );
 
-  return `calendar-subject-${subjectId.toLowerCase()}`;
+  return subject?.color
+    ? `calendar-subject-${subject.color}`
+    : "calendar-subject-default";
 };
 
 const hasEventDuration = (occurrence: CalendarOccurrence) => {

@@ -874,54 +874,99 @@
 /* Farger per fag */
 /* -------------------------------------------------- */
 
-.calendar-subject-tdt4160 {
+.calendar-subject-purple {
   background: #f3ecff;
   color: #5b21b6;
   border: 1px solid #c4b5fd;
 }
 
-.calendar-subject-tma4240 {
+.calendar-subject-pink {
   background: #fff0f5;
   color: #be185d;
   border: 1px solid #f9a8d4;
 }
 
-.calendar-subject-it1901 {
+.calendar-subject-green {
   background: #eefaf1;
   color: #237a3b;
   border: 1px solid #86d49b;
 }
 
-.calendar-subject-tdt4120 {
+.calendar-subject-blue {
   background: #eef6ff;
   color: #1d4ed8;
   border: 1px solid #93c5fd;
 }
 
+.calendar-subject-orange {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fdba74;
+}
+
+.calendar-subject-teal {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #5eead4;
+}
+
+.calendar-subject-red {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fda4af;
+}
+
+.calendar-subject-yellow {
+  background: #fefce8;
+  color: #a16207;
+  border: 1px solid #fde047;
+}
+
+.calendar-subject-default,
 .calendar-subject-general {
   background: #f3f4f6;
   color: #4b5563;
   border: 1px solid #d1d5db;
 }
 
-.calendar-subject-tdt4160 .calendar-event-time,
-.calendar-subject-tdt4160 .calendar-event-subject {
+.calendar-subject-purple .calendar-event-time,
+.calendar-subject-purple .calendar-event-subject {
   color: #7c3aed;
 }
 
-.calendar-subject-tma4240 .calendar-event-time,
-.calendar-subject-tma4240 .calendar-event-subject {
+.calendar-subject-pink .calendar-event-time,
+.calendar-subject-pink .calendar-event-subject {
   color: #db2777;
 }
 
-.calendar-subject-it1901 .calendar-event-time,
-.calendar-subject-it1901 .calendar-event-subject {
+.calendar-subject-green .calendar-event-time,
+.calendar-subject-green .calendar-event-subject {
   color: #2f9e55;
 }
 
-.calendar-subject-tdt4120 .calendar-event-time,
-.calendar-subject-tdt4120 .calendar-event-subject {
+.calendar-subject-blue .calendar-event-time,
+.calendar-subject-blue .calendar-event-subject {
   color: #2563eb;
+}
+
+.calendar-subject-orange .calendar-event-time,
+.calendar-subject-orange .calendar-event-subject {
+  color: #ea580c;
+}
+
+.calendar-subject-teal .calendar-event-time,
+.calendar-subject-teal .calendar-event-subject {
+  color: #0d9488;
+}
+
+.calendar-subject-red .calendar-event-time,
+.calendar-subject-red .calendar-event-subject {
+  color: #e11d48;
+}
+
+.calendar-subject-yellow .calendar-event-time,
+.calendar-subject-yellow .calendar-event-subject {
+  color: #ca8a04;
 }
 
 .calendar-event-exam,

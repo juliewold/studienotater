@@ -2,6 +2,23 @@ import "./WeeklyUpdates.css";
 
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  Binary,
+  Blocks,
+  BookOpen,
+  Braces,
+  ChartNoAxesColumnIncreasing,
+  CircuitBoard,
+  Code2,
+  Cpu,
+  Database,
+  FunctionSquare,
+  MousePointer2,
+  Network,
+  Sigma,
+  Terminal,
+  Wifi,
+} from "lucide-react";
 
 import { subjects } from "../../data/subjects";
 import { useSemesterSubjects } from "../../hooks/useSemesterSubjects";
@@ -22,6 +39,8 @@ type WeeklySubjectData = {
   id: string;
   code: string;
   name: string;
+  color: string;
+  icon: string | undefined;
   notes: DatabaseNote[];
   pdfs: DatabasePdf[];
   flashcards: DatabaseFlashcard[];
@@ -66,6 +85,58 @@ const getWeekNumber = () => {
   );
 };
 
+const getSubjectIcon = (icon: string | undefined) => {
+  switch (icon) {
+    case "code":
+      return Code2;
+
+    case "sigma":
+      return Sigma;
+
+    case "binary":
+      return Binary;
+
+    case "book-open":
+      return BookOpen;
+
+    case "braces":
+      return Braces;
+
+    case "mouse-pointer":
+      return MousePointer2;
+
+    case "function-square":
+      return FunctionSquare;
+
+    case "circuit-board":
+      return CircuitBoard;
+
+    case "network":
+      return Network;
+
+    case "cpu":
+      return Cpu;
+
+    case "chart":
+      return ChartNoAxesColumnIncreasing;
+
+    case "blocks":
+      return Blocks;
+
+    case "database":
+      return Database;
+
+    case "terminal":
+      return Terminal;
+
+    case "wifi":
+      return Wifi;
+
+    default:
+      return BookOpen;
+  }
+};
+
 export const WeeklyUpdates = () => {
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
 
@@ -88,6 +159,9 @@ export const WeeklyUpdates = () => {
           semesterSubject.subjectId.toUpperCase(),
 
         name: semesterSubject.customName ?? regularSubject?.name ?? "",
+
+        color: regularSubject?.color ?? "default",
+        icon: regularSubject?.icon,
       };
     });
   }, [semesterSubjects]);
@@ -175,14 +249,19 @@ export const WeeklyUpdates = () => {
               subject.pdfs.length +
               subject.flashcards.length;
 
+            const Icon = getSubjectIcon(subject.icon);
+
             return (
               <Link
                 key={subject.id}
                 to={`/fag/${subject.id}`}
-                className="weekly-update-card"
+                className={`weekly-update-card weekly-update-${subject.color}`}
               >
-                <p className="weekly-update-code">{subject.code}</p>
+                <div className="weekly-update-icon">
+                  <Icon size={22} strokeWidth={2} />
+                </div>
 
+                <p className="weekly-update-code">{subject.code}</p>
                 <h3>{subject.name}</h3>
 
                 <div className="weekly-update-meta">
