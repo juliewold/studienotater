@@ -41,6 +41,7 @@
 }
 
 /* Dashboard */
+
 .home-dashboard-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -61,6 +62,173 @@
   min-width: 0;
 }
 
+/* Logged out homepage */
+
+.logged-out-home {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 72px 24px 96px;
+}
+
+.logged-out-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  align-items: center;
+  gap: 72px;
+
+  min-height: 560px;
+}
+
+.logged-out-hero-content {
+  max-width: 650px;
+}
+
+.logged-out-hero h1 {
+  margin: 0;
+
+  color: #161329;
+  font-size: clamp(3.4rem, 6vw, 5.7rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.logged-out-hero-description {
+  max-width: 580px;
+  margin: 28px 0 0;
+
+  color: #6b7280;
+  font-size: 1.2rem;
+  line-height: 1.7;
+}
+
+.logged-out-hero-actions {
+  display: flex;
+  gap: 14px;
+
+  margin-top: 34px;
+}
+
+.logged-out-primary-button,
+.logged-out-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 48px;
+  padding: 0 24px;
+
+  border-radius: 14px;
+
+  font-weight: 700;
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.logged-out-primary-button {
+  background: #a97af5;
+  color: white;
+
+  box-shadow: 0 8px 20px rgba(169, 122, 245, 0.2);
+}
+
+.logged-out-primary-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 24px rgba(169, 122, 245, 0.26);
+}
+
+.logged-out-secondary-button {
+  border: 1px solid #e5dcf3;
+
+  background: rgba(255, 255, 255, 0.72);
+  color: #27213e;
+}
+
+.logged-out-secondary-button:hover {
+  transform: translateY(-2px);
+
+  background: white;
+}
+
+/* Note previews */
+
+.logged-out-note-preview {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  width: 100%;
+  min-height: 540px;
+}
+
+.logged-out-note-image {
+  position: static;
+
+  width: 310px;
+  height: auto;
+
+  border: 1px solid #e8e3ed;
+  border-radius: 12px;
+
+  background: white;
+
+  object-fit: contain;
+}
+
+.logged-out-note-image-front {
+  transform: rotate(1deg);
+}
+
+.logged-out-note-image-back {
+  transform: rotate(-1deg);
+}
+
+/* Logged out features */
+
+.logged-out-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 48px;
+
+  padding: 72px 0 48px;
+
+  border-top: 1px solid #e9e3ef;
+}
+
+.logged-out-feature-number {
+  display: block;
+
+  margin-bottom: 18px;
+
+  color: #9b6df3;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.logged-out-feature h2 {
+  margin: 0 0 12px;
+
+  color: #161329;
+  font-size: 1.35rem;
+}
+
+.logged-out-feature p {
+  margin: 0;
+
+  color: #737080;
+  line-height: 1.7;
+}
+
+/* Responsive */
+
 @media (max-width: 900px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -72,6 +240,26 @@
 
   .home-dashboard-grid {
     grid-template-columns: 1fr;
+  }
+
+  .logged-out-home {
+    padding-top: 48px;
+  }
+
+  .logged-out-hero {
+    grid-template-columns: 1fr;
+    gap: 48px;
+
+    min-height: auto;
+  }
+
+  .logged-out-hero-content {
+    max-width: 700px;
+  }
+
+  .logged-out-note-preview {
+    width: 100%;
+    max-width: 560px;
   }
 }
 
@@ -115,13 +303,71 @@
   }
 
   .home-dashboard-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 24px;
+    grid-template-columns: 1fr;
 
-    max-width: 1280px;
-    margin: 32px auto;
-    padding: 0 24px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .logged-out-home {
+    padding: 32px 16px 48px;
+  }
+
+  .logged-out-hero {
+    gap: 28px;
+  }
+
+  .logged-out-hero h1 {
+    font-size: clamp(2.65rem, 12vw, 3.4rem);
+    line-height: 1;
+  }
+
+  .logged-out-hero-description {
+    margin-top: 24px;
+
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .logged-out-hero-actions {
+    flex-direction: column;
+    gap: 12px;
+
+    margin-top: 28px;
+  }
+
+  .logged-out-primary-button,
+  .logged-out-secondary-button {
+    width: 100%;
+  }
+
+  .logged-out-note-preview {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 8px;
+
+    width: 100%;
+    min-height: 0;
+  }
+
+  .logged-out-note-image {
+    width: 100%;
+    height: auto;
+
+    transform: none;
+  }
+
+  .logged-out-note-image-front,
+  .logged-out-note-image-back {
+    transform: none;
+  }
+
+  .logged-out-features {
+    grid-template-columns: 1fr;
+    gap: 36px;
+
+    padding: 48px 0;
   }
 }
 
