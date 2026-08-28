@@ -1,7 +1,7 @@
 import "./AdminPdfsPage.css";
 
 import { subjects } from "../../../data/subjects";
-import { useAdminPdfs } from "../../../hooks/useAdminPdfs";
+import { useAdminPdfs } from "../../../hooks/admin/useAdminPdfs";
 
 const categories = [
   {

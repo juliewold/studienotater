@@ -6,7 +6,7 @@ import {
   type SyntheticEvent,
 } from "react";
 
-import { subjects } from "../data/subjects";
+import { subjects } from "../../data/subjects";
 
 import {
   createNote,
@@ -14,14 +14,14 @@ import {
   getNotesBySubject,
   updateNote,
   type DatabaseNote,
-} from "../services/notes/notesService";
+} from "../../services/notes/notesService";
 
 import {
   getTopicsBySubject,
   getSubtopicsByTopic,
   type DatabaseTopic,
   type DatabaseSubtopic,
-} from "../services/subjects/subjectStructureService";
+} from "../../services/subjects/subjectStructureService";
 
 export const useAdminNotes = () => {
   const [subjectId, setSubjectId] = useState("");

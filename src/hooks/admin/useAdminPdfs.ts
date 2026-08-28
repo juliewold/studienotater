@@ -7,22 +7,22 @@ import {
   type SyntheticEvent,
 } from "react";
 
-import { subjects } from "../data/subjects";
-import { supabase } from "../lib/supabase";
+import { subjects } from "../../data/subjects";
+import { supabase } from "../../lib/supabase";
 
 import {
   deletePdf,
   getAllPdfs,
   updatePdfSubtopic,
   type DatabasePdf,
-} from "../services/media/pdfsService";
+} from "../../services/media/pdfsService";
 
 import {
   getTopicsBySubject,
   getSubtopicsByTopic,
   type DatabaseTopic,
   type DatabaseSubtopic,
-} from "../services/subjects/subjectStructureService";
+} from "../../services/subjects/subjectStructureService";
 
 export const useAdminPdfs = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);

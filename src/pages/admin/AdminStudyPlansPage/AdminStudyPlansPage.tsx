@@ -1,6 +1,6 @@
 import "./AdminStudyPlansPage.css";
 import { subjects } from "../../../data/subjects";
-import { useAdminStudyPlans } from "../../../hooks/useAdminStudyPlans";
+import { useAdminStudyPlans } from "../../../hooks/admin/useAdminStudyPlans";
 
 export const AdminStudyPlansPage = () => {
   const {

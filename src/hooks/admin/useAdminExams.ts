@@ -5,15 +5,15 @@ import {
   useState,
   type SyntheticEvent,
 } from "react";
-import { subjects } from "../data/subjects";
-import { supabase } from "../lib/supabase";
+import { subjects } from "../../data/subjects";
+import { supabase } from "../../lib/supabase";
 import {
   createExam,
   deleteExam,
   getExamsBySubject,
   updateExam,
   type DatabaseExam,
-} from "../services/exams/examsService";
+} from "../../services/exams/examsService";
 
 export const useAdminExams = () => {
   const examFileInputRef = useRef<HTMLInputElement>(null);

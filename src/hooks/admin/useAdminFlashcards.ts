@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
 
-import { subjects } from "../data/subjects";
+import { subjects } from "../../data/subjects";
 
 import {
   createFlashcard,
@@ -8,12 +8,12 @@ import {
   getFlashcardsBySubject,
   updateFlashcard,
   type DatabaseFlashcard,
-} from "../services/study/flashcardsService";
+} from "../../services/study/flashcardsService";
 
 import {
   getSubtopicsByTopic,
   getTopicsBySubject,
-} from "../services/subjects/subjectStructureService";
+} from "../../services/subjects/subjectStructureService";
 
 type TopicOption = Awaited<ReturnType<typeof getTopicsBySubject>>[number];
 

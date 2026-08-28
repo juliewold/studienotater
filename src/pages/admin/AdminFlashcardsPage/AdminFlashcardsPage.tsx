@@ -1,6 +1,6 @@
 import "./AdminFlashcardsPage.css";
 import { subjects } from "../../../data/subjects";
-import { useAdminFlashcards } from "../../../hooks/useAdminFlashcards";
+import { useAdminFlashcards } from "../../../hooks/admin/useAdminFlashcards";
 
 export const AdminFlashcardsPage = () => {
   const {

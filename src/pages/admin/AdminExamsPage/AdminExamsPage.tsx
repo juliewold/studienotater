@@ -1,7 +1,7 @@
 import "./AdminExamsPage.css";
 import { subjects } from "../../../data/subjects";
-import { useAdminExams } from "../../../hooks/useAdminExams";
-import { useAdminUpcomingExams } from "../../../hooks/useAdminUpcomingExams";
+import { useAdminExams } from "../../../hooks/admin/useAdminExams";
+import { useAdminUpcomingExams } from "../../../hooks/admin/useAdminUpcomingExams";
 
 const semesters = [
   { value: "Vår", label: "Vår" },

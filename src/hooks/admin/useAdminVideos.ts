@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
-import { subjects } from "../data/subjects";
+import { subjects } from "../../data/subjects";
 import {
   createVideo,
   deleteVideo,
   getVideosBySubject,
   updateVideo,
   type DatabaseVideo,
-} from "../services/media/videosService";
+} from "../../services/media/videosService";
 
 import {
   getSubtopicsByTopic,
   getTopicsBySubject,
   type DatabaseSubtopic,
   type DatabaseTopic,
-} from "../services/subjects/subjectStructureService";
+} from "../../services/subjects/subjectStructureService";
 
 export const useAdminVideos = () => {
   const [subjectId, setSubjectId] = useState("");

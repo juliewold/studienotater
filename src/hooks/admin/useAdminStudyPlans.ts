@@ -7,7 +7,7 @@ import {
   type SetStateAction,
   type SyntheticEvent,
 } from "react";
-import { subjects } from "../data/subjects";
+import { subjects } from "../../data/subjects";
 import {
   createStudyTopic,
   deleteStudyTopic,
@@ -18,13 +18,13 @@ import {
   type DatabaseStudyTopic,
   type StudyTopicItemType,
   type StudyTopicResourceType,
-} from "../services/study/studyPlansService";
-import { getNotesBySubject, type DatabaseNote } from "../services/notes/notesService";
+} from "../../services/study/studyPlansService";
+import { getNotesBySubject, type DatabaseNote } from "../../services/notes/notesService";
 import {
   getVideosBySubject,
   type DatabaseVideo,
-} from "../services/media/videosService";
-import { getPdfsBySubject, type DatabasePdf } from "../services/media/pdfsService";
+} from "../../services/media/videosService";
+import { getPdfsBySubject, type DatabasePdf } from "../../services/media/pdfsService";
 
 type ResourceSelection = {
   resourceType: StudyTopicResourceType;

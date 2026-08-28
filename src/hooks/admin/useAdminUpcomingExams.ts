@@ -10,7 +10,7 @@ import {
   getUpcomingExams,
   updateUpcomingExam,
   type UpcomingExam,
-} from "../services/exams/upcomingExamsService";
+} from "../../services/exams/upcomingExamsService";
 
 export const useAdminUpcomingExams = () => {
   const [subjectId, setSubjectId] = useState("");
