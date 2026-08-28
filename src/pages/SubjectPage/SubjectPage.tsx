@@ -1,12 +1,21 @@
 import "./SubjectPage.css";
+
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { subjects } from "../../data/subjects";
 import { SubjectFeatureCard } from "../../components/SubjectFeatureCard/SubjectFeatureCard";
 import { useSubjectProgress } from "../../hooks/useSubjectProgress";
 
+const INITIAL_VISIBLE_TOPICS = 4;
+
 export const SubjectPage = () => {
   const { subjectId } = useParams();
+
+  const [visibleTopicCount, setVisibleTopicCount] = useState(
+    INITIAL_VISIBLE_TOPICS,
+  );
 
   const subject = subjects.find(
     (currentSubject) => currentSubject.id === subjectId,
@@ -14,6 +23,14 @@ export const SubjectPage = () => {
 
   const { subjectProgress, isLoading, errorMessage } =
     useSubjectProgress(subjectId);
+
+  const visibleTopics = subjectProgress.topicProgress.slice(
+    0,
+    visibleTopicCount,
+  );
+
+  const hasMoreTopics =
+    visibleTopicCount < subjectProgress.topicProgress.length;
 
   if (!subject) {
     return (
@@ -170,7 +187,7 @@ export const SubjectPage = () => {
             </div>
 
             <div className="subject-topic-progress-list">
-              {subjectProgress.topicProgress.map((topic) => (
+              {visibleTopics.map((topic) => (
                 <article
                   key={topic.topicId}
                   className="subject-topic-progress-item"
@@ -204,6 +221,35 @@ export const SubjectPage = () => {
                 </article>
               ))}
             </div>
+
+            {subjectProgress.topicProgress.length > INITIAL_VISIBLE_TOPICS && (
+              <div className="subject-topic-progress-more">
+                <button
+                  type="button"
+                  className="subject-topic-progress-more-button"
+                  aria-label={
+                    hasMoreTopics ? "Vis flere temaer" : "Vis færre temaer"
+                  }
+                  onClick={() => {
+                    if (hasMoreTopics) {
+                      setVisibleTopicCount(
+                        subjectProgress.topicProgress.length,
+                      );
+
+                      return;
+                    }
+
+                    setVisibleTopicCount(INITIAL_VISIBLE_TOPICS);
+                  }}
+                >
+                  {hasMoreTopics ? (
+                    <ChevronDown size={24} />
+                  ) : (
+                    <ChevronUp size={24} />
+                  )}
+                </button>
+              </div>
+            )}
           </section>
         )}
     </main>
