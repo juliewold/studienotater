@@ -4,13 +4,13 @@ import { Check, Edit3, LoaderCircle } from "lucide-react";
 
 import { NoteEditor } from "../NoteEditor/NoteEditor";
 
-import { updateNote, type DatabaseNote } from "../../../services/notesService";
+import { updateNote, type DatabaseNote } from "../../../services/notes/notesService";
 import {
   getTopicsBySubject,
   getSubtopicsByTopic,
   type DatabaseTopic,
   type DatabaseSubtopic,
-} from "../../../services/subjectStructureService";
+} from "../../../services/subjects/subjectStructureService";
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
 type EditableNoteProps = {

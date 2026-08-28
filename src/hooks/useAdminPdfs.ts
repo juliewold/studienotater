@@ -15,14 +15,14 @@ import {
   getAllPdfs,
   updatePdfSubtopic,
   type DatabasePdf,
-} from "../services/pdfsService";
+} from "../services/media/pdfsService";
 
 import {
   getTopicsBySubject,
   getSubtopicsByTopic,
   type DatabaseTopic,
   type DatabaseSubtopic,
-} from "../services/subjectStructureService";
+} from "../services/subjects/subjectStructureService";
 
 export const useAdminPdfs = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);

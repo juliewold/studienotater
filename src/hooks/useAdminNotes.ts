@@ -14,14 +14,14 @@ import {
   getNotesBySubject,
   updateNote,
   type DatabaseNote,
-} from "../services/notesService";
+} from "../services/notes/notesService";
 
 import {
   getTopicsBySubject,
   getSubtopicsByTopic,
   type DatabaseTopic,
   type DatabaseSubtopic,
-} from "../services/subjectStructureService";
+} from "../services/subjects/subjectStructureService";
 
 export const useAdminNotes = () => {
   const [subjectId, setSubjectId] = useState("");

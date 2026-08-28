@@ -1,5 +1,5 @@
-import type { DatabaseNote } from "../services/notesService";
-import type { DatabaseSubtopic } from "../services/subjectStructureService";
+import type { DatabaseNote } from "../services/notes/notesService";
+import type { DatabaseSubtopic } from "../services/subjects/subjectStructureService";
 
 export function sortNotesByStructure(
   notes: DatabaseNote[],

@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   getExamsBySubject,
   type DatabaseExam,
-} from "../../../services/examsService";
+} from "../../../services/exams/examsService";
 import { ExamProgressOverview } from "../../../components/exams/ExamProgressOverview/ExamProgressOverview";
 
 export const ExamsPage = () => {

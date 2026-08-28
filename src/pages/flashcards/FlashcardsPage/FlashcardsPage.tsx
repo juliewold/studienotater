@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   getFlashcardsBySubject,
   type DatabaseFlashcard,
-} from "../../../services/flashcardsService";
+} from "../../../services/study/flashcardsService";
 
 type GroupedSubtopic = {
   subtopicId: string;

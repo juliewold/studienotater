@@ -7,7 +7,7 @@ import {
   getGlobalSearchItems,
   searchGlobalItems,
   type GlobalSearchResult,
-} from "../../../services/globalSearchService.ts";
+} from "../../../services/search/globalSearchService.ts";
 
 type Props = {
   onNavigate: () => void;

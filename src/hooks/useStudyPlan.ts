@@ -11,23 +11,23 @@ import {
   type DatabaseStudyTopic,
   type DatabaseStudyTopicItem,
   type DatabaseStudyTopicResource,
-} from "../services/studyPlansService";
+} from "../services/study/studyPlansService";
 import {
   getNotesBySubject,
   type DatabaseNote,
-} from "../services/notesService";
+} from "../services/notes/notesService";
 import {
   getVideosBySubject,
   type DatabaseVideo,
-} from "../services/videosService";
+} from "../services/media/videosService";
 import {
   getPdfsBySubject,
   type DatabasePdf,
-} from "../services/pdfsService";
+} from "../services/media/pdfsService";
 import {
   getStudyPlanItems,
   saveStudyPlanItem,
-} from "../services/progressService";
+} from "../services/progress/progressService";
 import { useProgress } from "./useProgress";
 import { useBookProgress } from "./useBookProgress";
 import { tma4412Book } from "../data/books/tma4412Book";

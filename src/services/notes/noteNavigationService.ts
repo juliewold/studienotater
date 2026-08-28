@@ -3,7 +3,7 @@ import {
   getAllSubtopicsBySubject,
   type DatabaseTopic,
   type DatabaseSubtopic,
-} from "./subjectStructureService";
+} from "./../subjects/subjectStructureService";
 
 import { getNotesBySubject, type DatabaseNote } from "./notesService";
 

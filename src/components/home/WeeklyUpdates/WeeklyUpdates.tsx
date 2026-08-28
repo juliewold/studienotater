@@ -26,14 +26,14 @@ import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 import {
   getNotesBySubject,
   type DatabaseNote,
-} from "../../../services/notesService";
+} from "../../../services/notes/notesService";
 
-import { getPdfsBySubject, type DatabasePdf } from "../../../services/pdfsService";
+import { getPdfsBySubject, type DatabasePdf } from "../../../services/media/pdfsService";
 
 import {
   getFlashcardsBySubject,
   type DatabaseFlashcard,
-} from "../../../services/flashcardsService";
+} from "../../../services/study/flashcardsService";
 
 type WeeklySubjectData = {
   id: string;

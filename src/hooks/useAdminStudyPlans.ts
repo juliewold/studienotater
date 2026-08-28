@@ -18,13 +18,13 @@ import {
   type DatabaseStudyTopic,
   type StudyTopicItemType,
   type StudyTopicResourceType,
-} from "../services/studyPlansService";
-import { getNotesBySubject, type DatabaseNote } from "../services/notesService";
+} from "../services/study/studyPlansService";
+import { getNotesBySubject, type DatabaseNote } from "../services/notes/notesService";
 import {
   getVideosBySubject,
   type DatabaseVideo,
-} from "../services/videosService";
-import { getPdfsBySubject, type DatabasePdf } from "../services/pdfsService";
+} from "../services/media/videosService";
+import { getPdfsBySubject, type DatabasePdf } from "../services/media/pdfsService";
 
 type ResourceSelection = {
   resourceType: StudyTopicResourceType;

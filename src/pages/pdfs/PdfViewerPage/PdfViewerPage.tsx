@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   getPdfById,
   type DatabasePdf,
-} from "../../../services/pdfsService";
+} from "../../../services/media/pdfsService";
 import { ResourceProgress } from "../../../components/progress/ResourceProgress/ResourceProgress";
 
 export const PdfViewerPage = () => {

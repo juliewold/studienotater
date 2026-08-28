@@ -5,7 +5,7 @@ import { subjects } from "../../../data/subjects";
 import {
   getFlashcardsBySubject,
   type DatabaseFlashcard,
-} from "../../../services/flashcardsService";
+} from "../../../services/study/flashcardsService";
 
 type FlashcardSubject = {
   id: string;

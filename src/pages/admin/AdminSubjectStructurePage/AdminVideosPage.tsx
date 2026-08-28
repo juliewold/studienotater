@@ -2,7 +2,7 @@ import "./AdminVideosPage.css";
 import { useMemo } from "react";
 import { subjects } from "../../../data/subjects";
 import { useAdminVideos } from "../../../hooks/useAdminVideos";
-import type { DatabaseVideo } from "../../../services/videosService";
+import type { DatabaseVideo } from "../../../services/media/videosService";
 
 type AdminSubtopicGroup = {
   id: string;

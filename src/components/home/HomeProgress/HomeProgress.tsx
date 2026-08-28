@@ -6,17 +6,17 @@ import { subjects } from "../../../data/subjects";
 import {
   getPdfsBySubject,
   type DatabasePdf,
-} from "../../../services/pdfsService";
+} from "../../../services/media/pdfsService";
 
 import {
   getNotesBySubject,
   type DatabaseNote,
-} from "../../../services/notesService";
+} from "../../../services/notes/notesService";
 
 import {
   getVideosBySubject,
   type DatabaseVideo,
-} from "../../../services/videosService";
+} from "../../../services/media/videosService";
 
 import { useProgress } from "../../../hooks/useProgress";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";

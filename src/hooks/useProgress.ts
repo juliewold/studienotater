@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext/AuthContext";
 import {
   getAllProgress,
   type ProgressItem,
-} from "../services/progressService";
+} from "../services/progress/progressService";
 
 export const useProgress = () => {
   const { user } = useContext(AuthContext);

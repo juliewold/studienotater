@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext/AuthContext";
 import {
   getBookProgress,
   saveBookProgress,
-} from "../services/bookProgressService";
+} from "../services/progress/bookProgressService";
 
 export function useBookProgress(bookId: string) {
   const { user } = useContext(AuthContext);

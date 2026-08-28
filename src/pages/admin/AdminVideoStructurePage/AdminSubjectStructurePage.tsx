@@ -18,7 +18,7 @@ import {
   updateTopic,
   type DatabaseSubtopic,
   type DatabaseTopic,
-} from "../../../services/subjectStructureService";
+} from "../../../services/subjects/subjectStructureService";
 
 type StructureFormMode = "create" | "edit";
 

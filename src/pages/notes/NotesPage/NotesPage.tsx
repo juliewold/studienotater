@@ -9,14 +9,14 @@ import {
   createNote,
   getNotesBySubject,
   type DatabaseNote,
-} from "../../../services/notesService";
+} from "../../../services/notes/notesService";
 
 import {
   createNoteFolder,
   getNoteFoldersBySubject,
   updateNoteFolderTopic,
   type NoteFolder,
-} from "../../../services/noteFoldersService";
+} from "../../../services/notes/noteFoldersService";
 
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useProgress } from "../../../hooks/useProgress";
@@ -27,7 +27,7 @@ import {
   getAllSubtopicsBySubject,
   getTopicsBySubject,
   type DatabaseTopic,
-} from "../../../services/subjectStructureService";
+} from "../../../services/subjects/subjectStructureService";
 
 const createNoteSlug = (
   subjectId: string,

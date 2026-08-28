@@ -4,7 +4,7 @@ import { subjects } from "../../../data/subjects";
 import {
   getUpcomingExams,
   type UpcomingExam,
-} from "../../../services/upcomingExamsService";
+} from "../../../services/exams/upcomingExamsService";
 
 export const ExamOverviewPage = () => {
   const [databaseExams, setDatabaseExams] = useState<UpcomingExam[]>(

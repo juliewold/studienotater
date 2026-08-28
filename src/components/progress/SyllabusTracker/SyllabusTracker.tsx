@@ -4,7 +4,7 @@ import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import {
   getCompletedSyllabusTopics,
   saveSyllabusTopic,
-} from "../../../services/progressService";
+} from "../../../services/progress/progressService";
 
 type Topic = {
   id: string;

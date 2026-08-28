@@ -4,9 +4,9 @@ import { Link, useParams } from "react-router-dom";
 
 import { subjects } from "../../../data/subjects";
 
-import { getNoteBySlug, type DatabaseNote } from "../../../services/notesService";
+import { getNoteBySlug, type DatabaseNote } from "../../../services/notes/notesService";
 
-import { getOrderedNotes } from "../../../services/noteNavigationService";
+import { getOrderedNotes } from "../../../services/notes/noteNavigationService";
 
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 

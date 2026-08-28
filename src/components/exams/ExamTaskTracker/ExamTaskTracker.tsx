@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   getExamTaskProgress,
   setExamTaskCompleted,
-} from "../../../services/examTaskProgressService";
+} from "../../../services/exams/examTaskProgressService";
 
 type Props = {
   examId: string;

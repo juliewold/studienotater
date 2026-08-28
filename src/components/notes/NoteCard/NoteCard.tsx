@@ -2,7 +2,7 @@ import "./NoteCard.css";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
-import type { DatabaseNote } from "../../../services/notesService";
+import type { DatabaseNote } from "../../../services/notes/notesService";
 import { NoteMenu } from "../NoteMenu/NoteMenu";
 
 export type NoteChange =

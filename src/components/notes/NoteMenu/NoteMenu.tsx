@@ -5,12 +5,12 @@ import { FolderInput, MoreVertical, Pencil, Trash2, X } from "lucide-react";
 import {
   getNoteFoldersBySubject,
   type NoteFolder,
-} from "../../../services/noteFoldersService";
+} from "../../../services/notes/noteFoldersService";
 import {
   deleteNote,
   moveNoteToFolder,
   updateNoteTitle,
-} from "../../../services/notesService";
+} from "../../../services/notes/notesService";
 
 type NoteMenuProps = {
   noteId: string;

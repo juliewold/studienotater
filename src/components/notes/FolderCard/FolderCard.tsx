@@ -7,7 +7,7 @@ import {
   deleteNoteFolder,
   updateNoteFolder,
   type NoteFolder,
-} from "../../../services/noteFoldersService";
+} from "../../../services/notes/noteFoldersService";
 
 type FolderCardProps = {
   folder: NoteFolder;

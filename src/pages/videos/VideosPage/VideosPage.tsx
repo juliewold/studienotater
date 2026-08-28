@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   getVideosBySubject,
   type DatabaseVideo,
-} from "../../../services/videosService";
+} from "../../../services/media/videosService";
 import { ResourceProgress } from "../../../components/progress/ResourceProgress/ResourceProgress";
 
 type SubtopicGroup = {

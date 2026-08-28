@@ -13,7 +13,7 @@ import {
   getExamsBySubject,
   updateExam,
   type DatabaseExam,
-} from "../services/examsService";
+} from "../services/exams/examsService";
 
 export const useAdminExams = () => {
   const examFileInputRef = useRef<HTMLInputElement>(null);

@@ -4,7 +4,7 @@ import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import {
   getProgress,
   saveProgress,
-} from "../../../services/progressService";
+} from "../../../services/progress/progressService";
 
 type ResourceProgressProps = {
   resourceId: string;

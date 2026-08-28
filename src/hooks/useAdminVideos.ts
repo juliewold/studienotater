@@ -6,14 +6,14 @@ import {
   getVideosBySubject,
   updateVideo,
   type DatabaseVideo,
-} from "../services/videosService";
+} from "../services/media/videosService";
 
 import {
   getSubtopicsByTopic,
   getTopicsBySubject,
   type DatabaseSubtopic,
   type DatabaseTopic,
-} from "../services/subjectStructureService";
+} from "../services/subjects/subjectStructureService";
 
 export const useAdminVideos = () => {
   const [subjectId, setSubjectId] = useState("");

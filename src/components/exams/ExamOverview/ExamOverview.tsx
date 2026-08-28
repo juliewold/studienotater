@@ -5,7 +5,7 @@ import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 import {
   getUpcomingExams,
   type UpcomingExam,
-} from "../../../services/upcomingExamsService";
+} from "../../../services/exams/upcomingExamsService";
 
 export const ExamOverview = () => {
   const {

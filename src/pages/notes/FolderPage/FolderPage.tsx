@@ -8,20 +8,20 @@ import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import {
   getNoteFolderById,
   type NoteFolder,
-} from "../../../services/noteFoldersService";
+} from "../../../services/notes/noteFoldersService";
 
 import {
   createNote,
   getNotesByFolder,
   type DatabaseNote,
-} from "../../../services/notesService";
+} from "../../../services/notes/notesService";
 
 import {
   getSubtopicsByTopic,
   type DatabaseSubtopic,
-} from "../../../services/subjectStructureService";
+} from "../../../services/subjects/subjectStructureService";
 
-import { getAllProgress, type Progress } from "../../../services/progressService";
+import { getAllProgress, type Progress } from "../../../services/progress/progressService";
 
 import { FolderNoteCard } from "../../../components/notes/FolderNoteCard/FolderNoteCard";
 

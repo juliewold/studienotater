@@ -8,12 +8,12 @@ import {
   getFlashcardsBySubject,
   updateFlashcard,
   type DatabaseFlashcard,
-} from "../services/flashcardsService";
+} from "../services/study/flashcardsService";
 
 import {
   getSubtopicsByTopic,
   getTopicsBySubject,
-} from "../services/subjectStructureService";
+} from "../services/subjects/subjectStructureService";
 
 type TopicOption = Awaited<ReturnType<typeof getTopicsBySubject>>[number];
 

@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { getPdfsBySubject, type DatabasePdf } from "../services/pdfsService";
+import { getPdfsBySubject, type DatabasePdf } from "../services/media/pdfsService";
 
-import { getNotesBySubject, type DatabaseNote } from "../services/notesService";
+import { getNotesBySubject, type DatabaseNote } from "../services/notes/notesService";
 
 import {
   getVideosBySubject,
   type DatabaseVideo,
-} from "../services/videosService";
+} from "../services/media/videosService";
 
 import { useProgress } from "./useProgress";
 

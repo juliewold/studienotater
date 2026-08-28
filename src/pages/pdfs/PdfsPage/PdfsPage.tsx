@@ -2,7 +2,7 @@ import "./PdfsPage.css";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
-import { getPdfsBySubject, type DatabasePdf } from "../../../services/pdfsService";
+import { getPdfsBySubject, type DatabasePdf } from "../../../services/media/pdfsService";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useProgress } from "../../../hooks/useProgress";
 

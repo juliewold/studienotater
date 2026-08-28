@@ -5,7 +5,7 @@ import { subjects } from "../../../data/subjects";
 import {
   getVideosBySubject,
   type DatabaseVideo,
-} from "../../../services/videosService";
+} from "../../../services/media/videosService";
 import { useProgress } from "../../../hooks/useProgress";
 
 type VideoSubject = {

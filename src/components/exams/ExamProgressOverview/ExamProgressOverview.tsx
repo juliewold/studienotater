@@ -1,7 +1,7 @@
 import "./ExamProgressOverview.css";
 import { useEffect, useMemo, useState } from "react";
-import type { DatabaseExam } from "../../../services/examsService";
-import { getProgressForExams } from "../../../services/examTaskProgressService";
+import type { DatabaseExam } from "../../../services/exams/examsService";
+import { getProgressForExams } from "../../../services/exams/examTaskProgressService";
 
 type Props = {
   exams: DatabaseExam[];

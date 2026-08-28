@@ -5,7 +5,7 @@ import {
   getSemesterSubjects,
   removeSemesterSubject,
   type SemesterSubject,
-} from "../services/semesterSubjectsService";
+} from "../services/subjects/semesterSubjectsService";
 
 export const useSemesterSubjects = () => {
   const { user } = useContext(AuthContext);

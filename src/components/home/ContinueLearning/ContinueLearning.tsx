@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./ContinueLearning.css";
 import { subjects } from "../../../data/subjects";
-import { getAllPdfs } from "../../../services/pdfsService";
-import { getAllExams } from "../../../services/examsService";
+import { getAllPdfs } from "../../../services/media/pdfsService";
+import { getAllExams } from "../../../services/exams/examsService";
 
 type RecentItem = {
   id: string;

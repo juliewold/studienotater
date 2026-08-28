@@ -1,7 +1,7 @@
-import { getAllNotes, type DatabaseNote } from "./notesService";
-import { getAllFlashcards, type DatabaseFlashcard } from "./flashcardsService";
-import { getAllVideos, type DatabaseVideo } from "./videosService";
-import { getAllPdfs, type DatabasePdf } from "./pdfsService";
+import { getAllNotes, type DatabaseNote } from "./../notes/notesService";
+import { getAllFlashcards, type DatabaseFlashcard } from "./../study/flashcardsService";
+import { getAllVideos, type DatabaseVideo } from "./../media/videosService";
+import { getAllPdfs, type DatabasePdf } from "./../media/pdfsService";
 
 export type GlobalSearchResultType = "note" | "flashcard" | "video" | "pdf";
 
