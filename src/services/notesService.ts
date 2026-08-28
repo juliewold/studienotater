@@ -17,6 +17,7 @@ export type DatabaseNote = {
   description: string;
   content: string;
   contentJson: NoteContentJson;
+  createdAt: string;
 };
 
 type CreateNoteInput = {
@@ -62,6 +63,7 @@ type NoteRow = {
   description: string;
   content: string | null;
   content_json: NoteContentJson;
+  created_at: string;
   subtopics: SubtopicRelation | SubtopicRelation[] | null;
 };
 
@@ -75,6 +77,7 @@ const noteSelect = `
   description,
   content,
   content_json,
+  created_at,
   subtopics (
     id,
     name,
@@ -115,6 +118,7 @@ function mapDatabaseNote(note: NoteRow): DatabaseNote {
     description: note.description,
     content: note.content ?? "",
     contentJson: note.content_json ?? null,
+    createdAt: note.created_at,
   };
 }
 

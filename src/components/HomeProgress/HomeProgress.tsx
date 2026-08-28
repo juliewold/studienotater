@@ -1,52 +1,38 @@
 import "./HomeProgress.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+
 import { subjects } from "../../data/subjects";
-import {
-  getPdfsBySubject,
-  type DatabasePdf,
-} from "../../services/pdfsService";
+
+import { getPdfsBySubject, type DatabasePdf } from "../../services/pdfsService";
+
 import {
   getNotesBySubject,
   type DatabaseNote,
 } from "../../services/notesService";
+
 import {
   getVideosBySubject,
   type DatabaseVideo,
 } from "../../services/videosService";
+
 import { useProgress } from "../../hooks/useProgress";
 import { useSemesterSubjects } from "../../hooks/useSemesterSubjects";
 
 export const HomeProgress = () => {
   const { getProgress, isLoadingProgress } = useProgress();
 
-  const {
-    semesterSubjects,
-    isLoadingSemesterSubjects,
-  } = useSemesterSubjects();
+  const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
 
-  const [databasePdfs, setDatabasePdfs] = useState<DatabasePdf[]>(
-    [],
-  );
+  const [databasePdfs, setDatabasePdfs] = useState<DatabasePdf[]>([]);
+  const [databaseNotes, setDatabaseNotes] = useState<DatabaseNote[]>([]);
+  const [databaseVideos, setDatabaseVideos] = useState<DatabaseVideo[]>([]);
 
-  const [databaseNotes, setDatabaseNotes] = useState<DatabaseNote[]>(
-    [],
-  );
-
-  const [databaseVideos, setDatabaseVideos] = useState<
-    DatabaseVideo[]
-  >([]);
-
-  const [isLoadingResources, setIsLoadingResources] =
-    useState(true);
-
+  const [isLoadingResources, setIsLoadingResources] = useState(true);
   const [resourcesError, setResourcesError] = useState("");
 
   const selectedSubjectIds = useMemo(
-    () =>
-      semesterSubjects.map(
-        (subject) => subject.subjectId,
-      ),
+    () => semesterSubjects.map((semesterSubject) => semesterSubject.subjectId),
     [semesterSubjects],
   );
 
@@ -64,40 +50,32 @@ export const HomeProgress = () => {
       setResourcesError("");
 
       try {
-        const [
-          pdfsBySubject,
-          notesBySubject,
-          videosBySubject,
-        ] = await Promise.all([
-          Promise.all(
-            selectedSubjectIds.map((subjectId) =>
-              getPdfsBySubject(subjectId),
+        const [pdfsBySubject, notesBySubject, videosBySubject] =
+          await Promise.all([
+            Promise.all(
+              selectedSubjectIds.map((subjectId) =>
+                getPdfsBySubject(subjectId),
+              ),
             ),
-          ),
-          Promise.all(
-            selectedSubjectIds.map((subjectId) =>
-              getNotesBySubject(subjectId),
+            Promise.all(
+              selectedSubjectIds.map((subjectId) =>
+                getNotesBySubject(subjectId),
+              ),
             ),
-          ),
-          Promise.all(
-            selectedSubjectIds.map((subjectId) =>
-              getVideosBySubject(subjectId),
+            Promise.all(
+              selectedSubjectIds.map((subjectId) =>
+                getVideosBySubject(subjectId),
+              ),
             ),
-          ),
-        ]);
+          ]);
 
         setDatabasePdfs(pdfsBySubject.flat());
         setDatabaseNotes(notesBySubject.flat());
         setDatabaseVideos(videosBySubject.flat());
       } catch (error) {
-        console.error(
-          "Kunne ikke hente ressurser til fremdriften:",
-          error,
-        );
+        console.error("Kunne ikke hente ressurser til fremdriften:", error);
 
-        setResourcesError(
-          "Kunne ikke hente all fremdrift.",
-        );
+        setResourcesError("Kunne ikke hente all fremdrift.");
       } finally {
         setIsLoadingResources(false);
       }
@@ -107,10 +85,11 @@ export const HomeProgress = () => {
   }, [selectedSubjectIds]);
 
   const progressSubjects = useMemo(() => {
-    return selectedSubjectIds.map((subjectId) => {
-      const subject = subjects.find(
-        (currentSubject) =>
-          currentSubject.id === subjectId,
+    return semesterSubjects.map((semesterSubject) => {
+      const subjectId = semesterSubject.subjectId;
+
+      const regularSubject = subjects.find(
+        (subject) => subject.id === subjectId,
       );
 
       const subjectPdfs = databasePdfs.filter(
@@ -126,17 +105,11 @@ export const HomeProgress = () => {
       );
 
       const pdfProgress = subjectPdfs.map((pdf) =>
-        getProgress(
-          `pdf-${subjectId}-database-${pdf.id}`,
-          "resource",
-        ),
+        getProgress(`pdf-${subjectId}-database-${pdf.id}`, "resource"),
       );
 
       const noteProgress = subjectNotes.map((note) =>
-        getProgress(
-          `note-${subjectId}-database-${note.slug}`,
-          "resource",
-        ),
+        getProgress(`note-${subjectId}-database-${note.slug}`, "resource"),
       );
 
       const videoProgress = subjectVideos.map((video) =>
@@ -159,72 +132,58 @@ export const HomeProgress = () => {
       );
 
       const ratings = [
-        ...pdfProgress.map(
-          (progress) => progress.rating,
-        ),
-        ...noteProgress.map(
-          (progress) => progress.rating,
-        ),
-        ...videoProgress.map(
-          (progress) => progress.rating,
-        ),
+        ...pdfProgress.map((progress) => progress.rating),
+        ...noteProgress.map((progress) => progress.rating),
+        ...videoProgress.map((progress) => progress.rating),
       ].filter((rating) => rating > 0);
 
       const averageRating =
         ratings.length === 0
           ? 0
           : Math.round(
-              ratings.reduce(
-                (sum, rating) => sum + rating,
-                0,
-              ) / ratings.length,
+              ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length,
             );
 
       const completed =
-        completedPdfs.length +
-        completedNotes.length +
-        completedVideos.length;
+        completedPdfs.length + completedNotes.length + completedVideos.length;
 
       const total =
-        subjectPdfs.length +
-        subjectNotes.length +
-        subjectVideos.length;
+        subjectPdfs.length + subjectNotes.length + subjectVideos.length;
 
-      const progress =
-        total === 0
-          ? 0
-          : Math.round((completed / total) * 100);
+      const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
 
       return {
         id: subjectId,
+
         code:
-          subject?.code ?? subjectId.toUpperCase(),
-        name: subject?.name ?? "",
+          semesterSubject.customCode ??
+          regularSubject?.code ??
+          subjectId.toUpperCase(),
+
         completed,
         total,
         progress,
         averageRating,
+
         pdfCompleted: completedPdfs.length,
         pdfTotal: subjectPdfs.length,
+
         noteCompleted: completedNotes.length,
         noteTotal: subjectNotes.length,
+
         videoCompleted: completedVideos.length,
         videoTotal: subjectVideos.length,
       };
     });
   }, [
+    semesterSubjects,
     databasePdfs,
     databaseNotes,
     databaseVideos,
     getProgress,
-    selectedSubjectIds,
   ]);
 
-  if (
-    isLoadingProgress ||
-    isLoadingSemesterSubjects ||
-    isLoadingResources
-  ) {
+  if (isLoadingProgress || isLoadingSemesterSubjects || isLoadingResources) {
     return (
       <section className="home-progress">
         <p>Laster fremdrift...</p>
@@ -240,20 +199,14 @@ export const HomeProgress = () => {
     );
   }
 
-  if (selectedSubjectIds.length === 0) {
+  if (semesterSubjects.length === 0) {
     return null;
   }
 
   return (
     <section className="home-progress">
       <div className="home-progress-header">
-        <div>
-          <p className="home-progress-label">
-            Pensumtracker
-          </p>
-
-          <h2>Fremdrift i semesterfagene dine</h2>
-        </div>
+        <h2>Pensumtracker</h2>
       </div>
 
       <div className="home-progress-list">
@@ -263,32 +216,27 @@ export const HomeProgress = () => {
             to={`/fag/${subject.id}`}
             className="home-progress-item"
           >
-            <div className="home-progress-info">
-              <div>
-                <strong>{subject.code}</strong>
-                <span>{subject.name}</span>
-              </div>
+            <div className="home-progress-top">
+              <strong>{subject.code}</strong>
 
-              <p>
-                {subject.completed} / {subject.total}{" "}
-                ressurser fullført
-              </p>
+              <span>{subject.progress}%</span>
             </div>
+
+            <p className="home-progress-count">
+              {subject.completed} / {subject.total} ressurser fullført
+            </p>
 
             <div className="home-progress-details">
               <span>
-                PDF-er: {subject.pdfCompleted} /{" "}
-                {subject.pdfTotal}
+                PDF {subject.pdfCompleted}/{subject.pdfTotal}
               </span>
 
               <span>
-                Notater: {subject.noteCompleted} /{" "}
-                {subject.noteTotal}
+                Notater {subject.noteCompleted}/{subject.noteTotal}
               </span>
 
               <span>
-                Videoer: {subject.videoCompleted} /{" "}
-                {subject.videoTotal}
+                Videoer {subject.videoCompleted}/{subject.videoTotal}
               </span>
             </div>
 
@@ -301,13 +249,11 @@ export const HomeProgress = () => {
               />
             </div>
 
-            <p className="home-progress-percent">
-              {subject.progress}% fullført
-              {subject.averageRating > 0 &&
-                ` · Forståelse: ${"★".repeat(
-                  subject.averageRating,
-                )}`}
-            </p>
+            {subject.averageRating > 0 && (
+              <p className="home-progress-rating">
+                Forståelse: {"★".repeat(subject.averageRating)}
+              </p>
+            )}
           </Link>
         ))}
       </div>

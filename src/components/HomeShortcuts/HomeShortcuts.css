@@ -1,0 +1,60 @@
+.home-shortcuts {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+.home-shortcuts h2 {
+  margin: 0 0 14px;
+}
+
+.home-shortcuts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-shortcuts-list a {
+  padding: 11px 18px;
+
+  border: 1px solid #ddd6fe;
+  border-radius: 999px;
+
+  background: #ffffff;
+
+  color: #7c3aed;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.home-shortcuts-list a:hover {
+  transform: translateY(-1px);
+
+  border-color: #a78bfa;
+  background: #f5f3ff;
+}
+
+@media (max-width: 600px) {
+  .home-shortcuts {
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .home-shortcuts h2 {
+    font-size: 1.4rem;
+  }
+
+  .home-shortcuts-list {
+    gap: 10px;
+  }
+
+  .home-shortcuts-list a {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+}
