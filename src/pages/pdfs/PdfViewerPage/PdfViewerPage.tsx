@@ -187,7 +187,25 @@ export const PdfViewerPage = () => {
         </div>
       </div>
 
-      <iframe className="pdf-viewer" src={pdf.fileUrl} title={pdf.title} />
+      <object
+        className="pdf-viewer"
+        data={pdf.fileUrl}
+        type="application/pdf"
+        aria-label={pdf.title}
+      >
+        <div className="pdf-viewer-fallback">
+          <p>PDF-en kan ikke vises direkte i nettleseren.</p>
+
+          <a
+            href={pdf.fileUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="pdf-open-button"
+          >
+            Åpne PDF
+          </a>
+        </div>
+      </object>
 
       {summaryNote && subject && (
         <PdfSummaryModal
