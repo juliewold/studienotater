@@ -1,9 +1,13 @@
 import "./SemesterStartPage.css";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
 export const SemesterStartPage = () => {
+  const navigate = useNavigate();
+
   const [selectedYear, setSelectedYear] = useState(1);
   const [customCode, setCustomCode] = useState("");
   const [customName, setCustomName] = useState("");
@@ -29,9 +33,7 @@ export const SemesterStartPage = () => {
     })),
     ...semesterSubjects
       .filter(
-        (subject) =>
-          subject.customCode !== null &&
-          subject.customName !== null,
+        (subject) => subject.customCode !== null && subject.customName !== null,
       )
       .map((subject) => ({
         id: subject.subjectId,
@@ -52,22 +54,20 @@ export const SemesterStartPage = () => {
       return;
     }
 
-    const subjectId = trimmedCode
-      .toLowerCase()
-      .replace(/\s+/g, "-");
+    const subjectId = trimmedCode.toLowerCase().replace(/\s+/g, "-");
 
     if (isSelected(subjectId)) {
       return;
     }
 
-    await addCustomSubject(
-      subjectId,
-      trimmedCode.toUpperCase(),
-      trimmedName,
-    );
+    await addCustomSubject(subjectId, trimmedCode.toUpperCase(), trimmedName);
 
     setCustomCode("");
     setCustomName("");
+  };
+
+  const handleFinishSemesterSetup = () => {
+    navigate("/");
   };
 
   if (isLoadingSemesterSubjects) {
@@ -158,9 +158,7 @@ export const SemesterStartPage = () => {
         ) : (
           <ul>
             {selectedSubjectIds.map((subjectId) => {
-              const subject = allSubjects.find(
-                (item) => item.id === subjectId,
-              );
+              const subject = allSubjects.find((item) => item.id === subjectId);
 
               const semesterSubject = semesterSubjects.find(
                 (item) => item.subjectId === subjectId,
@@ -191,6 +189,19 @@ export const SemesterStartPage = () => {
           </ul>
         )}
       </section>
+
+      <div className="semester-finish">
+        <p className="semester-finish-info">Valgene dine lagres automatisk.</p>
+
+        <button
+          type="button"
+          className="semester-finish-button"
+          onClick={handleFinishSemesterSetup}
+          disabled={selectedSubjectIds.length === 0}
+        >
+          Fullfør semesteroppsett →
+        </button>
+      </div>
     </main>
   );
 };
