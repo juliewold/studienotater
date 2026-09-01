@@ -297,11 +297,11 @@
   }
 
   .nav-links {
-    gap: 4px;
+    display: none;
   }
 
-  .nav-link {
-    padding: 10px 12px;
+  .nav-actions {
+    margin-left: auto;
   }
 
   .menu-grid {
