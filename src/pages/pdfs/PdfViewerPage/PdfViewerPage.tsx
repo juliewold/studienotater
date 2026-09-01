@@ -1,6 +1,6 @@
 import "./PdfViewerPage.css";
 import { useContext, useEffect, useState } from "react";
-import { FileText } from "lucide-react";
+import { ExternalLink, FileText } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 import {
@@ -23,6 +23,15 @@ import { ResourceProgress } from "../../../components/progress/ResourceProgress/
 import { EditableNote } from "../../../components/notes/EditableNote/EditableNote";
 import { PdfSummaryModal } from "../../../components/media/PdfSummaryModal/PdfSummaryModal";
 
+const isAppleMobileDevice = () => {
+  const userAgent = navigator.userAgent;
+
+  return (
+    /iPad|iPhone|iPod/.test(userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+};
+
 export const PdfViewerPage = () => {
   const { subjectId, pdfId } = useParams();
 
@@ -40,6 +49,8 @@ export const PdfViewerPage = () => {
   const subject = subjects.find(
     (currentSubject) => currentSubject.id === subjectId,
   );
+
+  const useSeparatePdfView = isAppleMobileDevice();
 
   useEffect(() => {
     const loadPdf = async () => {
@@ -187,14 +198,16 @@ export const PdfViewerPage = () => {
         </div>
       </div>
 
-      <object
-        className="pdf-viewer"
-        data={pdf.fileUrl}
-        type="application/pdf"
-        aria-label={pdf.title}
-      >
-        <div className="pdf-viewer-fallback">
-          <p>PDF-en kan ikke vises direkte i nettleseren.</p>
+      {useSeparatePdfView ? (
+        <div className="pdf-mobile-viewer">
+          <FileText size={32} />
+
+          <h2>Åpne PDF</h2>
+
+          <p>
+            På iPad og iPhone åpnes PDF-en separat for å vise alle sidene
+            riktig.
+          </p>
 
           <a
             href={pdf.fileUrl}
@@ -202,10 +215,31 @@ export const PdfViewerPage = () => {
             rel="noreferrer"
             className="pdf-open-button"
           >
+            <ExternalLink size={18} />
             Åpne PDF
           </a>
         </div>
-      </object>
+      ) : (
+        <object
+          className="pdf-viewer"
+          data={pdf.fileUrl}
+          type="application/pdf"
+          aria-label={pdf.title}
+        >
+          <div className="pdf-viewer-fallback">
+            <p>PDF-en kan ikke vises direkte i nettleseren.</p>
+
+            <a
+              href={pdf.fileUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="pdf-open-button"
+            >
+              Åpne PDF
+            </a>
+          </div>
+        </object>
+      )}
 
       {summaryNote && subject && (
         <PdfSummaryModal
