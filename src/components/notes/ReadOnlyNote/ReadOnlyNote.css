@@ -1,14 +1,17 @@
 .read-only-note {
   max-width: 900px;
   min-height: 300px;
+
   margin: 0 auto;
-  padding: 1rem 1.5rem 5rem;
+  padding: 0.5rem 1.5rem 5rem;
 }
 
 .read-only-note-content {
   color: #29252f;
-  font-size: 1.05rem;
-  line-height: 1.85;
+
+  font-size: 1.04rem;
+  line-height: 1.8;
+
   outline: none;
 }
 
@@ -21,90 +24,109 @@
 }
 
 .read-only-note-content p {
-  margin: 0.8rem 0;
+  margin: 0.65rem 0;
 }
 
 .read-only-note-content h1,
 .read-only-note-content h2,
 .read-only-note-content h3 {
   color: #241e2e;
-  line-height: 1.25;
+
+  font-weight: 750;
+  line-height: 1.2;
   letter-spacing: -0.025em;
 }
 
 .read-only-note-content h1 {
-  margin: 2rem 0 0.8rem;
+  margin: 3rem 0 1rem;
+
   font-size: 2rem;
 }
 
 .read-only-note-content h2 {
-  margin: 1.75rem 0 0.7rem;
-  font-size: 1.55rem;
+  margin: 2.75rem 0 0.9rem;
+
+  font-size: 1.65rem;
 }
 
 .read-only-note-content h3 {
-  margin: 1.5rem 0 0.65rem;
-  font-size: 1.3rem;
+  margin: 2.1rem 0 0.75rem;
+
+  font-size: 1.25rem;
 }
 
 .read-only-note-content ul,
 .read-only-note-content ol {
-  margin: 1rem 0;
-  padding-left: 1.6rem;
+  margin: 0.7rem 0 1rem;
+  padding-left: 1.5rem;
 }
 
 .read-only-note-content li {
-  margin: 0.35rem 0;
+  margin: 0.2rem 0;
+  padding-left: 0.15rem;
 }
 
 .read-only-note-content blockquote {
-  margin: 1.5rem 0;
-  padding: 0.9rem 1.1rem;
-  border-left: 4px solid #9b6ee8;
-  border-radius: 0 12px 12px 0;
-  background: #f8f4ff;
-  color: #574b68;
+  margin: 1.25rem 0;
+  padding: 0.35rem 0 0.35rem 1rem;
+
+  border-left: 3px solid rgba(139, 92, 246, 0.5);
+
+  background: transparent;
+  color: #5f5866;
+}
+
+.read-only-note-content blockquote p {
+  margin: 0.35rem 0;
 }
 
 .read-only-note-content code {
   padding: 0.15rem 0.35rem;
+
   border-radius: 6px;
+
   background: #f1edf6;
   color: #7146bd;
-  font-family:
-    "SFMono-Regular",
-    Consolas,
-    "Liberation Mono",
-    monospace;
+
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.92em;
 }
 
 .read-only-note-content pre {
   position: relative;
+
   overflow-x: auto;
-  margin: 1.5rem 0;
-  padding: 1.35rem 1.5rem;
+
+  margin: 1.4rem 0;
+  padding: 1.25rem 1.4rem;
+
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
+
   background: #211d27;
+
   box-shadow: 0 10px 30px rgba(34, 28, 41, 0.14);
+
   color: #f8f5fb;
+
   line-height: 1.65;
   tab-size: 2;
 }
 
 .read-only-note-content pre code {
   display: block;
+
   min-width: max-content;
+
   padding: 0;
+
   border-radius: 0;
+
   background: transparent;
   color: #f8f5fb;
-  font-family:
-    "SFMono-Regular",
-    Consolas,
-    "Liberation Mono",
-    monospace;
+
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
   font-size: 0.92rem;
   white-space: pre;
 }
@@ -176,72 +198,79 @@
 }
 
 .read-only-note-content hr {
-  margin: 2rem 0;
+  margin: 2.4rem 0;
+
   border: none;
   border-top: 1px solid #e8e1ee;
 }
+
+/* Matematikk */
 
 .read-only-note-content .tiptap-mathematics-render {
   cursor: default;
 }
 
-.read-only-note-content
-  .tiptap-mathematics-render[data-type="inline-math"] {
+.read-only-note-content .tiptap-mathematics-render[data-type="inline-math"] {
   display: inline-block;
-  margin: 0 0.18rem;
+
+  margin: 0 0.15rem;
+
   vertical-align: middle;
 }
 
-.read-only-note-content
-  .tiptap-mathematics-render[data-type="block-math"] {
+.read-only-note-content .tiptap-mathematics-render[data-type="block-math"] {
   display: block;
+
   width: 100%;
-  margin: 1.5rem 0;
-  padding: 1.25rem 1.5rem;
+
+  margin: 1.4rem 0;
+  padding: 0.35rem 0;
+
   overflow-x: auto;
-  border: 1px solid #ebe6f2;
-  border-radius: 12px;
-  background: #faf8fd;
+
+  border: none;
+  border-radius: 0;
+
+  background: transparent;
+
   text-align: center;
 }
 
-@media (max-width: 700px) {
-  .read-only-note {
-    padding-right: 1rem;
-    padding-left: 1rem;
-  }
-
-  .read-only-note-content pre {
-    margin-right: -0.25rem;
-    margin-left: -0.25rem;
-    padding: 1.1rem 1.15rem;
-    border-radius: 12px;
-  }
-}
+/* Bilder */
 
 .read-only-note-content img {
   display: block;
+
   max-width: 100%;
   height: auto;
-  margin: 1.5rem auto;
+
+  margin: 1.4rem auto;
+
   border-radius: 12px;
 }
+
+/* Tabeller */
 
 .note-editor-content .tableWrapper,
 .read-only-note-content .tableWrapper {
   overflow-x: auto;
-  margin: 1.75rem 0;
+
+  margin: 1.6rem 0;
 }
 
 .note-editor-content table,
 .read-only-note-content table {
   width: 100%;
   min-width: 520px;
+
   border-collapse: collapse;
   table-layout: fixed;
+
   overflow: hidden;
+
   border: 1px solid #ded6e8;
   border-radius: 12px;
+
   background: #ffffff;
 }
 
@@ -250,9 +279,12 @@
 .read-only-note-content th,
 .read-only-note-content td {
   position: relative;
+
   min-width: 90px;
   padding: 0.75rem 0.9rem;
+
   border: 1px solid #ded6e8;
+
   vertical-align: top;
   text-align: left;
 }
@@ -261,6 +293,7 @@
 .read-only-note-content th {
   background: #f6f1fd;
   color: #463752;
+
   font-weight: 700;
 }
 
@@ -280,8 +313,11 @@
   position: absolute;
   inset: 0;
   z-index: 2;
+
   background: rgba(155, 110, 232, 0.16);
+
   content: "";
+
   pointer-events: none;
 }
 
@@ -291,8 +327,11 @@
   right: -2px;
   bottom: -2px;
   z-index: 20;
+
   width: 4px;
+
   background: #9b6ee8;
+
   pointer-events: none;
 }
 
@@ -300,74 +339,106 @@
   cursor: col-resize;
 }
 
-.read-only-note-content .note-callout {
-  margin: 1.4rem 0;
-  overflow: hidden;
-  border: 1px solid;
-  border-radius: 14px;
-}
-
-.read-only-note-content .note-callout-body {
-  padding: 1.2rem 1.25rem;
-}
-
-.read-only-note-content .note-callout-body p {
-  margin: 0;
-}
+/* Callouts */
 
 .note-editor-content .note-callout,
 .read-only-note-content .note-callout {
   position: relative;
+
   margin: 1.4rem 0;
+
   overflow: hidden;
+
   border: 1px solid;
-  border-radius: 16px;
+  border-radius: 14px;
 }
 
 .note-editor-content .note-callout-header,
 .read-only-note-content .note-callout-header {
   display: flex;
-  min-height: 56px;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.8rem 1rem;
-  border-bottom: 1px solid rgba(30, 24, 38, 0.06);
+
+  min-height: 40px;
+  padding: 0.5rem 0.9rem;
+
+  border-bottom: 1px solid rgba(30, 24, 38, 0.05);
 }
 
 .note-editor-content .note-callout-heading,
 .read-only-note-content .note-callout-heading {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+
+  font-size: 0.96rem;
   font-weight: 700;
+}
+
+.note-editor-content .note-callout-heading svg,
+.read-only-note-content .note-callout-heading svg {
+  width: 17px;
+  height: 17px;
 }
 
 .note-editor-content .note-callout-body,
 .read-only-note-content .note-callout-body {
-  padding: 1rem 1.1rem;
+  padding: 0.7rem 0.8rem 0.8rem;
 }
 
 .note-editor-content .note-callout-body p,
 .read-only-note-content .note-callout-body p {
-  margin: 0;
+  margin: 0.4rem 0;
 }
+
+.note-editor-content .note-callout-body > *:first-child,
+.read-only-note-content .note-callout-body > *:first-child {
+  margin-top: 0;
+}
+
+.note-editor-content .note-callout-body > *:last-child,
+.read-only-note-content .note-callout-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.note-editor-content
+  .note-callout-body
+  .tiptap-mathematics-render[data-type="block-math"],
+.read-only-note-content
+  .note-callout-body
+  .tiptap-mathematics-render[data-type="block-math"] {
+  margin: 0.9rem 0;
+  padding: 0.2rem 0;
+}
+
+.note-editor-content .note-callout-body blockquote,
+.read-only-note-content .note-callout-body blockquote {
+  margin: 0.85rem 0;
+}
+
+.note-editor-content .note-callout-body ul,
+.note-editor-content .note-callout-body ol,
+.read-only-note-content .note-callout-body ul,
+.read-only-note-content .note-callout-body ol {
+  margin: 0.65rem 0;
+}
+
+/* Editor-actions */
 
 .note-editor-content .note-callout-actions {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+
   opacity: 0;
   pointer-events: none;
+
   transition: opacity 150ms ease;
 }
 
-.note-editor-content
-  .note-callout:hover
-  .note-callout-actions,
-.note-editor-content
-  .note-callout:focus-within
-  .note-callout-actions {
+.note-editor-content .note-callout:hover .note-callout-actions,
+.note-editor-content .note-callout:focus-within .note-callout-actions {
   opacity: 1;
   pointer-events: auto;
 }
@@ -375,31 +446,39 @@
 .note-editor-content .note-callout-type-select {
   height: 32px;
   padding: 0 1.8rem 0 0.65rem;
+
   border: 1px solid rgba(30, 24, 38, 0.12);
   border-radius: 8px;
+
   background: rgba(255, 255, 255, 0.72);
   color: inherit;
+
   font: inherit;
   font-size: 0.82rem;
+
   cursor: pointer;
 }
 
 .note-editor-content .note-callout-delete-button {
   display: grid;
+  place-items: center;
+
   width: 32px;
   height: 32px;
   padding: 0;
-  place-items: center;
+
   border: 1px solid rgba(30, 24, 38, 0.12);
   border-radius: 8px;
+
   background: rgba(255, 255, 255, 0.72);
   color: inherit;
+
   cursor: pointer;
 }
 
-.note-editor-content
-  .note-callout-delete-button:hover {
+.note-editor-content .note-callout-delete-button:hover {
   border-color: #e39a9a;
+
   background: #fff1f1;
   color: #b53c3c;
 }
@@ -411,12 +490,11 @@
 
 /* Definisjon */
 
-.note-editor-content
-  .note-callout[data-callout-type="definition"],
-.read-only-note-content
-  .note-callout[data-callout-type="definition"] {
-  border-color: #b8dfc3;
-  background: #f3faf5;
+.note-editor-content .note-callout[data-callout-type="definition"],
+.read-only-note-content .note-callout[data-callout-type="definition"] {
+  border-color: #cce5d3;
+
+  background: #f8fcf9;
 }
 
 .note-editor-content
@@ -425,18 +503,17 @@
 .read-only-note-content
   .note-callout[data-callout-type="definition"]
   .note-callout-header {
-  background: #e4f4e9;
+  background: #edf8f0;
   color: #2d7147;
 }
 
 /* Tips */
 
-.note-editor-content
-  .note-callout[data-callout-type="tip"],
-.read-only-note-content
-  .note-callout[data-callout-type="tip"] {
-  border-color: #ead8a8;
-  background: #fffaf0;
+.note-editor-content .note-callout[data-callout-type="tip"],
+.read-only-note-content .note-callout[data-callout-type="tip"] {
+  border-color: #eee1be;
+
+  background: #fffdf7;
 }
 
 .note-editor-content
@@ -445,18 +522,17 @@
 .read-only-note-content
   .note-callout[data-callout-type="tip"]
   .note-callout-header {
-  background: #fff2c9;
+  background: #fff7df;
   color: #8a651f;
 }
 
 /* Teorem */
 
-.note-editor-content
-  .note-callout[data-callout-type="theorem"],
-.read-only-note-content
-  .note-callout[data-callout-type="theorem"] {
-  border-color: #efbcbc;
-  background: #fff5f5;
+.note-editor-content .note-callout[data-callout-type="theorem"],
+.read-only-note-content .note-callout[data-callout-type="theorem"] {
+  border-color: #efd0d0;
+
+  background: #fffafa;
 }
 
 .note-editor-content
@@ -465,18 +541,17 @@
 .read-only-note-content
   .note-callout[data-callout-type="theorem"]
   .note-callout-header {
-  background: #fde5e5;
-  color: #b03838;
+  background: #fceeee;
+  color: #a83c3c;
 }
 
 /* Eksempel */
 
-.note-editor-content
-  .note-callout[data-callout-type="example"],
-.read-only-note-content
-  .note-callout[data-callout-type="example"] {
-  border-color: #b8d8f3;
-  background: #f2f8fd;
+.note-editor-content .note-callout[data-callout-type="example"],
+.read-only-note-content .note-callout[data-callout-type="example"] {
+  border-color: #cbdff1;
+
+  background: #f8fbfe;
 }
 
 .note-editor-content
@@ -485,6 +560,57 @@
 .read-only-note-content
   .note-callout[data-callout-type="example"]
   .note-callout-header {
-  background: #e5f1fb;
+  background: #edf5fc;
   color: #2f6ea5;
+}
+
+/* Mobil */
+
+@media (max-width: 700px) {
+  .read-only-note {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .read-only-note-content {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .read-only-note-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .read-only-note-content h2 {
+    font-size: 1.45rem;
+  }
+
+  .read-only-note-content h3 {
+    font-size: 1.22rem;
+  }
+
+  .read-only-note-content pre {
+    margin-right: -0.25rem;
+    margin-left: -0.25rem;
+
+    padding: 1.1rem 1.15rem;
+
+    border-radius: 12px;
+  }
+
+  .read-only-note-content .tiptap-mathematics-render[data-type="block-math"] {
+    margin: 1.2rem 0;
+    padding: 0.25rem 0;
+  }
+
+  .note-editor-content .note-callout-header,
+  .read-only-note-content .note-callout-header {
+    min-height: 42px;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .note-editor-content .note-callout-body,
+  .read-only-note-content .note-callout-body {
+    padding: 0.8rem 0.85rem 0.9rem;
+  }
 }

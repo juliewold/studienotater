@@ -1,11 +1,14 @@
 .resource-progress {
-  margin-top: 24px;
-
-  background: white;
+  background: #ffffff;
   border-radius: 24px;
+
   padding: 24px;
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.resource-progress--default {
+  margin-top: 24px;
 }
 
 .resource-completed {
@@ -16,16 +19,20 @@
   margin-bottom: 24px;
 
   font-weight: 600;
+
   cursor: pointer;
 }
 
 .resource-completed input {
   width: 18px;
   height: 18px;
+
+  accent-color: #7c3aed;
 }
 
 .resource-rating p {
-  margin-bottom: 12px;
+  margin: 0 0 12px;
+
   font-weight: 600;
 }
 
@@ -35,18 +42,26 @@
 }
 
 .stars button {
+  padding: 0;
+
   border: none;
+
   background: transparent;
+  color: #d1d5db;
 
   font-size: 2rem;
+  line-height: 1;
+
   cursor: pointer;
 
-  color: #d1d5db;
-  transition: color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .stars button:hover {
   color: #b38bf3;
+  transform: translateY(-1px);
 }
 
 .stars button.star-1 {
@@ -67,4 +82,147 @@
 
 .stars button.star-5 {
   color: #22c55e;
+}
+
+/* Flytende variant for notater */
+
+.resource-progress--floating {
+  position: fixed;
+  top: 220px;
+  right: 24px;
+  z-index: 40;
+
+  width: 190px;
+
+  padding: 14px 16px;
+
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.92);
+
+  box-shadow:
+    0 10px 30px rgba(31, 24, 40, 0.08),
+    0 2px 8px rgba(31, 24, 40, 0.04);
+
+  backdrop-filter: blur(12px);
+}
+
+.resource-progress--floating .resource-completed {
+  gap: 8px;
+
+  margin-bottom: 12px;
+
+  font-size: 0.88rem;
+}
+
+.resource-progress--floating .resource-completed input {
+  width: 16px;
+  height: 16px;
+}
+
+.resource-progress--floating .resource-rating p {
+  margin-bottom: 7px;
+
+  color: #746d79;
+
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.resource-progress--floating .stars {
+  gap: 3px;
+}
+
+.resource-progress--floating .stars button {
+  font-size: 1.3rem;
+}
+
+/* Mellomstore skjermer */
+
+@media (max-width: 1300px) {
+  .resource-progress--floating {
+    top: auto;
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+
+    width: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    padding: 10px 14px;
+
+    border-radius: 14px;
+  }
+
+  .resource-progress--floating .resource-completed {
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .resource-progress--floating .resource-rating {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .resource-progress--floating .resource-rating p {
+    margin: 0;
+  }
+}
+
+/* Mobil */
+
+@media (max-width: 600px) {
+  .resource-progress--floating {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+
+    min-height: 44px;
+
+    gap: 0.5rem;
+
+    padding: 7px 10px;
+
+    border-radius: 12px;
+
+    box-shadow:
+      0 8px 24px rgba(31, 24, 40, 0.12),
+      0 2px 6px rgba(31, 24, 40, 0.05);
+  }
+
+  .resource-progress--floating .resource-completed {
+    gap: 6px;
+
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .resource-progress--floating .resource-completed input {
+    width: 15px;
+    height: 15px;
+  }
+
+  .resource-progress--floating .resource-rating {
+    gap: 0;
+  }
+
+  .resource-progress--floating .resource-rating p {
+    display: none;
+  }
+
+  .resource-progress--floating .stars {
+    gap: 0;
+  }
+
+  .resource-progress--floating .stars button {
+    width: 19px;
+
+    font-size: 1.08rem;
+  }
 }

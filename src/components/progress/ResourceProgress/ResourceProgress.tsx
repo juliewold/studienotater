@@ -1,6 +1,8 @@
 import "./ResourceProgress.css";
 import { useContext, useEffect, useState } from "react";
+
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
+
 import {
   getProgress,
   saveProgress,
@@ -9,11 +11,13 @@ import {
 type ResourceProgressProps = {
   resourceId: string;
   resourceType?: "lest" | "sett";
+  variant?: "default" | "floating";
 };
 
 export const ResourceProgress = ({
   resourceId,
   resourceType = "lest",
+  variant = "default",
 }: ResourceProgressProps) => {
   const { user } = useContext(AuthContext);
 
@@ -31,11 +35,7 @@ export const ResourceProgress = ({
       }
 
       try {
-        const progress = await getProgress(
-          user.id,
-          resourceId,
-          "resource",
-        );
+        const progress = await getProgress(user.id, resourceId, "resource");
 
         setCompleted(progress.completed);
         setRating(progress.rating);
@@ -57,15 +57,10 @@ export const ResourceProgress = ({
     setCompleted(checked);
 
     try {
-      await saveProgress(
-        user.id,
-        resourceId,
-        "resource",
-        checked,
-        rating,
-      );
+      await saveProgress(user.id, resourceId, "resource", checked, rating);
     } catch (error) {
       console.error("Kunne ikke lagre fremdrift:", error);
+
       setCompleted(!checked);
     }
   };
@@ -81,45 +76,48 @@ export const ResourceProgress = ({
     setRating(newRating);
 
     try {
-      await saveProgress(
-        user.id,
-        resourceId,
-        "resource",
-        completed,
-        newRating,
-      );
+      await saveProgress(user.id, resourceId, "resource", completed, newRating);
     } catch (error) {
       console.error("Kunne ikke lagre vurdering:", error);
+
       setRating(previousRating);
     }
   };
 
   if (isLoading) {
     return (
-      <section className="resource-progress">
+      <section className={`resource-progress resource-progress--${variant}`}>
         <p>Laster fremdrift...</p>
       </section>
     );
   }
 
+  const isFloating = variant === "floating";
+
   return (
-    <section className="resource-progress">
+    <section className={`resource-progress resource-progress--${variant}`}>
       <label className="resource-completed">
         <input
           type="checkbox"
           checked={completed}
-          onChange={(event) =>
-            handleCompletedChange(event.target.checked)
-          }
+          onChange={(event) => handleCompletedChange(event.target.checked)}
         />
 
         <span>
-          Marker som {resourceType === "sett" ? "sett" : "lest"}
+          {isFloating
+            ? completed
+              ? resourceType === "sett"
+                ? "Sett"
+                : "Lest"
+              : resourceType === "sett"
+                ? "Marker som sett"
+                : "Marker som lest"
+            : `Marker som ${resourceType === "sett" ? "sett" : "lest"}`}
         </span>
       </label>
 
       <div className="resource-rating">
-        <p>Hvor godt skjønte du dette?</p>
+        <p>{isFloating ? "Forståelse" : "Hvor godt skjønte du dette?"}</p>
 
         <div className="stars">
           {[1, 2, 3, 4, 5].map((star) => (
@@ -128,6 +126,7 @@ export const ResourceProgress = ({
               type="button"
               onClick={() => handleRatingChange(star)}
               className={star <= rating ? `star-${rating}` : ""}
+              aria-label={`Vurder forståelse ${star} av 5`}
             >
               ★
             </button>

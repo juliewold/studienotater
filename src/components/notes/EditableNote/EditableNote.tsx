@@ -340,50 +340,6 @@ export const EditableNote = ({
           </p>
         )}
 
-        {showClassification && (
-          <div className="editable-note-classification">
-            <label htmlFor="editable-note-topic">Tema</label>
-
-            <select
-              id="editable-note-topic"
-              value={selectedTopicId}
-              onChange={(event) => {
-                setSelectedTopicId(event.target.value);
-                setSelectedSubtopicId("");
-                setErrorMessage("");
-              }}
-            >
-              <option value="">Ingen tema</option>
-
-              {topics.map((topic) => (
-                <option key={topic.id} value={topic.id}>
-                  {topic.name}
-                </option>
-              ))}
-            </select>
-
-            <label htmlFor="editable-note-subtopic">Undertema</label>
-
-            <select
-              id="editable-note-subtopic"
-              value={selectedSubtopicId}
-              onChange={(event) => {
-                setSelectedSubtopicId(event.target.value);
-                setErrorMessage("");
-              }}
-              disabled={!selectedTopicId}
-            >
-              <option value="">Ingen undertema</option>
-
-              {subtopics.map((subtopic) => (
-                <option key={subtopic.id} value={subtopic.id}>
-                  {subtopic.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
         <div className="editable-note-document-header">
           <input
             type="text"
@@ -393,6 +349,50 @@ export const EditableNote = ({
             placeholder="Uten tittel"
             autoFocus
           />
+
+          {showClassification && (
+            <div className="editable-note-classification">
+              <label htmlFor="editable-note-topic">Tema</label>
+
+              <select
+                id="editable-note-topic"
+                value={selectedTopicId}
+                onChange={(event) => {
+                  setSelectedTopicId(event.target.value);
+                  setSelectedSubtopicId("");
+                  setErrorMessage("");
+                }}
+              >
+                <option value="">Ingen tema</option>
+
+                {topics.map((topic) => (
+                  <option key={topic.id} value={topic.id}>
+                    {topic.name}
+                  </option>
+                ))}
+              </select>
+
+              <label htmlFor="editable-note-subtopic">Undertema</label>
+
+              <select
+                id="editable-note-subtopic"
+                value={selectedSubtopicId}
+                onChange={(event) => {
+                  setSelectedSubtopicId(event.target.value);
+                  setErrorMessage("");
+                }}
+                disabled={!selectedTopicId}
+              >
+                <option value="">Ingen undertema</option>
+
+                {subtopics.map((subtopic) => (
+                  <option key={subtopic.id} value={subtopic.id}>
+                    {subtopic.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <textarea
             className="editable-note-description-input"
@@ -421,7 +421,7 @@ export const EditableNote = ({
             className="editable-note-edit-button"
             onClick={handleStartEditing}
           >
-            <Edit3 size={18} />
+            <Edit3 size={17} />
             Rediger
           </button>
         )}
@@ -433,25 +433,25 @@ export const EditableNote = ({
         </p>
       )}
 
-      {showClassification && (note.topicName || note.subtopicName) && (
-        <div className="editable-note-classification-display">
-          {currentTopic && (
-            <span>
-              Tema {currentTopic.sortOrder}: {currentTopic.name}
-            </span>
-          )}
-
-          {currentTopic && currentSubtopic && (
-            <span>
-              Undertema {currentTopic.sortOrder}.{currentSubtopic.sortOrder}:{" "}
-              {currentSubtopic.name}
-            </span>
-          )}
-        </div>
-      )}
-
       <div className="editable-note-document-header">
         <h1 className="editable-note-title">{note.title}</h1>
+
+        {showClassification && (note.topicName || note.subtopicName) && (
+          <div className="editable-note-classification-display">
+            {currentTopic && (
+              <span>
+                Tema {currentTopic.sortOrder}: {currentTopic.name}
+              </span>
+            )}
+
+            {currentTopic && currentSubtopic && (
+              <span>
+                Undertema {currentTopic.sortOrder}.{currentSubtopic.sortOrder}:{" "}
+                {currentSubtopic.name}
+              </span>
+            )}
+          </div>
+        )}
 
         {note.description && (
           <p className="editable-note-description">{note.description}</p>

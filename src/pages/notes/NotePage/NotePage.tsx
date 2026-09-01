@@ -4,7 +4,10 @@ import { Link, useParams } from "react-router-dom";
 
 import { subjects } from "../../../data/subjects";
 
-import { getNoteBySlug, type DatabaseNote } from "../../../services/notes/notesService";
+import {
+  getNoteBySlug,
+  type DatabaseNote,
+} from "../../../services/notes/notesService";
 
 import { getOrderedNotes } from "../../../services/notes/noteNavigationService";
 
@@ -123,37 +126,38 @@ export const NotePage = () => {
         <Link to={backUrl} className="back-link">
           ← Tilbake
         </Link>
-
-        <nav className="note-navigation" aria-label="Navigasjon mellom notater">
-          {previousNote && (
-            <Link
-              to={`/fag/${subject.id}/notater/${previousNote.slug}`}
-              className="note-navigation-button"
-              title={previousNote.title}
-            >
-              ← Forrige
-            </Link>
-          )}
-
-          {nextNote && (
-            <Link
-              to={`/fag/${subject.id}/notater/${nextNote.slug}`}
-              className="note-navigation-button"
-              title={nextNote.title}
-            >
-              Neste →
-            </Link>
-          )}
-        </nav>
       </div>
+      <nav
+        className="note-navigation note-navigation-sticky"
+        aria-label="Navigasjon mellom notater"
+      >
+        {previousNote && (
+          <Link
+            to={`/fag/${subject.id}/notater/${previousNote.slug}`}
+            className="note-navigation-button"
+            title={previousNote.title}
+          >
+            ← Forrige
+          </Link>
+        )}
+
+        {nextNote && (
+          <Link
+            to={`/fag/${subject.id}/notater/${nextNote.slug}`}
+            className="note-navigation-button"
+            title={nextNote.title}
+          >
+            Neste →
+          </Link>
+        )}
+      </nav>
       <EditableNote
         note={note}
         subjectCode={subject.code}
         isAdmin={isAdmin}
         onNoteUpdated={setNote}
       />{" "}
-      <hr className="note-page-divider" />
-      <ResourceProgress resourceId={resourceId} />
+      <ResourceProgress resourceId={resourceId} variant="floating" />
     </main>
   );
 };
