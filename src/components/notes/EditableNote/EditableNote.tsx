@@ -4,13 +4,18 @@ import { Check, Edit3, LoaderCircle } from "lucide-react";
 
 import { NoteEditor } from "../NoteEditor/NoteEditor";
 
-import { updateNote, type DatabaseNote } from "../../../services/notes/notesService";
+import {
+  updateNote,
+  type DatabaseNote,
+} from "../../../services/notes/notesService";
+
 import {
   getTopicsBySubject,
   getSubtopicsByTopic,
   type DatabaseTopic,
   type DatabaseSubtopic,
 } from "../../../services/subjects/subjectStructureService";
+
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
 type EditableNoteProps = {
@@ -18,6 +23,7 @@ type EditableNoteProps = {
   subjectCode: string;
   isAdmin: boolean;
   onNoteUpdated: (updatedNote: DatabaseNote) => void;
+  showClassification?: boolean;
 };
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -35,14 +41,15 @@ export const EditableNote = ({
   subjectCode,
   isAdmin,
   onNoteUpdated,
+  showClassification = true,
 }: EditableNoteProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [title, setTitle] = useState(note.title);
   const [description, setDescription] = useState(note.description);
   const [content, setContent] = useState(note.content);
-  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
 
+  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
   const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [currentTopic, setCurrentTopic] = useState<DatabaseTopic | null>(null);
@@ -333,47 +340,49 @@ export const EditableNote = ({
           </p>
         )}
 
-        <div className="editable-note-classification">
-          <label htmlFor="editable-note-topic">Tema</label>
+        {showClassification && (
+          <div className="editable-note-classification">
+            <label htmlFor="editable-note-topic">Tema</label>
 
-          <select
-            id="editable-note-topic"
-            value={selectedTopicId}
-            onChange={(event) => {
-              setSelectedTopicId(event.target.value);
-              setSelectedSubtopicId("");
-              setErrorMessage("");
-            }}
-          >
-            <option value="">Ingen tema</option>
+            <select
+              id="editable-note-topic"
+              value={selectedTopicId}
+              onChange={(event) => {
+                setSelectedTopicId(event.target.value);
+                setSelectedSubtopicId("");
+                setErrorMessage("");
+              }}
+            >
+              <option value="">Ingen tema</option>
 
-            {topics.map((topic) => (
-              <option key={topic.id} value={topic.id}>
-                {topic.name}
-              </option>
-            ))}
-          </select>
+              {topics.map((topic) => (
+                <option key={topic.id} value={topic.id}>
+                  {topic.name}
+                </option>
+              ))}
+            </select>
 
-          <label htmlFor="editable-note-subtopic">Undertema</label>
+            <label htmlFor="editable-note-subtopic">Undertema</label>
 
-          <select
-            id="editable-note-subtopic"
-            value={selectedSubtopicId}
-            onChange={(event) => {
-              setSelectedSubtopicId(event.target.value);
-              setErrorMessage("");
-            }}
-            disabled={!selectedTopicId}
-          >
-            <option value="">Ingen undertema</option>
+            <select
+              id="editable-note-subtopic"
+              value={selectedSubtopicId}
+              onChange={(event) => {
+                setSelectedSubtopicId(event.target.value);
+                setErrorMessage("");
+              }}
+              disabled={!selectedTopicId}
+            >
+              <option value="">Ingen undertema</option>
 
-            {subtopics.map((subtopic) => (
-              <option key={subtopic.id} value={subtopic.id}>
-                {subtopic.name}
-              </option>
-            ))}
-          </select>
-        </div>
+              {subtopics.map((subtopic) => (
+                <option key={subtopic.id} value={subtopic.id}>
+                  {subtopic.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="editable-note-document-header">
           <input
@@ -424,7 +433,7 @@ export const EditableNote = ({
         </p>
       )}
 
-      {(note.topicName || note.subtopicName) && (
+      {showClassification && (note.topicName || note.subtopicName) && (
         <div className="editable-note-classification-display">
           {currentTopic && (
             <span>

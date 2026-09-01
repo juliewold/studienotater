@@ -13,6 +13,7 @@ export type DatabasePdf = {
   subtopicName: string | null;
   topicId: string | null;
   topicName: string | null;
+  summaryNoteId: string | null;
 };
 
 type TopicRelation = {
@@ -37,6 +38,7 @@ type PdfRow = {
   created_at: string;
   subtopic_id: string | null;
   subtopics: SubtopicRelation | SubtopicRelation[] | null;
+  summary_note_id: string | null;
 };
 
 const pdfSelect = `
@@ -47,6 +49,7 @@ const pdfSelect = `
   file_path,
   created_at,
   subtopic_id,
+  summary_note_id,
   subtopics (
     id,
     name,
@@ -89,6 +92,7 @@ const mapPdf = (pdf: PdfRow): DatabasePdf => {
     subtopicName: subtopic?.name ?? null,
     topicId: topic?.id ?? null,
     topicName: topic?.name ?? null,
+    summaryNoteId: pdf.summary_note_id,
   };
 };
 
@@ -171,5 +175,21 @@ export async function deletePdf(pdfId: string, filePath: string) {
 
   if (databaseError) {
     throw databaseError;
+  }
+}
+
+export async function updatePdfSummaryNote(
+  pdfId: string,
+  summaryNoteId: string | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from("pdfs")
+    .update({
+      summary_note_id: summaryNoteId,
+    })
+    .eq("id", pdfId);
+
+  if (error) {
+    throw error;
   }
 }

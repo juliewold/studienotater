@@ -5,5 +5,82 @@
   border: none;
   border-radius: 20px;
 
-  margin-top: 24px;
+  margin-top: 0;
+}
+
+.pdf-learning-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+
+  margin-bottom: 0.75rem;
+}
+
+.pdf-learning-panel .resource-progress {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.pdf-summary-action {
+  display: flex;
+  align-items: center;
+}
+
+.pdf-summary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  padding: 0.7rem 1rem;
+
+  border: 1px solid #ddd6fe;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #6d28d9;
+
+  font: inherit;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.pdf-summary-button:hover {
+  background: #f5f3ff;
+  border-color: #c4b5fd;
+  transform: translateY(-1px);
+}
+
+.pdf-summary-button:disabled {
+  cursor: default;
+  opacity: 0.65;
+  transform: none;
+}
+
+@media (max-width: 700px) {
+  .pdf-learning-panel {
+    flex-direction: column;
+  }
+
+  .pdf-summary-action {
+    width: 100%;
+  }
+
+  .pdf-summary-button {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .pdf-viewer {
+    height: 700px;
+    margin-top: 16px;
+    border-radius: 14px;
+  }
 }
