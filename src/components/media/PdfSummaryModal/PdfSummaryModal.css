@@ -1,7 +1,7 @@
 .pdf-summary-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 10000;
 
   display: flex;
   align-items: center;
@@ -10,6 +10,7 @@
   padding: 2rem;
 
   background: rgba(24, 24, 35, 0.5);
+
   backdrop-filter: blur(2px);
 }
 
@@ -21,9 +22,10 @@
 
   overflow-y: auto;
 
-  padding: 3.5rem 3rem 3rem;
+  padding: 1.25rem 3rem 3rem;
 
   background: #ffffff;
+
   border-radius: 22px;
 
   box-shadow:
@@ -32,9 +34,9 @@
 }
 
 .pdf-summary-modal-close {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 
   display: flex;
   align-items: center;
@@ -43,32 +45,43 @@
   width: 44px;
   height: 44px;
 
+  margin-left: auto;
+  margin-bottom: -44px;
   padding: 0;
 
   border: 1px solid #e5e7eb;
   border-radius: 12px;
 
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.96);
   color: #374151;
 
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+
   cursor: pointer;
+
+  backdrop-filter: blur(8px);
 
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .pdf-summary-modal-close:hover {
   background: #f5f3ff;
   border-color: #ddd6fe;
   color: #6d28d9;
+
+  transform: translateY(-1px);
 }
 
 .pdf-summary-modal-content {
   width: 100%;
   max-width: 900px;
+
   margin: 0 auto;
+  padding-top: 2.25rem;
 }
 
 @media (max-width: 700px) {
@@ -82,13 +95,23 @@
     width: 100%;
     max-height: calc(100vh - 1.5rem);
 
-    padding: 4.5rem 1.25rem 2rem;
+    padding: 0.75rem 1.25rem 2rem;
 
     border-radius: 18px;
   }
 
   .pdf-summary-modal-close {
-    top: 1rem;
-    right: 1rem;
+    top: 0;
+
+    width: 40px;
+    height: 40px;
+
+    margin-bottom: -40px;
+
+    border-radius: 10px;
+  }
+
+  .pdf-summary-modal-content {
+    padding-top: 2.5rem;
   }
 }
