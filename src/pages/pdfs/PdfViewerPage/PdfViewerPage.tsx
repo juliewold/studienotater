@@ -2,6 +2,10 @@ import "./PdfViewerPage.css";
 import { useContext, useEffect, useState } from "react";
 import { FileText } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import { Document, Page, pdfjs } from "react-pdf";
+
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
 
 import {
   getPdfById,
@@ -23,6 +27,11 @@ import { ResourceProgress } from "../../../components/progress/ResourceProgress/
 import { EditableNote } from "../../../components/notes/EditableNote/EditableNote";
 import { PdfSummaryModal } from "../../../components/media/PdfSummaryModal/PdfSummaryModal";
 
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url,
+).toString();
+
 export const PdfViewerPage = () => {
   const { subjectId, pdfId } = useParams();
 
@@ -34,6 +43,8 @@ export const PdfViewerPage = () => {
   const [isLoadingPdf, setIsLoadingPdf] = useState(true);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isCreatingSummary, setIsCreatingSummary] = useState(false);
+
+  const [numPages, setNumPages] = useState(0);
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -187,25 +198,24 @@ export const PdfViewerPage = () => {
         </div>
       </div>
 
-      <object
-        className="pdf-viewer"
-        data={pdf.fileUrl}
-        type="application/pdf"
-        aria-label={pdf.title}
-      >
-        <div className="pdf-viewer-fallback">
-          <p>PDF-en kan ikke vises direkte i nettleseren.</p>
-
-          <a
-            href={pdf.fileUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="pdf-open-button"
-          >
-            Åpne PDF
-          </a>
-        </div>
-      </object>
+      <div className="pdf-document-container">
+        <Document
+          file={pdf.fileUrl}
+          onLoadSuccess={({ numPages: loadedNumPages }) =>
+            setNumPages(loadedNumPages)
+          }
+          loading={<p>Laster PDF...</p>}
+          error={<p>Kunne ikke vise PDF-en.</p>}
+        >
+          {Array.from({ length: numPages }, (_, index) => (
+            <Page
+              key={`page-${index + 1}`}
+              pageNumber={index + 1}
+              className="pdf-document-page"
+            />
+          ))}
+        </Document>
+      </div>
 
       {summaryNote && subject && (
         <PdfSummaryModal
