@@ -1,4 +1,5 @@
 import "./SemesterPlanPage.css";
+import { Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { SubjectCard } from "../../../components/subjects/SubjectCard/SubjectCard";
@@ -36,13 +37,24 @@ export const SemesterPlanPage = () => {
 
   return (
     <main className="page-container">
-      <p className="page-label">Planlegging</p>
+      <div className="semester-plan-header">
+        <div>
+          <p className="page-label">Planlegging</p>
 
-      <h1>Fagplan</h1>
+          <h1>Fagplan</h1>
 
-      <p className="page-description">
-        Her ser du fagene du har valgt for dette semesteret.
-      </p>
+          <p className="page-description">
+            Her ser du fagene du har valgt for dette semesteret.
+          </p>
+        </div>
+
+        {selectedSubjects.length > 0 && (
+          <Link to="/semesterstart" className="edit-semester-subjects-button">
+            <Pencil size={17} />
+            Endre fag
+          </Link>
+        )}
+      </div>
 
       {selectedSubjects.length === 0 ? (
         <section className="empty-plan">

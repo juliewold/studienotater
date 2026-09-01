@@ -1,22 +1,14 @@
-.page-container {
-  width: min(1200px, calc(100% - 3rem));
-  margin: 0 auto;
-  padding: 2rem 0 4rem;
-}
+.semester-plan-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
 
-.page-label {
-  margin: 0 0 0.5rem;
-  color: #9b6ee8;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.page-description {
-  margin-top: 0.5rem;
   margin-bottom: 2rem;
-  color: #666;
+}
+
+.semester-plan-header .page-description {
+  margin-bottom: 0;
 }
 
 .subject-grid {
@@ -25,102 +17,47 @@
   gap: 1.25rem;
 }
 
-.custom-subject-card {
-  display: flex;
-  flex-direction: column;
+.edit-semester-subjects-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
 
-  min-height: 180px;
+  flex-shrink: 0;
 
-  padding: 24px;
+  margin-top: 0.35rem;
+  padding: 0.7rem 1rem;
 
-  border: 1px solid #e5e7eb;
-  border-left: 4px solid #d1d5db;
-  border-radius: 20px;
-
-  background: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
-}
-
-.custom-subject-card .subject-code {
-  margin: 0 0 8px;
-
-  color: #6b7280;
-
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
-.custom-subject-card h2 {
-  margin: 0;
-
-  font-size: 1.1rem;
-  line-height: 1.35;
-}
-
-.custom-subject-label {
-  margin: auto 0 0;
-
-  padding-top: 20px;
-
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
-.empty-plan {
-  padding: 2rem;
-
-  border: 1px solid rgba(167, 116, 255, 0.15);
-  border-radius: 22px;
-
-  background: #ffffff;
-
-  box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
-}
-
-.empty-plan h2 {
-  margin-top: 0;
-}
-
-.empty-plan p {
-  margin-bottom: 1.5rem;
-  color: #666;
-}
-
-.semester-start-link {
-  display: inline-block;
-
-  padding: 0.8rem 1.2rem;
-
+  border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 12px;
 
-  background: #9b6ee8;
-  color: #ffffff;
+  background: #ffffff;
+  color: #7c3aed;
 
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
   text-decoration: none;
 
   transition:
-    transform 0.2s ease,
-    opacity 0.2s ease;
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
-.semester-start-link:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
-}
-
-@media (max-width: 900px) {
-  .subject-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.edit-semester-subjects-button:hover {
+  background: #f8f5ff;
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 600px) {
-  .page-container {
-    width: min(100% - 2rem, 1200px);
+  .semester-plan-header {
+    flex-direction: column;
+    gap: 1rem;
   }
 
-  .subject-grid {
-    grid-template-columns: 1fr;
+  .edit-semester-subjects-button {
+    width: 100%;
+    margin-top: 0;
   }
 }
