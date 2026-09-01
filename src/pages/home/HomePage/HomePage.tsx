@@ -1,7 +1,9 @@
 import "./HomePage.css";
 import { useContext } from "react";
+import { BookOpen } from "lucide-react";
 
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
+import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
 import { Footer } from "../../../components/layout/Footer/Footer";
 import { HomeProgress } from "../../../components/home/HomeProgress/HomeProgress";
@@ -16,7 +18,9 @@ import notePreviewTwo from "../../../assets/notat-2.png";
 export const HomePage = () => {
   const { user, isLoading } = useContext(AuthContext);
 
-  if (isLoading) {
+  const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
+
+  if (isLoading || isLoadingSemesterSubjects) {
     return null;
   }
 
@@ -62,6 +66,7 @@ export const HomePage = () => {
               />
             </div>
           </section>
+
           <section className="logged-out-features">
             <div className="logged-out-feature">
               <span className="logged-out-feature-number">01</span>
@@ -95,6 +100,35 @@ export const HomePage = () => {
                 du skal jobbe med videre.
               </p>
             </div>
+          </section>
+        </main>
+
+        <Footer />
+      </>
+    );
+  }
+
+  if (semesterSubjects.length === 0) {
+    return (
+      <>
+        <main className="home-empty-page">
+          <section className="home-empty-state">
+            <div className="home-empty-icon">
+              <BookOpen size={26} />
+            </div>
+
+            <p className="page-label">Kom i gang</p>
+
+            <h1>Sett opp semesteret ditt</h1>
+
+            <p className="home-empty-description">
+              Velg fagene du tar dette semesteret for å få ukentlige
+              oppdateringer, fremdrift og kommende oppgaver på forsiden.
+            </p>
+
+            <a href="#/semesterstart" className="home-empty-button">
+              Velg fag
+            </a>
           </section>
         </main>
 
