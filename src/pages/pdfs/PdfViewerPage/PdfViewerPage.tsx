@@ -200,15 +200,6 @@ export const PdfViewerPage = () => {
 
       {useSeparatePdfView ? (
         <div className="pdf-mobile-viewer">
-          <FileText size={32} />
-
-          <h2>Åpne PDF</h2>
-
-          <p>
-            På iPad og iPhone åpnes PDF-en separat for å vise alle sidene
-            riktig.
-          </p>
-
           <a
             href={pdf.fileUrl}
             target="_blank"
