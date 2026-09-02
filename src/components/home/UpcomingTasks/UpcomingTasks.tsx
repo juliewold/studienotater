@@ -21,7 +21,7 @@ type UpcomingTaskOccurrence = {
   start: Date;
 };
 
-const INITIAL_VISIBLE_TASKS = 5;
+const INITIAL_VISIBLE_TASKS = 8;
 const TASKS_PER_LOAD = 5;
 
 const addDays = (date: Date, amount: number) => {
@@ -60,6 +60,28 @@ const getTimeUntilLabel = (date: Date) => {
     day: "numeric",
     month: "short",
   });
+};
+
+const getTimeClass = (date: Date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const eventDate = new Date(date);
+  eventDate.setHours(0, 0, 0, 0);
+
+  const differenceInDays = Math.round(
+    (eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  if (differenceInDays === 0) {
+    return "upcoming-task-time-today";
+  }
+
+  if (differenceInDays === 1) {
+    return "upcoming-task-time-tomorrow";
+  }
+
+  return "";
 };
 
 const getEventTypeLabel = (eventType: CalendarEvent["eventType"]) => {
@@ -250,8 +272,10 @@ export const UpcomingTasks = () => {
                   <p>{getEventTypeLabel(event.eventType)}</p>
                 </div>
               </div>
-
-              <time dateTime={event.start.toISOString()}>
+              <time
+                dateTime={event.start.toISOString()}
+                className={getTimeClass(event.start)}
+              >
                 {getTimeUntilLabel(event.start)}
               </time>
             </div>

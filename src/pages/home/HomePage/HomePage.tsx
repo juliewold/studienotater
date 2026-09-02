@@ -144,12 +144,15 @@ export const HomePage = () => {
       <SemesterSubjects />
 
       <div className="home-dashboard-grid">
-        <UpcomingTasks />
+        <div className="home-dashboard-column">
+          <UpcomingTasks />
+        </div>
 
-        <HomeProgress />
+        <div className="home-dashboard-column">
+          <HomeProgress />
+          <ExamOverview />
+        </div>
       </div>
-
-      <ExamOverview />
 
       <Footer />
     </>

@@ -1,7 +1,6 @@
 import "./SemesterSubjects.css";
 import { Link } from "react-router-dom";
 
-import { SubjectCard } from "../SubjectCard/SubjectCard";
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
@@ -20,9 +19,7 @@ export const SemesterSubjects = () => {
         regularSubject?.code ??
         semesterSubject.subjectId.toUpperCase(),
       name: semesterSubject.customName ?? regularSubject?.name ?? "",
-      year: regularSubject?.year,
-      color: regularSubject?.color,
-      icon: regularSubject?.icon,
+      color: regularSubject?.color ?? "default",
       isCustom:
         semesterSubject.customCode !== null &&
         semesterSubject.customName !== null,
@@ -40,40 +37,31 @@ export const SemesterSubjects = () => {
   return (
     <section className="semester-subjects">
       <div className="semester-subjects-header">
-        <h2>Mine fag dette semesteret</h2>
+        <h2>Mine fag</h2>
 
-        <Link to="/semesterstart">Administrer fag</Link>
+        <Link to="/semesterstart">Administrer</Link>
       </div>
 
       {displaySubjects.length === 0 ? (
-        <p>
-          Du har ikke valgt fag enda. Gå til Semesterstart for å sette opp
-          semesteret ditt.
+        <p className="semester-subjects-empty">
+          Du har ikke valgt fag dette semesteret.
         </p>
       ) : (
         <div className="semester-subjects-grid">
-          {displaySubjects.map((subject) =>
-            subject.isCustom ? (
-              <article
-                key={subject.id}
-                className="semester-custom-subject-card"
-              >
-                <p className="subject-code">{subject.code}</p>
+          {displaySubjects.map((subject) => (
+            <Link
+              key={subject.id}
+              to={`/fag/${subject.id}`}
+              className={`semester-subject-item semester-subject-${subject.color}`}
+            >
+              <span className="semester-subject-indicator" />
+
+              <div>
+                <p className="semester-subject-code">{subject.code}</p>
                 <h3>{subject.name}</h3>
-                <p className="semester-custom-subject-label">Eget fag</p>
-              </article>
-            ) : (
-              <SubjectCard
-                key={subject.id}
-                id={subject.id}
-                code={subject.code}
-                name={subject.name}
-                year={subject.year}
-                color={subject.color}
-                icon={subject.icon}
-              />
-            ),
-          )}
+              </div>
+            </Link>
+          ))}
         </div>
       )}
     </section>

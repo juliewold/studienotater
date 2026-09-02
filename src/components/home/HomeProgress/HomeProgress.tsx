@@ -226,10 +226,6 @@ export const HomeProgress = () => {
               <span>{subject.progress}%</span>
             </div>
 
-            <p className="home-progress-count">
-              {subject.completed} / {subject.total} ressurser fullført
-            </p>
-
             <div className="home-progress-details">
               <span>
                 PDF {subject.pdfCompleted}/{subject.pdfTotal}
