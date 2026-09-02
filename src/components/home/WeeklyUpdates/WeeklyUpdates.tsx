@@ -2,23 +2,6 @@ import "./WeeklyUpdates.css";
 
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Binary,
-  Blocks,
-  BookOpen,
-  Braces,
-  ChartNoAxesColumnIncreasing,
-  CircuitBoard,
-  Code2,
-  Cpu,
-  Database,
-  FunctionSquare,
-  MousePointer2,
-  Network,
-  Sigma,
-  Terminal,
-  Wifi,
-} from "lucide-react";
 
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
@@ -28,7 +11,10 @@ import {
   type DatabaseNote,
 } from "../../../services/notes/notesService";
 
-import { getPdfsBySubject, type DatabasePdf } from "../../../services/media/pdfsService";
+import {
+  getPdfsBySubject,
+  type DatabasePdf,
+} from "../../../services/media/pdfsService";
 
 import {
   getFlashcardsBySubject,
@@ -40,7 +26,6 @@ type WeeklySubjectData = {
   code: string;
   name: string;
   color: string;
-  icon: string | undefined;
   notes: DatabaseNote[];
   pdfs: DatabasePdf[];
   flashcards: DatabaseFlashcard[];
@@ -85,63 +70,10 @@ const getWeekNumber = () => {
   );
 };
 
-const getSubjectIcon = (icon: string | undefined) => {
-  switch (icon) {
-    case "code":
-      return Code2;
-
-    case "sigma":
-      return Sigma;
-
-    case "binary":
-      return Binary;
-
-    case "book-open":
-      return BookOpen;
-
-    case "braces":
-      return Braces;
-
-    case "mouse-pointer":
-      return MousePointer2;
-
-    case "function-square":
-      return FunctionSquare;
-
-    case "circuit-board":
-      return CircuitBoard;
-
-    case "network":
-      return Network;
-
-    case "cpu":
-      return Cpu;
-
-    case "chart":
-      return ChartNoAxesColumnIncreasing;
-
-    case "blocks":
-      return Blocks;
-
-    case "database":
-      return Database;
-
-    case "terminal":
-      return Terminal;
-
-    case "wifi":
-      return Wifi;
-
-    default:
-      return BookOpen;
-  }
-};
-
 export const WeeklyUpdates = () => {
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
 
   const [weeklySubjects, setWeeklySubjects] = useState<WeeklySubjectData[]>([]);
-
   const [isLoadingWeeklyUpdates, setIsLoadingWeeklyUpdates] = useState(true);
 
   const displaySubjects = useMemo(() => {
@@ -152,16 +84,12 @@ export const WeeklyUpdates = () => {
 
       return {
         id: semesterSubject.subjectId,
-
         code:
           semesterSubject.customCode ??
           regularSubject?.code ??
           semesterSubject.subjectId.toUpperCase(),
-
         name: semesterSubject.customName ?? regularSubject?.name ?? "",
-
         color: regularSubject?.color ?? "default",
-        icon: regularSubject?.icon,
       };
     });
   }, [semesterSubjects]);
@@ -185,11 +113,8 @@ export const WeeklyUpdates = () => {
 
             return {
               ...subject,
-
               notes: notes.filter((note) => isFromThisWeek(note.createdAt)),
-
               pdfs: pdfs.filter((pdf) => isFromThisWeek(pdf.createdAt)),
-
               flashcards: flashcards.filter((flashcard) =>
                 isFromThisWeek(flashcard.createdAt),
               ),
@@ -207,7 +132,6 @@ export const WeeklyUpdates = () => {
         );
       } catch (error) {
         console.error("Kunne ikke hente ukens innhold:", error);
-
         setWeeklySubjects([]);
       } finally {
         setIsLoadingWeeklyUpdates(false);
@@ -228,77 +152,63 @@ export const WeeklyUpdates = () => {
   return (
     <section className="weekly-updates">
       <div className="weekly-updates-header">
-        <div>
-          <h2>Denne uken</h2>
-
-          <p>Nytt innhold i semesterfagene dine</p>
-        </div>
+        <h2>Denne uken</h2>
 
         <span className="weekly-updates-week">Uke {getWeekNumber()}</span>
       </div>
 
       {displaySubjects.length === 0 ? (
-        <p>Velg semesterfag for å se hva som er nytt denne uken.</p>
+        <p className="weekly-updates-empty">
+          Velg semesterfag for å se hva som er nytt denne uken.
+        </p>
       ) : weeklySubjects.length === 0 ? (
-        <p>Det er ikke lagt til noe nytt i fagene dine denne uken.</p>
+        <p className="weekly-updates-empty">
+          Det er ikke lagt til noe nytt i fagene dine denne uken.
+        </p>
       ) : (
-        <div className="weekly-updates-grid">
-          {weeklySubjects.map((subject) => {
-            const total =
-              subject.notes.length +
-              subject.pdfs.length +
-              subject.flashcards.length;
+        <div className="weekly-updates-list">
+          {weeklySubjects.map((subject) => (
+            <Link
+              key={subject.id}
+              to={`/fag/${subject.id}`}
+              className={`weekly-update-row weekly-update-${subject.color}`}
+            >
+              <span className="weekly-update-indicator" />
 
-            const Icon = getSubjectIcon(subject.icon);
+              <div className="weekly-update-subject">
+                <span className="weekly-update-code">{subject.code}</span>
 
-            return (
-              <Link
-                key={subject.id}
-                to={`/fag/${subject.id}`}
-                className={`weekly-update-card weekly-update-${subject.color}`}
-              >
-                <div className="weekly-update-icon">
-                  <Icon size={22} strokeWidth={2} />
-                </div>
+                <span className="weekly-update-name">{subject.name}</span>
+              </div>
 
-                <p className="weekly-update-code">{subject.code}</p>
-                <h3>{subject.name}</h3>
+              <div className="weekly-update-details">
+                {subject.notes.length > 0 && (
+                  <span>
+                    {subject.notes.length}{" "}
+                    {subject.notes.length === 1 ? "notat" : "notater"}
+                  </span>
+                )}
 
-                <div className="weekly-update-meta">
-                  <p className="weekly-update-total">
-                    {total} {total === 1 ? "ny ressurs" : "nye ressurser"}
-                  </p>
+                {subject.pdfs.length > 0 && (
+                  <span>
+                    {subject.pdfs.length}{" "}
+                    {subject.pdfs.length === 1
+                      ? "forelesning"
+                      : "forelesninger"}
+                  </span>
+                )}
 
-                  <div className="weekly-update-details">
-                    {subject.notes.length > 0 && (
-                      <span>
-                        {subject.notes.length}{" "}
-                        {subject.notes.length === 1 ? "notat" : "notater"}
-                      </span>
-                    )}
-
-                    {subject.pdfs.length > 0 && (
-                      <span>
-                        {subject.pdfs.length}{" "}
-                        {subject.pdfs.length === 1
-                          ? "forelesning"
-                          : "forelesninger"}
-                      </span>
-                    )}
-
-                    {subject.flashcards.length > 0 && (
-                      <span>
-                        {subject.flashcards.length}{" "}
-                        {subject.flashcards.length === 1
-                          ? "flashcard"
-                          : "flashcards"}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+                {subject.flashcards.length > 0 && (
+                  <span>
+                    {subject.flashcards.length}{" "}
+                    {subject.flashcards.length === 1
+                      ? "flashcard"
+                      : "flashcards"}
+                  </span>
+                )}
+              </div>
+            </Link>
+          ))}
         </div>
       )}
     </section>
