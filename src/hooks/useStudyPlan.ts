@@ -1,36 +1,42 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+
 import { AuthContext } from "../context/AuthContext/AuthContext";
+
 import {
   getStudyTopicsBySubject,
   type DatabaseStudyTopic,
   type DatabaseStudyTopicItem,
   type DatabaseStudyTopicResource,
 } from "../services/study/studyPlansService";
+
 import {
   getNotesBySubject,
   type DatabaseNote,
 } from "../services/notes/notesService";
+
 import {
   getVideosBySubject,
   type DatabaseVideo,
 } from "../services/media/videosService";
+
 import {
   getPdfsBySubject,
   type DatabasePdf,
 } from "../services/media/pdfsService";
+
 import {
   getStudyPlanItems,
   saveStudyPlanItem,
 } from "../services/progress/progressService";
+
+import {
+  getBookBySlug,
+  getBooksBySubject,
+  type DatabaseBook,
+} from "../services/study/booksService";
+
 import { useProgress } from "./useProgress";
 import { useBookProgress } from "./useBookProgress";
-import { tma4412Book } from "../data/books/tma4412Book";
 
 type StudyPlanResourceType = "pdf" | "note" | "video";
 
@@ -48,27 +54,27 @@ type TopicProgressItem =
 export const useStudyPlan = (subjectId?: string) => {
   const { user } = useContext(AuthContext);
 
-  const {
-    getProgress,
-    isLoadingProgress,
-  } = useProgress();
+  const { getProgress, isLoadingProgress } = useProgress();
 
-  const {
-    checkedPages,
-    isLoading: isLoadingBookProgress,
-  } = useBookProgress(tma4412Book.id);
+  const [books, setBooks] = useState<DatabaseBook[]>([]);
+  const [book, setBook] = useState<DatabaseBook | null>(null);
+
+  const { checkedPages, isLoading: isLoadingBookProgress } = useBookProgress(
+    book?.slug ?? "",
+  );
 
   const [topics, setTopics] = useState<DatabaseStudyTopic[]>([]);
   const [pdfs, setPdfs] = useState<DatabasePdf[]>([]);
   const [notes, setNotes] = useState<DatabaseNote[]>([]);
   const [videos, setVideos] = useState<DatabaseVideo[]>([]);
 
-  const [
-    completedStudyPlanItems,
-    setCompletedStudyPlanItems,
-  ] = useState<string[]>([]);
+  const [completedStudyPlanItems, setCompletedStudyPlanItems] = useState<
+    string[]
+  >([]);
 
   const [isLoadingPlan, setIsLoadingPlan] = useState(true);
+  const [isLoadingBooks, setIsLoadingBooks] = useState(true);
+
   const [errorMessage, setErrorMessage] = useState("");
 
   const loadStudyPlan = useCallback(async () => {
@@ -85,17 +91,13 @@ export const useStudyPlan = (subjectId?: string) => {
     setErrorMessage("");
 
     try {
-      const [
-        loadedTopics,
-        loadedPdfs,
-        loadedNotes,
-        loadedVideos,
-      ] = await Promise.all([
-        getStudyTopicsBySubject(subjectId),
-        getPdfsBySubject(subjectId),
-        getNotesBySubject(subjectId),
-        getVideosBySubject(subjectId),
-      ]);
+      const [loadedTopics, loadedPdfs, loadedNotes, loadedVideos] =
+        await Promise.all([
+          getStudyTopicsBySubject(subjectId),
+          getPdfsBySubject(subjectId),
+          getNotesBySubject(subjectId),
+          getVideosBySubject(subjectId),
+        ]);
 
       setTopics(loadedTopics);
       setPdfs(loadedPdfs);
@@ -109,6 +111,42 @@ export const useStudyPlan = (subjectId?: string) => {
     }
   }, [subjectId]);
 
+  const loadBooks = useCallback(async () => {
+    if (!subjectId) {
+      setBooks([]);
+      setBook(null);
+      setIsLoadingBooks(false);
+      return;
+    }
+
+    setIsLoadingBooks(true);
+
+    try {
+      const loadedBooks = await getBooksBySubject(subjectId);
+
+      const loadedBooksWithChapters = await Promise.all(
+        loadedBooks.map(async (currentBook) => {
+          const completeBook = await getBookBySlug(subjectId, currentBook.slug);
+
+          return completeBook;
+        }),
+      );
+
+      const availableBooks = loadedBooksWithChapters.filter(
+        (currentBook): currentBook is DatabaseBook => currentBook !== null,
+      );
+
+      setBooks(availableBooks);
+      setBook(availableBooks[0] ?? null);
+    } catch (error) {
+      console.error("Kunne ikke hente bøker:", error);
+      setBooks([]);
+      setBook(null);
+    } finally {
+      setIsLoadingBooks(false);
+    }
+  }, [subjectId]);
+
   const loadCompletedItems = useCallback(async () => {
     if (!user || !subjectId) {
       setCompletedStudyPlanItems([]);
@@ -116,23 +154,21 @@ export const useStudyPlan = (subjectId?: string) => {
     }
 
     try {
-      const completedItems = await getStudyPlanItems(
-        user.id,
-        subjectId,
-      );
+      const completedItems = await getStudyPlanItems(user.id, subjectId);
 
       setCompletedStudyPlanItems(completedItems);
     } catch (error) {
-      console.error(
-        "Kunne ikke hente studieplanfremdrift:",
-        error,
-      );
+      console.error("Kunne ikke hente studieplanfremdrift:", error);
     }
   }, [subjectId, user]);
 
   useEffect(() => {
     loadStudyPlan();
   }, [loadStudyPlan]);
+
+  useEffect(() => {
+    loadBooks();
+  }, [loadBooks]);
 
   useEffect(() => {
     loadCompletedItems();
@@ -143,62 +179,63 @@ export const useStudyPlan = (subjectId?: string) => {
       return;
     }
 
-    const wasCompleted =
-      completedStudyPlanItems.includes(itemId);
+    const wasCompleted = completedStudyPlanItems.includes(itemId);
 
     const previousItems = completedStudyPlanItems;
 
     setCompletedStudyPlanItems((currentItems) =>
       wasCompleted
-        ? currentItems.filter(
-            (currentItemId) =>
-              currentItemId !== itemId,
-          )
+        ? currentItems.filter((currentItemId) => currentItemId !== itemId)
         : [...currentItems, itemId],
     );
 
     try {
-      await saveStudyPlanItem(
-        user.id,
-        subjectId,
-        itemId,
-        !wasCompleted,
-      );
+      await saveStudyPlanItem(user.id, subjectId, itemId, !wasCompleted);
     } catch (error) {
-      console.error(
-        "Kunne ikke lagre studieplanfremdrift:",
-        error,
-      );
+      console.error("Kunne ikke lagre studieplanfremdrift:", error);
 
       setCompletedStudyPlanItems(previousItems);
     }
   };
 
   const getBookChapter = (readingTitle: string) => {
-    if (subjectId !== "tma4412") {
-      return undefined;
+    for (const currentBook of books) {
+      const chapter = currentBook.chapters.find(
+        (currentChapter) => currentChapter.title === readingTitle,
+      );
+
+      if (chapter) {
+        return {
+          book: currentBook,
+          chapter,
+        };
+      }
     }
 
-    return tma4412Book.chapters.find(
-      (chapter) => chapter.title === readingTitle,
-    );
+    return undefined;
   };
 
-  const getBookChapterProgress = (
-    readingTitle: string,
-  ) => {
-    const chapter = getBookChapter(readingTitle);
+  const getBookChapterProgress = (readingTitle: string) => {
+    const result = getBookChapter(readingTitle);
 
-    if (!chapter) {
+    if (!result) {
+      return null;
+    }
+
+    const { book: chapterBook, chapter } = result;
+
+    /*
+     * Foreløpig bruker useBookProgress fremdriften til den
+     * første boka i faget. Dette fungerer for fag med én bok,
+     * som TMA4412.
+     */
+    if (book?.id !== chapterBook.id) {
       return null;
     }
 
     const pages = Array.from(
       {
-        length:
-          chapter.endPage -
-          chapter.startPage +
-          1,
+        length: chapter.endPage - chapter.startPage + 1,
       },
       (_, index) => chapter.startPage + index,
     );
@@ -208,13 +245,10 @@ export const useStudyPlan = (subjectId?: string) => {
     ).length;
 
     const progress =
-      pages.length === 0
-        ? 0
-        : Math.round(
-            (readPages / pages.length) * 100,
-          );
+      pages.length === 0 ? 0 : Math.round((readPages / pages.length) * 100);
 
     return {
+      book: chapterBook,
       chapter,
       readPages,
       totalPages: pages.length,
@@ -229,9 +263,7 @@ export const useStudyPlan = (subjectId?: string) => {
     return `study-topic-${topic.id}-item-${item.id}`;
   };
 
-  const getResourceProgressId = (
-    resource: DatabaseStudyTopicResource,
-  ) => {
+  const getResourceProgressId = (resource: DatabaseStudyTopicResource) => {
     const source = "database";
 
     if (resource.resourceType === "pdf") {
@@ -240,8 +272,7 @@ export const useStudyPlan = (subjectId?: string) => {
 
     if (resource.resourceType === "note") {
       const note = notes.find(
-        (currentNote) =>
-          currentNote.id === resource.resourceId,
+        (currentNote) => currentNote.id === resource.resourceId,
       );
 
       return note
@@ -250,8 +281,7 @@ export const useStudyPlan = (subjectId?: string) => {
     }
 
     const video = videos.find(
-      (currentVideo) =>
-        currentVideo.id === resource.resourceId,
+      (currentVideo) => currentVideo.id === resource.resourceId,
     );
 
     return video
@@ -263,14 +293,9 @@ export const useStudyPlan = (subjectId?: string) => {
     topic: DatabaseStudyTopic,
     item: DatabaseStudyTopicItem,
   ) => {
-    const bookProgress = getBookChapterProgress(
-      item.value,
-    );
+    const bookProgress = getBookChapterProgress(item.value);
 
-    if (
-      item.type === "reading" &&
-      bookProgress
-    ) {
+    if (item.type === "reading" && bookProgress) {
       return bookProgress.progress === 100;
     }
 
@@ -279,86 +304,58 @@ export const useStudyPlan = (subjectId?: string) => {
     );
   };
 
-  const isResourceCompleted = (
-    resource: DatabaseStudyTopicResource,
-  ) => {
-    return getProgress(
-      getResourceProgressId(resource),
-      "resource",
-    ).completed;
+  const isResourceCompleted = (resource: DatabaseStudyTopicResource) => {
+    return getProgress(getResourceProgressId(resource), "resource").completed;
   };
 
   const getTopicProgressItems = (
     topic: DatabaseStudyTopic,
   ): TopicProgressItem[] => {
-    const studyItems: TopicProgressItem[] =
-      topic.items.map((item) => ({
-        id: getStudyItemProgressId(topic, item),
-        type: "study-plan",
-      }));
+    const studyItems: TopicProgressItem[] = topic.items.map((item) => ({
+      id: getStudyItemProgressId(topic, item),
+      type: "study-plan",
+    }));
 
-    const resourceItems: TopicProgressItem[] =
-      topic.resources.map((resource) => ({
+    const resourceItems: TopicProgressItem[] = topic.resources.map(
+      (resource) => ({
         id: getResourceProgressId(resource),
         type: "resource",
         resourceType: resource.resourceType,
-      }));
+      }),
+    );
 
     return [...studyItems, ...resourceItems];
   };
 
-  const isTopicProgressItemCompleted = (
-    item: TopicProgressItem,
-  ) => {
+  const isTopicProgressItemCompleted = (item: TopicProgressItem) => {
     if (item.type === "study-plan") {
       return completedStudyPlanItems.includes(item.id);
     }
 
-    return getProgress(
-      item.id,
-      "resource",
-    ).completed;
+    return getProgress(item.id, "resource").completed;
   };
 
   const progressSummary = useMemo(() => {
-    const allItems = topics.flatMap((topic) =>
-      getTopicProgressItems(topic),
-    );
+    const allItems = topics.flatMap((topic) => getTopicProgressItems(topic));
 
-    const completedItems = allItems.filter(
-      isTopicProgressItemCompleted,
-    );
+    const completedItems = allItems.filter(isTopicProgressItemCompleted);
 
     const percentage =
       allItems.length === 0
         ? 0
-        : Math.round(
-            (completedItems.length /
-              allItems.length) *
-              100,
-          );
+        : Math.round((completedItems.length / allItems.length) * 100);
 
     return {
       completed: completedItems.length,
       total: allItems.length,
       percentage,
     };
-  }, [
-    completedStudyPlanItems,
-    getProgress,
-    notes,
-    topics,
-    videos,
-  ]);
+  }, [completedStudyPlanItems, getProgress, notes, topics, videos]);
 
-  const getTopicProgress = (
-    topic: DatabaseStudyTopic,
-  ) => {
+  const getTopicProgress = (topic: DatabaseStudyTopic) => {
     const topicItems = getTopicProgressItems(topic);
 
-    const completedItems = topicItems.filter(
-      isTopicProgressItemCompleted,
-    );
+    const completedItems = topicItems.filter(isTopicProgressItemCompleted);
 
     return {
       completed: completedItems.length,
@@ -366,35 +363,23 @@ export const useStudyPlan = (subjectId?: string) => {
       percentage:
         topicItems.length === 0
           ? 0
-          : Math.round(
-              (completedItems.length /
-                topicItems.length) *
-                100,
-            ),
+          : Math.round((completedItems.length / topicItems.length) * 100),
     };
   };
 
   const getPdfById = (id: string) => {
-    return (
-      pdfs.find((pdf) => pdf.id === id) ?? null
-    );
+    return pdfs.find((pdf) => pdf.id === id) ?? null;
   };
 
   const getNoteById = (id: string) => {
-    return (
-      notes.find((note) => note.id === id) ?? null
-    );
+    return notes.find((note) => note.id === id) ?? null;
   };
 
   const getVideoById = (id: string) => {
-    return (
-      videos.find((video) => video.id === id) ?? null
-    );
+    return videos.find((video) => video.id === id) ?? null;
   };
 
-  const getResourceUrl = (
-    resource: DatabaseStudyTopicResource,
-  ) => {
+  const getResourceUrl = (resource: DatabaseStudyTopicResource) => {
     if (resource.resourceType === "pdf") {
       return `/fag/${subjectId}/pdfs/${resource.resourceId}`;
     }
@@ -410,36 +395,27 @@ export const useStudyPlan = (subjectId?: string) => {
     return `/fag/${subjectId}/videoer`;
   };
 
-  const getResourceTitle = (
-    resource: DatabaseStudyTopicResource,
-  ) => {
+  const getResourceTitle = (resource: DatabaseStudyTopicResource) => {
     if (resource.resourceType === "pdf") {
-      return (
-        getPdfById(resource.resourceId)?.title ??
-        "Ukjent PDF"
-      );
+      return getPdfById(resource.resourceId)?.title ?? "Ukjent PDF";
     }
 
     if (resource.resourceType === "note") {
-      return (
-        getNoteById(resource.resourceId)?.title ??
-        "Ukjent notat"
-      );
+      return getNoteById(resource.resourceId)?.title ?? "Ukjent notat";
     }
 
-    return (
-      getVideoById(resource.resourceId)?.title ??
-      "Ukjent video"
-    );
+    return getVideoById(resource.resourceId)?.title ?? "Ukjent video";
   };
 
   const isLoading =
     isLoadingPlan ||
     isLoadingProgress ||
+    isLoadingBooks ||
     isLoadingBookProgress;
 
   return {
     topics,
+    books,
     errorMessage,
     isLoading,
 

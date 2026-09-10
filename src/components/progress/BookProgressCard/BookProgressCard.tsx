@@ -1,44 +1,32 @@
 import { Link } from "react-router-dom";
+
 import { useBookProgress } from "../../../hooks/useBookProgress";
-
-type BookChapter = {
-  id: string;
-  title: string;
-  startPage: number;
-  endPage: number;
-};
-
-type Book = {
-  id: string;
-  title: string;
-  shortTitle: string;
-  chapters: BookChapter[];
-};
+import type { DatabaseBook } from "../../../services/study/booksService";
 
 type BookProgressCardProps = {
-  book: Book;
+  book: DatabaseBook;
+  subjectId: string;
 };
 
 export const BookProgressCard = ({
   book,
+  subjectId,
 }: BookProgressCardProps) => {
-  const {
-    checkedPages,
-    isLoading,
-  } = useBookProgress(book.id);
+  const { checkedPages, isLoading } = useBookProgress(book.slug);
 
   const totalPages = book.chapters.reduce(
-    (total, chapter) =>
-      total + (chapter.endPage - chapter.startPage + 1),
+    (total, chapter) => total + (chapter.endPage - chapter.startPage + 1),
     0,
   );
 
-  const readPages = checkedPages.length;
+  const readPages = checkedPages.filter((page) =>
+    book.chapters.some(
+      (chapter) => page >= chapter.startPage && page <= chapter.endPage,
+    ),
+  ).length;
 
   const progress =
-    totalPages === 0
-      ? 0
-      : Math.round((readPages / totalPages) * 100);
+    totalPages === 0 ? 0 : Math.round((readPages / totalPages) * 100);
 
   if (isLoading) {
     return (
@@ -50,15 +38,13 @@ export const BookProgressCard = ({
 
   return (
     <Link
-      to={`/fag/tma4412/bok/${book.id}`}
+      to={`/fag/${subjectId}/bok/${book.slug}`}
       className="book-progress-link"
     >
       <section className="book-progress-card">
         <div className="book-progress-header">
           <div>
-            <p className="study-plan-summary-label">
-              Bokfremdrift
-            </p>
+            <p className="study-plan-summary-label">Bokfremdrift</p>
 
             <h2>{book.title}</h2>
 
