@@ -7,11 +7,10 @@ export const AdminStudyPlansPage = () => {
     subjectId,
     handleSubjectChange,
 
-    title,
-    setTitle,
-
-    sortOrder,
-    setSortOrder,
+    structureTopicId,
+    setStructureTopicId,
+    topics,
+    isLoadingStructureTopics,
 
     reading,
     setReading,
@@ -60,8 +59,7 @@ export const AdminStudyPlansPage = () => {
 
   const getSubjectLabel = (topicSubjectId: string) => {
     const subject = subjects.find(
-      (currentSubject) =>
-        currentSubject.id === topicSubjectId,
+      (currentSubject) => currentSubject.id === topicSubjectId,
     );
 
     return subject
@@ -76,21 +74,16 @@ export const AdminStudyPlansPage = () => {
       <h1>Administrer studieplaner</h1>
 
       <p className="page-description">
-        Opprett temaer, legg til pensum og oppgaver, og koble
-        ressurser til studieplanen.
+        Opprett temaer, legg til pensum og oppgaver, og koble ressurser til
+        studieplanen.
       </p>
 
       <section className="admin-study-plan-card">
         <h2>
-          {editingTopic
-            ? "Rediger studietema"
-            : "Opprett nytt studietema"}
+          {editingTopic ? "Rediger studietema" : "Opprett nytt studietema"}
         </h2>
 
-        <form
-          className="admin-study-plan-form"
-          onSubmit={handleSubmit}
-        >
+        <form className="admin-study-plan-form" onSubmit={handleSubmit}>
           <div className="admin-study-plan-row">
             <div>
               <label htmlFor="study-plan-subject">Fag</label>
@@ -98,40 +91,18 @@ export const AdminStudyPlansPage = () => {
               <select
                 id="study-plan-subject"
                 value={subjectId}
-                onChange={(event) =>
-                  handleSubjectChange(event.target.value)
-                }
+                onChange={(event) => handleSubjectChange(event.target.value)}
                 disabled={Boolean(editingTopic)}
                 required
               >
                 <option value="">Velg fag</option>
 
                 {subjects.map((subject) => (
-                  <option
-                    key={subject.id}
-                    value={subject.id}
-                  >
+                  <option key={subject.id} value={subject.id}>
                     {subject.code} – {subject.name}
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label htmlFor="study-plan-order">
-                Rekkefølge
-              </label>
-
-              <input
-                id="study-plan-order"
-                type="number"
-                min="0"
-                value={sortOrder}
-                onChange={(event) =>
-                  setSortOrder(event.target.value)
-                }
-                required
-              />
             </div>
           </div>
 
@@ -141,51 +112,47 @@ export const AdminStudyPlansPage = () => {
             </p>
           )}
 
-          <label htmlFor="study-plan-title">
-            Tittel på tema
-          </label>
-
-          <input
-            id="study-plan-title"
-            type="text"
-            value={title}
-            onChange={(event) =>
-              setTitle(event.target.value)
+          <label htmlFor="study-plan-topic">Tema</label>
+          <select
+            id="study-plan-topic"
+            value={structureTopicId}
+            onChange={(event) => setStructureTopicId(event.target.value)}
+            disabled={
+              !subjectId || isLoadingStructureTopics || Boolean(editingTopic)
             }
-            placeholder="For eksempel Mengder og relasjoner"
             required
-          />
+          >
+            <option value="">
+              {isLoadingStructureTopics ? "Laster temaer..." : "Velg tema"}
+            </option>
+
+            {topics.map((topic) => (
+              <option key={topic.id} value={topic.id}>
+                {topic.sortOrder}. {topic.name}
+              </option>
+            ))}
+          </select>
 
           <div className="admin-study-plan-textareas">
             <div>
-              <label htmlFor="study-plan-reading">
-                Pensum / lesestoff
-              </label>
+              <label htmlFor="study-plan-reading">Pensum / lesestoff</label>
 
               <textarea
                 id="study-plan-reading"
                 value={reading}
-                onChange={(event) =>
-                  setReading(event.target.value)
-                }
-                placeholder={
-                  "Skriv ett punkt per linje:\nRA kap. 1\nRA kap. 6"
-                }
+                onChange={(event) => setReading(event.target.value)}
+                placeholder={"Skriv ett punkt per linje:\nRA kap. 1\nRA kap. 6"}
                 rows={6}
               />
             </div>
 
             <div>
-              <label htmlFor="study-plan-lectures">
-                Forelesninger
-              </label>
+              <label htmlFor="study-plan-lectures">Forelesninger</label>
 
               <textarea
                 id="study-plan-lectures"
                 value={lectures}
-                onChange={(event) =>
-                  setLectures(event.target.value)
-                }
+                onChange={(event) => setLectures(event.target.value)}
                 placeholder={
                   "Skriv én forelesning per linje:\nForelesning 1\nForelesning 2"
                 }
@@ -201,12 +168,8 @@ export const AdminStudyPlansPage = () => {
               <textarea
                 id="study-plan-exercises"
                 value={exercises}
-                onChange={(event) =>
-                  setExercises(event.target.value)
-                }
-                placeholder={
-                  "Skriv én oppgave per linje:\nØF-oppgave 1"
-                }
+                onChange={(event) => setExercises(event.target.value)}
+                placeholder={"Skriv én oppgave per linje:\nØF-oppgave 1"}
                 rows={6}
               />
             </div>
@@ -219,30 +182,20 @@ export const AdminStudyPlansPage = () => {
               <textarea
                 id="study-plan-assignments"
                 value={assignments}
-                onChange={(event) =>
-                  setAssignments(event.target.value)
-                }
-                placeholder={
-                  "Skriv én øving per linje:\nØving 1"
-                }
+                onChange={(event) => setAssignments(event.target.value)}
+                placeholder={"Skriv én øving per linje:\nØving 1"}
                 rows={6}
               />
             </div>
 
             <div>
-              <label htmlFor="study-plan-stack">
-                STACK-oppgaver
-              </label>
+              <label htmlFor="study-plan-stack">STACK-oppgaver</label>
 
               <textarea
                 id="study-plan-stack"
                 value={stack}
-                onChange={(event) =>
-                  setStack(event.target.value)
-                }
-                placeholder={
-                  "Skriv én STACK-oppgave per linje:\nStack #1"
-                }
+                onChange={(event) => setStack(event.target.value)}
+                placeholder={"Skriv én STACK-oppgave per linje:\nStack #1"}
                 rows={6}
               />
             </div>
@@ -252,10 +205,7 @@ export const AdminStudyPlansPage = () => {
             <div className="admin-study-plan-resource-heading">
               <h3>Koble ressurser</h3>
 
-              <p>
-                Velg PDF-er, notater og videoer som hører til
-                dette temaet.
-              </p>
+              <p>Velg PDF-er, notater og videoer som hører til dette temaet.</p>
             </div>
 
             {!subjectId ? (
@@ -274,18 +224,11 @@ export const AdminStudyPlansPage = () => {
                   ) : (
                     <div className="admin-resource-list">
                       {availablePdfs.map((pdf) => (
-                        <label
-                          key={pdf.id}
-                          className="admin-resource-option"
-                        >
+                        <label key={pdf.id} className="admin-resource-option">
                           <input
                             type="checkbox"
-                            checked={selectedPdfIds.includes(
-                              pdf.id,
-                            )}
-                            onChange={() =>
-                              togglePdf(pdf.id)
-                            }
+                            checked={selectedPdfIds.includes(pdf.id)}
+                            onChange={() => togglePdf(pdf.id)}
                           />
 
                           <span>{pdf.title}</span>
@@ -303,18 +246,11 @@ export const AdminStudyPlansPage = () => {
                   ) : (
                     <div className="admin-resource-list">
                       {availableNotes.map((note) => (
-                        <label
-                          key={note.id}
-                          className="admin-resource-option"
-                        >
+                        <label key={note.id} className="admin-resource-option">
                           <input
                             type="checkbox"
-                            checked={selectedNoteIds.includes(
-                              note.id,
-                            )}
-                            onChange={() =>
-                              toggleNote(note.id)
-                            }
+                            checked={selectedNoteIds.includes(note.id)}
+                            onChange={() => toggleNote(note.id)}
                           />
 
                           <span>{note.title}</span>
@@ -332,18 +268,11 @@ export const AdminStudyPlansPage = () => {
                   ) : (
                     <div className="admin-resource-list">
                       {availableVideos.map((video) => (
-                        <label
-                          key={video.id}
-                          className="admin-resource-option"
-                        >
+                        <label key={video.id} className="admin-resource-option">
                           <input
                             type="checkbox"
-                            checked={selectedVideoIds.includes(
-                              video.id,
-                            )}
-                            onChange={() =>
-                              toggleVideo(video.id)
-                            }
+                            checked={selectedVideoIds.includes(video.id)}
+                            onChange={() => toggleVideo(video.id)}
                           />
 
                           <span>
@@ -394,11 +323,7 @@ export const AdminStudyPlansPage = () => {
       </section>
 
       <section className="admin-study-plan-card study-topic-list-section">
-        <h2>
-          {subjectId
-            ? "Temaer i valgt fag"
-            : "Opprettede studietemaer"}
-        </h2>
+        <h2>{subjectId ? "Temaer i valgt fag" : "Opprettede studietemaer"}</h2>
 
         {isLoadingTopics ? (
           <p>Laster studieplaner...</p>
@@ -425,25 +350,19 @@ export const AdminStudyPlansPage = () => {
               );
 
               const pdfCount = topic.resources.filter(
-                (resource) =>
-                  resource.resourceType === "pdf",
+                (resource) => resource.resourceType === "pdf",
               ).length;
 
               const noteCount = topic.resources.filter(
-                (resource) =>
-                  resource.resourceType === "note",
+                (resource) => resource.resourceType === "note",
               ).length;
 
               const videoCount = topic.resources.filter(
-                (resource) =>
-                  resource.resourceType === "video",
+                (resource) => resource.resourceType === "video",
               ).length;
 
               return (
-                <article
-                  key={topic.id}
-                  className="study-topic-item"
-                >
+                <article key={topic.id} className="study-topic-item">
                   <div className="study-topic-content">
                     <div className="study-topic-heading">
                       <div>
@@ -453,24 +372,16 @@ export const AdminStudyPlansPage = () => {
 
                         <h3>{topic.title}</h3>
 
-                        <span>
-                          {getSubjectLabel(topic.subjectId)}
-                        </span>
+                        <span>{getSubjectLabel(topic.subjectId)}</span>
                       </div>
                     </div>
 
                     <div className="study-topic-summary">
-                      <span>
-                        {readingItems.length} pensumpunkter
-                      </span>
+                      <span>{readingItems.length} pensumpunkter</span>
 
-                      <span>
-                        {lectureItems.length} forelesninger
-                      </span>
+                      <span>{lectureItems.length} forelesninger</span>
 
-                      <span>
-                        {taskItems.length} oppgaver
-                      </span>
+                      <span>{taskItems.length} oppgaver</span>
 
                       <span>{pdfCount} PDF-er</span>
 
@@ -495,9 +406,7 @@ export const AdminStudyPlansPage = () => {
                       disabled={deletingTopicId === topic.id}
                       onClick={() => handleDelete(topic)}
                     >
-                      {deletingTopicId === topic.id
-                        ? "Sletter..."
-                        : "Slett"}
+                      {deletingTopicId === topic.id ? "Sletter..." : "Slett"}
                     </button>
                   </div>
                 </article>

@@ -19,12 +19,22 @@ import {
   type StudyTopicItemType,
   type StudyTopicResourceType,
 } from "../../services/study/studyPlansService";
-import { getNotesBySubject, type DatabaseNote } from "../../services/notes/notesService";
+import {
+  getNotesBySubject,
+  type DatabaseNote,
+} from "../../services/notes/notesService";
 import {
   getVideosBySubject,
   type DatabaseVideo,
 } from "../../services/media/videosService";
-import { getPdfsBySubject, type DatabasePdf } from "../../services/media/pdfsService";
+import {
+  getPdfsBySubject,
+  type DatabasePdf,
+} from "../../services/media/pdfsService";
+import {
+  getTopicsBySubject,
+  type DatabaseTopic,
+} from "../../services/subjects/subjectStructureService";
 
 type ResourceSelection = {
   resourceType: StudyTopicResourceType;
@@ -33,8 +43,8 @@ type ResourceSelection = {
 
 export const useAdminStudyPlans = () => {
   const [subjectId, setSubjectId] = useState("");
-  const [title, setTitle] = useState("");
-  const [sortOrder, setSortOrder] = useState("0");
+  const [structureTopicId, setStructureTopicId] = useState("");
+  const [topics, setTopics] = useState<DatabaseTopic[]>([]);
 
   const [reading, setReading] = useState("");
   const [lectures, setLectures] = useState("");
@@ -58,6 +68,8 @@ export const useAdminStudyPlans = () => {
 
   const [isLoadingTopics, setIsLoadingTopics] = useState(true);
   const [isLoadingResources, setIsLoadingResources] = useState(false);
+  const [isLoadingStructureTopics, setIsLoadingStructureTopics] =
+    useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingTopicId, setDeletingTopicId] = useState<string | null>(null);
 
@@ -83,8 +95,7 @@ export const useAdminStudyPlans = () => {
 
   const resetForm = () => {
     setSubjectId("");
-    setTitle("");
-    setSortOrder("0");
+    setStructureTopicId("");
 
     setReading("");
     setLectures("");
@@ -131,6 +142,27 @@ export const useAdminStudyPlans = () => {
       setErrorMessage("Kunne ikke hente studieplanene.");
     } finally {
       setIsLoadingTopics(false);
+    }
+  }, []);
+
+  const loadStructureTopics = useCallback(async (selectedSubjectId: string) => {
+    if (!selectedSubjectId) {
+      setTopics([]);
+      return;
+    }
+
+    setIsLoadingStructureTopics(true);
+
+    try {
+      const loadedTopics = await getTopicsBySubject(selectedSubjectId);
+
+      setTopics(loadedTopics);
+    } catch (error) {
+      console.error("Kunne ikke hente fagstruktur-temaer:", error);
+      setTopics([]);
+      setErrorMessage("Kunne ikke hente temaene i fagstrukturen.");
+    } finally {
+      setIsLoadingStructureTopics(false);
     }
   }, []);
 
@@ -184,17 +216,14 @@ export const useAdminStudyPlans = () => {
 
   const handleSubjectChange = (newSubjectId: string) => {
     setSubjectId(newSubjectId);
+    setStructureTopicId("");
+
+    loadStructureTopics(newSubjectId);
 
     if (!editingTopic) {
       setSelectedPdfIds([]);
       setSelectedNoteIds([]);
       setSelectedVideoIds([]);
-
-      const topicsInSubject = studyTopics.filter(
-        (topic) => topic.subjectId === newSubjectId,
-      );
-
-      setSortOrder(String(topicsInSubject.length));
     }
   };
 
@@ -253,16 +282,12 @@ export const useAdminStudyPlans = () => {
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const trimmedTitle = title.trim();
-    const parsedSortOrder = Number(sortOrder);
+    const selectedStructureTopic = topics.find(
+      (topic) => topic.id === structureTopicId,
+    );
 
-    if (!trimmedTitle) {
-      setErrorMessage("Temaet må ha en tittel.");
-      return;
-    }
-
-    if (!Number.isInteger(parsedSortOrder) || parsedSortOrder < 0) {
-      setErrorMessage("Rekkefølgen må være et heltall som er 0 eller høyere.");
+    if (!editingTopic && !selectedStructureTopic) {
+      setErrorMessage("Velg et tema fra fagstrukturen.");
       return;
     }
 
@@ -277,10 +302,13 @@ export const useAdminStudyPlans = () => {
 
     try {
       if (editingTopic) {
-        await updateStudyTopic(editingTopic.id, trimmedTitle, parsedSortOrder);
+        await updateStudyTopic(
+          editingTopic.id,
+          editingTopic.title,
+          editingTopic.sortOrder,
+        );
 
         await replaceStudyTopicItems(editingTopic.id, items);
-
         await replaceStudyTopicResources(editingTopic.id, resources);
 
         resetForm();
@@ -290,8 +318,12 @@ export const useAdminStudyPlans = () => {
         return;
       }
 
-      const slug = createSlug(trimmedTitle);
+      if (!selectedStructureTopic) {
+        setErrorMessage("Velg et tema fra fagstrukturen.");
+        return;
+      }
 
+      const slug = createSlug(selectedStructureTopic.name);
       if (!slug) {
         setErrorMessage("Temaet må ha en gyldig tittel.");
         return;
@@ -299,9 +331,10 @@ export const useAdminStudyPlans = () => {
 
       createdTopicId = await createStudyTopic(
         subjectId,
+        selectedStructureTopic.id,
         slug,
-        trimmedTitle,
-        parsedSortOrder,
+        selectedStructureTopic.name,
+        selectedStructureTopic.sortOrder,
       );
 
       await replaceStudyTopicItems(createdTopicId, items);
@@ -364,8 +397,7 @@ export const useAdminStudyPlans = () => {
     setEditingTopic(topic);
 
     setSubjectId(topic.subjectId);
-    setTitle(topic.title);
-    setSortOrder(String(topic.sortOrder));
+    setStructureTopicId(topic.structureTopicId ?? "");
 
     setReading(joinItemValues(topic, "reading"));
     setLectures(joinItemValues(topic, "lecture"));
@@ -452,11 +484,10 @@ export const useAdminStudyPlans = () => {
     subjectId,
     handleSubjectChange,
 
-    title,
-    setTitle,
-
-    sortOrder,
-    setSortOrder,
+    structureTopicId,
+    setStructureTopicId,
+    topics,
+    isLoadingStructureTopics,
 
     reading,
     setReading,
