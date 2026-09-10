@@ -32,7 +32,9 @@ import {
   type DatabasePdf,
 } from "../../services/media/pdfsService";
 import {
+  getSubtopicsByTopic,
   getTopicsBySubject,
+  type DatabaseSubtopic,
   type DatabaseTopic,
 } from "../../services/subjects/subjectStructureService";
 
@@ -45,6 +47,8 @@ export const useAdminStudyPlans = () => {
   const [subjectId, setSubjectId] = useState("");
   const [structureTopicId, setStructureTopicId] = useState("");
   const [topics, setTopics] = useState<DatabaseTopic[]>([]);
+  const [structureSubtopicId, setStructureSubtopicId] = useState("");
+  const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [reading, setReading] = useState("");
   const [lectures, setLectures] = useState("");
@@ -70,6 +74,7 @@ export const useAdminStudyPlans = () => {
   const [isLoadingResources, setIsLoadingResources] = useState(false);
   const [isLoadingStructureTopics, setIsLoadingStructureTopics] =
     useState(false);
+  const [isLoadingSubtopics, setIsLoadingSubtopics] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingTopicId, setDeletingTopicId] = useState<string | null>(null);
 
@@ -145,6 +150,26 @@ export const useAdminStudyPlans = () => {
     }
   }, []);
 
+  const loadSubtopics = useCallback(async (topicId: string) => {
+    if (!topicId) {
+      setSubtopics([]);
+      return;
+    }
+
+    setIsLoadingSubtopics(true);
+
+    try {
+      const loadedSubtopics = await getSubtopicsByTopic(topicId);
+      setSubtopics(loadedSubtopics);
+    } catch (error) {
+      console.error("Kunne ikke hente undertemaer:", error);
+      setSubtopics([]);
+      setErrorMessage("Kunne ikke hente undertemaene.");
+    } finally {
+      setIsLoadingSubtopics(false);
+    }
+  }, []);
+
   const loadStructureTopics = useCallback(async (selectedSubjectId: string) => {
     if (!selectedSubjectId) {
       setTopics([]);
@@ -217,6 +242,8 @@ export const useAdminStudyPlans = () => {
   const handleSubjectChange = (newSubjectId: string) => {
     setSubjectId(newSubjectId);
     setStructureTopicId("");
+    setStructureSubtopicId("");
+    setSubtopics([]);
 
     loadStructureTopics(newSubjectId);
 
@@ -225,6 +252,14 @@ export const useAdminStudyPlans = () => {
       setSelectedNoteIds([]);
       setSelectedVideoIds([]);
     }
+  };
+
+  const handleStructureTopicChange = (newTopicId: string) => {
+    setStructureTopicId(newTopicId);
+    setStructureSubtopicId("");
+    setSubtopics([]);
+
+    loadSubtopics(newTopicId);
   };
 
   const createItems = () => {
@@ -322,8 +357,18 @@ export const useAdminStudyPlans = () => {
         setErrorMessage("Velg et tema fra fagstrukturen.");
         return;
       }
+      const selectedStructureSubtopic = subtopics.find(
+        (subtopic) => subtopic.id === structureSubtopicId,
+      );
 
-      const slug = createSlug(selectedStructureTopic.name);
+      const studyTopicTitle =
+        selectedStructureSubtopic?.name ?? selectedStructureTopic.name;
+
+      const studyTopicSortOrder =
+        selectedStructureSubtopic?.sortOrder ??
+        selectedStructureTopic.sortOrder;
+
+      const slug = createSlug(studyTopicTitle);
       if (!slug) {
         setErrorMessage("Temaet må ha en gyldig tittel.");
         return;
@@ -332,9 +377,10 @@ export const useAdminStudyPlans = () => {
       createdTopicId = await createStudyTopic(
         subjectId,
         selectedStructureTopic.id,
+        structureSubtopicId || null,
         slug,
-        selectedStructureTopic.name,
-        selectedStructureTopic.sortOrder,
+        studyTopicTitle,
+        studyTopicSortOrder,
       );
 
       await replaceStudyTopicItems(createdTopicId, items);
@@ -398,6 +444,13 @@ export const useAdminStudyPlans = () => {
 
     setSubjectId(topic.subjectId);
     setStructureTopicId(topic.structureTopicId ?? "");
+    setStructureSubtopicId(topic.structureSubtopicId ?? "");
+
+    if (topic.structureTopicId) {
+      loadSubtopics(topic.structureTopicId);
+    } else {
+      setSubtopics([]);
+    }
 
     setReading(joinItemValues(topic, "reading"));
     setLectures(joinItemValues(topic, "lecture"));
@@ -488,6 +541,12 @@ export const useAdminStudyPlans = () => {
     setStructureTopicId,
     topics,
     isLoadingStructureTopics,
+
+    structureSubtopicId,
+    setStructureSubtopicId,
+    subtopics,
+    isLoadingSubtopics,
+    handleStructureTopicChange,
 
     reading,
     setReading,

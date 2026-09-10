@@ -8,9 +8,14 @@ export const AdminStudyPlansPage = () => {
     handleSubjectChange,
 
     structureTopicId,
-    setStructureTopicId,
     topics,
     isLoadingStructureTopics,
+    handleStructureTopicChange,
+
+    structureSubtopicId,
+    setStructureSubtopicId,
+    subtopics,
+    isLoadingSubtopics,
 
     reading,
     setReading,
@@ -116,7 +121,7 @@ export const AdminStudyPlansPage = () => {
           <select
             id="study-plan-topic"
             value={structureTopicId}
-            onChange={(event) => setStructureTopicId(event.target.value)}
+            onChange={(event) => handleStructureTopicChange(event.target.value)}
             disabled={
               !subjectId || isLoadingStructureTopics || Boolean(editingTopic)
             }
@@ -129,6 +134,26 @@ export const AdminStudyPlansPage = () => {
             {topics.map((topic) => (
               <option key={topic.id} value={topic.id}>
                 {topic.sortOrder}. {topic.name}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="study-plan-subtopic">Undertema (valgfritt)</label>
+          <select
+            id="study-plan-subtopic"
+            value={structureSubtopicId}
+            onChange={(event) => setStructureSubtopicId(event.target.value)}
+            disabled={
+              !structureTopicId || isLoadingSubtopics || Boolean(editingTopic)
+            }
+          >
+            <option value="">
+              {isLoadingSubtopics ? "Laster undertemaer..." : "Ingen undertema"}
+            </option>
+
+            {subtopics.map((subtopic) => (
+              <option key={subtopic.id} value={subtopic.id}>
+                {subtopic.sortOrder}. {subtopic.name}
               </option>
             ))}
           </select>

@@ -29,6 +29,7 @@ export type DatabaseStudyTopic = {
   id: string;
   subjectId: string;
   structureTopicId: string | null;
+  structureSubtopicId: string | null;
   slug: string;
   title: string;
   sortOrder: number;
@@ -114,6 +115,7 @@ export async function getStudyTopicsBySubject(
     id: topic.id,
     subjectId: topic.subject_id,
     structureTopicId: topic.structure_topic_id ?? null,
+    structureSubtopicId: topic.structure_subtopic_id ?? null,
     slug: topic.slug,
     title: topic.title,
     sortOrder: topic.sort_order,
@@ -125,6 +127,7 @@ export async function getStudyTopicsBySubject(
 export async function createStudyTopic(
   subjectId: string,
   structureTopicId: string,
+  structureSubtopicId: string | null,
   slug: string,
   title: string,
   sortOrder: number,
@@ -134,6 +137,7 @@ export async function createStudyTopic(
     .insert({
       subject_id: subjectId,
       structure_topic_id: structureTopicId,
+      structure_subtopic_id: structureSubtopicId,
       slug,
       title,
       sort_order: sortOrder,
