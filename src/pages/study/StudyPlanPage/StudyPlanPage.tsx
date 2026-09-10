@@ -1,7 +1,8 @@
 import "./StudyPlanPage.css";
+
 import { Link, useParams } from "react-router-dom";
+
 import { BookProgressCard } from "../../../components/progress/BookProgressCard/BookProgressCard";
-import { tma4412Book } from "../../../data/books/tma4412Book";
 import { useStudyPlan } from "../../../hooks/useStudyPlan";
 
 export const StudyPlanPage = () => {
@@ -9,6 +10,7 @@ export const StudyPlanPage = () => {
 
   const {
     topics,
+    books,
     errorMessage,
     isLoading,
 
@@ -58,19 +60,17 @@ export const StudyPlanPage = () => {
       <h1>Fremdriftsplan</h1>
 
       <p>
-        Kryss av det du har lest, sett eller gjort. Planen er
-        sortert etter tema, slik at du kan øve i ditt eget tempo.
+        Kryss av det du har lest, sett eller gjort. Planen er sortert etter
+        tema, slik at du kan øve i ditt eget tempo.
       </p>
 
       <section className="study-plan-summary">
         <div>
-          <p className="study-plan-summary-label">
-            Total fremdrift
-          </p>
+          <p className="study-plan-summary-label">Total fremdrift</p>
 
           <h2>
-            {progressSummary.completed} / {progressSummary.total}{" "}
-            punkter fullført
+            {progressSummary.completed} / {progressSummary.total} punkter
+            fullført
           </h2>
         </div>
 
@@ -86,9 +86,10 @@ export const StudyPlanPage = () => {
         </div>
       </section>
 
-      {subjectId === "tma4412" && (
-        <BookProgressCard book={tma4412Book} />
-      )}
+      {subjectId &&
+        books.map((book) => (
+          <BookProgressCard key={book.id} book={book} subjectId={subjectId} />
+        ))}
 
       {topics.length === 0 ? (
         <p>Ingen studietemaer er lagt til ennå.</p>
@@ -113,32 +114,26 @@ export const StudyPlanPage = () => {
             );
 
             const pdfResources = topic.resources.filter(
-              (resource) =>
-                resource.resourceType === "pdf",
+              (resource) => resource.resourceType === "pdf",
             );
 
             const noteResources = topic.resources.filter(
-              (resource) =>
-                resource.resourceType === "note",
+              (resource) => resource.resourceType === "note",
             );
 
             const videoResources = topic.resources.filter(
-              (resource) =>
-                resource.resourceType === "video",
+              (resource) => resource.resourceType === "video",
             );
 
             return (
-              <section
-                key={topic.id}
-                className="study-plan-card"
-              >
+              <section key={topic.id} className="study-plan-card">
                 <div className="study-plan-card-header">
                   <div>
                     <h2>{topic.title}</h2>
 
                     <p>
-                      {topicProgress.completed} /{" "}
-                      {topicProgress.total} punkter fullført
+                      {topicProgress.completed} / {topicProgress.total} punkter
+                      fullført
                     </p>
                   </div>
 
@@ -162,14 +157,13 @@ export const StudyPlanPage = () => {
                       <h3>Pensum</h3>
 
                       {readingItems.map((item) => {
-                        const bookProgress =
-                          getBookChapterProgress(item.value);
+                        const bookProgress = getBookChapterProgress(item.value);
 
                         if (bookProgress) {
                           return (
                             <Link
                               key={item.id}
-                              to={`/fag/${subjectId}/bok/${tma4412Book.id}`}
+                              to={`/fag/${subjectId}/bok/${bookProgress.book.slug}`}
                               className="study-plan-book-item"
                             >
                               <div className="study-plan-book-item-header">
@@ -199,23 +193,17 @@ export const StudyPlanPage = () => {
                           );
                         }
 
-                        const itemProgressId =
-                          getStudyItemProgressId(topic, item);
+                        const itemProgressId = getStudyItemProgressId(
+                          topic,
+                          item,
+                        );
 
                         return (
-                          <label
-                            key={item.id}
-                            className="study-plan-item"
-                          >
+                          <label key={item.id} className="study-plan-item">
                             <input
                               type="checkbox"
-                              checked={isStudyItemCompleted(
-                                topic,
-                                item,
-                              )}
-                              onChange={() =>
-                                toggleItem(itemProgressId)
-                              }
+                              checked={isStudyItemCompleted(topic, item)}
+                              onChange={() => toggleItem(itemProgressId)}
                             />
 
                             <span>{item.value}</span>
@@ -224,23 +212,17 @@ export const StudyPlanPage = () => {
                       })}
 
                       {lectureItems.map((item) => {
-                        const itemProgressId =
-                          getStudyItemProgressId(topic, item);
+                        const itemProgressId = getStudyItemProgressId(
+                          topic,
+                          item,
+                        );
 
                         return (
-                          <label
-                            key={item.id}
-                            className="study-plan-item"
-                          >
+                          <label key={item.id} className="study-plan-item">
                             <input
                               type="checkbox"
-                              checked={isStudyItemCompleted(
-                                topic,
-                                item,
-                              )}
-                              onChange={() =>
-                                toggleItem(itemProgressId)
-                              }
+                              checked={isStudyItemCompleted(topic, item)}
+                              onChange={() => toggleItem(itemProgressId)}
                             />
 
                             <span>{item.value}</span>
@@ -253,23 +235,17 @@ export const StudyPlanPage = () => {
                       <h3>Oppgaver</h3>
 
                       {taskItems.map((item) => {
-                        const itemProgressId =
-                          getStudyItemProgressId(topic, item);
+                        const itemProgressId = getStudyItemProgressId(
+                          topic,
+                          item,
+                        );
 
                         return (
-                          <label
-                            key={item.id}
-                            className="study-plan-item"
-                          >
+                          <label key={item.id} className="study-plan-item">
                             <input
                               type="checkbox"
-                              checked={isStudyItemCompleted(
-                                topic,
-                                item,
-                              )}
-                              onChange={() =>
-                                toggleItem(itemProgressId)
-                              }
+                              checked={isStudyItemCompleted(topic, item)}
+                              onChange={() => toggleItem(itemProgressId)}
                             />
 
                             <span>{item.value}</span>
@@ -293,14 +269,10 @@ export const StudyPlanPage = () => {
                             className="study-plan-resource-item"
                           >
                             <span>
-                              {isResourceCompleted(resource)
-                                ? "✓"
-                                : "○"}
+                              {isResourceCompleted(resource) ? "✓" : "○"}
                             </span>
 
-                            <span>
-                              {getResourceTitle(resource)}
-                            </span>
+                            <span>{getResourceTitle(resource)}</span>
                           </Link>
                         ))}
                       </div>
@@ -317,14 +289,10 @@ export const StudyPlanPage = () => {
                             className="study-plan-resource-item"
                           >
                             <span>
-                              {isResourceCompleted(resource)
-                                ? "✓"
-                                : "○"}
+                              {isResourceCompleted(resource) ? "✓" : "○"}
                             </span>
 
-                            <span>
-                              {getResourceTitle(resource)}
-                            </span>
+                            <span>{getResourceTitle(resource)}</span>
                           </Link>
                         ))}
                       </div>
@@ -341,14 +309,10 @@ export const StudyPlanPage = () => {
                             className="study-plan-resource-item"
                           >
                             <span>
-                              {isResourceCompleted(resource)
-                                ? "✓"
-                                : "○"}
+                              {isResourceCompleted(resource) ? "✓" : "○"}
                             </span>
 
-                            <span>
-                              {getResourceTitle(resource)}
-                            </span>
+                            <span>{getResourceTitle(resource)}</span>
                           </Link>
                         ))}
                       </div>

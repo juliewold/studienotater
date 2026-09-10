@@ -45,6 +45,7 @@ import { AdminStudyPlansPage } from "./pages/admin/AdminStudyPlansPage/AdminStud
 import { FolderPage } from "./pages/notes/FolderPage/FolderPage";
 import { PracticePage } from "./pages/study/PracticePage/PracticePage";
 import { CalendarPage } from "./pages/CalendarPage/CalendarPage";
+import { AdminBooksPage } from "./pages/admin/AdminBooksPage/AdminBooksPage";
 
 function App() {
   return (
@@ -411,6 +412,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminStudyPlansPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/boker"
+          element={
+            <AdminRoute>
+              <AdminBooksPage />
             </AdminRoute>
           }
         />

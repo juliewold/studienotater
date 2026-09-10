@@ -1,124 +1,250 @@
 import "./BookProgressPage.css";
+
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { tma4412Book } from "../../../data/books/tma4412Book";
+
 import { useBookProgress } from "../../../hooks/useBookProgress";
+import { useBookTaskProgress } from "../../../hooks/useBookTaskProgress";
+import {
+  getBookBySlug,
+  getBookTasksByChapter,
+  type DatabaseBook,
+  type DatabaseBookTask,
+} from "../../../services/study/booksService";
 
 export const BookProgressPage = () => {
-  const { subjectId } = useParams();
+  const { subjectId, bookId } = useParams();
 
-  const book = tma4412Book;
+  const [book, setBook] = useState<DatabaseBook | null>(null);
+
+  const [tasksByChapter, setTasksByChapter] = useState<
+    Record<string, DatabaseBookTask[]>
+  >({});
+
+  const [isLoadingBook, setIsLoadingBook] = useState(true);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+
+  const [bookErrorMessage, setBookErrorMessage] = useState("");
 
   const {
     checkedPages,
     togglePage,
-    isLoading,
-  } = useBookProgress(book.id);
+    isLoading: isLoadingProgress,
+  } = useBookProgress(book?.slug ?? "");
 
-  const totalPages = book.chapters.reduce((total, chapter) => {
-    return total + (chapter.endPage - chapter.startPage + 1);
-  }, 0);
+  const {
+    completedTaskIds,
+    toggleTask,
+    isLoading: isLoadingTaskProgress,
+  } = useBookTaskProgress();
 
-  const readPages = checkedPages.length;
+  useEffect(() => {
+    const loadBook = async () => {
+      if (!subjectId || !bookId) {
+        setBook(null);
+        setIsLoadingBook(false);
+        return;
+      }
 
-  const progress =
-    totalPages === 0 ? 0 : Math.round((readPages / totalPages) * 100);
+      setIsLoadingBook(true);
+      setBookErrorMessage("");
 
-  if (isLoading) {
+      try {
+        const loadedBook = await getBookBySlug(subjectId, bookId);
+
+        setBook(loadedBook);
+
+        if (!loadedBook) {
+          setBookErrorMessage("Fant ikke boka.");
+        }
+      } catch (error) {
+        console.error("Kunne ikke hente bok:", error);
+
+        setBook(null);
+        setBookErrorMessage("Kunne ikke hente boka.");
+      } finally {
+        setIsLoadingBook(false);
+      }
+    };
+
+    loadBook();
+  }, [subjectId, bookId]);
+
+  useEffect(() => {
+    const loadTasks = async () => {
+      if (!book) {
+        setTasksByChapter({});
+        return;
+      }
+
+      setIsLoadingTasks(true);
+
+      try {
+        const chapterTasks = await Promise.all(
+          book.chapters.map(async (chapter) => {
+            const tasks = await getBookTasksByChapter(chapter.id);
+
+            return {
+              chapterId: chapter.id,
+              tasks,
+            };
+          }),
+        );
+
+        const tasksRecord = chapterTasks.reduce<
+          Record<string, DatabaseBookTask[]>
+        >((result, item) => {
+          result[item.chapterId] = item.tasks;
+          return result;
+        }, {});
+
+        setTasksByChapter(tasksRecord);
+      } catch (error) {
+        console.error("Kunne ikke hente bokoppgaver:", error);
+        setTasksByChapter({});
+      } finally {
+        setIsLoadingTasks(false);
+      }
+    };
+
+    loadTasks();
+  }, [book]);
+
+  if (isLoadingBook) {
     return (
       <main className="page-container">
-        <p>Laster bokfremdrift...</p>
+        <p>Laster bok...</p>
       </main>
     );
   }
 
+  if (!book) {
+    return (
+      <main className="page-container">
+        <Link to={subjectId ? `/fag/${subjectId}` : "/"} className="back-link">
+          ← Tilbake
+        </Link>
+
+        <h1>Fant ikke bok</h1>
+
+        <p>
+          {bookErrorMessage || "Fant ingen bok som passer til denne adressen."}
+        </p>
+      </main>
+    );
+  }
+
+  const totalPages = book.chapters.reduce(
+    (total, chapter) => total + chapter.endPage - chapter.startPage + 1,
+    0,
+  );
+
+  const completedPages = checkedPages.filter((page) =>
+    book.chapters.some(
+      (chapter) => page >= chapter.startPage && page <= chapter.endPage,
+    ),
+  ).length;
+
+  const progress =
+    totalPages > 0 ? Math.round((completedPages / totalPages) * 100) : 0;
+
   return (
-    <main className="page-container">
+    <main className="page-container book-progress-page">
       <Link to={`/fag/${subjectId}/studieplan`} className="back-link">
-        ← Tilbake til fremdriftsplan
+        ← Tilbake til studieplan
       </Link>
 
-      <p className="page-label">Bokfremdrift</p>
-      <h1>{book.title}</h1>
+      <header>
+        <p className="page-label">Bok</p>
 
-      <section className="book-progress-card">
-        <div className="book-progress-header">
-          <div>
-            <p className="study-plan-summary-label">Total bokfremdrift</p>
+        <h1>{book.title}</h1>
 
-            <h2>
-              {readPages} / {totalPages} sider lest
-            </h2>
-          </div>
+        <p className="page-description">
+          Kryss av sider og oppgaver etter hvert som du fullfører dem.
+        </p>
 
-          <span>{progress}%</span>
+        <div className="book-progress-summary">
+          <strong>{progress}%</strong>
+
+          <span>
+            {completedPages} / {totalPages} sider
+          </span>
         </div>
+      </header>
 
-        <div className="study-plan-progress-bar">
-          <div
-            className="study-plan-progress-fill"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </section>
+      {isLoadingProgress ? (
+        <p>Laster fremdrift...</p>
+      ) : (
+        <div className="book-chapter-list">
+          {book.chapters.map((chapter) => {
+            const pages = Array.from(
+              {
+                length: chapter.endPage - chapter.startPage + 1,
+              },
+              (_, index) => chapter.startPage + index,
+            );
 
-      <div className="study-plan-list">
-        {book.chapters.map((chapter) => {
-          const chapterPages = chapter.endPage - chapter.startPage + 1;
+            const chapterTasks = tasksByChapter[chapter.id] ?? [];
 
-          const pages = Array.from(
-            { length: chapterPages },
-            (_, index) => chapter.startPage + index,
-          );
-
-          const readChapterPages = pages.filter((page) =>
-            checkedPages.includes(page),
-          ).length;
-
-          const chapterProgress =
-            chapterPages === 0
-              ? 0
-              : Math.round((readChapterPages / chapterPages) * 100);
-
-          return (
-            <section key={chapter.id} className="study-plan-card">
-              <div className="study-plan-card-header">
-                <div>
+            return (
+              <section key={chapter.id} className="book-chapter">
+                <div className="book-chapter-header">
                   <h2>{chapter.title}</h2>
 
-                  <p>
+                  <span>
                     Side {chapter.startPage}–{chapter.endPage}
-                  </p>
+                  </span>
                 </div>
 
-                <span>{chapterProgress}%</span>
-              </div>
+                <div className="book-page-grid">
+                  {pages.map((page) => {
+                    const isChecked = checkedPages.includes(page);
 
-              <div className="study-plan-progress-bar">
-                <div
-                  className="study-plan-progress-fill"
-                  style={{ width: `${chapterProgress}%` }}
-                />
-              </div>
+                    return (
+                      <button
+                        key={page}
+                        type="button"
+                        className={
+                          isChecked
+                            ? "book-page-cell is-read"
+                            : "book-page-cell"
+                        }
+                        onClick={() => togglePage(page)}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <div className="book-page-grid">
-                {pages.map((page) => (
-                  <button
-                    key={page}
-                    type="button"
-                    className={`book-page-cell ${
-                      checkedPages.includes(page) ? "is-read" : ""
-                    }`}
-                    onClick={() => togglePage(page)}
-                    title={`Side ${page}`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
+                {!isLoadingTasks &&
+                  !isLoadingTaskProgress &&
+                  chapterTasks.length > 0 && (
+                    <div className="book-task-list">
+                      <h3>Oppgaver</h3>
+
+                      {chapterTasks.map((task) => {
+                        const isCompleted = completedTaskIds.includes(task.id);
+
+                        return (
+                          <label key={task.id} className="book-task-item">
+                            <input
+                              type="checkbox"
+                              checked={isCompleted}
+                              onChange={() => toggleTask(task.id)}
+                            />
+
+                            <span>{task.title}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+              </section>
+            );
+          })}
+        </div>
+      )}
     </main>
   );
 };

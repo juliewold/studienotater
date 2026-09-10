@@ -21,16 +21,6 @@ export const AdminPage = () => {
           <p>Legg til og administrer eksamener.</p>
         </Link>
 
-        <button type="button" className="admin-card">
-          <h2>Fag</h2>
-          <p>Legg til og rediger fag.</p>
-        </button>
-
-        <Link to="/admin/notater" className="admin-card">
-          <h2>Notater</h2>
-          <p>Legg til og administrer notater.</p>
-        </Link>
-
         <Link to="/admin/videoer" className="admin-card">
           <h2>Videoer</h2>
           <p>Legg til og administrer videoer.</p>
@@ -38,7 +28,6 @@ export const AdminPage = () => {
 
         <Link to="/admin/subject-struktur" className="admin-card">
           <h2>Fagstruktur</h2>
-
           <p>Administrer temaer og undertemaer.</p>
         </Link>
 
@@ -50,6 +39,11 @@ export const AdminPage = () => {
         <Link to="/admin/studieplaner" className="admin-card">
           <h2>Studieplaner</h2>
           <p>Opprett og administrer temaer, oppgaver og ressurser.</p>
+        </Link>
+
+        <Link to="/admin/boker" className="admin-card">
+          <h2>Bøker</h2>
+          <p>Administrer bøker, kapitler og oppgaver.</p>
         </Link>
       </div>
     </main>

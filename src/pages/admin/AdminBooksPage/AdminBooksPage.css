@@ -1,0 +1,171 @@
+.admin-books-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.admin-books-section {
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.admin-books-section h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.admin-books-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-books-form label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+.admin-books-form input,
+.admin-books-form select,
+.admin-books-select {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  font: inherit;
+}
+
+.admin-books-form input:focus,
+.admin-books-form select:focus,
+.admin-books-select:focus {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 1px;
+  border-color: #8b5cf6;
+}
+
+.admin-books-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-books-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.admin-books-actions button,
+.admin-books-item-actions button {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-books-primary-button {
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+.admin-books-secondary-button {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.admin-books-delete-button {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.admin-books-actions button:disabled,
+.admin-books-item-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-books-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.admin-books-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding: 1rem 1.1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.admin-books-item-content {
+  min-width: 0;
+}
+
+.admin-books-item-content strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.admin-books-item-content span {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.admin-books-item-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.5rem;
+}
+
+.admin-books-message {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+}
+
+.admin-books-error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.admin-books-success {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.admin-books-empty {
+  color: #6b7280;
+}
+
+@media (max-width: 700px) {
+  .admin-books-section {
+    padding: 1.1rem;
+  }
+
+  .admin-books-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-books-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-books-item-actions {
+    width: 100%;
+  }
+
+  .admin-books-item-actions button {
+    flex: 1;
+  }
+}
