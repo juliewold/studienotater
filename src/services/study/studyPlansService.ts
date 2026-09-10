@@ -7,10 +7,7 @@ export type StudyTopicItemType =
   | "assignment"
   | "stack";
 
-export type StudyTopicResourceType =
-  | "pdf"
-  | "note"
-  | "video";
+export type StudyTopicResourceType = "pdf" | "note" | "video";
 
 export type DatabaseStudyTopicItem = {
   id: string;
@@ -31,6 +28,7 @@ export type DatabaseStudyTopicResource = {
 export type DatabaseStudyTopic = {
   id: string;
   subjectId: string;
+  structureTopicId: string | null;
   slug: string;
   title: string;
   sortOrder: number;
@@ -56,8 +54,7 @@ const mapStudyTopicResource = (
   return {
     id: String(resource.id),
     topicId: String(resource.topic_id),
-    resourceType:
-      resource.resource_type as StudyTopicResourceType,
+    resourceType: resource.resource_type as StudyTopicResourceType,
     resourceId: String(resource.resource_id),
     sortOrder: Number(resource.sort_order),
   };
@@ -111,25 +108,23 @@ export async function getStudyTopicsBySubject(
   }
 
   const items = (itemData ?? []).map(mapStudyTopicItem);
-  const resources = (resourceData ?? []).map(
-    mapStudyTopicResource,
-  );
+  const resources = (resourceData ?? []).map(mapStudyTopicResource);
 
   return topicData.map((topic) => ({
     id: topic.id,
     subjectId: topic.subject_id,
+    structureTopicId: topic.structure_topic_id ?? null,
     slug: topic.slug,
     title: topic.title,
     sortOrder: topic.sort_order,
     items: items.filter((item) => item.topicId === topic.id),
-    resources: resources.filter(
-      (resource) => resource.topicId === topic.id,
-    ),
+    resources: resources.filter((resource) => resource.topicId === topic.id),
   }));
 }
 
 export async function createStudyTopic(
   subjectId: string,
+  structureTopicId: string,
   slug: string,
   title: string,
   sortOrder: number,
@@ -138,6 +133,7 @@ export async function createStudyTopic(
     .from("study_topics")
     .insert({
       subject_id: subjectId,
+      structure_topic_id: structureTopicId,
       slug,
       title,
       sort_order: sortOrder,
@@ -171,10 +167,7 @@ export async function updateStudyTopic(
 }
 
 export async function deleteStudyTopic(id: string) {
-  const { error } = await supabase
-    .from("study_topics")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("study_topics").delete().eq("id", id);
 
   if (error) {
     throw error;
@@ -187,14 +180,12 @@ export async function createStudyTopicItem(
   value: string,
   sortOrder: number,
 ) {
-  const { error } = await supabase
-    .from("study_topic_items")
-    .insert({
-      topic_id: topicId,
-      type,
-      value,
-      sort_order: sortOrder,
-    });
+  const { error } = await supabase.from("study_topic_items").insert({
+    topic_id: topicId,
+    type,
+    value,
+    sort_order: sortOrder,
+  });
 
   if (error) {
     throw error;
@@ -238,14 +229,12 @@ export async function createStudyTopicResource(
   resourceId: string,
   sortOrder: number,
 ) {
-  const { error } = await supabase
-    .from("study_topic_resources")
-    .insert({
-      topic_id: topicId,
-      resource_type: resourceType,
-      resource_id: resourceId,
-      sort_order: sortOrder,
-    });
+  const { error } = await supabase.from("study_topic_resources").insert({
+    topic_id: topicId,
+    resource_type: resourceType,
+    resource_id: resourceId,
+    sort_order: sortOrder,
+  });
 
   if (error) {
     throw error;
