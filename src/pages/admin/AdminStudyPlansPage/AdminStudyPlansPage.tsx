@@ -392,7 +392,9 @@ export const AdminStudyPlansPage = () => {
                     <div className="study-topic-heading">
                       <div>
                         <p className="study-topic-order">
-                          Rekkefølge {topic.sortOrder}
+                          {topic.structureSubtopicId
+                            ? `Tema ${topic.structureTopicOrder} · Undertema ${topic.structureSubtopicOrder}`
+                            : `Tema ${topic.structureTopicOrder ?? topic.sortOrder}`}
                         </p>
 
                         <h3>{topic.title}</h3>

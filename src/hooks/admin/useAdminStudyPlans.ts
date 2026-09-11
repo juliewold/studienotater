@@ -134,8 +134,22 @@ export const useAdminStudyPlans = () => {
             );
           }
 
-          if (firstTopic.sortOrder !== secondTopic.sortOrder) {
-            return firstTopic.sortOrder - secondTopic.sortOrder;
+          const firstMainOrder =
+            firstTopic.structureTopicOrder ?? firstTopic.sortOrder;
+
+          const secondMainOrder =
+            secondTopic.structureTopicOrder ?? secondTopic.sortOrder;
+
+          if (firstMainOrder !== secondMainOrder) {
+            return firstMainOrder - secondMainOrder;
+          }
+
+          const firstSubtopicOrder = firstTopic.structureSubtopicOrder ?? 0;
+
+          const secondSubtopicOrder = secondTopic.structureSubtopicOrder ?? 0;
+
+          if (firstSubtopicOrder !== secondSubtopicOrder) {
+            return firstSubtopicOrder - secondSubtopicOrder;
           }
 
           return firstTopic.title.localeCompare(secondTopic.title, "nb");

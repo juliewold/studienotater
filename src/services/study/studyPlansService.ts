@@ -30,6 +30,8 @@ export type DatabaseStudyTopic = {
   subjectId: string;
   structureTopicId: string | null;
   structureSubtopicId: string | null;
+  structureTopicOrder: number | null;
+  structureSubtopicOrder: number | null;
   slug: string;
   title: string;
   sortOrder: number;
@@ -68,7 +70,6 @@ export async function getStudyTopicsBySubject(
     .from("study_topics")
     .select("*")
     .eq("subject_id", subjectId)
-    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
   if (topicError) {
@@ -81,9 +82,19 @@ export async function getStudyTopicsBySubject(
 
   const topicIds = topicData.map((topic) => topic.id);
 
+  const structureTopicIds = topicData
+    .map((topic) => topic.structure_topic_id)
+    .filter((id): id is string => Boolean(id));
+
+  const structureSubtopicIds = topicData
+    .map((topic) => topic.structure_subtopic_id)
+    .filter((id): id is string => Boolean(id));
+
   const [
     { data: itemData, error: itemError },
     { data: resourceData, error: resourceError },
+    { data: structureTopicData, error: structureTopicError },
+    { data: structureSubtopicData, error: structureSubtopicError },
   ] = await Promise.all([
     supabase
       .from("study_topic_items")
@@ -98,6 +109,26 @@ export async function getStudyTopicsBySubject(
       .in("topic_id", topicIds)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true }),
+
+    structureTopicIds.length > 0
+      ? supabase
+          .from("topics")
+          .select("id, sort_order")
+          .in("id", structureTopicIds)
+      : Promise.resolve({
+          data: [],
+          error: null,
+        }),
+
+    structureSubtopicIds.length > 0
+      ? supabase
+          .from("subtopics")
+          .select("id, sort_order")
+          .in("id", structureSubtopicIds)
+      : Promise.resolve({
+          data: [],
+          error: null,
+        }),
   ]);
 
   if (itemError) {
@@ -108,20 +139,76 @@ export async function getStudyTopicsBySubject(
     throw resourceError;
   }
 
+  if (structureTopicError) {
+    throw structureTopicError;
+  }
+
+  if (structureSubtopicError) {
+    throw structureSubtopicError;
+  }
+
   const items = (itemData ?? []).map(mapStudyTopicItem);
+
   const resources = (resourceData ?? []).map(mapStudyTopicResource);
 
-  return topicData.map((topic) => ({
-    id: topic.id,
-    subjectId: topic.subject_id,
-    structureTopicId: topic.structure_topic_id ?? null,
-    structureSubtopicId: topic.structure_subtopic_id ?? null,
-    slug: topic.slug,
-    title: topic.title,
-    sortOrder: topic.sort_order,
-    items: items.filter((item) => item.topicId === topic.id),
-    resources: resources.filter((resource) => resource.topicId === topic.id),
-  }));
+  const structureTopicOrders = new Map(
+    (structureTopicData ?? []).map((topic) => [
+      topic.id,
+      Number(topic.sort_order),
+    ]),
+  );
+
+  const structureSubtopicOrders = new Map(
+    (structureSubtopicData ?? []).map((subtopic) => [
+      subtopic.id,
+      Number(subtopic.sort_order),
+    ]),
+  );
+
+  return topicData
+    .map((topic) => ({
+      id: topic.id,
+      subjectId: topic.subject_id,
+      structureTopicId: topic.structure_topic_id ?? null,
+      structureSubtopicId: topic.structure_subtopic_id ?? null,
+
+      structureTopicOrder: topic.structure_topic_id
+        ? (structureTopicOrders.get(topic.structure_topic_id) ?? null)
+        : null,
+
+      structureSubtopicOrder: topic.structure_subtopic_id
+        ? (structureSubtopicOrders.get(topic.structure_subtopic_id) ?? null)
+        : null,
+
+      slug: topic.slug,
+      title: topic.title,
+      sortOrder: topic.sort_order,
+
+      items: items.filter((item) => item.topicId === topic.id),
+
+      resources: resources.filter((resource) => resource.topicId === topic.id),
+    }))
+    .sort((firstTopic, secondTopic) => {
+      const firstMainOrder =
+        firstTopic.structureTopicOrder ?? firstTopic.sortOrder;
+
+      const secondMainOrder =
+        secondTopic.structureTopicOrder ?? secondTopic.sortOrder;
+
+      if (firstMainOrder !== secondMainOrder) {
+        return firstMainOrder - secondMainOrder;
+      }
+
+      const firstSubtopicOrder = firstTopic.structureSubtopicOrder ?? 0;
+
+      const secondSubtopicOrder = secondTopic.structureSubtopicOrder ?? 0;
+
+      if (firstSubtopicOrder !== secondSubtopicOrder) {
+        return firstSubtopicOrder - secondSubtopicOrder;
+      }
+
+      return firstTopic.title.localeCompare(secondTopic.title, "nb");
+    });
 }
 
 export async function createStudyTopic(
