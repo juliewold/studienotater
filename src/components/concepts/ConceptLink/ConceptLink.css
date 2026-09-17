@@ -1,0 +1,12 @@
+.concept-link {
+  color: #7c3aed;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border-bottom: 1px dashed #7c3aed;
+}
+
+.concept-link:hover {
+  color: #5b21b6;
+  border-bottom-color: #5b21b6;
+}

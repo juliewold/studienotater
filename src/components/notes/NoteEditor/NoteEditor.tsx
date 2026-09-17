@@ -1,6 +1,8 @@
 import "./NoteEditor.css";
 import "katex/dist/katex.min.css";
 import { Callout, type CalloutType } from "./Callout";
+import { ConceptLink } from "../../concepts/ConceptLink/ConceptLink";
+import { ConceptPicker } from "../../concepts/ConceptPicker/ConceptPicker";
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import {
@@ -57,6 +59,11 @@ type SlashMenuState = {
   top: number;
 };
 
+type ConceptSelection = {
+  from: number;
+  to: number;
+};
+
 export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
@@ -64,6 +71,9 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   const slashSelectedIndexRef = useRef(0);
 
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isConceptPickerOpen, setIsConceptPickerOpen] = useState(false);
+  const [conceptSelection, setConceptSelection] =
+    useState<ConceptSelection | null>(null);
   const [slashMenu, setSlashMenu] = useState<SlashMenuState | null>(null);
   const [slashSelectedIndex, setSlashSelectedIndex] = useState(0);
   const [mathDialogType, setMathDialogType] = useState<
@@ -108,6 +118,7 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
       }),
 
       Callout,
+      ConceptLink,
     ],
 
     content: value,
@@ -749,7 +760,56 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
         </button>
 
         <div className="toolbar-divider" />
+        <div className="concept-picker-wrapper">
+          <button
+            type="button"
+            className={editor.isActive("conceptLink") ? "is-active" : ""}
+            onClick={() => {
+              if (editor.isActive("conceptLink")) {
+                editor.chain().focus().unsetConceptLink().run();
+                return;
+              }
 
+              const { from, to, empty } = editor.state.selection;
+
+              if (empty) {
+                return;
+              }
+
+              setConceptSelection({ from, to });
+              setIsConceptPickerOpen(true);
+            }}
+            title="Koble markert tekst til begrep"
+          >
+            <BookOpen size={18} />
+          </button>
+
+          {isConceptPickerOpen && (
+            <ConceptPicker
+              onSelect={(concept) => {
+                if (!conceptSelection) {
+                  return;
+                }
+
+                editor
+                  .chain()
+                  .focus()
+                  .setTextSelection(conceptSelection)
+                  .setConceptLink(concept.id)
+                  .run();
+
+                setConceptSelection(null);
+                setIsConceptPickerOpen(false);
+              }}
+              onClose={() => {
+                setConceptSelection(null);
+                setIsConceptPickerOpen(false);
+              }}
+            />
+          )}
+        </div>
+
+        <div className="toolbar-divider" />
         <button
           type="button"
           className={

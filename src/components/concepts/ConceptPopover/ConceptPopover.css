@@ -1,0 +1,64 @@
+.concept-popover {
+  width: min(360px, calc(100vw - 32px));
+  padding: 18px 20px;
+
+  background: #ffffff;
+  border: 1px solid #ede9fe;
+  border-radius: 16px;
+
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+
+  color: #1f2937;
+}
+
+.concept-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.concept-popover-type {
+  color: #7c3aed;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.concept-popover-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+
+  color: #6b7280;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.concept-popover-close:hover {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.concept-popover h3 {
+  margin: 8px 0 6px;
+
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.concept-popover p {
+  margin: 0;
+
+  color: #4b5563;
+  line-height: 1.6;
+}

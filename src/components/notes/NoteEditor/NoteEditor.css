@@ -24,7 +24,8 @@
   backdrop-filter: blur(12px);
 }
 
-.note-editor-toolbar button {
+.note-editor-toolbar > button,
+.note-editor-toolbar > .concept-picker-wrapper > button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -641,4 +642,16 @@
     width: 100%;
     max-width: none;
   }
+}
+
+.concept-picker-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.concept-picker-wrapper .concept-picker {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1000;
 }
