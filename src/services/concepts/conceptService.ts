@@ -1,6 +1,10 @@
 import { concepts } from "../../data/concepts/concepts";
 import type { Concept } from "../../data/concepts/types";
 
+export function getConcepts(): Concept[] {
+  return concepts;
+}
+
 export function getConceptById(conceptId: string): Concept | undefined {
   return concepts.find((concept) => concept.id === conceptId);
 }

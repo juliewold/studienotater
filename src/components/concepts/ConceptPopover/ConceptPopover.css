@@ -62,3 +62,40 @@
   color: #4b5563;
   line-height: 1.6;
 }
+
+.concept-popover-related {
+  margin-top: 14px;
+  padding-top: 12px;
+
+  border-top: 1px solid #ede9fe;
+}
+
+.concept-popover-related-label {
+  display: block;
+  margin-bottom: 7px;
+
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.concept-popover-related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.concept-popover-related-item {
+  padding: 5px 8px;
+
+  background: #f5f3ff;
+  border: 0;
+  border-radius: 7px;
+
+  color: #7c3aed;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}

@@ -1,7 +1,8 @@
 import "./ConceptPicker.css";
 
-import { concepts } from "../../../data/concepts/concepts";
+import { getConcepts } from "../../../services/concepts/conceptService";
 import type { Concept } from "../../../data/concepts/types";
+import { useState } from "react";
 
 const conceptTypeLabels = {
   definition: "Definisjon",
@@ -16,6 +17,19 @@ type ConceptPickerProps = {
 };
 
 export const ConceptPicker = ({ onSelect, onClose }: ConceptPickerProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const concepts = getConcepts();
+
+  const filteredConcepts = concepts.filter((concept) => {
+    const query = searchQuery.toLowerCase();
+
+    return (
+      concept.name.toLowerCase().includes(query) ||
+      concept.shortDefinition.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="concept-picker">
       <div className="concept-picker-header">
@@ -31,8 +45,20 @@ export const ConceptPicker = ({ onSelect, onClose }: ConceptPickerProps) => {
         </button>
       </div>
 
+      <input
+        type="text"
+        className="concept-picker-search"
+        placeholder="Søk etter begrep..."
+        value={searchQuery}
+        onChange={(event) => setSearchQuery(event.target.value)}
+        autoFocus
+      />
+
       <div className="concept-picker-list">
-        {concepts.map((concept) => (
+        {filteredConcepts.length === 0 && (
+          <p className="concept-picker-empty">Ingen begreper funnet</p>
+        )}
+        {filteredConcepts.map((concept) => (
           <button
             key={concept.id}
             type="button"

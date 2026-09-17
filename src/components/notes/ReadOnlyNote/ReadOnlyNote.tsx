@@ -126,6 +126,9 @@ export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
           concept={selectedConcept}
           left={popoverPosition.left}
           top={popoverPosition.top}
+          onSelectConcept={(concept) => {
+            setSelectedConcept(concept);
+          }}
           onClose={() => {
             setSelectedConcept(null);
             setPopoverPosition(null);

@@ -48,10 +48,44 @@
   color: #7c3aed;
 }
 
+.concept-picker-search {
+  box-sizing: border-box;
+
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  outline: none;
+
+  color: #1f2937;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.concept-picker-search:focus {
+  border-color: #7c3aed;
+}
+
+.concept-picker-search::placeholder {
+  color: #9ca3af;
+}
+
 .concept-picker-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.concept-picker-empty {
+  margin: 0;
+  padding: 10px;
+
+  color: #6b7280;
+  font-size: 0.82rem;
+  text-align: center;
 }
 
 .concept-picker-item {
