@@ -1,0 +1,104 @@
+.concept-page {
+  width: min(100% - 48px, 900px);
+  margin: 0 auto;
+  padding: 48px 0 80px;
+}
+
+.concept-page-back {
+  display: inline-block;
+  margin-bottom: 32px;
+
+  color: #7c3aed;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.concept-page-back:hover {
+  color: #5b21b6;
+}
+
+.concept-page-header {
+  margin-bottom: 48px;
+}
+
+.concept-page-type {
+  display: inline-block;
+  margin-bottom: 10px;
+
+  color: #7c3aed;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.concept-page-header h1 {
+  margin: 0 0 16px;
+
+  color: #111827;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.1;
+}
+
+.concept-page-definition {
+  max-width: 700px;
+  margin: 0;
+
+  color: #4b5563;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.concept-page-section {
+  margin-top: 36px;
+}
+
+.concept-page-section h2 {
+  margin: 0 0 12px;
+
+  color: #111827;
+  font-size: 1.2rem;
+}
+
+.concept-page-section p {
+  max-width: 700px;
+  margin: 0;
+
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.concept-page-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.concept-page-related-link {
+  padding: 7px 10px;
+
+  background: #f5f3ff;
+  border-radius: 8px;
+
+  color: #7c3aed;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.concept-page-related-link:hover {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+@media (max-width: 600px) {
+  .concept-page {
+    width: min(100% - 32px, 900px);
+    padding-top: 32px;
+  }
+
+  .concept-page-header {
+    margin-bottom: 36px;
+  }
+}

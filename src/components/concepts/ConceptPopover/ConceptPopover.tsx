@@ -1,5 +1,6 @@
 import "./ConceptPopover.css";
 
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import type { Concept } from "../../../data/concepts/types";
 import { getRelatedConcepts } from "../../../services/concepts/conceptService";
@@ -97,6 +98,13 @@ export const ConceptPopover = ({
           </div>
         </div>
       )}
+
+      <Link
+        to={`/concepts/${concept.slug}`}
+        className="concept-popover-page-link"
+      >
+        Åpne konseptside →
+      </Link>
     </div>
   );
 };

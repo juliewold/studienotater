@@ -46,6 +46,7 @@ import { FolderPage } from "./pages/notes/FolderPage/FolderPage";
 import { PracticePage } from "./pages/study/PracticePage/PracticePage";
 import { CalendarPage } from "./pages/CalendarPage/CalendarPage";
 import { AdminBooksPage } from "./pages/admin/AdminBooksPage/AdminBooksPage";
+import { ConceptPage } from "./pages/concepts/ConceptPage/ConceptPage";
 
 function App() {
   return (
@@ -350,6 +351,15 @@ function App() {
             <AdminRoute>
               <AdminPage />
             </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/concepts/:slug"
+          element={
+            <ProtectedRoute>
+              <ConceptPage />
+            </ProtectedRoute>
           }
         />
 

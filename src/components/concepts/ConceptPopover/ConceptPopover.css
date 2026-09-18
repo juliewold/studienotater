@@ -129,3 +129,17 @@
   font-size: 0.85rem;
   line-height: 1.6;
 }
+
+.concept-popover-page-link {
+  display: inline-block;
+  margin-top: 14px;
+
+  color: #7c3aed;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.concept-popover-page-link:hover {
+  color: #5b21b6;
+}
