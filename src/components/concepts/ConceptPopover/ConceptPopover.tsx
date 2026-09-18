@@ -1,5 +1,6 @@
 import "./ConceptPopover.css";
 
+import { useState } from "react";
 import type { Concept } from "../../../data/concepts/types";
 import { getRelatedConcepts } from "../../../services/concepts/conceptService";
 
@@ -25,6 +26,8 @@ export const ConceptPopover = ({
   onClose,
   onSelectConcept,
 }: ConceptPopoverProps) => {
+  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+
   const relatedConcepts = getRelatedConcepts(concept);
   return (
     <div
@@ -54,6 +57,23 @@ export const ConceptPopover = ({
       <h3>{concept.name}</h3>
 
       <p>{concept.shortDefinition}</p>
+      {concept.explanation && (
+        <div className="concept-popover-explanation">
+          <button
+            type="button"
+            className="concept-popover-explanation-toggle"
+            onClick={() => setIsExplanationOpen((current) => !current)}
+          >
+            {isExplanationOpen ? "Skjul forklaring" : "Mer forklaring"}
+          </button>
+
+          {isExplanationOpen && (
+            <p className="concept-popover-explanation-text">
+              {concept.explanation}
+            </p>
+          )}
+        </div>
+      )}
       {relatedConcepts.length > 0 && (
         <div className="concept-popover-related">
           <span className="concept-popover-related-label">
@@ -66,7 +86,10 @@ export const ConceptPopover = ({
                 key={relatedConcept.id}
                 type="button"
                 className="concept-popover-related-item"
-                onClick={() => onSelectConcept(relatedConcept)}
+                onClick={() => {
+                  setIsExplanationOpen(false);
+                  onSelectConcept(relatedConcept);
+                }}
               >
                 {relatedConcept.name}
               </button>

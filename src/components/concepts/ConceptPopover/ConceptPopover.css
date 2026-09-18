@@ -99,3 +99,33 @@
 
   cursor: pointer;
 }
+
+.concept-popover-explanation {
+  margin-top: 10px;
+}
+
+.concept-popover-explanation-toggle {
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+
+  color: #7c3aed;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.concept-popover-explanation-toggle:hover {
+  color: #5b21b6;
+}
+
+.concept-popover .concept-popover-explanation-text {
+  margin-top: 8px;
+
+  color: #4b5563;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
