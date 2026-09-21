@@ -14,6 +14,7 @@ import { common, createLowlight } from "lowlight";
 import { TableKit } from "@tiptap/extension-table";
 import { Callout } from "../NoteEditor/Callout";
 import { ConceptLink } from "../../concepts/ConceptLink/ConceptLink";
+import { AutomaticConceptLinks } from "../../concepts/AutomaticConceptLinks/AutomaticConceptLinks";
 
 const lowlight = createLowlight(common);
 
@@ -64,6 +65,7 @@ export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
 
       Callout,
       ConceptLink,
+      AutomaticConceptLinks,
     ],
 
     content,
