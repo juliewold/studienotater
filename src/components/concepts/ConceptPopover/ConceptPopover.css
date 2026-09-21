@@ -143,3 +143,60 @@
 .concept-popover-page-link:hover {
   color: #5b21b6;
 }
+
+/* Innhold hentet fra koblede definisjoner og teoremer */
+
+.concept-popover-note-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.9rem;
+}
+
+.concept-popover-note-item {
+  padding-top: 0.8rem;
+  border-top: 1px solid #ede9fe;
+}
+
+.concept-popover-note-item:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.concept-popover-note-type {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #7c3aed;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.concept-popover-note-html {
+  color: #374151;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.concept-popover-note-html p {
+  margin: 0;
+}
+
+.concept-popover-note-source {
+  display: block;
+  margin-top: 0.45rem;
+  color: #9ca3af;
+  font-size: 0.72rem;
+  text-decoration: none;
+}
+
+.concept-popover-note-source:hover {
+  color: #7c3aed;
+}
+
+.concept-popover-content-status {
+  margin: 0.75rem 0 0;
+  color: #9ca3af;
+  font-size: 0.82rem;
+}

@@ -37,6 +37,22 @@ export const Callout = Node.create({
           "data-callout-type": attributes.type,
         }),
       },
+
+      conceptId: {
+        default: null,
+
+        parseHTML: (element) => element.getAttribute("data-concept-id"),
+
+        renderHTML: (attributes) => {
+          if (!attributes.conceptId) {
+            return {};
+          }
+
+          return {
+            "data-concept-id": attributes.conceptId,
+          };
+        },
+      },
     };
   },
 
@@ -81,6 +97,7 @@ export const Callout = Node.create({
 
             attrs: {
               type,
+              conceptId: null,
             },
 
             content: [
