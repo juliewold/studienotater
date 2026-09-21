@@ -41,6 +41,8 @@ import { supabase } from "../../../lib/supabase";
 import { MathDialog } from "./MathDialog/MathDialog";
 import { SlashMenu } from "./SlashMenu";
 import { filterSlashCommands, type SlashCommandItem } from "./slashCommands";
+import { FormulaConceptLink } from "../../concepts/FormulaConceptLink/FormulaConceptLink";
+import { getConceptById } from "../../../services/concepts/conceptService";
 
 const lowlight = createLowlight(common);
 
@@ -59,9 +61,20 @@ type SlashMenuState = {
   top: number;
 };
 
-type ConceptSelection = {
-  from: number;
-  to: number;
+type ConceptSelection =
+  | {
+      type: "text";
+      from: number;
+      to: number;
+    }
+  | {
+      type: "formula";
+      from: number;
+    };
+
+type FormulaControlsPosition = {
+  left: number;
+  top: number;
 };
 
 export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
@@ -74,6 +87,11 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   const [isConceptPickerOpen, setIsConceptPickerOpen] = useState(false);
   const [conceptSelection, setConceptSelection] =
     useState<ConceptSelection | null>(null);
+  const [selectedFormulaConceptId, setSelectedFormulaConceptId] = useState<
+    string | null
+  >(null);
+  const [formulaControlsPosition, setFormulaControlsPosition] =
+    useState<FormulaControlsPosition | null>(null);
   const [slashMenu, setSlashMenu] = useState<SlashMenuState | null>(null);
   const [slashSelectedIndex, setSlashSelectedIndex] = useState(0);
   const [mathDialogType, setMathDialogType] = useState<
@@ -119,6 +137,7 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
 
       Callout,
       ConceptLink,
+      FormulaConceptLink,
     ],
 
     content: value,
@@ -402,6 +421,70 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
       editor.off("update", updateSlashMenu);
       editor.off("selectionUpdate", updateSlashMenu);
       editor.off("focus", updateSlashMenu);
+    };
+  }, [editor]);
+
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    const editorElement = editor.view.dom;
+
+    const handleFormulaClick = (event: MouseEvent) => {
+      const target = event.target;
+
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      const formulaElement = target.closest<HTMLElement>(
+        '[data-type="block-math"]',
+      );
+
+      if (!formulaElement || !editorElement.contains(formulaElement)) {
+        return;
+      }
+
+      let formulaPosition: number;
+
+      try {
+        formulaPosition = editor.view.posAtDOM(formulaElement, 0);
+      } catch {
+        return;
+      }
+
+      const formulaNode = editor.state.doc.nodeAt(formulaPosition);
+
+      if (!formulaNode || formulaNode.type.name !== "blockMath") {
+        return;
+      }
+
+      const conceptId = formulaNode.attrs.conceptId as string | null;
+
+      setConceptSelection({
+        type: "formula",
+        from: formulaPosition,
+      });
+
+      setSelectedFormulaConceptId(conceptId);
+
+      const formulaRect = formulaElement.getBoundingClientRect();
+
+      setFormulaControlsPosition({
+        left: formulaRect.left + formulaRect.width / 2,
+        top: formulaRect.bottom + 12,
+      });
+
+      if (!conceptId) {
+        setIsConceptPickerOpen(true);
+      }
+    };
+
+    editorElement.addEventListener("click", handleFormulaClick);
+
+    return () => {
+      editorElement.removeEventListener("click", handleFormulaClick);
     };
   }, [editor]);
 
@@ -763,8 +846,38 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
         <div className="concept-picker-wrapper">
           <button
             type="button"
-            className={editor.isActive("conceptLink") ? "is-active" : ""}
+            className={
+              editor.isActive("conceptLink") ||
+              (editor.isActive("blockMath") &&
+                Boolean(editor.getAttributes("blockMath").conceptId))
+                ? "is-active"
+                : ""
+            }
             onClick={() => {
+              if (editor.isActive("blockMath")) {
+                const formulaAttributes = editor.getAttributes("blockMath");
+
+                if (formulaAttributes.conceptId) {
+                  editor
+                    .chain()
+                    .focus()
+                    .updateAttributes("blockMath", {
+                      conceptId: null,
+                    })
+                    .run();
+
+                  return;
+                }
+
+                setConceptSelection({
+                  type: "formula",
+                  from: editor.state.selection.from,
+                });
+
+                setIsConceptPickerOpen(true);
+                return;
+              }
+
               if (editor.isActive("conceptLink")) {
                 editor.chain().focus().unsetConceptLink().run();
                 return;
@@ -776,10 +889,15 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
                 return;
               }
 
-              setConceptSelection({ from, to });
+              setConceptSelection({
+                type: "text",
+                from,
+                to,
+              });
+
               setIsConceptPickerOpen(true);
             }}
-            title="Koble markert tekst til begrep"
+            title="Koble markert tekst eller formel til begrep"
           >
             <BookOpen size={18} />
           </button>
@@ -790,15 +908,33 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
                 if (!conceptSelection) {
                   return;
                 }
+                if (conceptSelection.type === "formula") {
+                  editor
+                    .chain()
+                    .focus()
+                    .setNodeSelection(conceptSelection.from)
+                    .updateAttributes("blockMath", {
+                      conceptId: concept.id,
+                    })
+                    .run();
 
-                editor
-                  .chain()
-                  .focus()
-                  .setTextSelection(conceptSelection)
-                  .setConceptLink(concept.id)
-                  .run();
+                  setSelectedFormulaConceptId(concept.id);
+                } else {
+                  editor
+                    .chain()
+                    .focus()
+                    .setTextSelection({
+                      from: conceptSelection.from,
+                      to: conceptSelection.to,
+                    })
+                    .setConceptLink(concept.id)
+                    .run();
+                }
 
-                setConceptSelection(null);
+                if (conceptSelection.type !== "formula") {
+                  setConceptSelection(null);
+                }
+
                 setIsConceptPickerOpen(false);
               }}
               onClose={() => {
@@ -808,8 +944,6 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
             />
           )}
         </div>
-
-        <div className="toolbar-divider" />
         <button
           type="button"
           className={
@@ -1033,6 +1167,63 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
       </div>
 
       <EditorContent editor={editor} />
+
+      {conceptSelection?.type === "formula" &&
+        selectedFormulaConceptId &&
+        formulaControlsPosition &&
+        (() => {
+          const concept = getConceptById(selectedFormulaConceptId);
+
+          if (!concept) {
+            return null;
+          }
+
+          return (
+            <div
+              className="formula-concept-controls"
+              style={{
+                position: "fixed",
+                left: formulaControlsPosition.left,
+                top: formulaControlsPosition.top,
+                transform: "translateX(-50%)",
+                zIndex: 1000,
+              }}
+            >
+              <div className="formula-concept-name">
+                <BookOpen size={15} />
+                <span>{concept.name}</span>
+              </div>
+
+              <div className="formula-concept-actions">
+                <button
+                  type="button"
+                  onClick={() => setIsConceptPickerOpen(true)}
+                >
+                  Endre
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    editor
+                      .chain()
+                      .focus()
+                      .setNodeSelection(conceptSelection.from)
+                      .updateAttributes("blockMath", {
+                        conceptId: null,
+                      })
+                      .run();
+
+                    setSelectedFormulaConceptId(null);
+                    setConceptSelection(null);
+                  }}
+                >
+                  Fjern kobling
+                </button>
+              </div>
+            </div>
+          );
+        })()}
 
       {slashMenu && (
         <div

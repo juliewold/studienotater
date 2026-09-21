@@ -1,23 +1,69 @@
 import "./ConceptPage.css";
+import "katex/dist/katex.min.css";
 
+import katex from "katex";
+
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { BookOpen, Sigma } from "lucide-react";
 
 import {
   getConceptBySlug,
   getRelatedConcepts,
 } from "../../../services/concepts/conceptService";
-
-const conceptTypeLabels = {
-  definition: "Definisjon",
-  theorem: "Teorem",
-  formula: "Formel",
-  method: "Metode",
-};
+import {
+  getConceptContent,
+  type ConceptContentSource,
+} from "../../../services/concepts/conceptContentService";
 
 export const ConceptPage = () => {
   const { slug } = useParams();
 
+  const [conceptContent, setConceptContent] = useState<ConceptContentSource[]>(
+    [],
+  );
+  const [isLoading, setIsLoading] = useState(true);
+
   const concept = slug ? getConceptBySlug(slug) : undefined;
+
+  useEffect(() => {
+    if (!concept) {
+      setConceptContent([]);
+      setIsLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const loadConceptContent = async () => {
+      setIsLoading(true);
+      setConceptContent([]);
+
+      try {
+        const content = await getConceptContent(concept.id);
+
+        if (!isCancelled) {
+          setConceptContent(content);
+        }
+      } catch (error) {
+        console.error("Kunne ikke hente konseptinnhold:", error);
+
+        if (!isCancelled) {
+          setConceptContent([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadConceptContent();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [concept?.id]);
 
   if (!concept) {
     return (
@@ -31,6 +77,28 @@ export const ConceptPage = () => {
 
   const relatedConcepts = getRelatedConcepts(concept);
 
+  const definitions = conceptContent.filter(
+    (item) => item.type === "definition",
+  );
+
+  const formulas = conceptContent.filter((item) => item.type === "formula");
+
+  const theorems = conceptContent.filter((item) => item.type === "theorem");
+
+  const sourceNotes = Array.from(
+    new Map(
+      conceptContent.map((item) => [
+        item.noteId,
+        {
+          noteId: item.noteId,
+          noteTitle: item.noteTitle,
+          subjectId: item.subjectId,
+          noteSlug: item.noteSlug,
+        },
+      ]),
+    ).values(),
+  );
+
   return (
     <main className="concept-page">
       <Link to="/" className="concept-page-back">
@@ -38,16 +106,129 @@ export const ConceptPage = () => {
       </Link>
 
       <header className="concept-page-header">
-        <span className="concept-page-type">
-          {conceptTypeLabels[concept.type]}
-        </span>
-
         <h1>{concept.name}</h1>
 
-        <p className="concept-page-definition">{concept.shortDefinition}</p>
+        {!isLoading && conceptContent.length === 0 && (
+          <p className="concept-page-definition">{concept.shortDefinition}</p>
+        )}
       </header>
 
-      {concept.explanation && (
+      {isLoading && (
+        <section className="concept-page-section">
+          <p>Henter innhold...</p>
+        </section>
+      )}
+
+      {!isLoading && definitions.length > 0 && (
+        <section className="concept-page-section">
+          {definitions.map((definition, index) => (
+            <div
+              key={`${definition.noteId}-definition-${index}`}
+              className="concept-page-callout concept-page-callout-definition"
+            >
+              <div className="concept-page-callout-header">
+                <div className="concept-page-callout-heading">
+                  <BookOpen size={18} />
+                  <span>Definisjon</span>
+                </div>
+              </div>
+
+              <div className="concept-page-callout-body">
+                {definition.type !== "formula" && (
+                  <div
+                    className="concept-page-content-html"
+                    dangerouslySetInnerHTML={{
+                      __html: definition.html,
+                    }}
+                  />
+                )}
+
+                <Link
+                  to={`/fag/${definition.subjectId}/notater/${definition.noteSlug}`}
+                  className="concept-page-source"
+                >
+                  Fra {definition.noteTitle} →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {!isLoading && formulas.length > 0 && (
+        <section className="concept-page-section concept-page-formulas">
+          <h2>Formler</h2>
+          {formulas.map((formula, index) => {
+            if (formula.type !== "formula") {
+              return null;
+            }
+
+            const renderedFormula = katex.renderToString(formula.latex, {
+              throwOnError: false,
+              displayMode: true,
+            });
+
+            return (
+              <div
+                key={`${formula.noteId}-formula-${index}`}
+                className="concept-page-formula"
+              >
+                <div
+                  className="concept-page-formula-math"
+                  dangerouslySetInnerHTML={{
+                    __html: renderedFormula,
+                  }}
+                />
+
+                <Link
+                  to={`/fag/${formula.subjectId}/notater/${formula.noteSlug}`}
+                  className="concept-page-source"
+                >
+                  Fra {formula.noteTitle} →
+                </Link>
+              </div>
+            );
+          })}
+        </section>
+      )}
+
+      {!isLoading && theorems.length > 0 && (
+        <section className="concept-page-section">
+          {theorems.map((theorem, index) => (
+            <div
+              key={`${theorem.noteId}-theorem-${index}`}
+              className="concept-page-callout concept-page-callout-theorem"
+            >
+              <div className="concept-page-callout-header">
+                <div className="concept-page-callout-heading">
+                  <Sigma size={18} />
+                  <span>Teorem</span>
+                </div>
+              </div>
+
+              <div className="concept-page-callout-body">
+                {theorem.type !== "formula" && (
+                  <div
+                    className="concept-page-content-html"
+                    dangerouslySetInnerHTML={{
+                      __html: theorem.html,
+                    }}
+                  />
+                )}
+
+                <Link
+                  to={`/fag/${theorem.subjectId}/notater/${theorem.noteSlug}`}
+                  className="concept-page-source"
+                >
+                  Fra {theorem.noteTitle} →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {!isLoading && conceptContent.length === 0 && concept.explanation && (
         <section className="concept-page-section">
           <h2>Forklaring</h2>
           <p>{concept.explanation}</p>
@@ -66,6 +247,25 @@ export const ConceptPage = () => {
                 className="concept-page-related-link"
               >
                 {relatedConcept.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!isLoading && sourceNotes.length > 0 && (
+        <section className="concept-page-section">
+          <h2>Finnes i notater</h2>
+
+          <div className="concept-page-notes">
+            {sourceNotes.map((note) => (
+              <Link
+                key={note.noteId}
+                to={`/fag/${note.subjectId}/notater/${note.noteSlug}`}
+                className="concept-page-note-link"
+              >
+                {note.noteTitle}
+                <span>→</span>
               </Link>
             ))}
           </div>
