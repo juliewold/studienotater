@@ -1,0 +1,202 @@
+.concept-popover {
+  width: min(360px, calc(100vw - 32px));
+  padding: 18px 20px;
+
+  background: #ffffff;
+  border: 1px solid #ede9fe;
+  border-radius: 16px;
+
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+
+  color: #1f2937;
+}
+
+.concept-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.concept-popover-type {
+  color: #7c3aed;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.concept-popover-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+
+  color: #6b7280;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.concept-popover-close:hover {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.concept-popover h3 {
+  margin: 8px 0 6px;
+
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.concept-popover p {
+  margin: 0;
+
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.concept-popover-related {
+  margin-top: 14px;
+  padding-top: 12px;
+
+  border-top: 1px solid #ede9fe;
+}
+
+.concept-popover-related-label {
+  display: block;
+  margin-bottom: 7px;
+
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.concept-popover-related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.concept-popover-related-item {
+  padding: 5px 8px;
+
+  background: #f5f3ff;
+  border: 0;
+  border-radius: 7px;
+
+  color: #7c3aed;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.concept-popover-explanation {
+  margin-top: 10px;
+}
+
+.concept-popover-explanation-toggle {
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+
+  color: #7c3aed;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.concept-popover-explanation-toggle:hover {
+  color: #5b21b6;
+}
+
+.concept-popover .concept-popover-explanation-text {
+  margin-top: 8px;
+
+  color: #4b5563;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.concept-popover-page-link {
+  display: inline-block;
+  margin-top: 14px;
+
+  color: #7c3aed;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.concept-popover-page-link:hover {
+  color: #5b21b6;
+}
+
+/* Innhold hentet fra koblede definisjoner og teoremer */
+
+.concept-popover-note-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.9rem;
+}
+
+.concept-popover-note-item {
+  padding-top: 0.8rem;
+  border-top: 1px solid #ede9fe;
+}
+
+.concept-popover-note-item:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.concept-popover-note-type {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #7c3aed;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.concept-popover-note-html {
+  color: #374151;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.concept-popover-note-html p {
+  margin: 0;
+}
+
+.concept-popover-note-source {
+  display: block;
+  margin-top: 0.45rem;
+  color: #9ca3af;
+  font-size: 0.72rem;
+  text-decoration: none;
+}
+
+.concept-popover-note-source:hover {
+  color: #7c3aed;
+}
+
+.concept-popover-content-status {
+  margin: 0.75rem 0 0;
+  color: #9ca3af;
+  font-size: 0.82rem;
+}

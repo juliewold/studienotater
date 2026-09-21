@@ -24,7 +24,8 @@
   backdrop-filter: blur(12px);
 }
 
-.note-editor-toolbar button {
+.note-editor-toolbar > button,
+.note-editor-toolbar > .concept-picker-wrapper > button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -442,7 +443,7 @@
 .read-only-note-content .note-callout {
   position: relative;
   margin: 1.4rem 0;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid;
   border-radius: 16px;
 }
@@ -641,4 +642,170 @@
     width: 100%;
     max-width: none;
   }
+}
+
+.concept-picker-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.concept-picker-wrapper .concept-picker {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1000;
+}
+
+/* Konseptkobling i definisjon- og teoremblokker */
+
+.note-callout-concept {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.1rem 0;
+}
+
+.note-callout-concept .concept-picker {
+  position: static;
+  flex-basis: 100%;
+  margin-top: 0.25rem;
+}
+
+.note-callout-concept-selected {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.note-callout[data-callout-type="definition"] .note-callout-concept-selected {
+  color: #2d7147;
+}
+
+.note-callout[data-callout-type="theorem"] .note-callout-concept-selected {
+  color: #b03838;
+}
+
+.note-callout-concept-button,
+.note-callout-concept-change,
+.note-callout-concept-unlink {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.note-callout-concept-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0;
+
+  color: #7c3aed;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.note-callout-concept-button:hover {
+  color: #5b21b6;
+}
+
+.note-callout-concept-change {
+  padding: 0;
+  color: #7c3aed;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.note-callout-concept-change:hover {
+  color: #5b21b6;
+}
+
+.note-callout-concept-unlink {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  place-items: center;
+
+  border-radius: 7px;
+  color: #8b8492;
+}
+
+.note-callout-concept-unlink:hover {
+  background: rgba(255, 255, 255, 0.65);
+  color: #b53c3c;
+}
+
+.note-callout-concept .concept-picker {
+  position: static;
+  margin-top: 0.5rem;
+}
+
+.formula-concept-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 6px 10px;
+
+  background: #ffffff;
+  border: 1px solid #ede9fe;
+  border-radius: 8px;
+
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.08);
+
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.formula-concept-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  color: #6d28d9;
+  font-weight: 600;
+}
+
+.formula-concept-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.formula-concept-actions::before {
+  content: "";
+  width: 1px;
+  height: 14px;
+  background: #ddd6fe;
+}
+
+.formula-concept-actions button {
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+
+  color: #7c3aed;
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.formula-concept-actions button:hover {
+  color: #5b21b6;
+}
+
+.formula-concept-actions button:last-child {
+  color: #6b7280;
+}
+
+.formula-concept-actions button:last-child:hover {
+  color: #374151;
 }

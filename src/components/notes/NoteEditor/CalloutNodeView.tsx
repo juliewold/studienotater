@@ -3,16 +3,21 @@ import {
   NodeViewWrapper,
   type NodeViewProps,
 } from "@tiptap/react";
+import { useState } from "react";
 import {
   BadgeCheck,
   BookOpen,
   Lightbulb,
+  Link2,
   Puzzle,
   Sigma,
   Trash2,
+  Unlink,
 } from "lucide-react";
 
 import type { CalloutType } from "./Callout";
+import { ConceptPicker } from "../../concepts/ConceptPicker/ConceptPicker";
+import { getConceptById } from "../../../services/concepts/conceptService";
 
 const calloutInformation = {
   definition: {
@@ -53,15 +58,35 @@ export const CalloutNodeView = ({
   updateAttributes,
   deleteNode,
 }: NodeViewProps) => {
-  const type = (node.attrs.type as CalloutType) ?? "definition";
+  const [isConceptPickerOpen, setIsConceptPickerOpen] = useState(false);
+
+  const storedType = node.attrs.type as string | undefined;
+
+  const type: CalloutType =
+    storedType && storedType in calloutInformation
+      ? (storedType as CalloutType)
+      : "definition";
+
+  const conceptId = node.attrs.conceptId as string | null;
 
   const callout = calloutInformation[type];
   const Icon = callout.icon;
 
+  const concept = conceptId ? getConceptById(conceptId) : undefined;
+
+  const canLinkConcept = type === "definition" || type === "theorem";
+
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newType = event.target.value as CalloutType;
+
     updateAttributes({
-      type: event.target.value as CalloutType,
+      type: newType,
+
+      conceptId:
+        newType === "definition" || newType === "theorem" ? conceptId : null,
     });
+
+    setIsConceptPickerOpen(false);
   };
 
   const handleDelete = () => {
@@ -69,7 +94,11 @@ export const CalloutNodeView = ({
   };
 
   return (
-    <NodeViewWrapper className="note-callout" data-callout-type={type}>
+    <NodeViewWrapper
+      className="note-callout"
+      data-callout-type={type}
+      data-concept-id={conceptId ?? undefined}
+    >
       <div className="note-callout-header" contentEditable={false}>
         <div className="note-callout-heading">
           <Icon size={18} />
@@ -115,6 +144,72 @@ export const CalloutNodeView = ({
           </div>
         )}
       </div>
+
+      {canLinkConcept && (
+        <div className="note-callout-concept" contentEditable={false}>
+          {concept ? (
+            <div className="note-callout-concept-selected">
+              <span>{concept.name}</span>
+
+              {editor.isEditable && (
+                <button
+                  type="button"
+                  className="note-callout-concept-unlink"
+                  onClick={() => {
+                    updateAttributes({
+                      conceptId: null,
+                    });
+                  }}
+                  title="Fjern kobling til begrep"
+                  aria-label="Fjern kobling til begrep"
+                >
+                  <Unlink size={15} />
+                </button>
+              )}
+            </div>
+          ) : (
+            editor.isEditable && (
+              <button
+                type="button"
+                className="note-callout-concept-button"
+                onClick={() => {
+                  setIsConceptPickerOpen((current) => !current);
+                }}
+              >
+                <Link2 size={16} />
+                Koble til begrep
+              </button>
+            )
+          )}
+
+          {editor.isEditable && concept && (
+            <button
+              type="button"
+              className="note-callout-concept-change"
+              onClick={() => {
+                setIsConceptPickerOpen((current) => !current);
+              }}
+            >
+              Endre
+            </button>
+          )}
+
+          {isConceptPickerOpen && (
+            <ConceptPicker
+              onSelect={(selectedConcept) => {
+                updateAttributes({
+                  conceptId: selectedConcept.id,
+                });
+
+                setIsConceptPickerOpen(false);
+              }}
+              onClose={() => {
+                setIsConceptPickerOpen(false);
+              }}
+            />
+          )}
+        </div>
+      )}
 
       <NodeViewContent className="note-callout-body" />
     </NodeViewWrapper>

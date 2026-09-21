@@ -1,0 +1,237 @@
+.concept-page {
+  width: min(100% - 48px, 900px);
+  margin: 0 auto;
+  padding: 48px 0 80px;
+}
+
+.concept-page-back {
+  display: inline-block;
+  margin-bottom: 32px;
+
+  color: #7c3aed;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.concept-page-back:hover {
+  color: #5b21b6;
+}
+
+.concept-page-header {
+  margin-bottom: 48px;
+}
+
+.concept-page-type {
+  display: inline-block;
+  margin-bottom: 10px;
+
+  color: #7c3aed;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.concept-page-header h1 {
+  margin: 0 0 16px;
+
+  color: #111827;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.1;
+}
+
+.concept-page-definition {
+  max-width: 700px;
+  margin: 0;
+
+  color: #4b5563;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.concept-page-section {
+  margin-top: 36px;
+}
+
+.concept-page-section h2 {
+  margin: 0 0 12px;
+
+  color: #111827;
+  font-size: 1.2rem;
+}
+
+.concept-page-section p {
+  max-width: 700px;
+  margin: 0;
+
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.concept-page-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.concept-page-related-link {
+  padding: 7px 10px;
+
+  background: #f5f3ff;
+  border-radius: 8px;
+
+  color: #7c3aed;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.concept-page-related-link:hover {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+/* Definisjoner og teoremer */
+
+.concept-page-callout {
+  max-width: 700px;
+  overflow: hidden;
+  border: 1px solid;
+  border-radius: 16px;
+}
+
+.concept-page-callout + .concept-page-callout {
+  margin-top: 20px;
+}
+
+.concept-page-callout-header {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid rgba(30, 24, 38, 0.06);
+}
+
+.concept-page-callout-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.concept-page-callout-body {
+  padding: 1rem 1.1rem;
+}
+
+.concept-page-content-html {
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.concept-page-content-html p {
+  margin: 0;
+}
+
+/* Definisjon */
+
+.concept-page-callout-definition {
+  border-color: #b8dfc3;
+  background: #f3faf5;
+}
+
+.concept-page-callout-definition .concept-page-callout-header {
+  background: #e4f4e9;
+  color: #2d7147;
+}
+
+/* Teorem */
+
+.concept-page-callout-theorem {
+  border-color: #efbcbc;
+  background: #fff5f5;
+}
+
+.concept-page-callout-theorem .concept-page-callout-header {
+  background: #fde5e5;
+  color: #b03838;
+}
+
+/* Kilde */
+
+.concept-page-source {
+  display: inline-block;
+  margin-top: 12px;
+  color: #7c3aed;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.concept-page-source:hover {
+  color: #5b21b6;
+}
+
+.concept-page-notes {
+  display: flex;
+  flex-direction: column;
+  max-width: 700px;
+}
+
+.concept-page-note-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.concept-page-note-link:first-child {
+  border-top: 1px solid #e5e7eb;
+}
+
+.concept-page-note-link span {
+  color: #7c3aed;
+}
+
+.concept-page-note-link:hover {
+  color: #7c3aed;
+}
+
+.concept-page-formulas {
+  margin-top: 32px;
+}
+
+.concept-page-formula {
+  padding: 20px 0;
+}
+
+.concept-page-formula-math {
+  display: flex;
+  justify-content: center;
+
+  padding: 12px 0 18px;
+
+  font-size: 1.05rem;
+}
+
+.concept-page-formula .concept-page-source {
+  display: inline-block;
+  margin-top: 4px;
+}
+
+@media (max-width: 600px) {
+  .concept-page {
+    width: min(100% - 32px, 900px);
+    padding-top: 32px;
+  }
+
+  .concept-page-header {
+    margin-bottom: 36px;
+  }
+}
