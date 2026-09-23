@@ -10,6 +10,5 @@ export type Concept = {
   explanation?: string;
 
   subjectIds: string[];
-  subtopicIds: string[];
   relatedConceptIds: string[];
 };

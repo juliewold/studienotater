@@ -38,37 +38,6 @@ export async function getConceptIdsBySubtopic(
   return (data ?? []).map((link) => link.concept_id);
 }
 
-export async function setConceptSubtopics(
-  conceptId: string,
-  subtopicIds: string[],
-) {
-  const { error: deleteError } = await supabase
-    .from("concept_subtopics")
-    .delete()
-    .eq("concept_id", conceptId);
-
-  if (deleteError) {
-    throw deleteError;
-  }
-
-  if (subtopicIds.length === 0) {
-    return;
-  }
-
-  const { error: insertError } = await supabase
-    .from("concept_subtopics")
-    .insert(
-      subtopicIds.map((subtopicId) => ({
-        concept_id: conceptId,
-        subtopic_id: subtopicId,
-      })),
-    );
-
-  if (insertError) {
-    throw insertError;
-  }
-}
-
 export async function addConceptSubtopic(
   conceptId: string,
   subtopicId: string,
