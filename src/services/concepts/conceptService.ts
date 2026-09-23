@@ -20,3 +20,7 @@ export function getRelatedConcepts(concept: Concept): Concept[] {
       Boolean(relatedConcept),
     );
 }
+
+export function getConceptsBySubtopic(subtopicId: string): Concept[] {
+  return concepts.filter((concept) => concept.subtopicIds.includes(subtopicId));
+}

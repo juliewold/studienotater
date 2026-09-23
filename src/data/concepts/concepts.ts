@@ -14,6 +14,7 @@ export const concepts: Concept[] = [
       "Forventningsverdien beskriver den langsiktige gjennomsnittsverdien til en stokastisk variabel.",
 
     subjectIds: ["tma4240"],
+    subtopicIds: [],
     relatedConceptIds: ["variance"],
   },
 
@@ -30,6 +31,7 @@ export const concepts: Concept[] = [
       "Variansen beskriver spredningen rundt forventningsverdien og er definert som forventningsverdien av det kvadrerte avviket fra forventningsverdien.",
 
     subjectIds: ["tma4240"],
+    subtopicIds: [],
     relatedConceptIds: ["expected-value"],
   },
 ];

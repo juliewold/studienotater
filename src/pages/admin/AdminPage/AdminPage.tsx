@@ -31,6 +31,11 @@ export const AdminPage = () => {
           <p>Administrer temaer og undertemaer.</p>
         </Link>
 
+        <Link to="/admin/concepts" className="admin-card">
+          <h2>Konsepter</h2>
+          <p>Koble konsepter til temaer og undertemaer.</p>
+        </Link>
+
         <Link to="/admin/flashcards" className="admin-card">
           <h2>Flashcards</h2>
           <p>Legg til og administrer flashcards.</p>
