@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 
-import { getConceptById } from "../../../services/concepts/conceptService";
+import { getConceptsFromDatabase } from "../../../services/concepts/conceptService";
 import { getConceptIdsBySubtopic } from "../../../services/concepts/conceptSubtopicsService";
 import type { Concept } from "../../../data/concepts/types";
+
 import {
   getSubtopicsByTopic,
   getTopicsBySubject,
@@ -16,10 +17,11 @@ import {
 
 export const SubtopicPage = () => {
   const { subjectId, topicId, subtopicId } = useParams();
-  const [concepts, setConcepts] = useState<Concept[]>([]);
 
+  const [concepts, setConcepts] = useState<Concept[]>([]);
   const [topic, setTopic] = useState<DatabaseTopic | null>(null);
   const [subtopic, setSubtopic] = useState<DatabaseSubtopic | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -34,23 +36,28 @@ export const SubtopicPage = () => {
       setErrorMessage("");
 
       try {
-        const [topics, subtopics, conceptIds] = await Promise.all([
+        const [topics, subtopics, conceptIds, allConcepts] = await Promise.all([
           getTopicsBySubject(subjectId),
           getSubtopicsByTopic(topicId),
           getConceptIdsBySubtopic(subtopicId),
+          getConceptsFromDatabase(),
         ]);
 
-        const loadedConcepts = conceptIds
-          .map((conceptId) => getConceptById(conceptId))
-          .filter((concept): concept is Concept => Boolean(concept));
+        const conceptIdSet = new Set(conceptIds);
+
+        const loadedConcepts = allConcepts.filter((concept) =>
+          conceptIdSet.has(concept.id),
+        );
 
         setConcepts(loadedConcepts);
 
         setTopic(topics.find((item) => item.id === topicId) ?? null);
+
         setSubtopic(subtopics.find((item) => item.id === subtopicId) ?? null);
       } catch (error) {
         console.error("Kunne ikke hente undertema:", error);
 
+        setConcepts([]);
         setTopic(null);
         setSubtopic(null);
         setErrorMessage("Kunne ikke hente undertemaet.");
@@ -59,7 +66,7 @@ export const SubtopicPage = () => {
       }
     };
 
-    loadSubtopic();
+    void loadSubtopic();
   }, [subjectId, topicId, subtopicId]);
 
   if (isLoading) {

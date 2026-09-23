@@ -43,6 +43,7 @@ import { SlashMenu } from "./SlashMenu";
 import { filterSlashCommands, type SlashCommandItem } from "./slashCommands";
 import { FormulaConceptLink } from "../../concepts/FormulaConceptLink/FormulaConceptLink";
 import { getConceptById } from "../../../services/concepts/conceptService";
+import type { NoteContentJson } from "../../../services/notes/notesService";
 
 const lowlight = createLowlight(common);
 
@@ -50,7 +51,7 @@ const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
 type NoteEditorProps = {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, contentJson: NoteContentJson) => void;
 };
 
 type SlashMenuState = {
@@ -336,7 +337,7 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
     },
 
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onChange(editor.getHTML(), editor.getJSON());
     },
   });
 
