@@ -68,6 +68,7 @@ export const CalloutNodeView = ({
       : "definition";
 
   const conceptId = node.attrs.conceptId as string | null;
+  const conceptName = node.attrs.conceptName as string | null;
 
   const callout = calloutInformation[type];
   const Icon = callout.icon;
@@ -144,6 +145,20 @@ export const CalloutNodeView = ({
           </div>
         )}
       </div>
+
+      {canLinkConcept && editor.isEditable && (
+        <input
+          type="text"
+          className="note-callout-concept-name"
+          value={conceptName ?? ""}
+          onChange={(event) => {
+            updateAttributes({
+              conceptName: event.target.value,
+            });
+          }}
+          placeholder={type === "theorem" ? "Navn på teorem" : "Navn på begrep"}
+        />
+      )}
 
       {canLinkConcept && (
         <div className="note-callout-concept" contentEditable={false}>

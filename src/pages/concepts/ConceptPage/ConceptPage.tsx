@@ -7,10 +7,9 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { BookOpen, Sigma } from "lucide-react";
 
-import {
-  getConceptBySlug,
-  getRelatedConcepts,
-} from "../../../services/concepts/conceptService";
+import { getConceptBySlugFromDatabase } from "../../../services/concepts/conceptService";
+import type { Concept } from "../../../data/concepts/types";
+
 import {
   getConceptContent,
   type ConceptContentSource,
@@ -19,12 +18,52 @@ import {
 export const ConceptPage = () => {
   const { slug } = useParams();
 
+  const [concept, setConcept] = useState<Concept | undefined>();
+  const [isConceptLoading, setIsConceptLoading] = useState(true);
+
   const [conceptContent, setConceptContent] = useState<ConceptContentSource[]>(
     [],
   );
+
   const [isLoading, setIsLoading] = useState(true);
 
-  const concept = slug ? getConceptBySlug(slug) : undefined;
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadConcept = async () => {
+      if (!slug) {
+        setConcept(undefined);
+        setIsConceptLoading(false);
+        return;
+      }
+
+      setIsConceptLoading(true);
+
+      try {
+        const loadedConcept = await getConceptBySlugFromDatabase(slug);
+
+        if (!isCancelled) {
+          setConcept(loadedConcept);
+        }
+      } catch (error) {
+        console.error("Kunne ikke hente konsept:", error);
+
+        if (!isCancelled) {
+          setConcept(undefined);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsConceptLoading(false);
+        }
+      }
+    };
+
+    void loadConcept();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [slug]);
 
   useEffect(() => {
     if (!concept) {
@@ -65,6 +104,14 @@ export const ConceptPage = () => {
     };
   }, [concept?.id]);
 
+  if (isConceptLoading) {
+    return (
+      <main className="concept-page">
+        <p>Henter konsept...</p>
+      </main>
+    );
+  }
+
   if (!concept) {
     return (
       <main className="concept-page">
@@ -75,7 +122,7 @@ export const ConceptPage = () => {
     );
   }
 
-  const relatedConcepts = getRelatedConcepts(concept);
+  const relatedConcepts: Concept[] = [];
 
   const definitions = conceptContent.filter(
     (item) => item.type === "definition",
@@ -158,6 +205,7 @@ export const ConceptPage = () => {
       {!isLoading && formulas.length > 0 && (
         <section className="concept-page-section concept-page-formulas">
           <h2>Formler</h2>
+
           {formulas.map((formula, index) => {
             if (formula.type !== "formula") {
               return null;

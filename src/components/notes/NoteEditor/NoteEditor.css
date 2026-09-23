@@ -809,3 +809,27 @@
 .formula-concept-actions button:last-child:hover {
   color: #374151;
 }
+
+.note-callout-concept-name {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 6px 0;
+
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #ddd6fe;
+  outline: none;
+
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+}
+
+.note-callout-concept-name:focus {
+  border-bottom-color: #7c3aed;
+}
+
+.note-callout-concept-name::placeholder {
+  color: #a1a1aa;
+  font-weight: 400;
+}

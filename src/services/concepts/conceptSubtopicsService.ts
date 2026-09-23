@@ -42,18 +42,30 @@ export async function addConceptSubtopic(
   conceptId: string,
   subtopicId: string,
 ) {
-  const { error } = await supabase.from("concept_subtopics").upsert(
-    {
+  const { data: existingLink, error: selectError } = await supabase
+    .from("concept_subtopics")
+    .select("concept_id")
+    .eq("concept_id", conceptId)
+    .eq("subtopic_id", subtopicId)
+    .maybeSingle();
+
+  if (selectError) {
+    throw selectError;
+  }
+
+  if (existingLink) {
+    return;
+  }
+
+  const { error: insertError } = await supabase
+    .from("concept_subtopics")
+    .insert({
       concept_id: conceptId,
       subtopic_id: subtopicId,
-    },
-    {
-      onConflict: "concept_id,subtopic_id",
-    },
-  );
+    });
 
-  if (error) {
-    throw error;
+  if (insertError) {
+    throw insertError;
   }
 }
 

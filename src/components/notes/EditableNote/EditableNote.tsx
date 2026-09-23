@@ -7,6 +7,7 @@ import { NoteEditor } from "../NoteEditor/NoteEditor";
 import {
   updateNote,
   type DatabaseNote,
+  type NoteContentJson,
 } from "../../../services/notes/notesService";
 
 import {
@@ -15,6 +16,8 @@ import {
   type DatabaseTopic,
   type DatabaseSubtopic,
 } from "../../../services/subjects/subjectStructureService";
+
+import { autoLinkConceptsToSubtopic } from "../../../services/concepts/conceptAutoLinkService";
 
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
@@ -32,6 +35,7 @@ type NoteDraft = {
   title: string;
   description: string;
   content: string;
+  contentJson: NoteContentJson | undefined;
   topicId: string;
   subtopicId: string;
 };
@@ -48,6 +52,9 @@ export const EditableNote = ({
   const [title, setTitle] = useState(note.title);
   const [description, setDescription] = useState(note.description);
   const [content, setContent] = useState(note.content);
+  const [contentJson, setContentJson] = useState<NoteContentJson | undefined>(
+    note.contentJson,
+  );
 
   const [topics, setTopics] = useState<DatabaseTopic[]>([]);
   const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
@@ -64,13 +71,13 @@ export const EditableNote = ({
   );
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
-
   const [errorMessage, setErrorMessage] = useState("");
 
   const lastSavedDraft = useRef<NoteDraft>({
     title: note.title,
     description: note.description,
     content: note.content,
+    contentJson: note.contentJson,
     topicId: note.topicId ?? "",
     subtopicId: note.subtopicId ?? "",
   });
@@ -83,6 +90,7 @@ export const EditableNote = ({
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
+    setContentJson(note.contentJson);
     setSelectedTopicId(note.topicId ?? "");
     setSelectedSubtopicId(note.subtopicId ?? "");
 
@@ -90,6 +98,7 @@ export const EditableNote = ({
       title: note.title,
       description: note.description,
       content: note.content,
+      contentJson: note.contentJson,
       topicId: note.topicId ?? "",
       subtopicId: note.subtopicId ?? "",
     };
@@ -161,6 +170,7 @@ export const EditableNote = ({
     title: title.trim(),
     description: description.trim(),
     content,
+    contentJson,
     topicId: selectedTopicId,
     subtopicId: selectedSubtopicId,
   });
@@ -197,14 +207,27 @@ export const EditableNote = ({
         title: draft.title,
         description: draft.description,
         content: draft.content,
-        contentJson: note.contentJson,
+        contentJson: draft.contentJson,
         subtopicId: draft.subtopicId || null,
       });
+
+      if (draft.subtopicId) {
+        try {
+          await autoLinkConceptsToSubtopic(
+            draft.content,
+            draft.contentJson,
+            draft.subtopicId,
+          );
+        } catch (conceptError) {
+          console.error("Kunne ikke koble konsepter automatisk:", conceptError);
+        }
+      }
 
       lastSavedDraft.current = {
         title: updatedNote.title,
         description: updatedNote.description,
         content: updatedNote.content,
+        contentJson: updatedNote.contentJson,
         topicId: updatedNote.topicId ?? "",
         subtopicId: updatedNote.subtopicId ?? "",
       };
@@ -247,6 +270,7 @@ export const EditableNote = ({
     title,
     description,
     content,
+    contentJson,
     selectedTopicId,
     selectedSubtopicId,
     isEditing,
@@ -256,6 +280,7 @@ export const EditableNote = ({
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
+    setContentJson(note.contentJson);
     setSelectedTopicId(note.topicId ?? "");
     setSelectedSubtopicId(note.subtopicId ?? "");
 
@@ -263,6 +288,7 @@ export const EditableNote = ({
       title: note.title,
       description: note.description,
       content: note.content,
+      contentJson: note.contentJson,
       topicId: note.topicId ?? "",
       subtopicId: note.subtopicId ?? "",
     };
@@ -404,7 +430,13 @@ export const EditableNote = ({
         </div>
 
         <div className="editable-note-editor">
-          <NoteEditor value={content} onChange={setContent} />
+          <NoteEditor
+            value={content}
+            onChange={(newContent, newContentJson) => {
+              setContent(newContent);
+              setContentJson(newContentJson);
+            }}
+          />
         </div>
       </article>
     );

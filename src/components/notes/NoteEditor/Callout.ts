@@ -53,6 +53,22 @@ export const Callout = Node.create({
           };
         },
       },
+
+      conceptName: {
+        default: null,
+
+        parseHTML: (element) => element.getAttribute("data-concept-name"),
+
+        renderHTML: (attributes) => {
+          if (!attributes.conceptName) {
+            return {};
+          }
+
+          return {
+            "data-concept-name": attributes.conceptName,
+          };
+        },
+      },
     };
   },
 
@@ -98,6 +114,7 @@ export const Callout = Node.create({
             attrs: {
               type,
               conceptId: null,
+              conceptName: null,
             },
 
             content: [
