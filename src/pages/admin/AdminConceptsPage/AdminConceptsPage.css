@@ -1,0 +1,153 @@
+.admin-concepts-card {
+  max-width: 720px;
+  margin-top: 32px;
+  padding: 28px;
+
+  background: #ffffff;
+  border: 1px solid #ede9fe;
+  border-radius: 16px;
+}
+
+.admin-concepts-card h2 {
+  margin: 0 0 24px;
+}
+
+.admin-concepts-form {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-concepts-form label {
+  margin-top: 10px;
+
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.admin-concepts-form select {
+  width: 100%;
+  padding: 11px 12px;
+
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  color: #18181b;
+  font: inherit;
+}
+
+.admin-concepts-form select:focus {
+  border-color: #7c3aed;
+  outline: none;
+}
+
+.admin-concepts-form button {
+  justify-self: start;
+
+  margin-top: 18px;
+  padding: 10px 18px;
+
+  background: #7c3aed;
+  border: 0;
+  border-radius: 8px;
+
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-concepts-form button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.admin-concepts-message {
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+}
+
+.admin-concepts-error {
+  color: #b91c1c;
+}
+
+.admin-concepts-success {
+  color: #15803d;
+}
+
+.admin-concept-links {
+  margin: 12px 0 8px;
+  padding: 16px;
+
+  background: #faf8ff;
+  border: 1px solid #ede9fe;
+  border-radius: 10px;
+}
+
+.admin-concept-links-label {
+  margin: 0 0 10px;
+
+  color: #7c3aed;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.admin-concept-links-empty {
+  margin: 0;
+  color: #71717a;
+  font-size: 0.9rem;
+}
+
+.admin-concept-links-list {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-concept-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 0.9rem;
+}
+
+.admin-concept-link span {
+  color: #7c3aed;
+}
+
+.admin-concept-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  font-size: 0.9rem;
+}
+
+.admin-concept-link-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-concept-link-name span {
+  color: #7c3aed;
+}
+
+.admin-concept-link-remove {
+  padding: 4px 8px;
+
+  background: transparent;
+  border: 0;
+
+  color: #71717a;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.admin-concept-link-remove:hover {
+  color: #b91c1c;
+}

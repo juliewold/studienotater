@@ -58,6 +58,31 @@ export async function getSubtopicsByTopic(
   }));
 }
 
+export async function getSubtopicById(
+  subtopicId: string,
+): Promise<DatabaseSubtopic | null> {
+  const { data, error } = await supabase
+    .from("subtopics")
+    .select("id, topic_id, name, sort_order")
+    .eq("id", subtopicId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return {
+    id: data.id,
+    topicId: data.topic_id,
+    name: data.name,
+    sortOrder: data.sort_order,
+  };
+}
+
 export async function getAllSubtopicsBySubject(
   subjectId: string,
 ): Promise<DatabaseSubtopic[]> {

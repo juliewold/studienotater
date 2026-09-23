@@ -2,11 +2,12 @@ import "./SubjectPage.css";
 
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 
 import { subjects } from "../../../data/subjects";
 import { SubjectFeatureCard } from "../../../components/subjects/SubjectFeatureCard/SubjectFeatureCard";
 import { useSubjectProgress } from "../../../hooks/useSubjectProgress";
+import { useSubjectStructure } from "../../../hooks/useSubjectStructure";
 
 const INITIAL_VISIBLE_TOPICS = 4;
 
@@ -23,6 +24,12 @@ export const SubjectPage = () => {
 
   const { subjectProgress, isLoading, errorMessage } =
     useSubjectProgress(subjectId);
+
+  const {
+    topics,
+    isLoading: isLoadingStructure,
+    errorMessage: structureErrorMessage,
+  } = useSubjectStructure(subjectId);
 
   const visibleTopics = subjectProgress.topicProgress.slice(
     0,
@@ -171,6 +178,35 @@ export const SubjectPage = () => {
           link={`/fag/${subject.id}/studieplan`}
         />
       </div>
+
+      <section className="subject-syllabus">
+        <div className="subject-syllabus-header">
+          <div>
+            <p className="subject-progress-label">Pensum</p>
+            <h2>Temaer og undertemaer</h2>
+          </div>
+        </div>
+
+        {isLoadingStructure ? (
+          <p>Laster pensum...</p>
+        ) : structureErrorMessage ? (
+          <p>{structureErrorMessage}</p>
+        ) : (
+          <div className="subject-syllabus-list">
+            {topics.map((topic) => (
+              <article key={topic.id} className="subject-syllabus-topic">
+                <Link
+                  to={`/fag/${subject.id}/tema/${topic.id}`}
+                  className="subject-syllabus-topic-link"
+                >
+                  <h3>{topic.name}</h3>
+                  <ChevronRight size={20} />
+                </Link>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
 
       {!isLoading &&
         !errorMessage &&

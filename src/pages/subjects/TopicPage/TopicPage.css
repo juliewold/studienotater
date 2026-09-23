@@ -1,0 +1,144 @@
+.topic-page {
+  width: min(100% - 48px, 1280px);
+  margin: 0 auto;
+  padding: 48px 0 80px;
+}
+
+.topic-page .back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 40px;
+
+  color: #7c3aed;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topic-page .back-link:hover {
+  color: #5b21b6;
+}
+
+.topic-page-label {
+  margin: 0 0 8px;
+
+  color: #7c3aed;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.topic-page > h1 {
+  margin: 0;
+
+  color: #18181b;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+}
+
+.topic-page-section {
+  margin-top: 48px;
+}
+
+.topic-page-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-bottom: 20px;
+}
+
+.topic-page-section-header h2 {
+  margin: 0;
+
+  color: #18181b;
+  font-size: 1.5rem;
+}
+
+.topic-page-section-header > span {
+  color: #71717a;
+  font-size: 0.9rem;
+}
+
+.topic-page-subtopics {
+  display: grid;
+  gap: 12px;
+}
+
+.topic-page-subtopic {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+
+  min-height: 72px;
+  padding: 12px 18px;
+
+  background: #ffffff;
+  border: 1px solid #ede9fe;
+  border-radius: 14px;
+
+  color: #18181b;
+  text-decoration: none;
+
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.topic-page-subtopic:hover {
+  border-color: #c4b5fd;
+  transform: translateY(-1px);
+}
+
+.topic-page-subtopic-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  background: #f3e8ff;
+  border-radius: 10px;
+
+  color: #7c3aed;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.topic-page-subtopic-name {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.topic-page-subtopic svg {
+  color: #a78bfa;
+}
+
+@media (max-width: 700px) {
+  .topic-page {
+    width: min(100% - 32px, 1280px);
+    padding-top: 32px;
+  }
+
+  .topic-page-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .topic-page-subtopic {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 12px;
+
+    min-height: 64px;
+    padding: 10px 14px;
+  }
+
+  .topic-page-subtopic-number {
+    width: 34px;
+    height: 34px;
+  }
+}

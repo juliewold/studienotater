@@ -47,6 +47,9 @@ import { PracticePage } from "./pages/study/PracticePage/PracticePage";
 import { CalendarPage } from "./pages/CalendarPage/CalendarPage";
 import { AdminBooksPage } from "./pages/admin/AdminBooksPage/AdminBooksPage";
 import { ConceptPage } from "./pages/concepts/ConceptPage/ConceptPage";
+import { TopicPage } from "./pages/subjects/TopicPage/TopicPage";
+import { SubtopicPage } from "./pages/subjects/SubtopicPage/SubtopicPage";
+import { AdminConceptsPage } from "./pages/admin/AdminConceptsPage/AdminConceptsPage";
 
 function App() {
   return (
@@ -98,6 +101,24 @@ function App() {
           element={
             <ProtectedRoute>
               <SubjectPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fag/:subjectId/tema/:topicId"
+          element={
+            <ProtectedRoute>
+              <TopicPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fag/:subjectId/tema/:topicId/undertema/:subtopicId"
+          element={
+            <ProtectedRoute>
+              <SubtopicPage />
             </ProtectedRoute>
           }
         />
@@ -431,6 +452,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminBooksPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/concepts"
+          element={
+            <AdminRoute>
+              <AdminConceptsPage />
             </AdminRoute>
           }
         />
