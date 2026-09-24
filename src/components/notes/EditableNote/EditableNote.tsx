@@ -18,6 +18,7 @@ import {
 } from "../../../services/subjects/subjectStructureService";
 
 import { autoLinkConceptsToSubtopic } from "../../../services/concepts/conceptAutoLinkService";
+import { createConceptSuggestionsForNote } from "../../../services/concepts/conceptExtractionService";
 
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
@@ -302,9 +303,17 @@ export const EditableNote = ({
     const draft = getCurrentDraft();
     const wasSaved = await saveDraft(draft);
 
-    if (wasSaved) {
-      setIsEditing(false);
+    if (!wasSaved) {
+      return;
     }
+
+    try {
+      await createConceptSuggestionsForNote(note.id, draft.content);
+    } catch (conceptError) {
+      console.error("Kunne ikke opprette konseptforslag:", conceptError);
+    }
+
+    setIsEditing(false);
   };
 
   const renderSaveStatus = () => {
