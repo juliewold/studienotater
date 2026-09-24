@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from .concept_extraction_service import extract_concept_candidates
+
 
 @csrf_exempt
 @require_POST
@@ -21,8 +23,10 @@ def extract_concepts(request):
             status=400,
         )
 
+    candidates = extract_concept_candidates(text)
+
     return JsonResponse(
         {
-            "candidates": [],
+            "candidates": candidates,
         }
     )

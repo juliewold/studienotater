@@ -1,3 +1,4 @@
+import json
 import os
 
 from openai import OpenAI
@@ -18,17 +19,41 @@ def get_client():
         base_url=NTNU_LLM_BASE_URL,
     )
 
-def test_connection():
+
+def extract_concept_candidates(text):
     client = get_client()
 
     response = client.chat.completions.create(
         model=NTNU_LLM_MODEL,
         messages=[
             {
+                "role": "system",
+                "content": (
+                    "Du analyserer studienotater og finner faglige begreper. "
+                    "Finn sentrale fagbegreper som en student kan ha nytte av "
+                    "å ha en egen definisjon eller forklaring på. "
+                    "Ikke ta med vanlige ord eller generelle formuleringer. "
+                    "Skriv hvert begrep i naturlig grunnform, ikke i den bøyde formen "
+                    "som brukes i teksten. Bruk stor forbokstav i begrepsnavnet. "
+                    "Eksempel: 'normalfordelingen' skal bli 'Normalfordeling', "
+                    "'standardavviket' skal bli 'Standardavvik' og "
+                    "'forventningsverdien' skal bli 'Forventningsverdi'. "
+                    "Returner kun gyldig JSON på formatet "
+                    '{"candidates": [{"name": "Begrep"}]}.'
+                ),
+            },
+            {
                 "role": "user",
-                "content": "Svar kun med ordet OK.",
-            }
+                "content": text,
+            },
         ],
     )
 
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+
+    if not content:
+        return []
+
+    result = json.loads(content)
+
+    return result.get("candidates", [])
