@@ -93,6 +93,8 @@ export const EditableNote = ({
     subtopicId: note.subtopicId ?? "",
   });
 
+  const contentAtEditStart = useRef(note.content);
+
   useEffect(() => {
     if (isEditing) {
       return;
@@ -319,6 +321,7 @@ export const EditableNote = ({
 
     setErrorMessage("");
     setSaveStatus("saved");
+    contentAtEditStart.current = note.content;
     setIsEditing(true);
   };
 
@@ -330,11 +333,15 @@ export const EditableNote = ({
       return;
     }
 
-    try {
-      await createConceptSuggestionsForNote(note.id, draft.content);
-      await loadConceptSuggestions();
-    } catch (conceptError) {
-      console.error("Kunne ikke opprette konseptforslag:", conceptError);
+    const contentChanged = draft.content !== contentAtEditStart.current;
+
+    if (contentChanged) {
+      try {
+        await createConceptSuggestionsForNote(note.id, draft.content);
+        await loadConceptSuggestions();
+      } catch (conceptError) {
+        console.error("Kunne ikke opprette konseptforslag:", conceptError);
+      }
     }
 
     setIsEditing(false);
