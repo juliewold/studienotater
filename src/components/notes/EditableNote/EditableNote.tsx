@@ -20,6 +20,13 @@ import {
 import { autoLinkConceptsToSubtopic } from "../../../services/concepts/conceptAutoLinkService";
 import { createConceptSuggestionsForNote } from "../../../services/concepts/conceptExtractionService";
 
+import {
+  getConceptSuggestionsByNote,
+  type ConceptSuggestion,
+} from "../../../services/concepts/conceptSuggestionsService";
+
+import { ConceptSuggestions } from "../../concepts/ConceptSuggestions/ConceptSuggestions";
+
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
 type EditableNoteProps = {
@@ -73,6 +80,9 @@ export const EditableNote = ({
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [conceptSuggestions, setConceptSuggestions] = useState<
+    ConceptSuggestion[]
+  >([]);
 
   const lastSavedDraft = useRef<NoteDraft>({
     title: note.title,
@@ -166,6 +176,19 @@ export const EditableNote = ({
 
     void loadCurrentSubtopic();
   }, [topics, note.topicId, note.subtopicId]);
+
+  const loadConceptSuggestions = async () => {
+    try {
+      const loadedSuggestions = await getConceptSuggestionsByNote(note.id);
+      setConceptSuggestions(loadedSuggestions);
+    } catch (error) {
+      console.error("Kunne ikke hente konseptforslag:", error);
+    }
+  };
+
+  useEffect(() => {
+    void loadConceptSuggestions();
+  }, [note.id]);
 
   const getCurrentDraft = (): NoteDraft => ({
     title: title.trim(),
@@ -500,6 +523,14 @@ export const EditableNote = ({
       </div>
 
       <ReadOnlyNote content={note.content} />
+
+      {isAdmin && (
+        <ConceptSuggestions
+          suggestions={conceptSuggestions}
+          subtopicId={note.subtopicId}
+          onSuggestionUpdated={() => void loadConceptSuggestions()}
+        />
+      )}
     </article>
   );
 };

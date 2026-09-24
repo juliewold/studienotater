@@ -1,5 +1,5 @@
 import { supabase } from "../../lib/supabase";
-import type { Concept } from "../../data/concepts/types";
+import type { Concept, ConceptType } from "../../data/concepts/types";
 
 type ConceptRow = {
   id: string;
@@ -81,13 +81,15 @@ function createConceptSlug(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export async function getOrCreateConceptFromCallout(
+export async function createConcept(
   name: string,
-  type: "definition" | "theorem",
-  explanation: string,
+  type: ConceptType,
+  shortDefinition: string,
+  explanation?: string,
 ): Promise<Concept> {
   const trimmedName = name.trim();
-  const trimmedExplanation = explanation.trim();
+  const trimmedShortDefinition = shortDefinition.trim();
+  const trimmedExplanation = explanation?.trim();
   const slug = createConceptSlug(trimmedName);
 
   const { data: existingConcept, error: selectError } = await supabase
@@ -109,8 +111,8 @@ export async function getOrCreateConceptFromCallout(
     name: trimmedName,
     slug,
     type,
-    short_definition: trimmedExplanation,
-    explanation: trimmedExplanation,
+    short_definition: trimmedShortDefinition,
+    explanation: trimmedExplanation || null,
   };
 
   const { data, error: insertError } = await supabase
@@ -124,4 +126,12 @@ export async function getOrCreateConceptFromCallout(
   }
 
   return mapConceptRow(data as ConceptRow);
+}
+
+export async function getOrCreateConceptFromCallout(
+  name: string,
+  type: "definition" | "theorem",
+  explanation: string,
+): Promise<Concept> {
+  return createConcept(name, type, explanation, explanation);
 }
