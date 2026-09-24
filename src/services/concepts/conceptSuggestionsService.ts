@@ -2,10 +2,14 @@ import { supabase } from "../../lib/supabase";
 
 export type ConceptSuggestionStatus = "pending" | "accepted" | "rejected";
 
+import type { ConceptType } from "../../data/concepts/types";
+
 export type ConceptSuggestion = {
   id: string;
   noteId: string;
   name: string;
+  type: ConceptType | null;
+  shortDefinition: string | null;
   status: ConceptSuggestionStatus;
   createdAt: string;
 };
@@ -14,6 +18,8 @@ type ConceptSuggestionRow = {
   id: string;
   note_id: string;
   name: string;
+  type: ConceptType | null;
+  short_definition: string | null;
   status: ConceptSuggestionStatus;
   created_at: string;
 };
@@ -25,6 +31,8 @@ function mapConceptSuggestion(
     id: suggestion.id,
     noteId: suggestion.note_id,
     name: suggestion.name,
+    type: suggestion.type,
+    shortDefinition: suggestion.short_definition,
     status: suggestion.status,
     createdAt: suggestion.created_at,
   };
@@ -51,6 +59,8 @@ export async function getConceptSuggestionsByNote(
 export async function addConceptSuggestion(
   noteId: string,
   name: string,
+  type: ConceptType,
+  shortDefinition: string,
 ): Promise<void> {
   const normalizedName = name.trim();
 
@@ -78,6 +88,8 @@ export async function addConceptSuggestion(
     .insert({
       note_id: noteId,
       name: normalizedName,
+      type,
+      short_definition: shortDefinition.trim(),
       status: "pending",
     });
 

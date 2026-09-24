@@ -34,15 +34,21 @@ def extract_concept_candidates(text):
                     "å ha en egen definisjon eller forklaring på. "
                     "Ikke ta med vanlige ord eller generelle formuleringer. "
                     "Skriv hvert begrep i naturlig grunnform, ikke i den bøyde formen "
-                    "Returner hvert fagbegrep kun én gang. "
-                    "Hvis samme begrep forekommer i flere bøyningsformer, skal de behandles "
-                    "som samme begrep og bare grunnformen skal returneres. "
-                    "som brukes i teksten. Bruk stor forbokstav i begrepsnavnet. "
+                    "som brukes i teksten. "
+                    "Bruk stor forbokstav i begrepsnavnet. "
                     "Eksempel: 'normalfordelingen' skal bli 'Normalfordeling', "
                     "'standardavviket' skal bli 'Standardavvik' og "
                     "'forventningsverdien' skal bli 'Forventningsverdi'. "
+                    "Returner hvert fagbegrep kun én gang. "
+                    "Hvis samme begrep forekommer i flere bøyningsformer, skal de behandles "
+                    "som samme begrep og bare grunnformen skal returneres. "
+                    "For hvert begrep skal du også velge en type. "
+                    "Type må være én av: definition, theorem, formula, method. "
+                    "Lag også en kort og presis faglig definisjon av begrepet "
+                    "basert på innholdet i notatet. "
                     "Returner kun gyldig JSON på formatet "
-                    '{"candidates": [{"name": "Begrep"}]}.'
+                    '{"candidates": [{"name": "Begrep", "type": "definition", '
+                    '"shortDefinition": "Kort faglig definisjon"}]}.'
                 ),
             },
             {

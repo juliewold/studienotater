@@ -1,9 +1,11 @@
-import type { Concept } from "../../data/concepts/types";
+import type { Concept, ConceptType } from "../../data/concepts/types";
 import { getConceptsFromDatabase } from "./conceptService";
 import { addConceptSuggestion } from "./conceptSuggestionsService";
 
 export type ConceptCandidate = {
   name: string;
+  type: ConceptType;
+  shortDefinition: string;
 };
 
 export async function extractConceptCandidates(
@@ -86,6 +88,13 @@ export async function createConceptSuggestionsForNote(
   const candidates = await extractNewConceptCandidates(content);
 
   await Promise.all(
-    candidates.map((candidate) => addConceptSuggestion(noteId, candidate.name)),
+    candidates.map((candidate) =>
+      addConceptSuggestion(
+        noteId,
+        candidate.name,
+        candidate.type,
+        candidate.shortDefinition,
+      ),
+    ),
   );
 }
