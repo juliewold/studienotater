@@ -1,8 +1,9 @@
 import "./ConceptPicker.css";
 
-import { getConcepts } from "../../../services/concepts/conceptService";
+import { useEffect, useState } from "react";
+
+import { getConceptsFromDatabase } from "../../../services/concepts/conceptService";
 import type { Concept } from "../../../data/concepts/types";
-import { useState } from "react";
 
 const conceptTypeLabels = {
   definition: "Definisjon",
@@ -18,8 +19,40 @@ type ConceptPickerProps = {
 
 export const ConceptPicker = ({ onSelect, onClose }: ConceptPickerProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [concepts, setConcepts] = useState<Concept[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const concepts = getConcepts();
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadConcepts = async () => {
+      setIsLoading(true);
+
+      try {
+        const loadedConcepts = await getConceptsFromDatabase();
+
+        if (!isCancelled) {
+          setConcepts(loadedConcepts);
+        }
+      } catch (error) {
+        console.error("Kunne ikke hente konsepter:", error);
+
+        if (!isCancelled) {
+          setConcepts([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadConcepts();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const filteredConcepts = concepts.filter((concept) => {
     const query = searchQuery.toLowerCase();
@@ -55,22 +88,26 @@ export const ConceptPicker = ({ onSelect, onClose }: ConceptPickerProps) => {
       />
 
       <div className="concept-picker-list">
-        {filteredConcepts.length === 0 && (
+        {isLoading ? (
+          <p className="concept-picker-empty">Henter begreper...</p>
+        ) : filteredConcepts.length === 0 ? (
           <p className="concept-picker-empty">Ingen begreper funnet</p>
+        ) : (
+          filteredConcepts.map((concept) => (
+            <button
+              key={concept.id}
+              type="button"
+              className="concept-picker-item"
+              onClick={() => onSelect(concept)}
+            >
+              <span className="concept-picker-name">{concept.name}</span>
+
+              <span className="concept-picker-type">
+                {conceptTypeLabels[concept.type]}
+              </span>
+            </button>
+          ))
         )}
-        {filteredConcepts.map((concept) => (
-          <button
-            key={concept.id}
-            type="button"
-            className="concept-picker-item"
-            onClick={() => onSelect(concept)}
-          >
-            <span className="concept-picker-name">{concept.name}</span>
-            <span className="concept-picker-type">
-              {conceptTypeLabels[concept.type]}
-            </span>
-          </button>
-        ))}
       </div>
     </div>
   );

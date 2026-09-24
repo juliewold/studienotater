@@ -3,7 +3,6 @@ import "./ConceptPopover.css";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Concept } from "../../../data/concepts/types";
-import { getRelatedConcepts } from "../../../services/concepts/conceptService";
 import {
   getConceptContent,
   type ConceptContentSource,
@@ -14,7 +13,6 @@ type ConceptPopoverProps = {
   left: number;
   top: number;
   onClose: () => void;
-  onSelectConcept: (concept: Concept) => void;
 };
 
 export const ConceptPopover = ({
@@ -22,7 +20,6 @@ export const ConceptPopover = ({
   left,
   top,
   onClose,
-  onSelectConcept,
 }: ConceptPopoverProps) => {
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
   const [conceptContent, setConceptContent] = useState<ConceptContentSource[]>(
@@ -30,8 +27,6 @@ export const ConceptPopover = ({
   );
 
   const [isConceptContentLoading, setIsConceptContentLoading] = useState(false);
-
-  const relatedConcepts = getRelatedConcepts(concept);
 
   const textContent = conceptContent.filter(
     (item) => item.type === "definition" || item.type === "theorem",
@@ -148,30 +143,6 @@ export const ConceptPopover = ({
             )}
           </div>
         )}
-      {relatedConcepts.length > 0 && (
-        <div className="concept-popover-related">
-          <span className="concept-popover-related-label">
-            Relaterte begreper
-          </span>
-
-          <div className="concept-popover-related-list">
-            {relatedConcepts.map((relatedConcept) => (
-              <button
-                key={relatedConcept.id}
-                type="button"
-                className="concept-popover-related-item"
-                onClick={() => {
-                  setIsExplanationOpen(false);
-                  onSelectConcept(relatedConcept);
-                }}
-              >
-                {relatedConcept.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       <Link
         to={`/concepts/${concept.slug}`}
         className="concept-popover-page-link"

@@ -1,6 +1,7 @@
-import { useState, type SyntheticEvent } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 
-import { getConcepts } from "../../services/concepts/conceptService";
+import { getConceptsFromDatabase } from "../../services/concepts/conceptService";
+import type { Concept } from "../../data/concepts/types";
 
 import {
   addConceptSubtopic,
@@ -22,7 +23,8 @@ export type AdminConceptSubtopicLink = {
 };
 
 export const useAdminConcepts = () => {
-  const concepts = getConcepts();
+  const [concepts, setConcepts] = useState<Concept[]>([]);
+  const [isLoadingConcepts, setIsLoadingConcepts] = useState(true);
 
   const [conceptId, setConceptId] = useState("");
   const [subjectId, setSubjectId] = useState("");
@@ -43,6 +45,39 @@ export const useAdminConcepts = () => {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadConcepts = async () => {
+      setIsLoadingConcepts(true);
+
+      try {
+        const loadedConcepts = await getConceptsFromDatabase();
+
+        if (!isCancelled) {
+          setConcepts(loadedConcepts);
+        }
+      } catch (error) {
+        console.error("Kunne ikke hente konsepter:", error);
+
+        if (!isCancelled) {
+          setConcepts([]);
+          setErrorMessage("Kunne ikke hente konseptene.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoadingConcepts(false);
+        }
+      }
+    };
+
+    void loadConcepts();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const handleConceptChange = async (newConceptId: string) => {
     setConceptId(newConceptId);
@@ -228,6 +263,7 @@ export const useAdminConcepts = () => {
     subtopics,
     conceptLinks,
 
+    isLoadingConcepts,
     isLoadingTopics,
     isLoadingSubtopics,
     isLoadingConceptLinks,
