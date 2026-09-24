@@ -1,73 +1,230 @@
-# React + TypeScript + Vite
+# Studienotater
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Studienotater is a web application for organizing study material, notes, learning resources, and progress in one place.
 
-Currently, two official plugins are available:
+The project is primarily developed for university studies and provides a structured way to organize subjects, topics, notes, concepts, exams, and other study resources.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+Studienotater includes functionality for:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Organizing subjects by semester and study year
+- Creating and reading structured study notes
+- Organizing content by topics and subtopics
+- Linking concepts directly inside notes
+- Viewing definitions, theorems, examples, and related concepts
+- Tracking progress through subjects and course content
+- Managing exam-related content and tasks
+- Working with flashcards and practice questions
+- Viewing PDFs and other study resources
+- Organizing educational videos and programming material
+- Searching across study content
+- Marking and accessing favorite content
+- Managing study content through admin pages
+- User authentication and user-specific data
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+The application is built with:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **React** – user interface
+- **TypeScript** – type-safe application development
+- **Vite** – development server and build tool
+- **React Router** – client-side routing
+- **Supabase** – authentication and database
+- **Tiptap** – rich-text note editor
+- **KaTeX** – mathematical notation
+- **Lowlight** – syntax highlighting
+- **Lucide React** – icons
+- **CSS** – styling and responsive layout
+- **GitHub Pages** – deployment
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Project Structure
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The main application code is located in `src/`.
+
+```text
+src/
+├── assets/          # Images and other static assets
+├── components/      # Reusable UI components
+├── context/         # React context providers
+├── data/            # Static application data
+├── hooks/           # Custom React hooks
+├── lib/             # Library configuration
+├── pages/           # Application pages
+├── services/        # Data access and application services
+├── styles/          # Shared styles
+├── types/           # Shared TypeScript types
+└── utils/           # Utility functions
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Components
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Components are grouped by functionality:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+components/
+├── auth/            # Authentication and protected routes
+├── common/          # Shared components
+├── concepts/        # Concept linking and concept UI
+├── exams/           # Exam-related components
+├── home/            # Home page components
+├── layout/          # Navigation and page layout
+├── lesson/          # Lesson components
+├── media/           # Media-related components
+├── notes/           # Note viewing and editing
+├── progress/        # Study progress tracking
+├── search/          # Search functionality
+└── subjects/        # Subject-related components
 ```
+
+### Pages
+
+Pages represent the main routes and views of the application.
+
+The application currently contains pages for areas such as:
+
+- Home
+- Subjects
+- Notes
+- Concepts
+- Exams
+- Flashcards
+- PDFs
+- Videos
+- Programming
+- Calendar
+- Favorites
+- Profile
+- Settings
+- Admin tools
+
+### Services
+
+The `services/` directory separates data access and application logic from the UI.
+
+Services are currently organized around:
+
+```text
+services/
+├── concepts/
+├── exams/
+├── media/
+├── notes/
+├── practice/
+├── progress/
+├── search/
+├── study/
+└── subjects/
+```
+
+## Getting Started
+
+### Prerequisites
+
+Make sure you have Node.js and npm installed.
+
+You can verify the installation with:
+
+```bash
+node --version
+npm --version
+```
+
+### Installation
+
+Clone the repository and enter the project directory:
+
+```bash
+git clone <repository-url>
+cd studienotater
+```
+
+Install the dependencies:
+
+```bash
+npm install
+```
+
+## Environment Variables
+
+The project uses Supabase for authentication and data storage.
+
+Create a `.env` file in the project root with the following variables:
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+These values can be found in the Supabase project configuration.
+
+The `.env` file should not be committed to Git.
+
+## Running Locally
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Vite will start a local development server and display the local URL in the terminal.
+
+## Available Scripts
+
+### Development
+
+```bash
+npm run dev
+```
+
+Starts the Vite development server.
+
+### Build
+
+```bash
+npm run build
+```
+
+Runs the TypeScript build and creates a production build using Vite.
+
+### Lint
+
+```bash
+npm run lint
+```
+
+Runs ESLint across the project.
+
+### Preview
+
+```bash
+npm run preview
+```
+
+Locally previews the production build.
+
+### Deploy
+
+```bash
+npm run deploy
+```
+
+Builds the application and deploys the contents of `dist/` using `gh-pages`.
+
+## Deployment
+
+The application is configured for deployment with GitHub Pages.
+
+Before deployment, the `predeploy` script automatically runs:
+
+```bash
+npm run build
+```
+
+The generated `dist/` directory is then deployed using `gh-pages`.
+
+## Development Status
+
+Studienotater is under active development. Features, application structure, and data handling may change as the project continues to evolve.
