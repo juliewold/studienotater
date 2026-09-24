@@ -332,6 +332,7 @@ export const EditableNote = ({
 
     try {
       await createConceptSuggestionsForNote(note.id, draft.content);
+      await loadConceptSuggestions();
     } catch (conceptError) {
       console.error("Kunne ikke opprette konseptforslag:", conceptError);
     }
