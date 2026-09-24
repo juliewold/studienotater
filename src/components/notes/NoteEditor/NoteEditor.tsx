@@ -42,7 +42,8 @@ import { MathDialog } from "./MathDialog/MathDialog";
 import { SlashMenu } from "./SlashMenu";
 import { filterSlashCommands, type SlashCommandItem } from "./slashCommands";
 import { FormulaConceptLink } from "../../concepts/FormulaConceptLink/FormulaConceptLink";
-import { getConceptById } from "../../../services/concepts/conceptService";
+import { getConceptByIdFromDatabase } from "../../../services/concepts/conceptService";
+import type { Concept } from "../../../data/concepts/types";
 import type { NoteContentJson } from "../../../services/notes/notesService";
 
 const lowlight = createLowlight(common);
@@ -91,6 +92,8 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   const [selectedFormulaConceptId, setSelectedFormulaConceptId] = useState<
     string | null
   >(null);
+  const [selectedFormulaConcept, setSelectedFormulaConcept] =
+    useState<Concept | null>(null);
   const [formulaControlsPosition, setFormulaControlsPosition] =
     useState<FormulaControlsPosition | null>(null);
   const [slashMenu, setSlashMenu] = useState<SlashMenuState | null>(null);
@@ -98,6 +101,39 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
   const [mathDialogType, setMathDialogType] = useState<
     "inline" | "block" | null
   >(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadFormulaConcept = async () => {
+      if (!selectedFormulaConceptId) {
+        setSelectedFormulaConcept(null);
+        return;
+      }
+
+      try {
+        const concept = await getConceptByIdFromDatabase(
+          selectedFormulaConceptId,
+        );
+
+        if (!isCancelled) {
+          setSelectedFormulaConcept(concept ?? null);
+        }
+      } catch (error) {
+        console.error("Kunne ikke hente formelkonsept:", error);
+
+        if (!isCancelled) {
+          setSelectedFormulaConcept(null);
+        }
+      }
+    };
+
+    void loadFormulaConcept();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedFormulaConceptId]);
 
   const editor = useEditor({
     extensions: [
@@ -1170,14 +1206,10 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
       <EditorContent editor={editor} />
 
       {conceptSelection?.type === "formula" &&
-        selectedFormulaConceptId &&
+        selectedFormulaConcept &&
         formulaControlsPosition &&
         (() => {
-          const concept = getConceptById(selectedFormulaConceptId);
-
-          if (!concept) {
-            return null;
-          }
+          const concept = selectedFormulaConcept;
 
           return (
             <div

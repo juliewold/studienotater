@@ -3,7 +3,7 @@ import {
   NodeViewWrapper,
   type NodeViewProps,
 } from "@tiptap/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BadgeCheck,
   BookOpen,
@@ -15,9 +15,10 @@ import {
   Unlink,
 } from "lucide-react";
 
-import type { CalloutType } from "./Callout";
+import type { Concept } from "../../../data/concepts/types";
+import { getConceptByIdFromDatabase } from "../../../services/concepts/conceptService";
 import { ConceptPicker } from "../../concepts/ConceptPicker/ConceptPicker";
-import { getConceptById } from "../../../services/concepts/conceptService";
+import type { CalloutType } from "./Callout";
 
 const calloutInformation = {
   definition: {
@@ -59,6 +60,7 @@ export const CalloutNodeView = ({
   deleteNode,
 }: NodeViewProps) => {
   const [isConceptPickerOpen, setIsConceptPickerOpen] = useState(false);
+  const [concept, setConcept] = useState<Concept | undefined>();
 
   const storedType = node.attrs.type as string | undefined;
 
@@ -73,9 +75,38 @@ export const CalloutNodeView = ({
   const callout = calloutInformation[type];
   const Icon = callout.icon;
 
-  const concept = conceptId ? getConceptById(conceptId) : undefined;
-
   const canLinkConcept = type === "definition" || type === "theorem";
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadConcept = async () => {
+      if (!conceptId) {
+        setConcept(undefined);
+        return;
+      }
+
+      try {
+        const loadedConcept = await getConceptByIdFromDatabase(conceptId);
+
+        if (!isCancelled) {
+          setConcept(loadedConcept);
+        }
+      } catch (error) {
+        console.error("Kunne ikke hente konsept:", error);
+
+        if (!isCancelled) {
+          setConcept(undefined);
+        }
+      }
+    };
+
+    void loadConcept();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [conceptId]);
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newType = event.target.value as CalloutType;
@@ -216,6 +247,7 @@ export const CalloutNodeView = ({
                   conceptId: selectedConcept.id,
                 });
 
+                setConcept(selectedConcept);
                 setIsConceptPickerOpen(false);
               }}
               onClose={() => {

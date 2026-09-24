@@ -1,9 +1,12 @@
 import "./ReadOnlyNote.css";
 import "katex/dist/katex.min.css";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Concept } from "../../../data/concepts/types";
-import { getConceptById } from "../../../services/concepts/conceptService";
+import {
+  getConceptByIdFromDatabase,
+  getConceptsFromDatabase,
+} from "../../../services/concepts/conceptService";
 import { ConceptPopover } from "../../concepts/ConceptPopover/ConceptPopover";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -28,92 +31,126 @@ type PopoverPosition = {
 };
 
 export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
+  const [concepts, setConcepts] = useState<Concept[]>([]);
   const [selectedConcept, setSelectedConcept] = useState<Concept | null>(null);
 
   const [popoverPosition, setPopoverPosition] =
     useState<PopoverPosition | null>(null);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        codeBlock: false,
-      }),
+  useEffect(() => {
+    let isCancelled = false;
 
-      CodeBlockLowlight.configure({
-        lowlight,
-      }),
+    const loadConcepts = async () => {
+      try {
+        const loadedConcepts = await getConceptsFromDatabase();
 
-      Mathematics.configure({
-        katexOptions: {
-          throwOnError: false,
-        },
-      }),
+        if (!isCancelled) {
+          setConcepts(loadedConcepts);
+        }
+      } catch (error) {
+        console.error("Kunne ikke hente konsepter:", error);
+      }
+    };
 
-      Image.configure({
-        inline: false,
-        allowBase64: false,
-      }),
+    void loadConcepts();
 
-      TableKit.configure({
-        table: {
-          resizable: false,
-          HTMLAttributes: {
-            class: "note-table",
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit.configure({
+          codeBlock: false,
+        }),
+
+        CodeBlockLowlight.configure({
+          lowlight,
+        }),
+
+        Mathematics.configure({
+          katexOptions: {
+            throwOnError: false,
           },
+        }),
+
+        Image.configure({
+          inline: false,
+          allowBase64: false,
+        }),
+
+        TableKit.configure({
+          table: {
+            resizable: false,
+            HTMLAttributes: {
+              class: "note-table",
+            },
+          },
+        }),
+
+        Callout,
+        ConceptLink,
+
+        AutomaticConceptLinks.configure({
+          concepts,
+        }),
+      ],
+
+      content,
+      editable: false,
+
+      editorProps: {
+        attributes: {
+          class: "read-only-note-content",
         },
-      }),
 
-      Callout,
-      ConceptLink,
-      AutomaticConceptLinks,
-    ],
+        handleClick: (_view, _pos, event) => {
+          const target = event.target;
 
-    content,
-    editable: false,
+          if (!(target instanceof HTMLElement)) {
+            return false;
+          }
 
-    editorProps: {
-      attributes: {
-        class: "read-only-note-content",
-      },
+          const conceptElement =
+            target.closest<HTMLElement>("[data-concept-id]");
 
-      handleClick: (_view, _pos, event) => {
-        const target = event.target;
+          if (!conceptElement) {
+            return false;
+          }
 
-        if (!(target instanceof HTMLElement)) {
-          return false;
-        }
+          const conceptId = conceptElement.dataset.conceptId;
 
-        const conceptElement = target.closest<HTMLElement>("[data-concept-id]");
+          if (!conceptId) {
+            return false;
+          }
 
-        if (!conceptElement) {
-          return false;
-        }
+          const rect = conceptElement.getBoundingClientRect();
 
-        const conceptId = conceptElement.dataset.conceptId;
+          void getConceptByIdFromDatabase(conceptId)
+            .then((concept) => {
+              if (!concept) {
+                return;
+              }
 
-        if (!conceptId) {
-          return false;
-        }
+              setPopoverPosition({
+                left: rect.left,
+                top: rect.bottom + 8,
+              });
 
-        const concept = getConceptById(conceptId);
+              setSelectedConcept(concept);
+            })
+            .catch((error) => {
+              console.error("Kunne ikke hente konsept:", error);
+            });
 
-        if (!concept) {
-          return false;
-        }
-
-        const rect = conceptElement.getBoundingClientRect();
-
-        setPopoverPosition({
-          left: rect.left,
-          top: rect.bottom + 8,
-        });
-
-        setSelectedConcept(concept);
-
-        return true;
+          return true;
+        },
       },
     },
-  });
+    [concepts],
+  );
 
   if (!editor) {
     return null;
@@ -128,9 +165,6 @@ export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
           concept={selectedConcept}
           left={popoverPosition.left}
           top={popoverPosition.top}
-          onSelectConcept={(concept) => {
-            setSelectedConcept(concept);
-          }}
           onClose={() => {
             setSelectedConcept(null);
             setPopoverPosition(null);

@@ -2,57 +2,69 @@ import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
-import { getConcepts } from "../../../services/concepts/conceptService";
+import type { Concept } from "../../../data/concepts/types";
 import { findConceptsInText } from "../../../services/concepts/conceptRecognitionService";
 
 const automaticConceptLinksPluginKey = new PluginKey("automaticConceptLinks");
 
-export const AutomaticConceptLinks = Extension.create({
-  name: "automaticConceptLinks",
+type AutomaticConceptLinksOptions = {
+  concepts: Concept[];
+};
 
-  addProseMirrorPlugins() {
-    return [
-      new Plugin({
-        key: automaticConceptLinksPluginKey,
+export const AutomaticConceptLinks =
+  Extension.create<AutomaticConceptLinksOptions>({
+    name: "automaticConceptLinks",
 
-        props: {
-          decorations(state) {
-            const concepts = getConcepts();
-            const decorations: Decoration[] = [];
+    addOptions() {
+      return {
+        concepts: [],
+      };
+    },
 
-            state.doc.descendants((node, position) => {
-              if (!node.isText || !node.text) {
-                return;
-              }
+    addProseMirrorPlugins() {
+      const concepts = this.options.concepts;
 
-              const alreadyHasConceptLink = node.marks.some(
-                (mark) => mark.type.name === "conceptLink",
-              );
+      return [
+        new Plugin({
+          key: automaticConceptLinksPluginKey,
 
-              if (alreadyHasConceptLink) {
-                return;
-              }
+          props: {
+            decorations(state) {
+              const decorations: Decoration[] = [];
 
-              const matches = findConceptsInText(node.text, concepts);
+              state.doc.descendants((node, position) => {
+                if (!node.isText || !node.text) {
+                  return;
+                }
 
-              matches.forEach((match) => {
-                decorations.push(
-                  Decoration.inline(
-                    position + match.from,
-                    position + match.to,
-                    {
-                      class: "concept-link",
-                      "data-concept-id": match.concept.id,
-                    },
-                  ),
+                const alreadyHasConceptLink = node.marks.some(
+                  (mark) => mark.type.name === "conceptLink",
                 );
-              });
-            });
 
-            return DecorationSet.create(state.doc, decorations);
+                if (alreadyHasConceptLink) {
+                  return;
+                }
+
+                const matches = findConceptsInText(node.text, concepts);
+
+                matches.forEach((match) => {
+                  decorations.push(
+                    Decoration.inline(
+                      position + match.from,
+                      position + match.to,
+                      {
+                        class: "concept-link",
+                        "data-concept-id": match.concept.id,
+                      },
+                    ),
+                  );
+                });
+              });
+
+              return DecorationSet.create(state.doc, decorations);
+            },
           },
-        },
-      }),
-    ];
-  },
-});
+        }),
+      ];
+    },
+  });
