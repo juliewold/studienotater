@@ -1,6 +1,6 @@
 import "./SubjectPage.css";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 
@@ -8,11 +8,22 @@ import { subjects } from "../../../data/subjects";
 import { SubjectFeatureCard } from "../../../components/subjects/SubjectFeatureCard/SubjectFeatureCard";
 import { useSubjectProgress } from "../../../hooks/useSubjectProgress";
 import { useSubjectStructure } from "../../../hooks/useSubjectStructure";
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
+import { generateKnowledgeBaseForSubject } from "../../../services/concepts/knowledgeBaseService";
 
 const INITIAL_VISIBLE_TOPICS = 4;
 
 export const SubjectPage = () => {
   const { subjectId } = useParams();
+
+  const { isAdmin } = useContext(AuthContext);
+
+  const [isGeneratingKnowledgeBase, setIsGeneratingKnowledgeBase] =
+    useState(false);
+
+  const [knowledgeBaseMessage, setKnowledgeBaseMessage] = useState<
+    string | null
+  >(null);
 
   const [visibleTopicCount, setVisibleTopicCount] = useState(
     INITIAL_VISIBLE_TOPICS,
@@ -39,6 +50,48 @@ export const SubjectPage = () => {
   const hasMoreTopics =
     visibleTopicCount < subjectProgress.topicProgress.length;
 
+  const handleGenerateKnowledgeBase = async () => {
+    if (!subjectId || isGeneratingKnowledgeBase) {
+      return;
+    }
+
+    const shouldGenerate = window.confirm(
+      `Vil du generere kunnskapsbasen for ${subject?.code ?? "dette faget"}? ` +
+        "AI vil analysere alle notater som er koblet til et undertema og opprette fagbegreper.",
+    );
+
+    if (!shouldGenerate) {
+      return;
+    }
+
+    setIsGeneratingKnowledgeBase(true);
+    setKnowledgeBaseMessage(null);
+
+    try {
+      const result = await generateKnowledgeBaseForSubject(
+        subjectId,
+        subject?.name ?? subjectId,
+      );
+
+      setKnowledgeBaseMessage(
+        `${result.topicsCreated} temaer og ` +
+          `${result.subtopicsCreated} undertemaer opprettet. ` +
+          `${result.notesOrganized} notater organisert. ` +
+          `${result.processedNotes} notater analysert og ` +
+          `${result.conceptsProcessed} begreper behandlet. ` +
+          `${result.skippedNotes} notater hoppet over.`,
+      );
+    } catch (error) {
+      console.error("Kunne ikke generere kunnskapsbase:", error);
+
+      setKnowledgeBaseMessage(
+        "Kunne ikke generere kunnskapsbasen. Se konsollen for detaljer.",
+      );
+    } finally {
+      setIsGeneratingKnowledgeBase(false);
+    }
+  };
+
   if (!subject) {
     return (
       <main className="subject-page">
@@ -58,6 +111,31 @@ export const SubjectPage = () => {
       <h1>{subject.code}</h1>
 
       <p className="subject-page-name">{subject.name}</p>
+
+      {isAdmin && (
+        <section className="subject-knowledge-base">
+          <div>
+            <p className="subject-progress-label">AI-kunnskapsbase</p>
+            <h2>Bygg begreper automatisk</h2>
+            <p>
+              Analyser fagets notater og opprett begreper og forklaringer
+              automatisk.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => void handleGenerateKnowledgeBase()}
+            disabled={isGeneratingKnowledgeBase}
+          >
+            {isGeneratingKnowledgeBase
+              ? "Genererer kunnskapsbase..."
+              : "Generer kunnskapsbase"}
+          </button>
+
+          {knowledgeBaseMessage && <p>{knowledgeBaseMessage}</p>}
+        </section>
+      )}
 
       <section className="subject-progress-card">
         <div className="subject-progress-header">

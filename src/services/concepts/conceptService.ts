@@ -103,7 +103,23 @@ export async function createConcept(
   }
 
   if (existingConcept) {
-    return mapConceptRow(existingConcept as ConceptRow);
+    const { data, error: updateError } = await supabase
+      .from("concepts")
+      .update({
+        name: trimmedName,
+        type,
+        short_definition: trimmedShortDefinition,
+        explanation: trimmedExplanation || null,
+      })
+      .eq("id", existingConcept.id)
+      .select("id, name, slug, type, short_definition, explanation")
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return mapConceptRow(data as ConceptRow);
   }
 
   const newConcept = {

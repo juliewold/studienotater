@@ -6,6 +6,7 @@ export type ConceptCandidate = {
   name: string;
   type: ConceptType;
   shortDefinition: string;
+  explanation: string;
 };
 
 export async function extractConceptCandidates(
@@ -94,6 +95,7 @@ export async function createConceptSuggestionsForNote(
         candidate.name,
         candidate.type,
         candidate.shortDefinition,
+        candidate.explanation,
       ),
     ),
   );
