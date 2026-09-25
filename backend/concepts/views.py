@@ -1,5 +1,6 @@
 import json
 
+from .subject_structure_service import generate_subject_structure
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -30,3 +31,33 @@ def extract_concepts(request):
             "candidates": candidates,
         }
     )
+
+@csrf_exempt
+@require_POST
+def generate_structure(request):
+    try:
+        body = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+    subject_name = body.get("subjectName")
+    notes = body.get("notes")
+
+    if not isinstance(subject_name, str) or not subject_name.strip():
+        return JsonResponse(
+            {"error": "Subject name is required."},
+            status=400,
+        )
+
+    if not isinstance(notes, list) or not notes:
+        return JsonResponse(
+            {"error": "Notes are required."},
+            status=400,
+        )
+
+    structure = generate_subject_structure(
+        subject_name.strip(),
+        notes,
+    )
+
+    return JsonResponse(structure)

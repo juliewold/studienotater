@@ -29,26 +29,38 @@ def extract_concept_candidates(text):
             {
                 "role": "system",
                 "content": (
-                    "Du analyserer studienotater og finner faglige begreper. "
-                    "Finn sentrale fagbegreper som en student kan ha nytte av "
-                    "å ha en egen definisjon eller forklaring på. "
-                    "Ikke ta med vanlige ord eller generelle formuleringer. "
-                    "Skriv hvert begrep i naturlig grunnform, ikke i den bøyde formen "
-                    "som brukes i teksten. "
-                    "Bruk stor forbokstav i begrepsnavnet. "
-                    "Eksempel: 'normalfordelingen' skal bli 'Normalfordeling', "
-                    "'standardavviket' skal bli 'Standardavvik' og "
-                    "'forventningsverdien' skal bli 'Forventningsverdi'. "
+                    "Du bygger en kunnskapsbase fra studienotater. "
+                    "Finn sentrale fagbegreper som en student bør kunne forstå "
+                    "og som egner seg til en egen begrepsside. "
+                    "Ikke ta med vanlige ord, overskrifter eller generelle formuleringer. "
+
+                    "Skriv hvert begrep i naturlig grunnform med stor forbokstav. "
+                    "Eksempel: 'normalfordelingen' blir 'Normalfordeling', "
+                    "'standardavviket' blir 'Standardavvik' og "
+                    "'forventningsverdien' blir 'Forventningsverdi'. "
                     "Returner hvert fagbegrep kun én gang. "
-                    "Hvis samme begrep forekommer i flere bøyningsformer, skal de behandles "
-                    "som samme begrep og bare grunnformen skal returneres. "
-                    "For hvert begrep skal du også velge en type. "
-                    "Type må være én av: definition, theorem, formula, method. "
-                    "Lag også en kort og presis faglig definisjon av begrepet "
-                    "basert på innholdet i notatet. "
-                    "Returner kun gyldig JSON på formatet "
-                    '{"candidates": [{"name": "Begrep", "type": "definition", '
-                    '"shortDefinition": "Kort faglig definisjon"}]}.'
+
+                    "Velg type fra: definition, theorem, formula, method. "
+
+                    "For hvert begrep skal du lage: "
+                    "1. shortDefinition: én kort og presis definisjon. "
+                    "2. explanation: en pedagogisk forklaring som kan vises direkte "
+                    "på en begrepsside for en universitetsstudent. "
+                    "Forklar hva begrepet betyr, hvordan det brukes og det viktigste "
+                    "studenten bør forstå. Bruk gjerne relevante matematiske uttrykk "
+                    "fra notatet når det er naturlig. "
+
+                    "Innholdet skal bygge på studienotatet. "
+                    "Ikke finn på detaljer som ikke støttes av teksten. "
+
+                    "Returner kun gyldig JSON. Ingen markdown og ingen tekst "
+                    "før eller etter JSON. Formatet skal være "
+                    '{"candidates": ['
+                    '{"name": "Begrep", '
+                    '"type": "definition", '
+                    '"shortDefinition": "Kort definisjon", '
+                    '"explanation": "Pedagogisk forklaring"}'
+                    "]}"
                 ),
             },
             {
