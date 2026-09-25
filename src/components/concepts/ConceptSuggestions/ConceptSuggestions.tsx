@@ -108,7 +108,10 @@ export const ConceptSuggestions = ({
           const isEditing = editingSuggestionId === suggestion.id;
 
           return (
-            <div className="concept-suggestion" key={suggestion.id}>
+            <div
+              className={`concept-suggestion${isEditing ? " concept-suggestion-editing" : ""}`}
+              key={suggestion.id}
+            >
               <div className="concept-suggestion-content">
                 {isEditing ? (
                   <input
@@ -163,6 +166,7 @@ export const ConceptSuggestions = ({
                   <>
                     <button
                       type="button"
+                      className="concept-suggestion-accept"
                       onClick={() => void handleAcceptEdited(suggestion)}
                       disabled={
                         !editedName.trim() ||
@@ -200,6 +204,7 @@ export const ConceptSuggestions = ({
 
                     <button
                       type="button"
+                      className="concept-suggestion-accept"
                       onClick={() => void handleAccept(suggestion)}
                       disabled={
                         !suggestion.type ||
