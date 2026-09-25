@@ -1,0 +1,162 @@
+.concept-suggestions {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.concept-suggestions h2 {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.concept-suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.concept-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  padding: 16px 18px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.concept-suggestion-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.concept-suggestion-content h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 650;
+  color: #111827;
+}
+
+.concept-suggestion-content p {
+  margin: 8px 0 0;
+  max-width: 700px;
+
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.concept-suggestion-type {
+  display: inline-block;
+
+  padding: 3px 8px;
+
+  background: #f3f4f6;
+  border-radius: 6px;
+
+  color: #4b5563;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.concept-suggestion-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.concept-suggestion-actions button {
+  padding: 8px 12px;
+
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  color: #374151;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.concept-suggestion-actions button:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.concept-suggestion-actions button:disabled {
+  color: #9ca3af;
+  background: #f9fafb;
+  cursor: not-allowed;
+}
+
+.concept-suggestion-content input,
+.concept-suggestion-content select,
+.concept-suggestion-content textarea {
+  display: block;
+  width: 100%;
+
+  padding: 9px 10px;
+
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  color: #111827;
+  font: inherit;
+}
+
+.concept-suggestion-content input {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.concept-suggestion-content select {
+  width: auto;
+  margin-bottom: 8px;
+}
+
+.concept-suggestion-content textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.concept-suggestion-content input:focus,
+.concept-suggestion-content select:focus,
+.concept-suggestion-content textarea:focus {
+  outline: none;
+  border-color: #7c3aed;
+}
+
+.concept-suggestion-actions .concept-suggestion-accept:not(:disabled) {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #ffffff;
+}
+
+.concept-suggestion-actions .concept-suggestion-accept:hover:not(:disabled) {
+  background: #6d28d9;
+  border-color: #6d28d9;
+}
+
+.concept-suggestion-editing {
+  align-items: flex-end;
+}
+
+@media (max-width: 700px) {
+  .concept-suggestion {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .concept-suggestion-actions {
+    flex-wrap: wrap;
+  }
+}

@@ -18,6 +18,14 @@ import {
 } from "../../../services/subjects/subjectStructureService";
 
 import { autoLinkConceptsToSubtopic } from "../../../services/concepts/conceptAutoLinkService";
+import { createConceptSuggestionsForNote } from "../../../services/concepts/conceptExtractionService";
+
+import {
+  getConceptSuggestionsByNote,
+  type ConceptSuggestion,
+} from "../../../services/concepts/conceptSuggestionsService";
+
+import { ConceptSuggestions } from "../../concepts/ConceptSuggestions/ConceptSuggestions";
 
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
@@ -72,6 +80,9 @@ export const EditableNote = ({
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [conceptSuggestions, setConceptSuggestions] = useState<
+    ConceptSuggestion[]
+  >([]);
 
   const lastSavedDraft = useRef<NoteDraft>({
     title: note.title,
@@ -81,6 +92,8 @@ export const EditableNote = ({
     topicId: note.topicId ?? "",
     subtopicId: note.subtopicId ?? "",
   });
+
+  const contentAtEditStart = useRef(note.content);
 
   useEffect(() => {
     if (isEditing) {
@@ -165,6 +178,19 @@ export const EditableNote = ({
 
     void loadCurrentSubtopic();
   }, [topics, note.topicId, note.subtopicId]);
+
+  const loadConceptSuggestions = async () => {
+    try {
+      const loadedSuggestions = await getConceptSuggestionsByNote(note.id);
+      setConceptSuggestions(loadedSuggestions);
+    } catch (error) {
+      console.error("Kunne ikke hente konseptforslag:", error);
+    }
+  };
+
+  useEffect(() => {
+    void loadConceptSuggestions();
+  }, [note.id]);
 
   const getCurrentDraft = (): NoteDraft => ({
     title: title.trim(),
@@ -295,6 +321,7 @@ export const EditableNote = ({
 
     setErrorMessage("");
     setSaveStatus("saved");
+    contentAtEditStart.current = note.content;
     setIsEditing(true);
   };
 
@@ -302,9 +329,22 @@ export const EditableNote = ({
     const draft = getCurrentDraft();
     const wasSaved = await saveDraft(draft);
 
-    if (wasSaved) {
-      setIsEditing(false);
+    if (!wasSaved) {
+      return;
     }
+
+    const contentChanged = draft.content !== contentAtEditStart.current;
+
+    if (contentChanged) {
+      try {
+        await createConceptSuggestionsForNote(note.id, draft.content);
+        await loadConceptSuggestions();
+      } catch (conceptError) {
+        console.error("Kunne ikke opprette konseptforslag:", conceptError);
+      }
+    }
+
+    setIsEditing(false);
   };
 
   const renderSaveStatus = () => {
@@ -491,6 +531,14 @@ export const EditableNote = ({
       </div>
 
       <ReadOnlyNote content={note.content} />
+
+      {isAdmin && (
+        <ConceptSuggestions
+          suggestions={conceptSuggestions}
+          subtopicId={note.subtopicId}
+          onSuggestionUpdated={() => void loadConceptSuggestions()}
+        />
+      )}
     </article>
   );
 };
