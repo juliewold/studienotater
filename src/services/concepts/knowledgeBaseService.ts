@@ -1,8 +1,17 @@
 import { getNotesBySubject } from "../notes/notesService";
-import { getTopicsBySubject } from "../subjects/subjectStructureService";
-import { extractConceptCandidates } from "./conceptExtractionService";
+import {
+  getAllSubtopicsBySubject,
+  getTopicsBySubject,
+} from "../subjects/subjectStructureService";
+import {
+  extractConceptCandidates,
+  getPlainTextFromNote,
+} from "./conceptExtractionService";
 import { createConcept } from "./conceptService";
-import { addConceptSubtopic } from "./conceptSubtopicsService";
+import {
+  addConceptSubtopic,
+  removeConceptSubtopicsBySubtopicIds,
+} from "./conceptSubtopicsService";
 import { generateAndSaveSubjectStructure } from "./subjectStructureGenerationService";
 
 export type KnowledgeBaseGenerationResult = {
@@ -37,6 +46,16 @@ export async function generateKnowledgeBaseForSubject(
   }
 
   const notes = await getNotesBySubject(subjectId);
+  const subtopics = await getAllSubtopicsBySubject(subjectId);
+
+  const availableSubtopics = subtopics.map((subtopic) => ({
+    id: subtopic.id,
+    name: subtopic.name,
+  }));
+
+  await removeConceptSubtopicsBySubtopicIds(
+    availableSubtopics.map((subtopic) => subtopic.id),
+  );
 
   let processedNotes = 0;
   let skippedNotes = 0;
@@ -49,7 +68,14 @@ export async function generateKnowledgeBaseForSubject(
       continue;
     }
 
-    const candidates = await extractConceptCandidates(note.content);
+    const text = getPlainTextFromNote(note.content);
+
+    if (!text) {
+      skippedNotes += 1;
+      continue;
+    }
+
+    const candidates = await extractConceptCandidates(text, availableSubtopics);
 
     for (const candidate of candidates) {
       const concept = await createConcept(
@@ -61,9 +87,10 @@ export async function generateKnowledgeBaseForSubject(
 
       conceptsProcessed += 1;
 
-      await addConceptSubtopic(concept.id, note.subtopicId);
-
-      linkedConcepts += 1;
+      for (const subtopicId of candidate.subtopicIds) {
+        await addConceptSubtopic(concept.id, subtopicId);
+        linkedConcepts += 1;
+      }
     }
 
     processedNotes += 1;

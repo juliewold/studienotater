@@ -1,11 +1,11 @@
 import json
 
-from .subject_structure_service import generate_subject_structure
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .concept_extraction_service import extract_concept_candidates
+from .subject_structure_service import generate_subject_structure
 
 
 @csrf_exempt
@@ -17,6 +17,7 @@ def extract_concepts(request):
         return JsonResponse({"error": "Invalid JSON."}, status=400)
 
     text = body.get("text")
+    subtopics = body.get("subtopics", [])
 
     if not isinstance(text, str) or not text.strip():
         return JsonResponse(
@@ -24,13 +25,23 @@ def extract_concepts(request):
             status=400,
         )
 
-    candidates = extract_concept_candidates(text)
+    if not isinstance(subtopics, list):
+        return JsonResponse(
+            {"error": "Subtopics must be a list."},
+            status=400,
+        )
+
+    candidates = extract_concept_candidates(
+        text,
+        subtopics,
+    )
 
     return JsonResponse(
         {
             "candidates": candidates,
         }
     )
+
 
 @csrf_exempt
 @require_POST

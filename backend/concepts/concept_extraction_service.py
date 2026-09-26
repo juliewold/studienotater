@@ -17,27 +17,55 @@ def get_client():
     return OpenAI(
         api_key=api_key,
         base_url=NTNU_LLM_BASE_URL,
+        timeout=120.0,
+        max_retries=2,
     )
 
 
-def extract_concept_candidates(text):
+def extract_concept_candidates(text, subtopics=None):
     client = get_client()
+
+    subtopics = subtopics or []
+
+    subtopic_text = "\n".join(
+        f"- ID: {subtopic['id']} | NAVN: {subtopic['name']}"
+        for subtopic in subtopics
+    )
+
+    if subtopics:
+        subtopic_instructions = (
+            "Du får en liste over undertemaer som allerede finnes i faget. "
+            "For hvert begrep skal du velge hvilket eller hvilke undertemaer "
+            "begrepet faglig hører hjemme under. "
+            "Bruk bare undertema-ID-er fra listen. "
+            "Et begrep kan høre til flere undertemaer dersom det er faglig naturlig. "
+            "Ikke velg undertema basert bare på hvor selve notatet er plassert. "
+            "Velg basert på begrepets faglige betydning. "
+        )
+    else:
+        subtopic_instructions = (
+            "Ingen undertemaer er oppgitt. "
+            "Returner derfor en tom subtopicIds-liste for hvert begrep. "
+        )
 
     response = client.chat.completions.create(
         model=NTNU_LLM_MODEL,
+        response_format={"type": "json_object"},
         messages=[
             {
                 "role": "system",
                 "content": (
                     "Du bygger en kunnskapsbase fra studienotater. "
+
                     "Finn sentrale fagbegreper som en student bør kunne forstå "
                     "og som egner seg til en egen begrepsside. "
                     "Ikke ta med vanlige ord, overskrifter eller generelle formuleringer. "
 
                     "Skriv hvert begrep i naturlig grunnform med stor forbokstav. "
-                    "Eksempel: 'normalfordelingen' blir 'Normalfordeling', "
-                    "'standardavviket' blir 'Standardavvik' og "
-                    "'forventningsverdien' blir 'Forventningsverdi'. "
+                    "Bruk samme fagterminologi som brukes i notatet. "
+                    "Ikke oversett etablerte fagbegreper bare for å gjøre dem norske. "
+                    "Hvis notatet bruker et etablert engelsk begrep som 'Big O', "
+                    "'Insertion Sort' eller 'Merge Sort', behold dette navnet. "
                     "Returner hvert fagbegrep kun én gang. "
 
                     "Velg type fra: definition, theorem, formula, method. "
@@ -47,25 +75,37 @@ def extract_concept_candidates(text):
                     "2. explanation: en pedagogisk forklaring som kan vises direkte "
                     "på en begrepsside for en universitetsstudent. "
                     "Forklar hva begrepet betyr, hvordan det brukes og det viktigste "
-                    "studenten bør forstå. Bruk gjerne relevante matematiske uttrykk "
-                    "fra notatet når det er naturlig. "
+                    "studenten bør forstå. "
+                    "Bruk gjerne relevante matematiske uttrykk fra notatet "
+                    "når det er naturlig. "
+                    "3. subtopicIds: en liste med ID-ene til undertemaene "
+                    "begrepet faglig hører til. "
 
                     "Innholdet skal bygge på studienotatet. "
                     "Ikke finn på detaljer som ikke støttes av teksten. "
 
-                    "Returner kun gyldig JSON. Ingen markdown og ingen tekst "
-                    "før eller etter JSON. Formatet skal være "
+                    f"{subtopic_instructions}"
+
+                    "Returner kun gyldig JSON. "
+                    "Ingen markdown og ingen tekst før eller etter JSON. "
+
+                    "Formatet skal være "
                     '{"candidates": ['
                     '{"name": "Begrep", '
                     '"type": "definition", '
                     '"shortDefinition": "Kort definisjon", '
-                    '"explanation": "Pedagogisk forklaring"}'
+                    '"explanation": "Pedagogisk forklaring", '
+                    '"subtopicIds": ["subtopic-id"]}'
                     "]}"
                 ),
             },
             {
                 "role": "user",
-                "content": text,
+                "content": (
+                    f"UNDERTEMAER:\n"
+                    f"{subtopic_text or 'Ingen undertemaer'}\n\n"
+                    f"STUDIENOTAT:\n{text}"
+                ),
             },
         ],
     )
@@ -75,6 +115,36 @@ def extract_concept_candidates(text):
     if not content:
         return []
 
-    result = json.loads(content)
+    try:
+        result = json.loads(content)
+    except json.JSONDecodeError as error:
+        raise ValueError(
+            f"LLM returned invalid JSON: {content}"
+        ) from error
 
-    return result.get("candidates", [])
+    candidates = result.get("candidates", [])
+
+    if not isinstance(candidates, list):
+        raise ValueError(
+            "LLM response does not contain a valid candidates list."
+        )
+
+    valid_subtopic_ids = {
+        subtopic["id"]
+        for subtopic in subtopics
+    }
+
+    for candidate in candidates:
+        subtopic_ids = candidate.get("subtopicIds", [])
+
+        if not isinstance(subtopic_ids, list):
+            candidate["subtopicIds"] = []
+            continue
+
+        candidate["subtopicIds"] = [
+            subtopic_id
+            for subtopic_id in subtopic_ids
+            if subtopic_id in valid_subtopic_ids
+        ]
+
+    return candidates

@@ -17,9 +17,9 @@ export async function getConceptSubtopicLinks(
     throw error;
   }
 
-  return (data ?? []).map((link) => ({
-    conceptId: link.concept_id,
-    subtopicId: link.subtopic_id,
+  return (data ?? []).map((row) => ({
+    conceptId: row.concept_id,
+    subtopicId: row.subtopic_id,
   }));
 }
 
@@ -35,7 +35,7 @@ export async function getConceptIdsBySubtopic(
     throw error;
   }
 
-  return (data ?? []).map((link) => link.concept_id);
+  return (data ?? []).map((row) => row.concept_id);
 }
 
 export async function addConceptSubtopic(
@@ -78,6 +78,23 @@ export async function removeConceptSubtopic(
     .delete()
     .eq("concept_id", conceptId)
     .eq("subtopic_id", subtopicId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function removeConceptSubtopicsBySubtopicIds(
+  subtopicIds: string[],
+) {
+  if (subtopicIds.length === 0) {
+    return;
+  }
+
+  const { error } = await supabase
+    .from("concept_subtopics")
+    .delete()
+    .in("subtopic_id", subtopicIds);
 
   if (error) {
     throw error;
