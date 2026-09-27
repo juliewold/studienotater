@@ -541,12 +541,8 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
     fileInputRef.current?.click();
   };
 
-  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    event.target.value = "";
-
-    if (!file || !editor) {
+  const uploadImage = async (file: File) => {
+    if (!editor) {
       return;
     }
 
@@ -576,7 +572,10 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
         throw new Error("Du må være logget inn for å laste opp bilder.");
       }
 
-      const fileExtension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const mimeExtension = file.type.split("/")[1]?.toLowerCase();
+
+      const fileExtension =
+        file.name.split(".").pop()?.toLowerCase() || mimeExtension || "png";
 
       const filePath = `${user.id}/${crypto.randomUUID()}.${fileExtension}`;
 
@@ -601,8 +600,8 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
         .focus()
         .setImage({
           src: publicUrlData.publicUrl,
-          alt: file.name,
-          title: file.name,
+          alt: file.name || "Innlimt bilde",
+          title: file.name || "Innlimt bilde",
         })
         .run();
     } catch (error) {
@@ -616,6 +615,46 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
       setIsUploadingImage(false);
     }
   };
+
+  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    await uploadImage(file);
+  };
+
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    const editorElement = editor.view.dom;
+
+    const handlePasteImage = (event: ClipboardEvent) => {
+      const files = Array.from(event.clipboardData?.files ?? []);
+
+      const image = files.find((file) => file.type.startsWith("image/"));
+
+      if (!image) {
+        return;
+      }
+
+      event.preventDefault();
+
+      void uploadImage(image);
+    };
+
+    editorElement.addEventListener("paste", handlePasteImage);
+
+    return () => {
+      editorElement.removeEventListener("paste", handlePasteImage);
+    };
+  }, [editor]);
 
   const handleInsertTable = () => {
     if (!editor) {
