@@ -92,20 +92,40 @@ def generate_subject_structure(subject_name, notes):
     content = response.choices[0].message.content
 
     if not content:
-        return {"topics": []}
+        raise ValueError("LLM returned an empty structure.")
 
     try:
         result = json.loads(content)
     except json.JSONDecodeError as error:
-        raise ValueError(
-            f"LLM returned invalid JSON: {content}"
-        ) from error
+        raise ValueError("LLM returned invalid JSON.") from error
 
-    topics = result.get("topics")
-
-    if not isinstance(topics, list):
+    if not isinstance(result, dict) or not isinstance(result.get("topics"), list):
         raise ValueError("LLM response does not contain a valid topics list.")
 
-    return {
-        "topics": topics,
-    }
+    valid_note_ids = {note["id"] for note in notes}
+    assigned = set()
+    validated_topics = []
+    for topic in result["topics"]:
+        if not isinstance(topic, dict) or not isinstance(topic.get("name"), str) or not topic["name"].strip():
+            raise ValueError("Topic must have a non-empty name.")
+        if not isinstance(topic.get("subtopics"), list) or not topic["subtopics"]:
+            raise ValueError("Topic must have a non-empty subtopics list.")
+        validated_subtopics = []
+        for subtopic in topic["subtopics"]:
+            if not isinstance(subtopic, dict) or not isinstance(subtopic.get("name"), str) or not subtopic["name"].strip():
+                raise ValueError("Subtopic must have a non-empty name.")
+            if not isinstance(subtopic.get("noteIds"), list):
+                raise ValueError("Subtopic noteIds must be a list.")
+            note_ids = []
+            for note_id in subtopic["noteIds"]:
+                if isinstance(note_id, str) and note_id in valid_note_ids and note_id not in assigned:
+                    note_ids.append(note_id)
+                    assigned.add(note_id)
+            validated_subtopics.append({"name": subtopic["name"].strip(), "noteIds": note_ids})
+        validated_topics.append({"name": topic["name"].strip(), "subtopics": validated_subtopics})
+
+    # Do not invent a fallback topic or save an incomplete plan. The caller can
+    # retry or organize the notes manually; no frontend writes have started yet.
+    if assigned != valid_note_ids:
+        raise ValueError("The generated structure omitted one or more notes.")
+    return {"topics": validated_topics}

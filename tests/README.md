@@ -20,7 +20,7 @@ simulerte API-svar og kontrollerer blant annet AI-feil før lagring, bevaring av
 manuelle koblinger og forklaringer, feil under lagring, avgrensing til ett notat
 og navngitte bokser som AI-en utelater.
 
-Backendens fire tester kjøres fra roten med:
+Backend-testene kjøres fra roten med:
 
 ```sh
 backend/.venv/bin/python backend/manage.py test concepts
@@ -45,3 +45,13 @@ lagringen og visningen av en eksplisitt navngitt testboks er verifisert separat.
 Genereringen bevarer gamle koblinger; utdaterte koblinger må derfor fjernes
 manuelt. Lagringsfeil kan fortsatt gi delvise tillegg. Opprettelse av manglende
 fagstruktur skjer før begrepsanalysen og er ikke del av samme transaksjon.
+
+
+## Validering av generert struktur
+
+`/studienotater/tests/subject-structure.html` kjører seks tester med simulerte
+API-svar: eksisterende struktur, struktur opprettet under AI-kallet, AI-feil uten
+lagring, tydelig feil ved delvis lagring uten sletting, vellykket lagring og tomt
+notatutvalg. Backend-testene dekker ugyldige kandidater, strukturfelt, ukjente og
+repeterte ID-er, glemte notater og kontrollerte feil fra begge AI-endepunktene.
+Se `database/README.md` for valideringsregler og transaksjonsbegrensningene.

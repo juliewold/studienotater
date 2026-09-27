@@ -2,6 +2,7 @@ import { getNotesBySubject } from "../notes/notesService";
 import {
   createSubtopic,
   createTopic,
+  getTopicsBySubject,
 } from "../subjects/subjectStructureService";
 import { updateNoteSubtopic } from "../notes/notesService";
 
@@ -51,7 +52,12 @@ async function requestSubjectStructure(
   });
 
   if (!response.ok) {
-    throw new Error("Failed to generate subject structure.");
+    const failure = await response.json().catch(() => null);
+    throw new Error(
+      typeof failure?.error === "string"
+        ? failure.error
+        : "Kunne ikke generere fagstruktur. Ingen struktur er lagret.",
+    );
   }
 
   return response.json();
@@ -61,6 +67,9 @@ export async function generateAndSaveSubjectStructure(
   subjectId: string,
   subjectName: string,
 ): Promise<GenerateSubjectStructureResult> {
+  if ((await getTopicsBySubject(subjectId)).length > 0) {
+    throw new Error("Faget har allerede en fagstruktur. Eksisterende struktur er bevart.");
+  }
   const notes = await getNotesBySubject(subjectId);
 
   const notesWithContent = notes.filter(
@@ -84,39 +93,57 @@ export async function generateAndSaveSubjectStructure(
     })),
   );
 
+  // Recheck after the slow AI call to reduce the chance of concurrent creation.
+  // This is not a database transaction; see database/README.md.
+  if ((await getTopicsBySubject(subjectId)).length > 0) {
+    throw new Error("Fagstruktur ble opprettet mens AI-en arbeidet. Eksisterende struktur er bevart.");
+  }
+
   let topicsCreated = 0;
   let subtopicsCreated = 0;
   let notesOrganized = 0;
 
-  for (const [topicIndex, generatedTopic] of structure.topics.entries()) {
-    const topic = await createTopic(subjectId, generatedTopic.name, topicIndex);
+  try {
+    for (const [topicIndex, generatedTopic] of structure.topics.entries()) {
+      const topic = await createTopic(subjectId, generatedTopic.name, topicIndex);
 
-    topicsCreated += 1;
+      topicsCreated += 1;
 
-    for (const [
-      subtopicIndex,
-      generatedSubtopic,
-    ] of generatedTopic.subtopics.entries()) {
-      const subtopic = await createSubtopic(
-        topic.id,
-        generatedSubtopic.name,
+      for (const [
         subtopicIndex,
-      );
+        generatedSubtopic,
+      ] of generatedTopic.subtopics.entries()) {
+        const subtopic = await createSubtopic(
+          topic.id,
+          generatedSubtopic.name,
+          subtopicIndex,
+        );
 
-      subtopicsCreated += 1;
+        subtopicsCreated += 1;
 
-      for (const noteId of generatedSubtopic.noteIds) {
-        const noteExists = notesWithContent.some((note) => note.id === noteId);
+        for (const noteId of generatedSubtopic.noteIds) {
+          const noteExists = notesWithContent.some((note) => note.id === noteId);
 
-        if (!noteExists) {
-          continue;
+          if (!noteExists) {
+            continue;
+          }
+
+          await updateNoteSubtopic(noteId, subtopic.id);
+
+          notesOrganized += 1;
         }
-
-        await updateNoteSubtopic(noteId, subtopic.id);
-
-        notesOrganized += 1;
       }
     }
+  } catch (error) {
+    // Never delete created rows as compensation: they may already be in use,
+    // and a lost network response does not prove that a write failed.
+    const detail = error instanceof Error ? error.message : "Lagringen ble avbrutt.";
+    throw new Error(
+      `Fagstrukturen kan være delvis lagret (${topicsCreated} temaer, ` +
+        `${subtopicsCreated} undertemaer og ${notesOrganized} notatplasseringer bekreftet). ` +
+        "Kontroller fagstrukturen i administrasjonen før du prøver igjen. " + detail,
+      { cause: error },
+    );
   }
 
   return {

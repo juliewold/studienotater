@@ -57,7 +57,9 @@ export const SubjectPage = () => {
 
     const shouldGenerate = window.confirm(
       `Vil du generere kunnskapsbasen for ${subject?.code ?? "dette faget"}? ` +
-        "AI vil analysere alle notater som er koblet til et undertema og opprette fagbegreper. Eksisterende begreper og koblinger bevares.",
+        "Hvis fagstruktur mangler, kan AI opprette temaer og undertemaer og organisere notatene først. " +
+        "Deretter analyseres notatene som er knyttet til undertemaer, og begreper, forklaringer og koblinger genereres. " +
+        "Eksisterende fagstruktur, begrepsinnhold og manuelle koblinger bevares.",
     );
 
     if (!shouldGenerate) {

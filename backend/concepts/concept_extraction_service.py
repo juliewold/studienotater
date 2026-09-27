@@ -40,7 +40,12 @@ def extract_concept_candidates(text, subtopics=None):
             "Bruk bare undertema-ID-er fra listen. "
             "Et begrep kan høre til flere undertemaer dersom det er faglig naturlig. "
             "Ikke velg undertema basert bare på hvor selve notatet er plassert. "
-            "Velg basert på begrepets faglige betydning. "
+            "Koble bare når begrepet er sentralt for kunnskapen studenten skal lære "
+            "i akkurat dette undertemaet. At begrepet nevnes i et notat, brukes som "
+            "bakgrunn eller har en indirekte faglig forbindelse er IKKE tilstrekkelig. "
+            "Velg heller for få enn for mange undertemaer. Ved tvil, utelat koblingen. "
+            "En tom subtopicIds-liste er riktig når ingen undertemaer passer direkte. "
+            "Flere undertemaer er bare riktig når begrepet er sentralt i hvert av dem. "
         )
     else:
         subtopic_instructions = (
@@ -113,38 +118,37 @@ def extract_concept_candidates(text, subtopics=None):
     content = response.choices[0].message.content
 
     if not content:
-        return []
+        raise ValueError("LLM returned an empty response.")
 
     try:
         result = json.loads(content)
     except json.JSONDecodeError as error:
-        raise ValueError(
-            f"LLM returned invalid JSON: {content}"
-        ) from error
+        raise ValueError("LLM returned invalid JSON.") from error
 
-    candidates = result.get("candidates", [])
+    if not isinstance(result, dict) or not isinstance(result.get("candidates"), list):
+        raise ValueError("LLM response does not contain a valid candidates list.")
 
-    if not isinstance(candidates, list):
-        raise ValueError(
-            "LLM response does not contain a valid candidates list."
-        )
-
-    valid_subtopic_ids = {
-        subtopic["id"]
-        for subtopic in subtopics
-    }
-
-    for candidate in candidates:
-        subtopic_ids = candidate.get("subtopicIds", [])
-
-        if not isinstance(subtopic_ids, list):
-            candidate["subtopicIds"] = []
-            continue
-
-        candidate["subtopicIds"] = [
-            subtopic_id
-            for subtopic_id in subtopic_ids
-            if subtopic_id in valid_subtopic_ids
-        ]
-
-    return candidates
+    valid_subtopic_ids = {subtopic["id"] for subtopic in subtopics}
+    validated = []
+    for candidate in result["candidates"]:
+        if not isinstance(candidate, dict):
+            raise ValueError("Each candidate must be an object.")
+        for field in ("name", "type", "shortDefinition", "explanation"):
+            if not isinstance(candidate.get(field), str) or not candidate[field].strip():
+                raise ValueError(f"Candidate has an invalid {field}.")
+        candidate_type = candidate["type"].strip()
+        if candidate_type not in {"definition", "theorem", "formula", "method"}:
+            raise ValueError("Candidate has an invalid type.")
+        if not isinstance(candidate.get("subtopicIds"), list):
+            raise ValueError("Candidate subtopicIds must be a list.")
+        validated.append({
+            "name": candidate["name"].strip(),
+            "type": candidate_type,
+            "shortDefinition": candidate["shortDefinition"].strip(),
+            "explanation": candidate["explanation"].strip(),
+            "subtopicIds": list(dict.fromkeys(
+                value for value in candidate["subtopicIds"]
+                if isinstance(value, str) and value in valid_subtopic_ids
+            )),
+        })
+    return validated
