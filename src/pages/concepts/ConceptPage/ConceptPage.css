@@ -1,115 +1,146 @@
 .concept-page {
-  width: min(100% - 48px, 900px);
+  width: min(100% - 48px, 1040px);
   margin: 0 auto;
-  padding: 48px 0 80px;
+  padding: 40px 0 96px;
 }
 
 .concept-page-back {
-  display: inline-block;
-  margin-bottom: 32px;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 36px;
 
   color: #7c3aed;
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
+
+  transition: color 0.2s ease;
 }
 
 .concept-page-back:hover {
   color: #5b21b6;
 }
 
+/* Header */
+
 .concept-page-header {
-  margin-bottom: 48px;
-}
-
-.concept-page-type {
-  display: inline-block;
-  margin-bottom: 10px;
-
-  color: #7c3aed;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  max-width: 820px;
+  margin-bottom: 32px;
 }
 
 .concept-page-header h1 {
-  margin: 0 0 16px;
+  margin: 0 0 14px;
 
   color: #111827;
-  font-size: clamp(2rem, 5vw, 3.25rem);
-  line-height: 1.1;
+  font-size: clamp(2.4rem, 5vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
 }
 
 .concept-page-definition {
-  max-width: 700px;
+  max-width: 760px;
   margin: 0;
 
   color: #4b5563;
-  font-size: 1.05rem;
-  line-height: 1.7;
+  font-size: 1.08rem;
+  line-height: 1.75;
 }
 
+/* Seksjoner */
+
 .concept-page-section {
-  margin-top: 36px;
+  max-width: 820px;
+  margin-top: 32px;
 }
 
 .concept-page-section h2 {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
 
-  color: #111827;
-  font-size: 1.2rem;
+  color: #1f2937;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
-.concept-page-section p {
-  max-width: 700px;
+.concept-page-section > p {
+  max-width: 760px;
   margin: 0;
 
   color: #4b5563;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
-.concept-page-related {
+/* Faglig plassering */
+
+.concept-page-contexts {
   display: flex;
   flex-wrap: wrap;
+  gap: 10px;
+}
+
+.concept-page-context {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-}
 
-.concept-page-related-link {
-  padding: 7px 10px;
+  padding: 9px 13px;
 
-  background: #f5f3ff;
-  border-radius: 8px;
+  background: #faf7ff;
+  border: 1px solid #e9ddff;
+  border-radius: 10px;
 
-  color: #7c3aed;
-  font-size: 0.85rem;
-  font-weight: 600;
+  color: #6b7280;
+  font-size: 0.88rem;
   text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.concept-page-related-link:hover {
-  background: #ede9fe;
+.concept-page-context span:first-child {
+  color: #6d28d9;
+  font-weight: 600;
+}
+
+.concept-page-context span:nth-child(2) {
+  color: #a78bfa;
+}
+
+.concept-page-context strong {
   color: #5b21b6;
+  font-weight: 700;
+}
+
+.concept-page-context:hover {
+  background: #f5f0ff;
+  border-color: #d8c4ff;
+  transform: translateY(-1px);
 }
 
 /* Definisjoner og teoremer */
 
 .concept-page-callout {
-  max-width: 700px;
+  width: 100%;
+  max-width: 820px;
   overflow: hidden;
+
   border: 1px solid;
-  border-radius: 16px;
+  border-radius: 14px;
 }
 
 .concept-page-callout + .concept-page-callout {
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 .concept-page-callout-header {
   display: flex;
-  min-height: 56px;
   align-items: center;
-  padding: 0.8rem 1rem;
+
+  min-height: 48px;
+  padding: 0.7rem 1rem;
+
   border-bottom: 1px solid rgba(30, 24, 38, 0.06);
 }
 
@@ -117,17 +148,19 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+
+  font-size: 0.92rem;
   font-weight: 700;
 }
 
 .concept-page-callout-body {
-  padding: 1rem 1.1rem;
+  padding: 1rem 1.1rem 1.05rem;
 }
 
 .concept-page-content-html {
   color: #374151;
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 0.98rem;
+  line-height: 1.75;
 }
 
 .concept-page-content-html p {
@@ -137,32 +170,61 @@
 /* Definisjon */
 
 .concept-page-callout-definition {
-  border-color: #b8dfc3;
-  background: #f3faf5;
+  background: #f5fbf7;
+  border-color: #c8e5d0;
 }
 
 .concept-page-callout-definition .concept-page-callout-header {
-  background: #e4f4e9;
+  background: #eaf6ed;
   color: #2d7147;
 }
 
 /* Teorem */
 
 .concept-page-callout-theorem {
-  border-color: #efbcbc;
-  background: #fff5f5;
+  background: #fff7f7;
+  border-color: #efcaca;
 }
 
 .concept-page-callout-theorem .concept-page-callout-header {
-  background: #fde5e5;
-  color: #b03838;
+  background: #fdeaea;
+  color: #a83b3b;
 }
 
-/* Kilde */
+/* Formler */
+
+.concept-page-formulas {
+  max-width: 820px;
+}
+
+.concept-page-formula {
+  padding: 20px 24px;
+
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+.concept-page-formula + .concept-page-formula {
+  margin-top: 12px;
+}
+
+.concept-page-formula-math {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+
+  padding: 12px 0 18px;
+
+  font-size: 1.05rem;
+}
+
+/* Kilder */
 
 .concept-page-source {
   display: inline-block;
   margin-top: 12px;
+
   color: #7c3aed;
   font-size: 0.8rem;
   font-weight: 600;
@@ -171,67 +233,128 @@
 
 .concept-page-source:hover {
   color: #5b21b6;
+  text-decoration: underline;
 }
+
+/* Relaterte begreper */
+
+.concept-page-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.concept-page-related-link {
+  padding: 7px 11px;
+
+  background: #f5f3ff;
+  border: 1px solid #ede9fe;
+  border-radius: 8px;
+
+  color: #7c3aed;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.concept-page-related-link:hover {
+  background: #ede9fe;
+  border-color: #ddd6fe;
+  color: #5b21b6;
+}
+
+/* Notater */
 
 .concept-page-notes {
   display: flex;
   flex-direction: column;
-  max-width: 700px;
+
+  width: 100%;
+  max-width: 820px;
+
+  overflow: hidden;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
 }
 
 .concept-page-note-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #e5e7eb;
+  gap: 16px;
+
+  padding: 13px 16px;
+
+  border-bottom: 1px solid #f0f1f3;
+
   color: #374151;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 600;
   text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
-.concept-page-note-link:first-child {
-  border-top: 1px solid #e5e7eb;
+.concept-page-note-link:last-child {
+  border-bottom: 0;
 }
 
 .concept-page-note-link span {
-  color: #7c3aed;
+  color: #8b5cf6;
 }
 
 .concept-page-note-link:hover {
-  color: #7c3aed;
+  background: #faf8ff;
+  color: #6d28d9;
 }
 
-.concept-page-formulas {
-  margin-top: 32px;
-}
-
-.concept-page-formula {
-  padding: 20px 0;
-}
-
-.concept-page-formula-math {
-  display: flex;
-  justify-content: center;
-
-  padding: 12px 0 18px;
-
-  font-size: 1.05rem;
-}
-
-.concept-page-formula .concept-page-source {
-  display: inline-block;
-  margin-top: 4px;
-}
+/* Mobil */
 
 @media (max-width: 600px) {
   .concept-page {
-    width: min(100% - 32px, 900px);
-    padding-top: 32px;
+    width: min(100% - 32px, 1040px);
+    padding: 28px 0 64px;
+  }
+
+  .concept-page-back {
+    margin-bottom: 28px;
   }
 
   .concept-page-header {
-    margin-bottom: 36px;
+    margin-bottom: 28px;
+  }
+
+  .concept-page-header h1 {
+    font-size: clamp(2.1rem, 11vw, 3rem);
+  }
+
+  .concept-page-section {
+    margin-top: 28px;
+  }
+
+  .concept-page-contexts {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .concept-page-context {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .concept-page-callout-body {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .concept-page-formula {
+    padding: 16px;
   }
 }

@@ -1,0 +1,45 @@
+<!doctype html><html lang="nb"><meta charset="utf-8"><title>Fagstruktur – regresjonstester</title>
+<h1>Fagstruktur – regresjonstester</h1><p id="summary">Kjører …</p><pre id="results"></pre>
+<script type="module">
+import { generateAndSaveSubjectStructure } from '../src/services/concepts/subjectStructureGenerationService.ts';
+const assert=(ok,message)=>{if(!ok)throw new Error(message)};
+const response=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});
+const originalFetch=window.fetch;
+async function scenario(mode){
+ let topicReads=0;const calls=[];
+ window.fetch=async(input,init={})=>{
+  const url=new URL(typeof input==='string'?input:input.url), method=init.method??'GET';
+  calls.push({path:url.pathname,method});const table=url.pathname.split('/').at(-1);
+  if(method==='GET'&&table==='topics'){
+   topicReads++;
+   return response(mode==='existing'||(mode==='concurrent'&&topicReads===2)?[{id:'old',name:'Old',subject_id:'subject',sort_order:0}]:[]);
+  }
+  if(method==='GET'&&table==='notes')return response(mode==='empty'?[]:[{id:'n1',subject_id:'subject',title:'Note',slug:'note',description:'',content:'Source',content_json:null,created_at:'',subtopics:null}]);
+  if(url.pathname.endsWith('/api/concepts/generate-structure/'))return mode==='ai-error'
+   ?response({error:'AI-tjenesten er utilgjengelig.'},503)
+   :response({topics:[{name:'Topic',subtopics:[{name:'Subtopic',noteIds:['n1']}]}]});
+  if(method==='POST'&&table==='topics')return response({id:'t1',name:'Topic',subject_id:'subject',sort_order:0},201);
+  if(method==='POST'&&table==='subtopics')return mode==='partial'
+   ?response({message:'Write failed'},400)
+   :response({id:'s1',topic_id:'t1',name:'Subtopic',sort_order:0},201);
+  if(method==='PATCH'&&table==='notes')return response(null);
+  throw new Error('Unexpected request '+method+' '+url.pathname);
+ };
+ let result,error;
+ try{result=await generateAndSaveSubjectStructure('subject','Subject')}catch(e){error=e}
+ finally{window.fetch=originalFetch}
+ return{calls,result,error};
+}
+const writes=s=>s.calls.filter(c=>c.path.includes('/rest/v1/')&&c.method!=='GET');
+const tests=[
+ ['Eksisterende fagstruktur stopper både AI og lagring',async()=>{const s=await scenario('existing');assert(s.error,'Expected rejection');assert(s.calls.length===1&&writes(s).length===0,'Existing structure changed')}],
+ ['Struktur opprettet under AI-kallet bevares',async()=>{const s=await scenario('concurrent');assert(s.error,'Expected rejection');assert(writes(s).length===0,'Concurrent structure changed')}],
+ ['AI-feil vises før noen lagring',async()=>{const s=await scenario('ai-error');assert(s.error?.message==='AI-tjenesten er utilgjengelig.','Missing error message');assert(writes(s).length===0,'Unexpected writes')}],
+ ['Delvis lagring gir beskjed uten sletting',async()=>{const s=await scenario('partial');assert(s.error?.message.includes('delvis lagret (1 temaer'),'Missing partial status');assert(!s.calls.some(c=>c.method==='DELETE'),'Unsafe rollback')}],
+ ['Gyldig plan lagres og notatet organiseres',async()=>{const s=await scenario('success');assert(!s.error,s.error?.message);assert(s.result.topicsCreated===1&&s.result.subtopicsCreated===1&&s.result.notesOrganized===1,'Incorrect result')}],
+ ['Ingen notater gir ingen endringer',async()=>{const s=await scenario('empty');assert(!s.error,s.error?.message);assert(s.result.topicsCreated===0&&writes(s).length===0,'Unexpected creation')}],
+];
+let passed=0;
+for(const[name,test]of tests){try{await test();passed++;document.querySelector('#results').textContent+='BESTÅTT: '+name+'\n'}catch(e){document.querySelector('#results').textContent+='FEIL: '+name+': '+e.message+'\n'}}
+document.querySelector('#summary').textContent=`${passed}/${tests.length} bestått`;
+</script></html>

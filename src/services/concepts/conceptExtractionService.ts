@@ -4,12 +4,35 @@ import { addConceptSuggestion } from "./conceptSuggestionsService";
 
 export type ConceptCandidate = {
   name: string;
+  sourceName?: string;
   type: ConceptType;
   shortDefinition: string;
+  explanation: string;
+  subtopicIds: string[];
 };
+
+export type ExistingConceptContext = Pick<Concept, "name" | "type" | "shortDefinition">;
+
+type AvailableSubtopic = {
+  id: string;
+  name: string;
+};
+
+type ConceptExtractionResponse = {
+  candidates: ConceptCandidate[];
+};
+
+export class InvalidConceptResponseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidConceptResponseError";
+  }
+}
 
 export async function extractConceptCandidates(
   text: string,
+  subtopics: AvailableSubtopic[] = [],
+  existingConcepts: ExistingConceptContext[] = [],
 ): Promise<ConceptCandidate[]> {
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -22,46 +45,50 @@ export async function extractConceptCandidates(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({
+      text,
+      subtopics,
+      existingConcepts,
+    }),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to extract concept candidates.");
+    const failure = await response.json().catch(() => null);
+    const message = typeof failure?.error === "string"
+      ? failure.error
+      : "Kunne ikke hente begreper fra AI-tjenesten. Prøv igjen senere.";
+    if (response.status === 502 && failure?.code === "invalid_ai_response") {
+      throw new InvalidConceptResponseError(message);
+    }
+    throw new Error(message);
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as ConceptExtractionResponse;
 
   return data.candidates ?? [];
 }
 
-function normalizeText(content: string): string {
-  return content
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function normalizeName(name: string): string {
-  return name.trim().toLocaleLowerCase();
+function normalizeText(value: string): string {
+  return value.trim().toLocaleLowerCase("nb-NO");
 }
 
 export function removeExistingConcepts(
   candidates: ConceptCandidate[],
-  concepts: Concept[],
+  existingConcepts: Concept[],
 ): ConceptCandidate[] {
   const existingNames = new Set(
-    concepts.map((concept) => normalizeName(concept.name)),
+    existingConcepts.map((concept) => normalizeText(concept.name)),
   );
 
   return candidates.filter(
-    (candidate) => !existingNames.has(normalizeName(candidate.name)),
+    (candidate) => !existingNames.has(normalizeText(candidate.name)),
   );
 }
 
 export function getPlainTextFromNote(content: string): string {
-  return normalizeText(content);
+  const documentElement = new DOMParser().parseFromString(content, "text/html");
+
+  return documentElement.body.textContent?.trim() ?? "";
 }
 
 export async function extractNewConceptCandidates(
@@ -73,28 +100,29 @@ export async function extractNewConceptCandidates(
     return [];
   }
 
-  const [candidates, concepts] = await Promise.all([
+  const [candidates, existingConcepts] = await Promise.all([
     extractConceptCandidates(text),
     getConceptsFromDatabase(),
   ]);
 
-  return removeExistingConcepts(candidates, concepts);
+  return removeExistingConcepts(candidates, existingConcepts);
 }
 
 export async function createConceptSuggestionsForNote(
   noteId: string,
   content: string,
-): Promise<void> {
+): Promise<number> {
   const candidates = await extractNewConceptCandidates(content);
 
-  await Promise.all(
-    candidates.map((candidate) =>
-      addConceptSuggestion(
-        noteId,
-        candidate.name,
-        candidate.type,
-        candidate.shortDefinition,
-      ),
-    ),
-  );
+  for (const candidate of candidates) {
+    await addConceptSuggestion(
+      noteId,
+      candidate.name,
+      candidate.type,
+      candidate.shortDefinition,
+      candidate.explanation,
+    );
+  }
+
+  return candidates.length;
 }

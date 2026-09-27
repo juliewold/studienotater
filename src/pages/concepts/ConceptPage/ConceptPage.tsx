@@ -15,94 +15,71 @@ import {
   type ConceptContentSource,
 } from "../../../services/concepts/conceptContentService";
 
+import {
+  getConceptContexts,
+  type ConceptContext,
+} from "../../../services/concepts/conceptContextService";
+
 export const ConceptPage = () => {
   const { slug } = useParams();
 
+  return <ConceptDetails key={slug} slug={slug} />;
+};
+
+const ConceptDetails = ({ slug }: { slug: string | undefined }) => {
   const [concept, setConcept] = useState<Concept | undefined>();
   const [isConceptLoading, setIsConceptLoading] = useState(true);
-
-  const [conceptContent, setConceptContent] = useState<ConceptContentSource[]>(
-    [],
-  );
-
+  const [conceptContent, setConceptContent] = useState<ConceptContentSource[]>([]);
+  const [conceptContexts, setConceptContexts] = useState<ConceptContext[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [conceptError, setConceptError] = useState(false);
+  const [dataErrors, setDataErrors] = useState<string[]>([]);
 
   useEffect(() => {
     let isCancelled = false;
 
-    const loadConcept = async () => {
-      if (!slug) {
-        setConcept(undefined);
-        setIsConceptLoading(false);
+    const load = async () => {
+      let loadedConcept: Concept | undefined;
+      try {
+        loadedConcept = slug ? await getConceptBySlugFromDatabase(slug) : undefined;
+      } catch (error) {
+        console.error("Kunne ikke hente konsept:", error);
+        if (!isCancelled) setConceptError(true);
+      }
+      if (isCancelled) return;
+      setConcept(loadedConcept);
+      setIsConceptLoading(false);
+      if (!loadedConcept) {
+        setIsLoading(false);
         return;
       }
 
-      setIsConceptLoading(true);
+      const [content, contexts] = await Promise.allSettled([
+        getConceptContent(loadedConcept.id),
+        getConceptContexts(loadedConcept.id),
+      ]);
+      if (isCancelled) return;
 
-      try {
-        const loadedConcept = await getConceptBySlugFromDatabase(slug);
-
-        if (!isCancelled) {
-          setConcept(loadedConcept);
-        }
-      } catch (error) {
-        console.error("Kunne ikke hente konsept:", error);
-
-        if (!isCancelled) {
-          setConcept(undefined);
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsConceptLoading(false);
-        }
+      const errors: string[] = [];
+      if (content.status === "fulfilled") {
+        setConceptContent(content.value);
+      } else {
+        console.error("Kunne ikke hente kildeinnhold:", content.reason);
+        errors.push("Kunne ikke hente innhold fra notatene. Prøv å laste siden på nytt.");
       }
-    };
-
-    void loadConcept();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [slug]);
-
-  useEffect(() => {
-    if (!concept) {
-      setConceptContent([]);
+      if (contexts.status === "fulfilled") {
+        setConceptContexts(contexts.value);
+      } else {
+        console.error("Kunne ikke hente tilhørighet:", contexts.reason);
+        errors.push("Kunne ikke hente tilhørighet til temaer. Prøv å laste siden på nytt.");
+      }
+      setDataErrors(errors);
       setIsLoading(false);
-      return;
-    }
-
-    let isCancelled = false;
-
-    const loadConceptContent = async () => {
-      setIsLoading(true);
-      setConceptContent([]);
-
-      try {
-        const content = await getConceptContent(concept.id);
-
-        if (!isCancelled) {
-          setConceptContent(content);
-        }
-      } catch (error) {
-        console.error("Kunne ikke hente konseptinnhold:", error);
-
-        if (!isCancelled) {
-          setConceptContent([]);
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
-      }
     };
 
-    void loadConceptContent();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [concept?.id]);
+    void load();
+    return () => { isCancelled = true; };
+  }, [slug]);
 
   if (isConceptLoading) {
     return (
@@ -115,9 +92,9 @@ export const ConceptPage = () => {
   if (!concept) {
     return (
       <main className="concept-page">
-        <h1>Fant ikke konseptet</h1>
+        <h1>{conceptError ? "Kunne ikke hente konseptet" : "Fant ikke konseptet"}</h1>
 
-        <p>Konseptet du prøver å åpne finnes ikke.</p>
+        <p>{conceptError ? "Prøv å laste siden på nytt." : "Konseptet du prøver å åpne finnes ikke."}</p>
       </main>
     );
   }
@@ -163,6 +140,28 @@ export const ConceptPage = () => {
       {isLoading && (
         <section className="concept-page-section">
           <p>Henter innhold...</p>
+        </section>
+      )}
+
+      {dataErrors.map((message) => <p role="status" key={message}>{message}</p>)}
+
+      {!isLoading && conceptContexts.length > 0 && (
+        <section className="concept-page-section">
+          <h2>Tilhører</h2>
+
+          <div className="concept-page-contexts">
+            {conceptContexts.map((context) => (
+              <Link
+                key={`${context.topicId}-${context.subtopicId}`}
+                to={`/fag/${context.subjectId}/tema/${context.topicId}/undertema/${context.subtopicId}`}
+                className="concept-page-context"
+              >
+                <span>{context.topicName}</span>
+                <span>→</span>
+                <strong>{context.subtopicName}</strong>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
 

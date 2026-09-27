@@ -68,6 +68,15 @@ export async function getConceptBySlugFromDatabase(
   return data ? mapConceptRow(data as ConceptRow) : undefined;
 }
 
+export function normalizeConceptName(name: string): string {
+  return name
+    .normalize("NFKC")
+    .replace(/[\u2010-\u2015\u2212]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLocaleLowerCase("nb-NO");
+}
+
 function createConceptSlug(name: string): string {
   return name
     .trim()
@@ -86,6 +95,7 @@ export async function createConcept(
   type: ConceptType,
   shortDefinition: string,
   explanation?: string,
+  options: { preserveExisting?: boolean } = {},
 ): Promise<Concept> {
   const trimmedName = name.trim();
   const trimmedShortDefinition = shortDefinition.trim();
@@ -103,7 +113,36 @@ export async function createConcept(
   }
 
   if (existingConcept) {
-    return mapConceptRow(existingConcept as ConceptRow);
+    if (options.preserveExisting) {
+      if (
+        normalizeConceptName(existingConcept.name) !==
+        normalizeConceptName(trimmedName)
+      ) {
+        throw new Error(
+          `Slug-kollisjon: "${trimmedName}" forsøkte å bruke slug "${slug}", ` +
+            `men den tilhører allerede "${existingConcept.name}".`,
+        );
+      }
+      return mapConceptRow(existingConcept as ConceptRow);
+    }
+
+    const { data, error: updateError } = await supabase
+      .from("concepts")
+      .update({
+        name: trimmedName,
+        type,
+        short_definition: trimmedShortDefinition,
+        explanation: trimmedExplanation || null,
+      })
+      .eq("id", existingConcept.id)
+      .select("id, name, slug, type, short_definition, explanation")
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return mapConceptRow(data as ConceptRow);
   }
 
   const newConcept = {
