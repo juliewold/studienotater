@@ -41,7 +41,12 @@ export async function extractConceptCandidates(
   });
 
   if (!response.ok) {
-    throw new Error("Failed to extract concept candidates.");
+    const failure = await response.json().catch(() => null);
+    throw new Error(
+      typeof failure?.error === "string"
+        ? failure.error
+        : "Kunne ikke hente begreper fra AI-tjenesten. Prøv igjen senere.",
+    );
   }
 
   const data = (await response.json()) as ConceptExtractionResponse;

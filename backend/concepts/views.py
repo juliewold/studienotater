@@ -1,4 +1,5 @@
 import json
+from openai import APIConnectionError, APIStatusError
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -31,10 +32,20 @@ def extract_concepts(request):
             status=400,
         )
 
-    candidates = extract_concept_candidates(
-        text,
-        subtopics,
-    )
+    try:
+        candidates = extract_concept_candidates(text, subtopics)
+    except APIConnectionError:
+        return JsonResponse(
+            {"error": "Kunne ikke nå AI-tjenesten. Prøv igjen senere."}, status=503
+        )
+    except APIStatusError:
+        return JsonResponse(
+            {"error": "AI-tjenesten avviste forespørselen. Prøv igjen senere."}, status=502
+        )
+    except ValueError:
+        return JsonResponse(
+            {"error": "AI-tjenesten returnerte et ugyldig svar. Prøv igjen."}, status=502
+        )
 
     return JsonResponse(
         {

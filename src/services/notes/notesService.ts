@@ -329,6 +329,29 @@ export async function updateNote(
   return mapDatabaseNote(data as NoteRow);
 }
 
+// AI processing can take time. Only save links if the note content is still current.
+export async function updateNoteConceptLinks(
+  note: DatabaseNote,
+  content: string,
+  contentJson: NoteContentJson,
+): Promise<void> {
+  let query = supabase
+    .from("notes")
+    .update({ content, content_json: contentJson })
+    .eq("id", note.id)
+    .eq("content", note.content);
+
+  query = note.contentJson === null
+    ? query.is("content_json", null)
+    : query.eq("content_json", JSON.stringify(note.contentJson));
+
+  const { data, error } = await query.select("id").maybeSingle();
+  if (error) throw error;
+  if (!data) {
+    throw new Error("Notatet ble endret eller kunne ikke lagres. Kjør genereringen på nytt.");
+  }
+}
+
 export async function updateNoteTitle(
   id: string,
   title: string,

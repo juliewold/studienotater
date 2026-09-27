@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="nb">
+<meta charset="utf-8">
+<title>Tester av begrepskoblinger</title>
+<h1>Tester av begrepskoblinger</h1>
+<p id="summary">Kjører …</p>
+<pre id="results"></pre>
+<script type="module">
+import { linkCalloutsToConcepts } from '../src/services/concepts/calloutConceptLinkingService.ts';
+
+const concept = { id: 'set', name: 'Mengde', type: 'definition' };
+const box = (text, attrs = {}) => ({ type: 'callout', attrs: { type: 'definition', ...attrs },
+  content: [{ type: 'paragraph', content: [{ type: 'text', text }] }] });
+const render = node => {
+  if (node.text) return node.text;
+  const children = (node.content ?? []).map(render).join('');
+  if (node.type !== 'callout') return `<p>${children}</p>`;
+  const { type, conceptId, conceptName } = node.attrs;
+  return `<div data-type="callout" data-callout-type="${type}"${conceptId ? ` data-concept-id="${conceptId}"` : ''}${conceptName ? ` data-concept-name="${conceptName}"` : ''}><div class="note-callout-body">${children}</div></div>`;
+};
+const fixture = nodes => ({ content: nodes.map(render).join(''), contentJson: { type: 'doc', content: nodes } });
+function assert(condition, message) { if (!condition) throw new Error(message); }
+function check(nodes, expected, concepts = [concept]) {
+  const input = fixture(nodes);
+  const before = JSON.stringify(input);
+  const output = linkCalloutsToConcepts(input.content, input.contentJson, concepts);
+  const elements = [...new DOMParser().parseFromString(output.content, 'text/html').querySelectorAll('[data-type="callout"]')];
+  const flatten = node => [...(node.type === 'callout' ? [node] : []), ...(node.content ?? []).flatMap(flatten)];
+  const linkedNodes = flatten(output.contentJson);
+  expected.forEach((id, index) => {
+    assert((elements[index].dataset.conceptId ?? null) === id, `HTML-boks ${index}`);
+    assert((linkedNodes[index].attrs.conceptId ?? null) === id, `JSON-boks ${index}`);
+  });
+  assert(JSON.stringify(input) === before, 'Originalnotatet ble endret');
+  const again = linkCalloutsToConcepts(output.content, output.contentJson, concepts);
+  assert(again.linkedCallouts === 0 && again.content === output.content, 'Gjentatt kjøring endret resultatet');
+  return output;
+}
+const tests = [
+  ['Boks uten treff foran treff', () => check([box('Ukjent'), box('Mengde: elementer')], [null, 'set'])],
+  ['Eksisterende og gjentatte koblinger', () => {
+    const result = check([box('Mengde', { conceptId: 'set' }), box('Mengde'), box('Mengde')], ['set', 'set', 'set']);
+    assert(result.linkedCallouts === 2, 'Feil antall nye koblinger');
+  }],
+  ['Bevarer manuell kobling', () => check([box('Mengde', { conceptId: 'manual' })], ['manual'])],
+  ['Hopper over tips og kobler teoremer', () => check([box('Mengde', { type: 'tip' }), box('Mengde', { type: 'theorem' })], [null, 'set'])],
+  ['Bruker eksplisitt begrepsnavn', () => check([box('En samling elementer', { conceptName: 'Mengde' })], ['set'])],
+  ['Lengste navn og ordgrense', () => check([box('Mengdelære'), box('Endelig mengde: eksempel')], [null, 'finite'], [concept, { ...concept, id: 'finite', name: 'Endelig mengde' }])],
+  ['Tvetydig navn får ingen kobling', () => check([box('Mengde')], [null], [concept, { ...concept, id: 'other' }])],
+  ['Ulik HTML og JSON bevares', () => {
+    const input = fixture([box('Mengde')]);
+    const content = input.content.replace('Mengde', 'Annet');
+    const output = linkCalloutsToConcepts(content, input.contentJson, [concept]);
+    assert(output.linkedCallouts === 0 && output.content === content && output.contentJson === input.contentJson, 'Endret usamsvarende data');
+  }],
+  ['Ulikt antall bokser bevares', () => {
+    const input = fixture([box('Mengde')]);
+    assert(linkCalloutsToConcepts('', input.contentJson, [concept]).linkedCallouts === 0, 'Koblet med manglende HTML');
+  }],
+  ['Nøstede bokser beholder rekkefølgen', () => {
+    const outer = box('Eksempel', { type: 'example' });
+    outer.content.push(box('Mengde'));
+    check([outer, box('Mengde')], [null, 'set', 'set']);
+  }],
+  ['Manglende JSON bevares', () => assert(linkCalloutsToConcepts('<p>Hei</p>', null, [concept]).content === '<p>Hei</p>', 'Endret HTML')],
+];
+let passed = 0;
+for (const [name, test] of tests) {
+  try { test(); passed++; document.querySelector('#results').textContent += `BESTÅTT: ${name}\n`; }
+  catch (error) { document.querySelector('#results').textContent += `FEIL: ${name}: ${error.message}\n`; }
+}
+document.querySelector('#summary').textContent = `${passed}/${tests.length} bestått`;
+</script>
+</html>

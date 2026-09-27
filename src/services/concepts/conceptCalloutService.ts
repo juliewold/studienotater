@@ -4,6 +4,7 @@ export type ConceptCallout = {
   name: string;
   type: "definition" | "theorem";
   explanation: string;
+  conceptId?: string;
 };
 
 type TipTapNode = {
@@ -48,6 +49,9 @@ export function getConceptCallouts(
           name: conceptName.trim(),
           type,
           explanation: getNodeText(node),
+          conceptId: typeof node.attrs?.conceptId === "string"
+            ? node.attrs.conceptId
+            : undefined,
         });
       }
     }

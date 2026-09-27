@@ -86,6 +86,7 @@ export async function createConcept(
   type: ConceptType,
   shortDefinition: string,
   explanation?: string,
+  options: { preserveExisting?: boolean } = {},
 ): Promise<Concept> {
   const trimmedName = name.trim();
   const trimmedShortDefinition = shortDefinition.trim();
@@ -103,6 +104,8 @@ export async function createConcept(
   }
 
   if (existingConcept) {
+    if (options.preserveExisting) return mapConceptRow(existingConcept as ConceptRow);
+
     const { data, error: updateError } = await supabase
       .from("concepts")
       .update({

@@ -14,53 +14,55 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadUserRole = async (currentUser: User | null) => {
-    if (!currentUser) {
-      setRole(null);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", currentUser.id)
-      .single();
-
-    if (error) {
-      console.error("Kunne ikke hente brukerrolle:", error);
-      setRole("user");
-      return;
-    }
-
-    setRole(data.role === "admin" ? "admin" : "user");
-  };
-
   useEffect(() => {
-    const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    let active = true;
+    let version = 0;
+    let currentUserId: string | null | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
-      const currentUser = session?.user ?? null;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        const currentUser = session?.user ?? null;
+        const requestVersion = ++version;
+        clearTimeout(timer);
+        setUser(currentUser);
+        // Refreshing the same session must not unmount an open note editor.
+        if (currentUserId !== (currentUser?.id ?? null)) {
+          setRole(null);
+          setIsLoading(Boolean(currentUser));
+        }
+        currentUserId = currentUser?.id ?? null;
+        if (!currentUser) return;
 
-      setUser(currentUser);
-      await loadUserRole(currentUser);
-      setIsLoading(false);
-    };
-
-    getInitialSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const currentUser = session?.user ?? null;
-
-      setUser(currentUser);
-      await loadUserRole(currentUser);
-      setIsLoading(false);
-    });
+        // Supabase holds its auth lock while notifying listeners. Query the
+        // profile in a later task so token refresh cannot deadlock this client.
+        timer = setTimeout(() => {
+          const loadRole = async () => {
+            let nextRole: UserRole = "user";
+            try {
+              const { data, error } = await supabase
+                .from("profiles")
+                .select("role")
+                .eq("id", currentUser.id)
+                .single();
+              if (error) throw error;
+              nextRole = data.role === "admin" ? "admin" : "user";
+            } catch (error) {
+              console.error("Kunne ikke hente brukerrolle:", error);
+            }
+            if (active && requestVersion === version) {
+              setRole(nextRole);
+              setIsLoading(false);
+            }
+          };
+          void loadRole();
+        }, 0);
+      },
+    );
 
     return () => {
+      active = false;
+      clearTimeout(timer);
       subscription.unsubscribe();
     };
   }, []);

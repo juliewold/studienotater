@@ -29,3 +29,6 @@ backend/.venv/
 backend/db.sqlite3
 __pycache__/
 *.py[cod]
+
+# Local project handover
+/OVERLEVERING.md

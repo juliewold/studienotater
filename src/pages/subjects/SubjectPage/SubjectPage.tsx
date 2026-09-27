@@ -57,7 +57,7 @@ export const SubjectPage = () => {
 
     const shouldGenerate = window.confirm(
       `Vil du generere kunnskapsbasen for ${subject?.code ?? "dette faget"}? ` +
-        "AI vil analysere alle notater som er koblet til et undertema og opprette fagbegreper.",
+        "AI vil analysere alle notater som er koblet til et undertema og opprette fagbegreper. Eksisterende begreper og koblinger bevares.",
     );
 
     if (!shouldGenerate) {
@@ -79,13 +79,16 @@ export const SubjectPage = () => {
           `${result.notesOrganized} notater organisert. ` +
           `${result.processedNotes} notater analysert og ` +
           `${result.conceptsProcessed} begreper behandlet. ` +
+          `${result.linkedCallouts} definisjons- og teorembokser koblet til begreper. ` +
           `${result.skippedNotes} notater hoppet over.`,
       );
     } catch (error) {
       console.error("Kunne ikke generere kunnskapsbase:", error);
 
       setKnowledgeBaseMessage(
-        "Kunne ikke generere kunnskapsbasen. Se konsollen for detaljer.",
+        (error instanceof Error ? `${error.message} ` : "Genereringen ble avbrutt. ") +
+          "Eksisterende begreper og koblinger er bevart. " +
+          "Noe nytt innhold kan være lagret før feilen. Du kan prøve igjen.",
       );
     } finally {
       setIsGeneratingKnowledgeBase(false);
