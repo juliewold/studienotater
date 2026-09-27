@@ -1,6 +1,12 @@
 import "./EditableNote.css";
 import { useEffect, useRef, useState } from "react";
-import { Check, Edit3, LoaderCircle } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Edit3,
+  LoaderCircle,
+} from "lucide-react";
 
 import { NoteEditor } from "../NoteEditor/NoteEditor";
 
@@ -12,10 +18,15 @@ import {
 
 import {
   getTopicsBySubject,
-  getSubtopicsByTopic,
+  getAllSubtopicsBySubject,
   type DatabaseTopic,
   type DatabaseSubtopic,
 } from "../../../services/subjects/subjectStructureService";
+
+import {
+  getSubtopicIdsByNote,
+  replaceNoteSubtopics,
+} from "../../../services/notes/noteSubtopicsService";
 
 import { autoLinkConceptsToSubtopic } from "../../../services/concepts/conceptAutoLinkService";
 import { createConceptSuggestionsForNote } from "../../../services/concepts/conceptExtractionService";
@@ -46,6 +57,7 @@ type NoteDraft = {
   contentJson: NoteContentJson | undefined;
   topicId: string;
   subtopicId: string;
+  subtopicIds: string[];
 };
 
 export const EditableNote = ({
@@ -65,21 +77,13 @@ export const EditableNote = ({
   );
 
   const [topics, setTopics] = useState<DatabaseTopic[]>([]);
-  const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
-
-  const [currentTopic, setCurrentTopic] = useState<DatabaseTopic | null>(null);
-
-  const [currentSubtopic, setCurrentSubtopic] =
-    useState<DatabaseSubtopic | null>(null);
-
-  const [selectedTopicId, setSelectedTopicId] = useState(note.topicId ?? "");
-
-  const [selectedSubtopicId, setSelectedSubtopicId] = useState(
-    note.subtopicId ?? "",
-  );
+  const [allSubtopics, setAllSubtopics] = useState<DatabaseSubtopic[]>([]);
+  const [selectedSubtopicIds, setSelectedSubtopicIds] = useState<string[]>([]);
+  const [expandedTopicIds, setExpandedTopicIds] = useState<string[]>([]);
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
   const [conceptSuggestions, setConceptSuggestions] = useState<
     ConceptSuggestion[]
   >([]);
@@ -91,6 +95,7 @@ export const EditableNote = ({
     contentJson: note.contentJson,
     topicId: note.topicId ?? "",
     subtopicId: note.subtopicId ?? "",
+    subtopicIds: note.subtopicId ? [note.subtopicId] : [],
   });
 
   const contentAtEditStart = useRef(note.content);
@@ -104,8 +109,6 @@ export const EditableNote = ({
     setDescription(note.description);
     setContent(note.content);
     setContentJson(note.contentJson);
-    setSelectedTopicId(note.topicId ?? "");
-    setSelectedSubtopicId(note.subtopicId ?? "");
 
     lastSavedDraft.current = {
       title: note.title,
@@ -114,70 +117,59 @@ export const EditableNote = ({
       contentJson: note.contentJson,
       topicId: note.topicId ?? "",
       subtopicId: note.subtopicId ?? "",
+      subtopicIds: [...selectedSubtopicIds],
     };
-  }, [isEditing, note]);
+  }, [isEditing, note, selectedSubtopicIds]);
 
   useEffect(() => {
     const loadTopics = async () => {
       try {
         const loadedTopics = await getTopicsBySubject(note.subjectId);
-
         setTopics(loadedTopics);
       } catch (error) {
         console.error("Kunne ikke hente temaer:", error);
       }
     };
 
-    loadTopics();
+    void loadTopics();
   }, [note.subjectId]);
 
   useEffect(() => {
-    const loadSubtopics = async () => {
-      if (!selectedTopicId) {
-        setSubtopics([]);
-        return;
-      }
-
+    const loadMultipleSubtopics = async () => {
       try {
-        const loadedSubtopics = await getSubtopicsByTopic(selectedTopicId);
+        const [loadedSubtopics, linkedSubtopicIds] = await Promise.all([
+          getAllSubtopicsBySubject(note.subjectId),
+          getSubtopicIdsByNote(note.id),
+        ]);
 
-        setSubtopics(loadedSubtopics);
+        setAllSubtopics(loadedSubtopics);
+        setSelectedSubtopicIds(linkedSubtopicIds);
+
+        lastSavedDraft.current = {
+          title: note.title,
+          description: note.description,
+          content: note.content,
+          contentJson: note.contentJson,
+          topicId: note.topicId ?? "",
+          subtopicId: note.subtopicId ?? "",
+          subtopicIds: [...linkedSubtopicIds],
+        };
       } catch (error) {
-        console.error("Kunne ikke hente undertemaer:", error);
-
-        setSubtopics([]);
+        console.error("Kunne ikke hente undertemaer for notatet:", error);
       }
     };
 
-    loadSubtopics();
-  }, [selectedTopicId]);
-
-  useEffect(() => {
-    const topic = topics.find((topic) => topic.id === note.topicId) ?? null;
-
-    setCurrentTopic(topic);
-
-    if (!topic || !note.subtopicId) {
-      setCurrentSubtopic(null);
-      return;
-    }
-
-    const loadCurrentSubtopic = async () => {
-      try {
-        const loadedSubtopics = await getSubtopicsByTopic(topic.id);
-
-        const subtopic =
-          loadedSubtopics.find((subtopic) => subtopic.id === note.subtopicId) ??
-          null;
-
-        setCurrentSubtopic(subtopic);
-      } catch {
-        setCurrentSubtopic(null);
-      }
-    };
-
-    void loadCurrentSubtopic();
-  }, [topics, note.topicId, note.subtopicId]);
+    void loadMultipleSubtopics();
+  }, [
+    note.id,
+    note.subjectId,
+    note.title,
+    note.description,
+    note.content,
+    note.contentJson,
+    note.topicId,
+    note.subtopicId,
+  ]);
 
   const loadConceptSuggestions = async () => {
     try {
@@ -192,13 +184,19 @@ export const EditableNote = ({
     void loadConceptSuggestions();
   }, [note.id]);
 
+  const primarySubtopicId = selectedSubtopicIds[0] ?? "";
+
+  const primarySubtopic =
+    allSubtopics.find((subtopic) => subtopic.id === primarySubtopicId) ?? null;
+
   const getCurrentDraft = (): NoteDraft => ({
     title: title.trim(),
     description: description.trim(),
     content,
     contentJson,
-    topicId: selectedTopicId,
-    subtopicId: selectedSubtopicId,
+    topicId: primarySubtopic?.topicId ?? "",
+    subtopicId: primarySubtopicId,
+    subtopicIds: selectedSubtopicIds,
   });
 
   const hasUnsavedChanges = (draft: NoteDraft) => {
@@ -209,7 +207,9 @@ export const EditableNote = ({
       draft.description !== savedDraft.description ||
       draft.content !== savedDraft.content ||
       draft.topicId !== savedDraft.topicId ||
-      draft.subtopicId !== savedDraft.subtopicId
+      draft.subtopicId !== savedDraft.subtopicId ||
+      JSON.stringify([...draft.subtopicIds].sort()) !==
+        JSON.stringify([...savedDraft.subtopicIds].sort())
     );
   };
 
@@ -237,6 +237,8 @@ export const EditableNote = ({
         subtopicId: draft.subtopicId || null,
       });
 
+      await replaceNoteSubtopics(note.id, draft.subtopicIds);
+
       if (draft.subtopicId) {
         try {
           await autoLinkConceptsToSubtopic(
@@ -254,8 +256,9 @@ export const EditableNote = ({
         description: updatedNote.description,
         content: updatedNote.content,
         contentJson: updatedNote.contentJson,
-        topicId: updatedNote.topicId ?? "",
-        subtopicId: updatedNote.subtopicId ?? "",
+        topicId: draft.topicId,
+        subtopicId: draft.subtopicId,
+        subtopicIds: [...draft.subtopicIds],
       };
 
       onNoteUpdated(updatedNote);
@@ -297,8 +300,7 @@ export const EditableNote = ({
     description,
     content,
     contentJson,
-    selectedTopicId,
-    selectedSubtopicId,
+    selectedSubtopicIds,
     isEditing,
   ]);
 
@@ -307,21 +309,31 @@ export const EditableNote = ({
     setDescription(note.description);
     setContent(note.content);
     setContentJson(note.contentJson);
-    setSelectedTopicId(note.topicId ?? "");
-    setSelectedSubtopicId(note.subtopicId ?? "");
 
     lastSavedDraft.current = {
       title: note.title,
       description: note.description,
       content: note.content,
       contentJson: note.contentJson,
-      topicId: note.topicId ?? "",
-      subtopicId: note.subtopicId ?? "",
+      topicId: primarySubtopic?.topicId ?? "",
+      subtopicId: primarySubtopicId,
+      subtopicIds: [...selectedSubtopicIds],
     };
 
     setErrorMessage("");
     setSaveStatus("saved");
     contentAtEditStart.current = note.content;
+
+    const topicIdsWithSelectedSubtopics = [
+      ...new Set(
+        allSubtopics
+          .filter((subtopic) => selectedSubtopicIds.includes(subtopic.id))
+          .map((subtopic) => subtopic.topicId),
+      ),
+    ];
+
+    setExpandedTopicIds(topicIdsWithSelectedSubtopics);
+
     setIsEditing(true);
   };
 
@@ -345,6 +357,16 @@ export const EditableNote = ({
     }
 
     setIsEditing(false);
+  };
+
+  const toggleSubtopic = (subtopicId: string) => {
+    setSelectedSubtopicIds((current) =>
+      current.includes(subtopicId)
+        ? current.filter((id) => id !== subtopicId)
+        : [...current, subtopicId],
+    );
+
+    setErrorMessage("");
   };
 
   const renderSaveStatus = () => {
@@ -378,6 +400,18 @@ export const EditableNote = ({
       <span className="editable-note-save-status">Ulagrede endringer</span>
     );
   };
+
+  const selectedSubtopics = allSubtopics.filter((subtopic) =>
+    selectedSubtopicIds.includes(subtopic.id),
+  );
+
+  const selectedTopicIds = new Set(
+    selectedSubtopics.map((subtopic) => subtopic.topicId),
+  );
+
+  const selectedTopics = topics.filter((topic) =>
+    selectedTopicIds.has(topic.id),
+  );
 
   if (isEditing) {
     return (
@@ -417,46 +451,88 @@ export const EditableNote = ({
           />
 
           {showClassification && (
-            <div className="editable-note-classification">
-              <label htmlFor="editable-note-topic">Tema</label>
+            <div className="editable-note-multiple-subtopics">
+              <span className="editable-note-multiple-subtopics-title">
+                Temaer og undertemaer
+              </span>
 
-              <select
-                id="editable-note-topic"
-                value={selectedTopicId}
-                onChange={(event) => {
-                  setSelectedTopicId(event.target.value);
-                  setSelectedSubtopicId("");
-                  setErrorMessage("");
-                }}
-              >
-                <option value="">Ingen tema</option>
+              {topics.map((topic) => {
+                const topicSubtopics = allSubtopics.filter(
+                  (subtopic) => subtopic.topicId === topic.id,
+                );
 
-                {topics.map((topic) => (
-                  <option key={topic.id} value={topic.id}>
-                    {topic.name}
-                  </option>
-                ))}
-              </select>
+                if (topicSubtopics.length === 0) {
+                  return null;
+                }
 
-              <label htmlFor="editable-note-subtopic">Undertema</label>
+                const selectedCount = topicSubtopics.filter((subtopic) =>
+                  selectedSubtopicIds.includes(subtopic.id),
+                ).length;
 
-              <select
-                id="editable-note-subtopic"
-                value={selectedSubtopicId}
-                onChange={(event) => {
-                  setSelectedSubtopicId(event.target.value);
-                  setErrorMessage("");
-                }}
-                disabled={!selectedTopicId}
-              >
-                <option value="">Ingen undertema</option>
+                const isExpanded = expandedTopicIds.includes(topic.id);
 
-                {subtopics.map((subtopic) => (
-                  <option key={subtopic.id} value={subtopic.id}>
-                    {subtopic.name}
-                  </option>
-                ))}
-              </select>
+                return (
+                  <div className="editable-note-topic-group" key={topic.id}>
+                    <button
+                      type="button"
+                      className="editable-note-topic-toggle"
+                      onClick={() => {
+                        setExpandedTopicIds((current) =>
+                          current.includes(topic.id)
+                            ? current.filter((id) => id !== topic.id)
+                            : [...current, topic.id],
+                        );
+                      }}
+                    >
+                      <span className="editable-note-topic-toggle-main">
+                        {isExpanded ? (
+                          <ChevronDown size={17} />
+                        ) : (
+                          <ChevronRight size={17} />
+                        )}
+
+                        <span>
+                          Tema {topic.sortOrder}: {topic.name}
+                        </span>
+                      </span>
+
+                      {selectedCount > 0 && (
+                        <span className="editable-note-topic-selected-count">
+                          {selectedCount} valgt
+                        </span>
+                      )}
+                    </button>
+
+                    {isExpanded && (
+                      <div className="editable-note-subtopic-options">
+                        {topicSubtopics.map((subtopic) => {
+                          const isSelected = selectedSubtopicIds.includes(
+                            subtopic.id,
+                          );
+
+                          return (
+                            <label
+                              className="editable-note-subtopic-option"
+                              key={subtopic.id}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleSubtopic(subtopic.id)}
+                              />
+
+                              <span>
+                                {topic.sortOrder}.{subtopic.sortOrder}{" "}
+                                {subtopic.name}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
 
@@ -508,20 +584,30 @@ export const EditableNote = ({
       <div className="editable-note-document-header">
         <h1 className="editable-note-title">{note.title}</h1>
 
-        {showClassification && (note.topicName || note.subtopicName) && (
+        {showClassification && selectedSubtopics.length > 0 && (
           <div className="editable-note-classification-display">
-            {currentTopic && (
-              <span>
-                Tema {currentTopic.sortOrder}: {currentTopic.name}
+            {selectedTopics.map((topic) => (
+              <span key={`topic-${topic.id}`}>
+                Tema {topic.sortOrder}: {topic.name}
               </span>
-            )}
+            ))}
 
-            {currentTopic && currentSubtopic && (
-              <span>
-                Undertema {currentTopic.sortOrder}.{currentSubtopic.sortOrder}:{" "}
-                {currentSubtopic.name}
-              </span>
-            )}
+            {selectedSubtopics.map((subtopic) => {
+              const topic = topics.find(
+                (currentTopic) => currentTopic.id === subtopic.topicId,
+              );
+
+              if (!topic) {
+                return null;
+              }
+
+              return (
+                <span key={`subtopic-${subtopic.id}`}>
+                  Undertema {topic.sortOrder}.{subtopic.sortOrder}:{" "}
+                  {subtopic.name}
+                </span>
+              );
+            })}
           </div>
         )}
 
