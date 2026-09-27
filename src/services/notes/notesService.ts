@@ -78,7 +78,7 @@ const noteSelect = `
   content,
   content_json,
   created_at,
-  subtopics (
+  subtopics!notes_subtopic_id_fkey (
     id,
     name,
     topic_id,
@@ -341,14 +341,17 @@ export async function updateNoteConceptLinks(
     .eq("id", note.id)
     .eq("content", note.content);
 
-  query = note.contentJson === null
-    ? query.is("content_json", null)
-    : query.eq("content_json", JSON.stringify(note.contentJson));
+  query =
+    note.contentJson === null
+      ? query.is("content_json", null)
+      : query.eq("content_json", JSON.stringify(note.contentJson));
 
   const { data, error } = await query.select("id").maybeSingle();
   if (error) throw error;
   if (!data) {
-    throw new Error("Notatet ble endret eller kunne ikke lagres. Kjør genereringen på nytt.");
+    throw new Error(
+      "Notatet ble endret eller kunne ikke lagres. Kjør genereringen på nytt.",
+    );
   }
 }
 
