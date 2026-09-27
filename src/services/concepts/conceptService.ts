@@ -69,7 +69,12 @@ export async function getConceptBySlugFromDatabase(
 }
 
 export function normalizeConceptName(name: string): string {
-  return name.trim().replace(/\s+/g, " ").toLocaleLowerCase("nb-NO").normalize("NFC");
+  return name
+    .normalize("NFKC")
+    .replace(/[\u2010-\u2015\u2212]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLocaleLowerCase("nb-NO");
 }
 
 function createConceptSlug(name: string): string {
@@ -109,8 +114,14 @@ export async function createConcept(
 
   if (existingConcept) {
     if (options.preserveExisting) {
-      if (normalizeConceptName(existingConcept.name) !== normalizeConceptName(trimmedName)) {
-        throw new Error("Et annet begrep har samme slug. Avklar navnene manuelt før generering.");
+      if (
+        normalizeConceptName(existingConcept.name) !==
+        normalizeConceptName(trimmedName)
+      ) {
+        throw new Error(
+          `Slug-kollisjon: "${trimmedName}" forsøkte å bruke slug "${slug}", ` +
+            `men den tilhører allerede "${existingConcept.name}".`,
+        );
       }
       return mapConceptRow(existingConcept as ConceptRow);
     }
