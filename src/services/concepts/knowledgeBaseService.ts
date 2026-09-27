@@ -8,6 +8,7 @@ import {
 } from "../subjects/subjectStructureService";
 import {
   extractConceptCandidates,
+  InvalidConceptResponseError,
   type ConceptCandidate,
   getPlainTextFromNote,
 } from "./conceptExtractionService";
@@ -21,6 +22,7 @@ export type KnowledgeBaseGenerationResult = {
   notesOrganized: number;
   processedNotes: number;
   skippedNotes: number;
+  failedNotes: { id: string; title: string }[];
   conceptsProcessed: number;
   linkedConcepts: number;
   linkedCallouts: number;
@@ -64,14 +66,15 @@ export async function generateKnowledgeBaseForSubject(
 
   let processedNotes = 0;
   let skippedNotes = 0;
+  const failedNotes: KnowledgeBaseGenerationResult["failedNotes"] = [];
   let conceptsProcessed = 0;
   let linkedConcepts = 0;
   let linkedCallouts = 0;
 
   const prepared: { note: (typeof notes)[number]; candidates: ConceptCandidate[] }[] = [];
 
-  // Complete extraction before writing concepts or links. A failed AI call leaves
-  // existing knowledge untouched. Structure creation above is a separate step.
+  // Finish extraction before writing. Exhausted validation failures are reported
+  // per note; unexpected/service errors still abort before concept/link writes.
   for (const note of notes) {
     if (!note.content.trim() || !note.subtopicId) {
       skippedNotes += 1;
@@ -85,7 +88,15 @@ export async function generateKnowledgeBaseForSubject(
       continue;
     }
 
-    const candidates = await extractConceptCandidates(text, availableSubtopics);
+    let candidates: ConceptCandidate[];
+    try {
+      candidates = await extractConceptCandidates(text, availableSubtopics);
+    } catch (error) {
+      if (!(error instanceof InvalidConceptResponseError)) throw error;
+      skippedNotes += 1;
+      failedNotes.push({ id: note.id, title: note.title });
+      continue;
+    }
     // A name entered on a callout is an explicit editorial choice, even when
     // the AI omits it. Never create a replacement for an already linked box.
     const normalize = (name: string) => name.trim().toLocaleLowerCase("nb-NO").normalize("NFC");
@@ -142,6 +153,7 @@ export async function generateKnowledgeBaseForSubject(
     notesOrganized,
     processedNotes,
     skippedNotes,
+    failedNotes,
     conceptsProcessed,
     linkedConcepts,
     linkedCallouts,

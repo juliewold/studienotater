@@ -10,21 +10,23 @@ const existing={id:'concept',name:'Begrep',slug:'begrep',type:'definition',short
 const candidate={name:'Begrep',type:'definition',shortDefinition:'AI-definisjon',explanation:'AI-forklaring',subtopicIds:['subtopic']};
 const response=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});
 const originalFetch=window.fetch;
-async function scenario({failAI=false,failSave=false,namedCallout=false,alreadyLinked=false,options={}}={}){
+async function scenario({failAI=false,failStatus=500,invalidNote=false,allInvalid=false,emptyNote=false,failSave=false,namedCallout=false,alreadyLinked=false,options={}}={}){
  const calls=[];let extractionCount=0;let links=[];
  window.fetch=async(input,init={})=>{
   const url=new URL(typeof input==='string'?input:input.url);const method=init.method??'GET';
   calls.push({path:url.pathname,method});
   if(url.pathname.endsWith('/api/concepts/extract/')){
    extractionCount++;
-   return failAI&&extractionCount===2?response({error:'Testfeil'},500):response({candidates:namedCallout?[]:[candidate]});
+   if(allInvalid || (invalidNote && extractionCount===2))return response({error:'Ugyldig svar etter to forsøk',code:'invalid_ai_response'},502);
+   return failAI&&extractionCount===2?response({error:'Testfeil'},failStatus):response({candidates:namedCallout?[]:[candidate]});
   }
   const table=url.pathname.split('/').at(-1);
   if(method==='GET'){
    if(table==='topics')return response([topic]);
    if(table==='subtopics')return response([subtopic]);
-   if(table==='notes')return response(['one','two'].map(id=>{
+   if(table==='notes')return response((invalidNote?['one','two','three']:['one','two']).map(id=>{
     const row=note(id);
+    if(emptyNote&&id==='one')row.content='';
     if(namedCallout){
       row.content='<div data-type="callout" data-callout-type="definition" data-concept-name="Begrep"'+(alreadyLinked?' data-concept-id="manual"':'')+'><div class="note-callout-body"><p>En forklaring</p></div></div>';
       row.content_json={type:'doc',content:[{type:'callout',attrs:{type:'definition',conceptName:'Begrep',conceptId:alreadyLinked?'manual':null},content:[{type:'paragraph',content:[{type:'text',text:'En forklaring'}]}]}]};
@@ -48,6 +50,29 @@ async function scenario({failAI=false,failSave=false,namedCallout=false,alreadyL
 }
 const writes=calls=>calls.filter(c=>c.path.includes('/rest/v1/')&&c.method!=='GET');
 const tests=[
+ ['Andre 502/503-feil stoppes uten å feilmerkes som ugyldige notater',async()=>{
+  for(const status of [502,503]){
+   const s=await scenario({failAI:true,failStatus:status});
+   assert(s.error,'Tjenestefeil ble skjult');assert(writes(s.calls).length===0,'Tjenestefeil ga skriving');
+  }
+ }],
+ ['Ett ugyldig notat hoppes over med tydelig rapport',async()=>{
+  const s=await scenario({invalidNote:true});assert(!s.error,s.error?.message);
+  assert(s.result.processedNotes===2&&s.result.skippedNotes===1,'Feil antall');
+  assert(s.result.failedNotes.length===1&&s.result.failedNotes[0].id==='two'&&s.result.failedNotes[0].title==='two','Manglende notatidentifikasjon');
+  const firstWrite=s.calls.findIndex(c=>c.path.includes('/rest/v1/')&&c.method!=='GET');
+  assert(s.calls.slice(0,firstWrite).filter(c=>c.path.endsWith('/extract/')).length===3,'Lagring startet før analysen var ferdig');
+  assert(writes(s.calls).every(c=>c.method==='POST'&&c.path.endsWith('/concept_subtopics')),'Eksisterende data ble endret');
+ }],
+ ['Alle ugyldige svar gir null behandlede notater og ingen lagring',async()=>{
+  const s=await scenario({allInvalid:true,namedCallout:true});assert(!s.error,s.error?.message);
+  assert(s.result.processedNotes===0&&s.result.skippedNotes===2&&s.result.failedNotes.length===2,'Feil total');
+  assert(writes(s.calls).length===0,'Ugyldig notat ble delvis lagret via callout');
+ }],
+ ['Notater uten innhold skilles fra feilende AI-svar',async()=>{
+  const s=await scenario({emptyNote:true});assert(!s.error,s.error?.message);
+  assert(s.result.processedNotes===1&&s.result.skippedNotes===1&&s.result.failedNotes.length===0,'Feil kategorisering');
+ }],
  ['Navngitt boks kobles selv når AI utelater begrepet',async()=>{
   const s=await scenario({namedCallout:true,options:{noteId:'one'}});assert(!s.error,s.error?.message);assert(s.result.linkedCallouts===1,'Navngitt boks ble ikke koblet');
  }],

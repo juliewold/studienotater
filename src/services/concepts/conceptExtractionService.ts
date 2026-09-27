@@ -19,6 +19,13 @@ type ConceptExtractionResponse = {
   candidates: ConceptCandidate[];
 };
 
+export class InvalidConceptResponseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidConceptResponseError";
+  }
+}
+
 export async function extractConceptCandidates(
   text: string,
   subtopics: AvailableSubtopic[] = [],
@@ -42,11 +49,13 @@ export async function extractConceptCandidates(
 
   if (!response.ok) {
     const failure = await response.json().catch(() => null);
-    throw new Error(
-      typeof failure?.error === "string"
-        ? failure.error
-        : "Kunne ikke hente begreper fra AI-tjenesten. Prøv igjen senere.",
-    );
+    const message = typeof failure?.error === "string"
+      ? failure.error
+      : "Kunne ikke hente begreper fra AI-tjenesten. Prøv igjen senere.";
+    if (response.status === 502 && failure?.code === "invalid_ai_response") {
+      throw new InvalidConceptResponseError(message);
+    }
+    throw new Error(message);
   }
 
   const data = (await response.json()) as ConceptExtractionResponse;

@@ -195,3 +195,77 @@ class StructureEndpointTests(SimpleTestCase):
                 response = self.client.post("/api/concepts/extract/", json.dumps(body), content_type="application/json")
                 self.assertEqual(response.status_code, 400)
                 ai.assert_not_called()
+
+
+class ConceptRetryTests(SimpleTestCase):
+    def response(self, content, finish_reason="stop"):
+        return Mock(choices=[Mock(message=Mock(content=content), finish_reason=finish_reason)])
+
+    def test_invalid_candidate_then_valid_response_retries_once(self):
+        from .concept_extraction_service import extract_concept_candidates
+        client = Mock()
+        client.chat.completions.create.side_effect = [
+            self.response('{"candidates":[{"name":"secret-note-content"}]}'),
+            self.response('{"candidates":[{"name":"Induksjon","type":"method","shortDefinition":"Definisjon","explanation":"Forklaring","subtopicIds":[]}]}'),
+        ]
+        with patch("concepts.concept_extraction_service.get_client", return_value=client), self.assertLogs(
+            "concepts.concept_extraction_service", level="WARNING"
+        ) as logs:
+            result = extract_concept_candidates("secret-note-content", [])
+        self.assertEqual(result[0]["name"], "Induksjon")
+        self.assertEqual(client.chat.completions.create.call_count, 2)
+        self.assertIn("invalid type", logs.output[0])
+        self.assertNotIn("secret-note-content", " ".join(logs.output))
+        retry_prompt = client.chat.completions.create.call_args.kwargs["messages"][0]["content"]
+        self.assertIn("Forrige forsøk", retry_prompt)
+
+    def test_repeated_invalid_responses_stop_after_two_calls(self):
+        from .concept_extraction_service import extract_concept_candidates
+        client = Mock()
+        client.chat.completions.create.return_value = self.response('not json')
+        with patch("concepts.concept_extraction_service.get_client", return_value=client), self.assertLogs(
+            "concepts.concept_extraction_service", level="WARNING"
+        ), self.assertRaises(ValueError):
+            extract_concept_candidates("Note", [])
+        self.assertEqual(client.chat.completions.create.call_count, 2)
+
+    def test_valid_empty_candidates_are_not_retried(self):
+        from .concept_extraction_service import extract_concept_candidates
+        client = Mock()
+        client.chat.completions.create.return_value = self.response('{"candidates":[]}')
+        with patch("concepts.concept_extraction_service.get_client", return_value=client):
+            self.assertEqual(extract_concept_candidates("Note", []), [])
+        self.assertEqual(client.chat.completions.create.call_count, 1)
+
+    def test_truncated_and_empty_choices_are_retried(self):
+        from .concept_extraction_service import extract_concept_candidates
+        for first in (self.response('{"candidates":[]}', "length"), Mock(choices=[])):
+            client = Mock()
+            client.chat.completions.create.side_effect = [first, self.response('{"candidates":[]}')]
+            with self.subTest(first=first), patch("concepts.concept_extraction_service.get_client", return_value=client), self.assertLogs(
+                "concepts.concept_extraction_service", level="WARNING"
+            ):
+                self.assertEqual(extract_concept_candidates("Note", []), [])
+            self.assertEqual(client.chat.completions.create.call_count, 2)
+
+    def test_transport_errors_do_not_get_additional_validation_retries(self):
+        from .concept_extraction_service import extract_concept_candidates
+        for error in (APIConnectionError(request=Mock()), APIStatusError(
+            "Provider error", response=Mock(status_code=401, request=Mock()), body=None
+        )):
+            client = Mock()
+            client.chat.completions.create.side_effect = error
+            with self.subTest(error=type(error).__name__), patch("concepts.concept_extraction_service.get_client", return_value=client), self.assertRaises(type(error)):
+                extract_concept_candidates("Note", [])
+            self.assertEqual(client.chat.completions.create.call_count, 1)
+
+    def test_exhausted_validation_has_specific_api_code(self):
+        client = Mock()
+        client.chat.completions.create.return_value = self.response('{"candidates":[null]}')
+        with patch("concepts.concept_extraction_service.get_client", return_value=client), self.assertLogs(
+            "concepts.concept_extraction_service", level="WARNING"
+        ):
+            response = self.client.post('/api/concepts/extract/', {"text": "Note", "subtopics": []}, content_type='application/json')
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(response.json()["code"], "invalid_ai_response")
+        self.assertEqual(client.chat.completions.create.call_count, 2)

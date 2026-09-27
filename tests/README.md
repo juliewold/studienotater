@@ -15,7 +15,7 @@ HTML og JSON ikke kan sammenlignes sikkert.
 
 ## Generering og feiltilstander
 
-Åpne `/studienotater/tests/knowledge-base.html` med Vite. De sju testene bruker
+Åpne `/studienotater/tests/knowledge-base.html` med Vite. Testene bruker
 simulerte API-svar og kontrollerer blant annet AI-feil før lagring, bevaring av
 manuelle koblinger og forklaringer, feil under lagring, avgrensing til ett notat
 og navngitte bokser som AI-en utelater.
@@ -55,3 +55,26 @@ lagring, tydelig feil ved delvis lagring uten sletting, vellykket lagring og tom
 notatutvalg. Backend-testene dekker ugyldige kandidater, strukturfelt, ukjente og
 repeterte ID-er, glemte notater og kontrollerte feil fra begge AI-endepunktene.
 Se `database/README.md` for valideringsregler og transaksjonsbegrensningene.
+
+
+## Sporadisk ugyldig AI-svar
+
+Backend prøver et nytt AI-svar én gang ved valideringsfeil (to forsøk totalt).
+Valideringen svekkes ikke, og loggen viser forsøk og valideringsårsak uten rått
+AI-svar eller notattekst. Et fortsatt ugyldig svar får HTTP 502 med den særskilte
+koden `invalid_ai_response`. Bare denne feilen gir kontrollert hopping over et
+notat i kunnskapsbasegeneratoren. Andre tjeneste-, nettverks- og lagringsfeil
+stopper fortsatt kjøringen; SDK-ens eksisterende transport-retries er uendret.
+
+Alle notater analyseres før begreper/koblinger lagres. Bare fullt validerte
+notater går videre til lagring. `processedNotes` teller notater som er behandlet
+og lagret; `skippedNotes` inkluderer både manglende innhold/undertema og notater
+med ugyldige svar etter retry. `failedNotes` identifiserer sistnevnte med ID og
+tittel. UI merker resultatet som ufullstendig og viser titlene, også når alle
+notater feiler. Ingen automatisk sletting eller overskriving av eksisterende
+redaksjonelt innhold innføres. Delvis feil under selve lagringen er fortsatt
+ikke atomisk, som dokumentert i `database/README.md`.
+
+Testene dekker ugyldig → gyldig svar, to ugyldige svar, avkortede/tomme svar,
+ingen ekstra retries for transportfeil, et feilende notat mellom to vellykkede,
+alle notater ugyldige, vanlige skippede notater og andre 502/503-feil.

@@ -1,8 +1,11 @@
 import json
+import logging
 import os
 
 from openai import OpenAI
 
+
+logger = logging.getLogger(__name__)
 
 NTNU_LLM_BASE_URL = "https://llm.hpc.ntnu.no/v1"
 NTNU_LLM_MODEL = "openai/gpt-oss-120b"
@@ -22,7 +25,7 @@ def get_client():
     )
 
 
-def extract_concept_candidates(text, subtopics=None):
+def _extract_concept_candidates_once(text, subtopics=None, validation_hint=""):
     client = get_client()
 
     subtopics = subtopics or []
@@ -91,6 +94,7 @@ def extract_concept_candidates(text, subtopics=None):
 
                     f"{subtopic_instructions}"
 
+                    f"{validation_hint}"
                     "Returner kun gyldig JSON. "
                     "Ingen markdown og ingen tekst før eller etter JSON. "
 
@@ -115,6 +119,10 @@ def extract_concept_candidates(text, subtopics=None):
         ],
     )
 
+    if not response.choices:
+        raise ValueError("LLM returned no choices.")
+    if response.choices[0].finish_reason == "length":
+        raise ValueError("LLM response was truncated.")
     content = response.choices[0].message.content
 
     if not content:
@@ -130,17 +138,17 @@ def extract_concept_candidates(text, subtopics=None):
 
     valid_subtopic_ids = {subtopic["id"] for subtopic in subtopics}
     validated = []
-    for candidate in result["candidates"]:
+    for index, candidate in enumerate(result["candidates"]):
         if not isinstance(candidate, dict):
-            raise ValueError("Each candidate must be an object.")
+            raise ValueError(f"Candidate {index} must be an object.")
         for field in ("name", "type", "shortDefinition", "explanation"):
             if not isinstance(candidate.get(field), str) or not candidate[field].strip():
-                raise ValueError(f"Candidate has an invalid {field}.")
+                raise ValueError(f"Candidate {index} has an invalid {field}.")
         candidate_type = candidate["type"].strip()
         if candidate_type not in {"definition", "theorem", "formula", "method"}:
-            raise ValueError("Candidate has an invalid type.")
+            raise ValueError(f"Candidate {index} has an invalid type.")
         if not isinstance(candidate.get("subtopicIds"), list):
-            raise ValueError("Candidate subtopicIds must be a list.")
+            raise ValueError(f"Candidate {index} subtopicIds must be a list.")
         validated.append({
             "name": candidate["name"].strip(),
             "type": candidate_type,
@@ -152,3 +160,24 @@ def extract_concept_candidates(text, subtopics=None):
             )),
         })
     return validated
+
+
+def extract_concept_candidates(text, subtopics=None):
+    """Retry invalid model output once; transport errors retain SDK handling."""
+    validation_hint = ""
+    for attempt in range(1, 3):
+        try:
+            return _extract_concept_candidates_once(text, subtopics, validation_hint)
+        except ValueError as error:
+            # Validator messages contain only field/index/reason, never note text
+            # or raw model output. This makes the next failing response diagnosable.
+            logger.warning("Concept extraction validation failed (attempt %s/2): %s", attempt, error)
+            if attempt == 2:
+                raise
+            validation_hint = (
+                "Forrige forsøk bestod ikke valideringen: " + str(error) + " "
+                "Lag et nytt komplett svar fra kildeteksten. Alle kandidater må ha "
+                "name, type, shortDefinition og explanation som ikke-tomme strenger, "
+                "og subtopicIds som liste. Bruk bare de fire tillatte typene. "
+                "Hold forklaringene konsise slik at hele JSON-svaret får plass. "
+            )

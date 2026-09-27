@@ -54,7 +54,8 @@ def extract_concepts(request):
         )
     except ValueError:
         return JsonResponse(
-            {"error": "AI-tjenesten returnerte et ugyldig svar. Prøv igjen."}, status=502
+            {"error": "AI-tjenesten returnerte et ugyldig svar etter to forsøk.",
+             "code": "invalid_ai_response"}, status=502
         )
 
     return JsonResponse(

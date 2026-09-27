@@ -82,7 +82,12 @@ export const SubjectPage = () => {
           `${result.processedNotes} notater analysert og ` +
           `${result.conceptsProcessed} begreper behandlet. ` +
           `${result.linkedCallouts} definisjons- og teorembokser koblet til begreper. ` +
-          `${result.skippedNotes} notater hoppet over.`,
+          `${result.skippedNotes} notater hoppet over. ` +
+          (result.failedNotes.length > 0
+            ? `Genereringen er ufullstendig: ${result.failedNotes.length} notater ga ugyldige AI-svar etter to forsøk og ble ikke behandlet: ` +
+              result.failedNotes.map((note) => note.title).join(", ") +
+              ". Prøv disse notatene igjen senere. Eksisterende innhold og koblinger er bevart."
+            : ""),
       );
     } catch (error) {
       console.error("Kunne ikke generere kunnskapsbase:", error);
