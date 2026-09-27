@@ -269,3 +269,45 @@ class ConceptRetryTests(SimpleTestCase):
         self.assertEqual(response.status_code, 502)
         self.assertEqual(response.json()["code"], "invalid_ai_response")
         self.assertEqual(client.chat.completions.create.call_count, 2)
+
+
+class ConceptCanonicalContextTests(SimpleTestCase):
+    def test_context_and_original_name_survive_retry(self):
+        import json
+        from .concept_extraction_service import extract_concept_candidates
+        context = [{"name": "Indikatorvariabel", "type": "definition",
+                    "shortDefinition": "En variabel som er 0 eller 1."}]
+        candidate = dict(name="Indikatorvariabel", sourceName="Indicator variable",
+                         type="definition", shortDefinition="0 eller 1",
+                         explanation="Forklaring", subtopicIds=[])
+        client = Mock()
+        client.chat.completions.create.side_effect = [
+            Mock(choices=[Mock(message=Mock(content='invalid'), finish_reason="stop")]),
+            Mock(choices=[Mock(message=Mock(content=json.dumps({"candidates": [candidate]})), finish_reason="stop")]),
+        ]
+        with patch("concepts.concept_extraction_service.get_client", return_value=client), self.assertLogs("concepts.concept_extraction_service"):
+            self.assertEqual(extract_concept_candidates("Indicator variable", [], context), [candidate])
+        for call in client.chat.completions.create.call_args_list:
+            messages = call.kwargs["messages"]
+            self.assertIn("Indikatorvariabel", messages[1]["content"])
+            self.assertIn("0 eller 1", messages[1]["content"])
+            self.assertIn("ikke slå sammen", messages[0]["content"])
+            self.assertIn("canonical-navn", messages[0]["content"])
+
+    def test_context_request_validation_and_forwarding(self):
+        context = [{"name": "Begrep", "type": "definition", "shortDefinition": "Definisjon"}]
+        with patch("concepts.views.extract_concept_candidates", return_value=[]) as extract:
+            response = self.client.post('/api/concepts/extract/', {"text": "Note", "existingConcepts": context}, content_type='application/json')
+            self.assertEqual(response.status_code, 200)
+            extract.assert_called_once_with("Note", [], context)
+        for bad in (None, {}, [None], [{"name": "Begrep"}], [dict(context[0], type="unknown")]):
+            with self.subTest(bad=bad), patch("concepts.views.extract_concept_candidates") as extract:
+                response = self.client.post('/api/concepts/extract/', {"text": "Note", "existingConcepts": bad}, content_type='application/json')
+                self.assertEqual(response.status_code, 400)
+                extract.assert_not_called()
+
+    def test_invalid_source_name_is_not_accepted(self):
+        helper = AIValidationTests()
+        for bad in (None, [], 3, " "):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                helper.call_service("concept_extraction_service", {"candidates": [helper.candidate(sourceName=bad)]})

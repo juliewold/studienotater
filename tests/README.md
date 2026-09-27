@@ -78,3 +78,28 @@ ikke atomisk, som dokumentert i `database/README.md`.
 Testene dekker ugyldig → gyldig svar, to ugyldige svar, avkortede/tomme svar,
 ingen ekstra retries for transportfeil, et feilende notat mellom to vellykkede,
 alle notater ugyldige, vanlige skippede notater og andre 502/503-feil.
+
+## Semantisk deduplisering
+
+Åpne `/studienotater/tests/concept-deduplication.html` med Vite. Testene bruker
+simulerte AI- og databasesvar og dekker normalisert navnegjenbruk, oversettelser,
+separate begreper, callout-kobling, bevaring og kontekst mellom notater.
+De verifiserer integrasjonskontrakten, ikke modellens faktiske treffsikkerhet.
+
+Generatoren henter den globale begrepslisten én gang (begreper er globale i dagens
+skjema). Navn, type og kort definisjon sendes med hvert eksisterende ekstraksjonskall.
+Nye validerte kandidater blir kontekst for neste notat før lagring starter. Ingen
+AI-kall per kandidat legges til. Modellen skal gjenbruke canonical-navnet bare ved
+samme faglige betydning, og beholde separate navn ved tvil. `sourceName` er et
+valgfritt, validert originalnavn brukt lokalt for kobling av notatets bokser.
+
+Normalisert eksakt navn (Unicode NFC, små bokstaver og normaliserte mellomrom)
+gjenbrukes deterministisk i generatoren. Lagringens eksisterende slug-oppslag
+beholdes, men `preserveExisting` avviser kolliderende slug med forskjellig navn.
+Eksisterende begreper og manuelle koblinger slettes ikke, og innhold overskrives
+ikke. Gamle semantiske duplikater slås ikke sammen automatisk.
+
+Semantisk identitet er fortsatt en modellvurdering, ikke en garanti. Konteksten
+vokser med kunnskapsbasen; ved svært store baser bør en senere løsning velge
+relevant kontekst uten å kutte listen vilkårlig. Denne endringen innfører ingen
+ny tabell, aliasregister eller transaksjon, og endrer ikke eksisterende retry-policy.

@@ -12,7 +12,7 @@ import {
   type ConceptCandidate,
   getPlainTextFromNote,
 } from "./conceptExtractionService";
-import { createConcept } from "./conceptService";
+import { createConcept, getConceptsFromDatabase, normalizeConceptName } from "./conceptService";
 import { addConceptSubtopic } from "./conceptSubtopicsService";
 import { generateAndSaveSubjectStructure } from "./subjectStructureGenerationService";
 
@@ -59,6 +59,12 @@ export async function generateKnowledgeBaseForSubject(
   }
   const subtopics = await getAllSubtopicsBySubject(subjectId);
 
+  // Concepts are global in the current schema; include definitions to distinguish meanings.
+  const existingConcepts = await getConceptsFromDatabase();
+  const savedByName = new Map(existingConcepts.map((concept) => [normalizeConceptName(concept.name), concept]));
+  const contextByName = new Map(existingConcepts.map(({ name, type, shortDefinition }) =>
+    [normalizeConceptName(name), { name, type, shortDefinition }]));
+
   const availableSubtopics = subtopics.map((subtopic) => ({
     id: subtopic.id,
     name: subtopic.name,
@@ -90,7 +96,7 @@ export async function generateKnowledgeBaseForSubject(
 
     let candidates: ConceptCandidate[];
     try {
-      candidates = await extractConceptCandidates(text, availableSubtopics);
+      candidates = await extractConceptCandidates(text, availableSubtopics, [...contextByName.values()]);
     } catch (error) {
       if (!(error instanceof InvalidConceptResponseError)) throw error;
       skippedNotes += 1;
@@ -99,8 +105,8 @@ export async function generateKnowledgeBaseForSubject(
     }
     // A name entered on a callout is an explicit editorial choice, even when
     // the AI omits it. Never create a replacement for an already linked box.
-    const normalize = (name: string) => name.trim().toLocaleLowerCase("nb-NO").normalize("NFC");
-    const names = new Set(candidates.map((candidate) => normalize(candidate.name)));
+    const normalize = normalizeConceptName;
+    const names = new Set(candidates.flatMap((candidate) => [candidate.name, candidate.sourceName ?? candidate.name].map(normalize)));
     for (const callout of getConceptCallouts(note.contentJson)) {
       if (callout.conceptId || !callout.explanation.trim() || names.has(normalize(callout.name))) continue;
       candidates.push({
@@ -112,6 +118,11 @@ export async function generateKnowledgeBaseForSubject(
       });
       names.add(normalize(callout.name));
     }
+    for (const { name, type, shortDefinition } of candidates) {
+      const key = normalize(name);
+      if (!contextByName.has(key)) contextByName.set(key, { name, type, shortDefinition });
+    }
+
     prepared.push({ note, candidates });
   }
 
@@ -121,7 +132,8 @@ export async function generateKnowledgeBaseForSubject(
     const noteConcepts: Concept[] = [];
 
     for (const candidate of candidates) {
-      const concept = await createConcept(
+      const key = normalizeConceptName(candidate.name);
+      const concept = savedByName.get(key) ?? await createConcept(
         candidate.name,
         candidate.type,
         candidate.shortDefinition,
@@ -129,8 +141,11 @@ export async function generateKnowledgeBaseForSubject(
         { preserveExisting: true },
       );
 
+      savedByName.set(key, concept);
       conceptsProcessed += 1;
       noteConcepts.push(concept);
+      // Alias is local to this note; never rename or overwrite the stored concept.
+      if (candidate.sourceName) noteConcepts.push({ ...concept, name: candidate.sourceName });
 
       for (const subtopicId of candidate.subtopicIds) {
         await addConceptSubtopic(concept.id, subtopicId);

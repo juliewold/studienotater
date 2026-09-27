@@ -42,8 +42,18 @@ def extract_concepts(request):
     ):
         return JsonResponse({"error": "Invalid subtopics."}, status=400)
 
+    existing_concepts = body.get("existingConcepts", [])
+    if not isinstance(existing_concepts, list) or any(
+        not isinstance(item, dict)
+        or any(not isinstance(item.get(key), str) or not item[key].strip()
+               for key in ("name", "type", "shortDefinition"))
+        or item.get("type") not in {"definition", "theorem", "formula", "method"}
+        for item in existing_concepts
+    ):
+        return JsonResponse({"error": "Invalid existing concepts."}, status=400)
+
     try:
-        candidates = extract_concept_candidates(text, subtopics)
+        candidates = extract_concept_candidates(text, subtopics, existing_concepts)
     except APIConnectionError:
         return JsonResponse(
             {"error": "Kunne ikke nå AI-tjenesten. Prøv igjen senere."}, status=503

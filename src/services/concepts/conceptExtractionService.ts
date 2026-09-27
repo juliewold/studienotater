@@ -4,11 +4,14 @@ import { addConceptSuggestion } from "./conceptSuggestionsService";
 
 export type ConceptCandidate = {
   name: string;
+  sourceName?: string;
   type: ConceptType;
   shortDefinition: string;
   explanation: string;
   subtopicIds: string[];
 };
+
+export type ExistingConceptContext = Pick<Concept, "name" | "type" | "shortDefinition">;
 
 type AvailableSubtopic = {
   id: string;
@@ -29,6 +32,7 @@ export class InvalidConceptResponseError extends Error {
 export async function extractConceptCandidates(
   text: string,
   subtopics: AvailableSubtopic[] = [],
+  existingConcepts: ExistingConceptContext[] = [],
 ): Promise<ConceptCandidate[]> {
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -44,6 +48,7 @@ export async function extractConceptCandidates(
     body: JSON.stringify({
       text,
       subtopics,
+      existingConcepts,
     }),
   });
 

@@ -1,0 +1,68 @@
+<!doctype html><html lang="nb"><meta charset="utf-8"><title>Begrepsdeduplisering – tester</title>
+<h1>Begrepsdeduplisering – tester</h1><p id="summary">Kjører …</p><pre id="results"></pre>
+<script type="module">
+import { generateKnowledgeBaseForSubject } from '../src/services/concepts/knowledgeBaseService.ts';
+import { createConcept } from '../src/services/concepts/conceptService.ts';
+const assert=(v,m)=>{if(!v)throw new Error(m)};
+const response=(data)=>new Response(JSON.stringify(data),{headers:{'Content-Type':'application/json'}});
+const originalFetch=window.fetch;
+const canonical={id:'canonical',name:'Indikatorvariabel',slug:'indikatorvariabel',type:'definition',short_definition:'Manuell definisjon',explanation:'Manuell forklaring'};
+const candidate=(name,sourceName)=>({name,sourceName,type:'definition',shortDefinition:'AI-definisjon',explanation:'AI-forklaring',subtopicIds:['sub']});
+async function run({existing=[canonical],outputs,callout=false}){
+ const concepts=structuredClone(existing),links=[{concept_id:'canonical',subtopic_id:'manual-sub'}],requests=[],writes=[];let index=0;
+ window.fetch=async(input,init={})=>{
+  const url=new URL(typeof input==='string'?input:input.url),method=init.method??'GET',table=url.pathname.split('/').at(-1),body=init.body?JSON.parse(init.body):null;
+  if(url.pathname.endsWith('/extract/')){requests.push(body);return response({candidates:outputs[index++]})}
+  if(method==='GET'){
+   if(table==='topics')return response([{id:'topic',name:'Tema',subject_id:'subject'}]);
+   if(table==='subtopics')return response([{id:'sub',name:'Undertema',topic_id:'topic'}]);
+   if(table==='notes')return response(outputs.map((_,i)=>({id:String(i),title:'Notat',subject_id:'subject',slug:'note-'+i,subtopic_id:'sub',content:callout?'<div data-type="callout" data-callout-type="definition" data-concept-name="Indicator variable"><div class="note-callout-body"><p>Indicator variable</p></div></div>':'<p>Notat</p>',content_json:callout?{type:'doc',content:[{type:'callout',attrs:{type:'definition',conceptName:'Indicator variable'},content:[{type:'paragraph',content:[{type:'text',text:'Indicator variable'}]}]}]}:null})));
+   if(table==='concepts')return response(url.searchParams.has('slug')?concepts.filter(c=>'eq.'+c.slug===url.searchParams.get('slug')):concepts);
+   if(table==='concept_subtopics')return response(links.filter(l=>'eq.'+l.concept_id===url.searchParams.get('concept_id')&&'eq.'+l.subtopic_id===url.searchParams.get('subtopic_id')));
+  }
+  writes.push({table,method,body});
+  if(table==='concepts'&&method==='POST'){concepts.push(body);return response(body)}
+  if(table==='concept_subtopics'&&method==='POST'){links.push(body);return response(null)}
+  if(table==='notes'&&method==='PATCH')return response([{id:'0'}]);
+  throw new Error('Uventet skriving: '+table+' '+method);
+ };
+ try {const result=await generateKnowledgeBaseForSubject('subject','Statistikk');return {result,concepts,links,requests,writes}}
+ finally{window.fetch=originalFetch}
+}
+const tests=[
+ ['Eksakt normalisert navn gjenbrukes uten AI-hjelp',async()=>{
+  const s=await run({outputs:[[candidate('  INDIKATORVARIABEL  ')]]});
+  assert(s.concepts.length===1,'Duplikat');assert(s.links.some(l=>l.concept_id==='canonical'&&l.subtopic_id==='sub'),'Mangler kobling');
+ }],
+ ['Oversettelse gjenbruker canonical-navn og kobler original boks',async()=>{
+  const s=await run({outputs:[[candidate('Indikatorvariabel','Indicator variable')]],callout:true});
+  assert(s.requests[0].existingConcepts[0].name==='Indikatorvariabel','Kontekst mangler');
+  assert(s.requests[0].existingConcepts[0].shortDefinition==='Manuell definisjon','Betydning mangler');
+  assert(s.concepts.length===1&&s.result.linkedCallouts===1,'Alias laget duplikat eller mistet boks');
+  assert(s.writes.find(w=>w.table==='notes').body.content.includes('data-concept-id="canonical"'),'Feil ID');
+  assert(s.concepts[0].explanation==='Manuell forklaring','Innhold overskrevet');
+  assert(s.links.some(l=>l.subtopic_id==='manual-sub'),'Manuell kobling tapt');
+ }],
+ ['Faglig forskjellig begrep beholdes separat',async()=>{
+  const s=await run({outputs:[[candidate('Diskret stokastisk variabel')]]});
+  assert(s.concepts.length===2,'Forskjellige begreper slått sammen');
+  assert(s.links.some(l=>l.concept_id!=='canonical'&&l.subtopic_id==='sub'),'Ny kobling mangler');
+ }],
+ ['Nye kandidater sendes til neste notat før lagring',async()=>{
+  const s=await run({existing:[],outputs:[[candidate('Indikatorvariabel')],[candidate('Indikatorvariabel','Indicator variable')]]});
+  assert(s.requests.length===2,'Ekstra AI-kall');assert(s.requests[1].existingConcepts[0].name==='Indikatorvariabel','Ny kontekst mangler');
+  assert(s.concepts.length===1,'Duplikat på tvers av notater');
+ }],
+ ['Slug-oppslag gjenbruker eksakt navn og avviser kollisjon',async()=>{
+  window.fetch=async()=>response([canonical]);
+  try {
+   const reused=await createConcept(' INDIKATORVARIABEL ','definition','Ny','Ny',{preserveExisting:true});
+   assert(reused.id==='canonical'&&reused.explanation==='Manuell forklaring','Eksisterende overskrevet');
+   let rejected=false;try{await createConcept('Annet begrep','definition','Ny','Ny',{preserveExisting:true})}catch{rejected=true}
+   assert(rejected,'Slug-kollisjon slo sammen ulike navn');
+  }finally{window.fetch=originalFetch}
+ }],
+];
+let passed=0;for(const [name,test]of tests){try{await test();passed++;document.querySelector('#results').textContent+='BESTÅTT: '+name+'\n'}catch(e){document.querySelector('#results').textContent+='FEIL: '+name+': '+e.message+'\n'}}
+document.querySelector('#summary').textContent=`${passed}/${tests.length} bestått`;
+</script></html>

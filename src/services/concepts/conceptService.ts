@@ -68,6 +68,10 @@ export async function getConceptBySlugFromDatabase(
   return data ? mapConceptRow(data as ConceptRow) : undefined;
 }
 
+export function normalizeConceptName(name: string): string {
+  return name.trim().replace(/\s+/g, " ").toLocaleLowerCase("nb-NO").normalize("NFC");
+}
+
 function createConceptSlug(name: string): string {
   return name
     .trim()
@@ -104,7 +108,12 @@ export async function createConcept(
   }
 
   if (existingConcept) {
-    if (options.preserveExisting) return mapConceptRow(existingConcept as ConceptRow);
+    if (options.preserveExisting) {
+      if (normalizeConceptName(existingConcept.name) !== normalizeConceptName(trimmedName)) {
+        throw new Error("Et annet begrep har samme slug. Avklar navnene manuelt før generering.");
+      }
+      return mapConceptRow(existingConcept as ConceptRow);
+    }
 
     const { data, error: updateError } = await supabase
       .from("concepts")
