@@ -25,7 +25,9 @@ def get_client():
     )
 
 
-def _extract_concept_candidates_once(text, subtopics=None, validation_hint="", existing_concepts=None):
+def _extract_concept_candidates_once(
+    text, subtopics=None, validation_hint="", existing_concepts=None
+):
     client = get_client()
 
     subtopics = subtopics or []
@@ -111,6 +113,7 @@ def _extract_concept_candidates_once(text, subtopics=None, validation_hint="", e
                     "Formatet skal være "
                     '{"candidates": ['
                     '{"name": "Begrep", '
+                    '"sourceName": "Navnet som faktisk står i notatet", '
                     '"type": "definition", '
                     '"shortDefinition": "Kort definisjon", '
                     '"explanation": "Pedagogisk forklaring", '
@@ -123,7 +126,8 @@ def _extract_concept_candidates_once(text, subtopics=None, validation_hint="", e
                 "content": (
                     f"UNDERTEMAER:\n"
                     f"{subtopic_text or 'Ingen undertemaer'}\n\n"
-                    f"EKSISTERENDE BEGREPER:\n{json.dumps(existing_concepts or [], ensure_ascii=False)}\n\n"
+                    f"EKSISTERENDE BEGREPER:\n"
+                    f"{json.dumps(existing_concepts or [], ensure_ascii=False)}\n\n"
                     f"STUDIENOTAT:\n{text}"
                 ),
             },
@@ -132,8 +136,10 @@ def _extract_concept_candidates_once(text, subtopics=None, validation_hint="", e
 
     if not response.choices:
         raise ValueError("LLM returned no choices.")
+
     if response.choices[0].finish_reason == "length":
         raise ValueError("LLM response was truncated.")
+
     content = response.choices[0].message.content
 
     if not content:
@@ -149,51 +155,100 @@ def _extract_concept_candidates_once(text, subtopics=None, validation_hint="", e
 
     valid_subtopic_ids = {subtopic["id"] for subtopic in subtopics}
     validated = []
+
     for index, candidate in enumerate(result["candidates"]):
         if not isinstance(candidate, dict):
             raise ValueError(f"Candidate {index} must be an object.")
+
         for field in ("name", "type", "shortDefinition", "explanation"):
-            if not isinstance(candidate.get(field), str) or not candidate[field].strip():
+            if (
+                not isinstance(candidate.get(field), str)
+                or not candidate[field].strip()
+            ):
                 raise ValueError(f"Candidate {index} has an invalid {field}.")
+
         candidate_type = candidate["type"].strip()
-        if candidate_type not in {"definition", "theorem", "formula", "method"}:
+
+        if candidate_type not in {
+            "definition",
+            "theorem",
+            "formula",
+            "method",
+        }:
             raise ValueError(f"Candidate {index} has an invalid type.")
+
         if not isinstance(candidate.get("subtopicIds"), list):
-            raise ValueError(f"Candidate {index} subtopicIds must be a list.")
+            raise ValueError(
+                f"Candidate {index} subtopicIds must be a list."
+            )
+
         if "sourceName" in candidate and (
-            not isinstance(candidate["sourceName"], str) or not candidate["sourceName"].strip()
+            not isinstance(candidate["sourceName"], str)
+            or not candidate["sourceName"].strip()
         ):
-            raise ValueError(f"Candidate {index} has an invalid sourceName.")
-        validated.append({
-            **({"sourceName": candidate["sourceName"].strip()} if "sourceName" in candidate else {}),
-            "name": candidate["name"].strip(),
-            "type": candidate_type,
-            "shortDefinition": candidate["shortDefinition"].strip(),
-            "explanation": candidate["explanation"].strip(),
-            "subtopicIds": list(dict.fromkeys(
-                value for value in candidate["subtopicIds"]
-                if isinstance(value, str) and value in valid_subtopic_ids
-            )),
-        })
+            raise ValueError(
+                f"Candidate {index} has an invalid sourceName."
+            )
+
+        validated.append(
+            {
+                **(
+                    {"sourceName": candidate["sourceName"].strip()}
+                    if "sourceName" in candidate
+                    else {}
+                ),
+                "name": candidate["name"].strip(),
+                "type": candidate_type,
+                "shortDefinition": candidate["shortDefinition"].strip(),
+                "explanation": candidate["explanation"].strip(),
+                "subtopicIds": list(
+                    dict.fromkeys(
+                        value
+                        for value in candidate["subtopicIds"]
+                        if isinstance(value, str)
+                        and value in valid_subtopic_ids
+                    )
+                ),
+            }
+        )
+
     return validated
 
 
-def extract_concept_candidates(text, subtopics=None, existing_concepts=None):
+def extract_concept_candidates(
+    text, subtopics=None, existing_concepts=None
+):
     """Retry invalid model output once; transport errors retain SDK handling."""
     validation_hint = ""
+
     for attempt in range(1, 3):
         try:
-            return _extract_concept_candidates_once(text, subtopics, validation_hint, existing_concepts)
+            return _extract_concept_candidates_once(
+                text,
+                subtopics,
+                validation_hint,
+                existing_concepts,
+            )
         except ValueError as error:
             # Validator messages contain only field/index/reason, never note text
             # or raw model output. This makes the next failing response diagnosable.
-            logger.warning("Concept extraction validation failed (attempt %s/2): %s", attempt, error)
+            logger.warning(
+                "Concept extraction validation failed (attempt %s/2): %s",
+                attempt,
+                error,
+            )
+
             if attempt == 2:
                 raise
+
             validation_hint = (
-                "Forrige forsøk bestod ikke valideringen: " + str(error) + " "
+                "Forrige forsøk bestod ikke valideringen: "
+                + str(error)
+                + " "
                 "Lag et nytt komplett svar fra kildeteksten. Alle kandidater må ha "
                 "name, type, shortDefinition og explanation som ikke-tomme strenger, "
                 "og subtopicIds som liste. Bruk bare de fire tillatte typene. "
+                "Hvis du gjenbruker et eksisterende begrep, bruk også sourceName "
+                "med navnet som faktisk står i notatet. "
                 "Hold forklaringene konsise slik at hele JSON-svaret får plass. "
             )
