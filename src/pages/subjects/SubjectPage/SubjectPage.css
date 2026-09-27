@@ -26,6 +26,101 @@
   line-height: 1.4;
 }
 
+/* AI-kunnskapsbase */
+
+.subject-knowledge-base {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+
+  margin-top: 24px;
+  padding: 18px 20px;
+
+  border: 1px solid #e4d8fb;
+  border-radius: 16px;
+
+  background: #faf8ff;
+}
+
+.subject-knowledge-base > div {
+  flex: 1 1 500px;
+  min-width: 0;
+}
+
+.subject-knowledge-base h2 {
+  margin: 0;
+
+  color: #211a32;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.subject-knowledge-base > div > p:last-child {
+  max-width: 650px;
+  margin: 6px 0 0;
+
+  color: #6b6475;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.subject-knowledge-base button {
+  flex-shrink: 0;
+
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #7c3aed;
+  color: #ffffff;
+
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.subject-knowledge-base button:hover:not(:disabled) {
+  background: #6d28d9;
+}
+
+.subject-knowledge-base button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.subject-knowledge-base button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.subject-knowledge-base button:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 3px;
+}
+
+.subject-knowledge-base > p {
+  flex-basis: 100%;
+
+  margin: 0;
+  padding-top: 12px;
+
+  border-top: 1px solid #e9ddfb;
+
+  color: #625b6f;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+/* Progresjon */
+
 .subject-progress-card {
   margin-top: 24px;
   padding: 18px 20px;
@@ -134,12 +229,16 @@
   color: #b42318;
 }
 
+/* Funksjonskort */
+
 .subject-features-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin-top: 28px;
 }
+
+/* Temaprogresjon */
 
 .subject-topic-progress {
   margin-top: 28px;
@@ -187,6 +286,13 @@
   background: #faf8ff;
 }
 
+.subject-topic-progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
 .subject-topic-progress-top h3 {
   margin: 0;
   color: #34284a;
@@ -221,45 +327,12 @@
   font-size: 0.76rem;
 }
 
-.subject-topic-progress-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-}
-
 .subject-topic-progress-rating span {
   color: #84cc16;
   letter-spacing: 0.06em;
 }
 
-@media (max-width: 800px) {
-  .subject-progress-categories {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 700px) {
-  .subject-page {
-    margin: 24px auto 48px;
-    padding: 0 16px;
-  }
-
-  .subject-page h1 {
-    font-size: 2rem;
-  }
-
-  .subject-page-name {
-    font-size: 1rem;
-  }
-
-  .subject-features-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-
-    margin-top: 24px;
-  }
-}
+/* Vis flere temaer */
 
 .subject-topic-progress-more {
   display: flex;
@@ -303,7 +376,67 @@
   outline-offset: 2px;
 }
 
+/* Responsive */
+
+@media (max-width: 1000px) {
+  .subject-features-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .subject-progress-categories {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .subject-page {
+    margin: 24px auto 48px;
+    padding: 0 16px;
+  }
+
+  .subject-page h1 {
+    font-size: 2rem;
+  }
+
+  .subject-page-name {
+    font-size: 1rem;
+  }
+
+  .subject-features-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+
+    margin-top: 24px;
+  }
+}
+
 @media (max-width: 600px) {
+  .subject-knowledge-base {
+    align-items: stretch;
+    gap: 16px;
+
+    margin-top: 20px;
+    padding: 16px;
+  }
+
+  .subject-knowledge-base > div {
+    flex-basis: 100%;
+  }
+
+  .subject-knowledge-base h2 {
+    font-size: 1.1rem;
+  }
+
+  .subject-knowledge-base button {
+    width: 100%;
+  }
+
+  .subject-knowledge-base > p {
+    padding-top: 14px;
+  }
+
   .subject-progress-card {
     margin-top: 20px;
     padding: 16px;
@@ -411,8 +544,102 @@
   }
 }
 
-@media (max-width: 1000px) {
-  .subject-features-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Pensum – temaer */
+
+.subject-syllabus {
+  margin-top: 28px;
+}
+
+.subject-syllabus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.subject-syllabus-header h2 {
+  margin: 0;
+  color: #211a32;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.subject-syllabus-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.subject-syllabus-topic {
+  min-width: 0;
+}
+
+.subject-syllabus-topic-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  min-height: 64px;
+  padding: 14px 16px;
+
+  border: 1px solid #ece7f5;
+  border-radius: 12px;
+  background: #ffffff;
+
+  color: #34284a;
+  text-decoration: none;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.subject-syllabus-topic-link h3 {
+  min-width: 0;
+  margin: 0;
+
+  color: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.subject-syllabus-topic-link svg {
+  flex-shrink: 0;
+  color: #8b5cf6;
+}
+
+.subject-syllabus-topic-link:hover {
+  border-color: #d8c8f5;
+  background: #faf8ff;
+  color: #7c3aed;
+}
+
+.subject-syllabus-topic-link:active {
+  transform: translateY(1px);
+}
+
+.subject-syllabus-topic-link:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .subject-syllabus {
+    margin-top: 24px;
+  }
+
+  .subject-syllabus-list {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .subject-syllabus-topic-link {
+    min-height: 58px;
+    padding: 12px 14px;
   }
 }
