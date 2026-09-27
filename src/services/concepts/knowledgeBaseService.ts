@@ -1,4 +1,7 @@
-import { getNotesBySubject, updateNoteConceptLinks } from "../notes/notesService";
+import {
+  getNotesBySubject,
+  updateNoteConceptLinks,
+} from "../notes/notesService";
 import type { Concept } from "../../data/concepts/types";
 import { linkCalloutsToConcepts } from "./calloutConceptLinkingService";
 import { getConceptCallouts } from "./conceptCalloutService";
@@ -54,9 +57,11 @@ export async function generateKnowledgeBaseForSubject(
   const notes = options.noteId
     ? subjectNotes.filter((note) => note.id === options.noteId)
     : subjectNotes;
+
   if (options.noteId && notes.length === 0) {
     throw new Error("Fant ikke det valgte notatet i faget.");
   }
+
   const subtopics = await getAllSubtopicsBySubject(subjectId);
 
   // Concepts are global in the current schema; include definitions to distinguish meanings.
@@ -77,12 +82,17 @@ export async function generateKnowledgeBaseForSubject(
   let linkedConcepts = 0;
   let linkedCallouts = 0;
 
-  const prepared: { note: (typeof notes)[number]; candidates: ConceptCandidate[] }[] = [];
+  const prepared: {
+    note: (typeof notes)[number];
+    candidates: ConceptCandidate[];
+  }[] = [];
 
-  // Finish extraction before writing. Exhausted validation failures are reported
-  // per note; unexpected/service errors still abort before concept/link writes.
+  // Finish extraction before writing. Notes do not need to already belong to a
+  // subtopic: the AI can classify extracted concepts using availableSubtopics.
+  // Exhausted validation failures are reported per note; unexpected/service
+  // errors still abort before concept/link writes.
   for (const note of notes) {
-    if (!note.content.trim() || !note.subtopicId) {
+    if (!note.content.trim()) {
       skippedNotes += 1;
       continue;
     }
@@ -95,35 +105,59 @@ export async function generateKnowledgeBaseForSubject(
     }
 
     let candidates: ConceptCandidate[];
+
     try {
       candidates = await extractConceptCandidates(text, availableSubtopics, [...contextByName.values()]);
     } catch (error) {
-      if (!(error instanceof InvalidConceptResponseError)) throw error;
+      if (!(error instanceof InvalidConceptResponseError)) {
+        throw error;
+      }
+
       skippedNotes += 1;
-      failedNotes.push({ id: note.id, title: note.title });
+      failedNotes.push({
+        id: note.id,
+        title: note.title,
+      });
       continue;
     }
+
     // A name entered on a callout is an explicit editorial choice, even when
     // the AI omits it. Never create a replacement for an already linked box.
     const normalize = normalizeConceptName;
-    const names = new Set(candidates.flatMap((candidate) => [candidate.name, candidate.sourceName ?? candidate.name].map(normalize)));
+
+    const names = new Set(
+      candidates.flatMap((candidate) => [candidate.name, candidate.sourceName ?? candidate.name].map(normalize)),
+    );
+
     for (const callout of getConceptCallouts(note.contentJson)) {
-      if (callout.conceptId || !callout.explanation.trim() || names.has(normalize(callout.name))) continue;
+      if (
+        callout.conceptId ||
+        !callout.explanation.trim() ||
+        names.has(normalize(callout.name))
+      ) {
+        continue;
+      }
+
       candidates.push({
         name: callout.name,
         type: callout.type,
         shortDefinition: callout.explanation,
         explanation: callout.explanation,
-        subtopicIds: [note.subtopicId],
+        subtopicIds: note.subtopicId ? [note.subtopicId] : [],
       });
+
       names.add(normalize(callout.name));
     }
+
     for (const { name, type, shortDefinition } of candidates) {
       const key = normalize(name);
       if (!contextByName.has(key)) contextByName.set(key, { name, type, shortDefinition });
     }
 
-    prepared.push({ note, candidates });
+    prepared.push({
+      note,
+      candidates,
+    });
   }
 
   // Add links without deleting existing/manual links. A failed save can leave
@@ -153,9 +187,19 @@ export async function generateKnowledgeBaseForSubject(
       }
     }
 
-    const linkedNote = linkCalloutsToConcepts(note.content, note.contentJson, noteConcepts);
+    const linkedNote = linkCalloutsToConcepts(
+      note.content,
+      note.contentJson,
+      noteConcepts,
+    );
+
     if (linkedNote.linkedCallouts > 0) {
-      await updateNoteConceptLinks(note, linkedNote.content, linkedNote.contentJson);
+      await updateNoteConceptLinks(
+        note,
+        linkedNote.content,
+        linkedNote.contentJson,
+      );
+
       linkedCallouts += linkedNote.linkedCallouts;
     }
 
