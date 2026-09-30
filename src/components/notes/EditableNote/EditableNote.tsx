@@ -40,6 +40,7 @@ import { ConceptSuggestions } from "../../concepts/ConceptSuggestions/ConceptSug
 
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
+import { NoteSummary } from "../NoteSummary/NoteSummary";
 import { FlashcardGenerator } from "../../flashcards/FlashcardGenerator/FlashcardGenerator";
 
 type EditableNoteProps = {
@@ -619,6 +620,8 @@ export const EditableNote = ({
       </div>
 
       <ReadOnlyNote content={note.content} />
+
+      {isAdmin && !isEditing && <NoteSummary key={note.id + note.content} content={note.content} />}
 
       {isAdmin && (
         <FlashcardGenerator

@@ -1,0 +1,3 @@
+.note-summary-result { border: 1px solid #e5dced; border-radius: 12px; padding: 18px; line-height: 1.65; }
+.note-summary-result > p { margin-top: 0; font-size: .85rem; color: #746d79; }
+.note-summary-result > div { white-space: pre-wrap; overflow-wrap: anywhere; }
