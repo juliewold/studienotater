@@ -1,0 +1,18 @@
+<!doctype html><html lang="nb"><meta charset="utf-8"><title>Notatoversikt – tester</title><h1>Notatoversikt – tester</h1><pre id="results"></pre><script type="module">
+import { groupNotes } from '../src/pages/notes/NotesPage/groupNotes.ts';
+const topics=[{id:'t2',name:'Andre',sortOrder:2},{id:'t1',name:'Første',sortOrder:1}];
+const subtopics=[{id:'s1',topicId:'t1',name:'A',sortOrder:1},{id:'s2',topicId:'t2',name:'B',sortOrder:1}];
+const notes=[{id:'n1',title:'Sannsynlighet',subtopicId:'s1'},{id:'n2',title:'Forventning',subtopicId:null},{id:'n3',title:'Varians',subtopicId:'s2'}];
+const links=[{noteId:'n1',subtopicId:'s1'},{noteId:'n1',subtopicId:'s2'},{noteId:'n1',subtopicId:'s2'}];
+const assert=(v)=>{if(!v)throw Error('Uventet gruppering')};
+const tests=[
+ ['Mange-til-mange viser samme notatobjekt under begge undertemaer',()=>{const r=groupNotes(notes,topics,subtopics,links,'');assert(r.groups[0].subtopics[0].notes[0]===notes[0]);assert(r.groups[1].subtopics[0].notes[0]===notes[0]);assert(r.count===3)}],
+ ['Duplikate koblinger dupliserer ikke notat i et undertema',()=>{const r=groupNotes(notes,topics,subtopics,links,'');assert(r.groups[1].subtopics[0].notes.length===2)}],
+ ['Søk ignorerer store bokstaver og skjuler tomme grupper',()=>{const r=groupNotes(notes,topics,subtopics,links,' VARI ');assert(r.count===1&&r.groups.length===1&&r.groups[0].id==='t2')}],
+ ['Uten kobling og eldre notatplassering beholdes',()=>{const r=groupNotes(notes,topics,subtopics,links,'');assert(r.unassigned[0]===notes[1]);assert(r.groups[1].subtopics[0].notes.includes(notes[2]))}],
+ ['Koblingstabellen overstyrer eldre enkeltplassering',()=>{const r=groupNotes(notes,topics,subtopics,[{noteId:'n1',subtopicId:'s2'}],'sann');assert(r.groups.length===1&&r.groups[0].id==='t2')}],
+ ['Ukjente koblinger skjuler ikke notater',()=>{const r=groupNotes(notes,[],[],links,'');assert(r.unassigned.length===3)}],
+ ['Ingen treff gir tomt resultat',()=>assert(groupNotes(notes,topics,subtopics,links,'xyz').count===0)],
+];
+let passed=0;for(const [name,test] of tests){try{test();passed++;document.querySelector('#results').textContent+='BESTÅTT: '+name+'\n'}catch(e){document.querySelector('#results').textContent+='FEIL: '+name+'\n'}}document.querySelector('#results').textContent+=`${passed}/${tests.length} bestått`;
+</script></html>
