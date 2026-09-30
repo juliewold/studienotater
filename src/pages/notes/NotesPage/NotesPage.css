@@ -559,3 +559,20 @@
 .folder-modal-delete:hover:not(:disabled) {
   background: #922018;
 }
+
+.structured-notes { margin-top: 28px; }
+.notes-search > label { display: block; margin-bottom: 8px; font-weight: 600; }
+.notes-search > input { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #d9cfe2; border-radius: 12px; font: inherit; background: #fff; color: #28232d; }
+.notes-search > input:focus-visible, .notes-topic button:focus-visible, .notes-view-switch button:focus-visible { outline: 2px solid #8b5cf6; outline-offset: 3px; }
+.notes-topic { margin-top: 16px; border: 1px solid #e5dced; border-radius: 14px; overflow: hidden; }
+.notes-topic h2 { margin: 0; font-size: 1.1rem; }
+.notes-topic h2 button { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; width: 100%; padding: 18px; border: 0; background: #f7f3fa; color: #403747; font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.notes-topic-count { margin-left: auto; font-size: .85rem; font-weight: 400; }
+.notes-subtopic { padding: 0 16px 18px; }
+.notes-subtopic > h3 { color: #655b6c; font-size: 1rem; margin: 20px 0 12px; }
+.notes-subtopic .notes-list { margin-top: 0; }
+
+.notes-view-switch { display: flex; gap: 8px; margin-top: 24px; }
+.notes-view-switch button { padding: 10px 16px; border: 1px solid #d9cfe2; border-radius: 12px; background: #fff; color: #403747; font: inherit; cursor: pointer; }
+.notes-view-switch button[aria-pressed="true"] { background: #f4ecff; border-color: #8b5cf6; color: #6d28d9; font-weight: 600; }
+.notes-search { margin-top: 20px; }

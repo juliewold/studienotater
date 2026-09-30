@@ -1,4 +1,5 @@
 import "./NotesPage.css";
+import { StructuredNotes } from "./StructuredNotes";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart, Plus, Sparkles, X } from "lucide-react";
@@ -52,6 +53,9 @@ export const NotesPage = () => {
 
   const { isAdmin } = useContext(AuthContext);
 
+  const [view, setView] = useState<"all" | "topics">("all");
+  const [query, setQuery] = useState("");
+  const [notesRevision, setNotesRevision] = useState(0);
   const [notes, setNotes] = useState<DatabaseNote[]>([]);
 
   const [folderNoteCounts, setFolderNoteCounts] = useState<
@@ -150,10 +154,6 @@ export const NotesPage = () => {
       try {
         const allNotes = await getNotesBySubject(subjectId);
 
-        const notesWithoutFolder = allNotes.filter(
-          (note) => note.folderId === null,
-        );
-
         const counts = allNotes.reduce<Record<string, number>>(
           (currentCounts, note) => {
             if (!note.folderId) {
@@ -168,7 +168,7 @@ export const NotesPage = () => {
           {},
         );
 
-        setNotes(notesWithoutFolder);
+        setNotes(allNotes);
         setFolderNoteCounts(counts);
       } catch (error) {
         console.error("Kunne ikke hente notater:", error);
@@ -180,7 +180,7 @@ export const NotesPage = () => {
     };
 
     loadNotes();
-  }, [subjectId]);
+  }, [subjectId, notesRevision]);
 
   useEffect(() => {
     const loadFolders = async () => {
@@ -410,10 +410,6 @@ export const NotesPage = () => {
         }
       }
 
-      const notesWithoutFolder = updatedNotes.filter(
-        (note) => note.folderId === null,
-      );
-
       const counts = updatedNotes.reduce<Record<string, number>>(
         (currentCounts, note) => {
           if (!note.folderId) {
@@ -430,7 +426,7 @@ export const NotesPage = () => {
 
       setTopics(loadedTopics);
       setFolders(updatedFolders);
-      setNotes(notesWithoutFolder);
+      setNotes(updatedNotes);
       setFolderNoteCounts(counts);
 
       if (createdFolderCount === 0 && createdNoteCount === 0) {
@@ -468,98 +464,12 @@ export const NotesPage = () => {
     );
   }
 
-  return (
-    <main className="notes-page">
-      <Link to={`/fag/${subject.id}`} className="back-link">
-        ← Tilbake til faget
-      </Link>
-
-      <div className="notes-header">
-        <div>
-          <p className="notes-label">Notater</p>
-
-          <h1>{subject.code}</h1>
-
-          <p>{subject.name}</p>
-        </div>
-
-        {isAdmin && (
-          <div className="notes-header-actions">
-            <button
-              type="button"
-              className="generate-structure-button"
-              onClick={handleGenerateStructure}
-              disabled={isGeneratingStructure}
-            >
-              <Sparkles size={19} />
-
-              {isGeneratingStructure ? "Oppretter..." : "Opprett fagstruktur"}
-            </button>
-
-            <button
-              type="button"
-              className="new-folder-button"
-              onClick={openFolderModal}
-              disabled={isGeneratingStructure}
-            >
-              <Plus size={20} />
-              Ny mappe
-            </button>
-          </div>
-        )}
-      </div>
-
-      {structureMessage && (
-        <p className="structure-message">{structureMessage}</p>
-      )}
-
-      {foldersError && <p className="notes-error-message">{foldersError}</p>}
-
-      {isLoadingFolders && <p>Laster mapper...</p>}
-
-      {!isLoadingFolders && folders.length > 0 && (
-        <div className="notes-folders">
-          {sortedFolders.map((folder) => (
-            <FolderCard
-              key={folder.id}
-              folder={folder}
-              subjectId={subject.id}
-              noteCount={folderNoteCounts[folder.id] ?? 0}
-              onFolderUpdated={(updatedFolder) => {
-                setFolders((currentFolders) =>
-                  currentFolders.map((currentFolder) =>
-                    currentFolder.id === updatedFolder.id
-                      ? updatedFolder
-                      : currentFolder,
-                  ),
-                );
-              }}
-              onFolderDeleted={(deletedFolderId) => {
-                setFolders((currentFolders) =>
-                  currentFolders.filter(
-                    (currentFolder) => currentFolder.id !== deletedFolderId,
-                  ),
-                );
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {(isLoadingProgress || isLoadingNotes) && <p>Laster notater...</p>}
-
-      {notesError && <p className="notes-error-message">{notesError}</p>}
-
-      {!isLoadingNotes &&
-        !isLoadingFolders &&
-        notes.length === 0 &&
-        folders.length === 0 && (
-          <p>Ingen mapper eller notater er lagt til ennå.</p>
-        )}
-
-      {!isLoadingNotes && notes.length > 0 && (
-        <div className="notes-list">
-          {notes.map((note) => {
+  // Without a search, preserve the original folder + loose-notes overview.
+  // A title search also finds notes inside folders without moving them.
+  const visibleNotes = notes.filter(note => query.trim()
+    ? note.title.normalize("NFC").toLocaleLowerCase("nb").includes(query.trim().normalize("NFC").toLocaleLowerCase("nb"))
+    : note.folderId === null);
+  const renderNote = (note: DatabaseNote) => {
             const favoriteId = `${subject.id}-database-${note.slug}`;
 
             const resourceId = `note-${subject.id}-database-${note.slug}`;
@@ -608,6 +518,8 @@ export const NotesPage = () => {
                 }
                 onNoteChanged={(change) => {
                   if (change.type === "moved" || change.type === "deleted") {
+                    setNotesRevision(value => value + 1);
+                    if (change.type === "moved") return;
                     setNotes((currentNotes) =>
                       currentNotes.filter(
                         (currentNote) => currentNote.id !== note.id,
@@ -632,8 +544,116 @@ export const NotesPage = () => {
                 }}
               />
             );
-          })}
+  };
+
+  return (
+    <main className="notes-page">
+      <Link to={`/fag/${subject.id}`} className="back-link">
+        ← Tilbake til faget
+      </Link>
+
+      <div className="notes-header">
+        <div>
+          <p className="notes-label">Notater</p>
+
+          <h1>{subject.code}</h1>
+
+          <p>{subject.name}</p>
         </div>
+
+        {isAdmin && (
+          <div className="notes-header-actions">
+            <button
+              type="button"
+              className="generate-structure-button"
+              onClick={handleGenerateStructure}
+              disabled={isGeneratingStructure}
+            >
+              <Sparkles size={19} />
+
+              {isGeneratingStructure ? "Oppretter..." : "Opprett fagstruktur"}
+            </button>
+
+            <button
+              type="button"
+              className="new-folder-button"
+              onClick={openFolderModal}
+              disabled={isGeneratingStructure}
+            >
+              <Plus size={20} />
+              Ny mappe
+            </button>
+          </div>
+        )}
+      </div>
+
+      {structureMessage && (
+        <p className="structure-message">{structureMessage}</p>
+      )}
+
+      <div className="notes-view-switch" role="group" aria-label="Notatvisning">
+        <button type="button" aria-pressed={view === "all"} onClick={() => setView("all")}>Alle notater</button>
+        <button type="button" aria-pressed={view === "topics"} onClick={() => setView("topics")}>Etter tema</button>
+      </div>
+      <div className="notes-search">
+        <label htmlFor="note-title-search">Søk i notattitler</label>
+        <input id="note-title-search" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Søk etter notat …" />
+      </div>
+
+      {foldersError && <p className="notes-error-message">{foldersError}</p>}
+
+      {isLoadingFolders && <p>Laster mapper...</p>}
+
+      {view === "all" && !isLoadingFolders && folders.length > 0 && (
+        <div className="notes-folders">
+          {sortedFolders.map((folder) => (
+            <FolderCard
+              key={folder.id}
+              folder={folder}
+              subjectId={subject.id}
+              noteCount={folderNoteCounts[folder.id] ?? 0}
+              onFolderUpdated={(updatedFolder) => {
+                setFolders((currentFolders) =>
+                  currentFolders.map((currentFolder) =>
+                    currentFolder.id === updatedFolder.id
+                      ? updatedFolder
+                      : currentFolder,
+                  ),
+                );
+              }}
+              onFolderDeleted={(deletedFolderId) => {
+                setNotesRevision(value => value + 1);
+                setFolders((currentFolders) =>
+                  currentFolders.filter(
+                    (currentFolder) => currentFolder.id !== deletedFolderId,
+                  ),
+                );
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {(isLoadingProgress || isLoadingNotes) && <p>Laster notater...</p>}
+
+      {notesError && <p className="notes-error-message">{notesError}</p>}
+
+      {!isLoadingNotes &&
+        !isLoadingFolders &&
+        notes.length === 0 &&
+        folders.length === 0 && (
+          <p>Ingen mapper eller notater er lagt til ennå.</p>
+        )}
+
+      {!isLoadingNotes && notes.length > 0 && (
+        view === "topics" ? (
+          <StructuredNotes key={subject.id} subjectId={subject.id} notes={notes} query={query} renderNote={renderNote} />
+        ) : (
+          <div className="notes-list">
+            {visibleNotes.map(renderNote)}
+            {query.trim() && visibleNotes.length === 0 && <p>Ingen notater matcher søket.</p>}
+          </div>
+        )
       )}
 
       {isFolderModalOpen && (

@@ -82,3 +82,23 @@ export async function replaceNoteSubtopics(
     throw insertError;
   }
 }
+
+/** Read links in batches rather than issuing one request per note. */
+export async function getSubtopicLinksForNotes(noteIds: string[]): Promise<NoteSubtopicLink[]> {
+  const links: NoteSubtopicLink[] = [];
+  for (let start = 0; start < noteIds.length; start += 100) {
+    let offset = 0;
+    while (true) {
+      const { data, error } = await supabase.from("note_subtopics")
+        .select("note_id, subtopic_id")
+        .in("note_id", noteIds.slice(start, start + 100))
+        .order("note_id").order("subtopic_id")
+        .range(offset, offset + 499);
+      if (error) throw error;
+      links.push(...(data ?? []).map((row) => ({ noteId: row.note_id, subtopicId: row.subtopic_id })));
+      if (!data || data.length < 500) break;
+      offset += 500;
+    }
+  }
+  return links;
+}
