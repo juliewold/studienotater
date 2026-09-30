@@ -1,0 +1,26 @@
+<!doctype html><html lang="nb"><meta charset="utf-8"><title>Note explanation tests</title><h1>Note explanation tests</h1><pre id="results"></pre><script type="module">
+import { explainSelectedText, getSelectedNoteText } from '../src/services/notes/selectedTextService.ts';
+const original=window.fetch;
+const assert=(v,m)=>{if(!v)throw Error(m)};
+const tests=[
+ ['Selection must be completely inside note',()=>{
+  const root=document.createElement('div');root.textContent='Bare utdraget';document.body.append(root);
+  const outside=document.createElement('p');outside.textContent='Utenfor';document.body.append(outside);
+  const selection=window.getSelection();const range=document.createRange();range.setStart(root.firstChild,5);range.setEnd(root.firstChild,13);selection.removeAllRanges();selection.addRange(range);
+  assert(getSelectedNoteText(root,selection)==='utdraget','Wrong substring');
+  range.setEnd(outside.firstChild,3);selection.removeAllRanges();selection.addRange(range);assert(getSelectedNoteText(root,selection)==='','Cross-note selection accepted');
+  selection.removeAllRanges();assert(getSelectedNoteText(root,selection)==='','Empty selection accepted');root.remove();outside.remove();
+ }],
+ ['Oversize selection rejected without request',async()=>{
+  window.fetch=()=>{throw Error('called AI')};try{await explainSelectedText('x'.repeat(10001));throw Error('accepted')}catch(e){assert(e.message.includes('kortere'),'Wrong size validation')}
+ }],
+ ['Sends only current note text and receives explanation',async()=>{
+  window.fetch=async(url,options)=>{assert(url.endsWith('/explain-selection/'),'Wrong URL');assert(JSON.stringify(JSON.parse(options.body))===JSON.stringify({text:'Kilde'}),'Wrong source');return Response.json({explanation:' Kort '})};
+  assert(await explainSelectedText('Kilde')==='Kort','Invalid explanation');
+ }],
+ ['Empty note does not call AI',async()=>{window.fetch=()=>{throw Error('called AI')};try{await explainSelectedText(' ');throw Error('accepted')}catch(e){assert(e.message.includes('Marker tekst'),'Expected empty note error')}}],
+ ['Rejects malformed successful responses',async()=>{for(const data of [null,{}, {explanation:[]},{explanation:' '},{explanation:'ord '.repeat(201)}]){window.fetch=async()=>Response.json(data);let rejected=false;try{await explainSelectedText('Note')}catch{rejected=true}assert(rejected,'Accepted invalid data')}}],
+ ['Reports service and network failures',async()=>{for(const status of [400,502,503]){window.fetch=async()=>Response.json({error:'Try again'},{status});try{await explainSelectedText('Note');throw Error('accepted')}catch(e){assert(e.message==='Try again','Missing service error')}}window.fetch=async()=>{throw Error('Network failure')};try{await explainSelectedText('Note');throw Error('accepted')}catch(e){assert(e.message==='Network failure','Missing network error')}}],
+ ['Passes cancellation signal',async()=>{const controller=new AbortController();window.fetch=async(url,options)=>{assert(options.signal===controller.signal,'Missing signal');return Response.json({explanation:'Kort'})};await explainSelectedText('Note',controller.signal)}],
+];let passed=0;for(const [name,test] of tests){try{await test();passed++;document.querySelector('#results').textContent+='PASS: '+name+'\n'}catch(e){document.querySelector('#results').textContent+='FAIL: '+name+': '+e.message+'\n'}}window.fetch=original;document.querySelector('#results').textContent+=`${passed}/${tests.length} passed`;
+</script></html>

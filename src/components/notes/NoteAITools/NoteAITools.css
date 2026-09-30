@@ -1,0 +1,12 @@
+.note-ai-tools { max-width: 900px; margin: 20px auto; padding: 14px 18px; border: 1px solid #e5dced; border-radius: 12px; background: #faf8fd; color: #403747; }
+.note-ai-tools > h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 1rem; color: #6f60db; }
+.note-ai-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.note-ai-actions > details { border: 1px solid #e5dced; border-radius: 8px; padding: 8px 12px; }
+.note-ai-actions > details[open] { flex-basis: 100%; }
+.note-ai-actions summary { cursor: pointer; font-weight: 600; font-size: .9rem; }
+.note-ai-actions summary:focus-visible, .note-ai-actions button:focus-visible { outline: 2px solid #8b5cf6; outline-offset: 3px; }
+.note-ai-tools .flashcard-generator { margin: 16px 0 0; padding: 0; }
+.note-ai-tools .flashcard-generator-header { gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.note-ai-tools .flashcard-generator-header h2 { font-size: 1.1rem; }
+.note-ai-tools blockquote { margin: 12px 0; padding: 8px 12px; border-left: 3px solid #c4b5fd; max-height: 140px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.note-ai-explanation > p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }

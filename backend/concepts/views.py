@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from .concept_extraction_service import extract_concept_candidates
 from .flashcard_generation_service import generate_flashcards
 from .note_summary_service import summarize_note
+from .selected_text_service import explain_selected_text
 from .subject_structure_service import generate_subject_structure
 
 
@@ -279,3 +280,25 @@ def generate_note_summary(request):
     except ValueError:
         return JsonResponse({"error": "AI-tjenesten returnerte en ugyldig oppsummering etter to forsøk.", "code": "invalid_ai_response"}, status=502)
     return JsonResponse({"summary": summary})
+
+
+@csrf_exempt
+@require_POST
+def explain_note_selection(request):
+    try:
+        body = json.loads(request.body)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"error": "Invalid JSON."}, status=400)
+    if not isinstance(body, dict) or not isinstance(body.get("text"), str) or not body["text"].strip():
+        return JsonResponse({"error": "Marker tekst i notatet først."}, status=400)
+    if len(body["text"].strip()) > 10000:
+        return JsonResponse({"error": "Velg et kortere utdrag (maks. 10 000 tegn)."}, status=400)
+    try:
+        explanation = explain_selected_text(body["text"].strip())
+    except APIConnectionError:
+        return JsonResponse({"error": "Kunne ikke nå AI-tjenesten. Prøv igjen senere."}, status=503)
+    except APIStatusError:
+        return JsonResponse({"error": "AI-tjenesten avviste forespørselen. Prøv igjen senere."}, status=502)
+    except ValueError:
+        return JsonResponse({"error": "AI-tjenesten returnerte en ugyldig forklaring etter to forsøk.", "code": "invalid_ai_response"}, status=502)
+    return JsonResponse({"explanation": explanation})
