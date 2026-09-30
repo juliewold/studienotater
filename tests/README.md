@@ -103,3 +103,20 @@ Semantisk identitet er fortsatt en modellvurdering, ikke en garanti. Konteksten
 vokser med kunnskapsbasen; ved svært store baser bør en senere løsning velge
 relevant kontekst uten å kutte listen vilkårlig. Denne endringen innfører ingen
 ny tabell, aliasregister eller transaksjon, og endrer ikke eksisterende retry-policy.
+
+## AI note summaries
+
+Run `backend/.venv/bin/python backend/manage.py test concepts` and open
+`/studienotater/tests/note-summary.html` with Vite for request/response tests.
+`note-summary-preview.html` is an isolated UI fixture with simulated responses
+and a service-failure toggle; it never calls the real AI or writes to the database.
+
+Admins see “Oppsummer notatet” with the existing AI tools when reading a saved
+note. Only that note's plain text is sent to `/api/concepts/summarize-note/`.
+Summaries are temporary, displayed as escaped text, and reset when the note
+or its saved content changes. Requests are cancelled on unmount. A failed
+regeneration retains the previous summary with an error message.
+The endpoint follows the existing Django AI endpoint/access patterns; the
+admin visibility check lives in EditableNote, as for flashcard generation.
+Strict JSON/summary validation retries once; provider errors use controlled
+502/503 responses. Tests mock the model and do not measure factual accuracy.

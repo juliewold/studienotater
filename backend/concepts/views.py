@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 
 from .concept_extraction_service import extract_concept_candidates
 from .flashcard_generation_service import generate_flashcards
+from .note_summary_service import summarize_note
 from .subject_structure_service import generate_subject_structure
 
 
@@ -259,3 +260,22 @@ def generate_flashcard_suggestions(request):
             "flashcards": flashcards,
         }
     )
+
+@csrf_exempt
+@require_POST
+def generate_note_summary(request):
+    try:
+        body = json.loads(request.body)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"error": "Invalid JSON."}, status=400)
+    if not isinstance(body, dict) or not isinstance(body.get("text"), str) or not body["text"].strip():
+        return JsonResponse({"error": "Notatet inneholder ingen tekst."}, status=400)
+    try:
+        summary = summarize_note(body["text"].strip())
+    except APIConnectionError:
+        return JsonResponse({"error": "Kunne ikke nå AI-tjenesten. Prøv igjen senere."}, status=503)
+    except APIStatusError:
+        return JsonResponse({"error": "AI-tjenesten avviste forespørselen. Prøv igjen senere."}, status=502)
+    except ValueError:
+        return JsonResponse({"error": "AI-tjenesten returnerte en ugyldig oppsummering etter to forsøk.", "code": "invalid_ai_response"}, status=502)
+    return JsonResponse({"summary": summary})

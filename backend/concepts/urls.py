@@ -4,6 +4,7 @@ from . import views
 
 
 urlpatterns = [
+    path("summarize-note/", views.generate_note_summary, name="summarize-note"),
     path(
         "extract/",
         views.extract_concepts,

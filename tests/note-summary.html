@@ -1,0 +1,15 @@
+<!doctype html><html lang="nb"><meta charset="utf-8"><title>Note summary tests</title><h1>Note summary tests</h1><pre id="results"></pre><script type="module">
+import { generateNoteSummary } from '../src/services/notes/noteSummaryService.ts';
+const original=window.fetch;
+const assert=(v,m)=>{if(!v)throw Error(m)};
+const tests=[
+ ['Sends only current note text and receives summary',async()=>{
+  window.fetch=async(url,options)=>{assert(url.endsWith('/summarize-note/'),'Wrong URL');assert(JSON.stringify(JSON.parse(options.body))===JSON.stringify({text:'Kilde'}),'Wrong source');return Response.json({summary:' Kort '})};
+  assert(await generateNoteSummary('<p>Kilde</p>')==='Kort','Invalid summary');
+ }],
+ ['Empty note does not call AI',async()=>{window.fetch=()=>{throw Error('called AI')};try{await generateNoteSummary('<p><br></p>');throw Error('accepted')}catch(e){assert(e.message.includes('ingen tekst'),'Expected empty note error')}}],
+ ['Rejects malformed successful responses',async()=>{for(const data of [null,{}, {summary:[]},{summary:' '},{summary:'ord '.repeat(201)}]){window.fetch=async()=>Response.json(data);let rejected=false;try{await generateNoteSummary('Note')}catch{rejected=true}assert(rejected,'Accepted invalid data')}}],
+ ['Reports service and network failures',async()=>{for(const status of [400,502,503]){window.fetch=async()=>Response.json({error:'Try again'},{status});try{await generateNoteSummary('Note');throw Error('accepted')}catch(e){assert(e.message==='Try again','Missing service error')}}window.fetch=async()=>{throw Error('Network failure')};try{await generateNoteSummary('Note');throw Error('accepted')}catch(e){assert(e.message==='Network failure','Missing network error')}}],
+ ['Passes cancellation signal',async()=>{const controller=new AbortController();window.fetch=async(url,options)=>{assert(options.signal===controller.signal,'Missing signal');return Response.json({summary:'Kort'})};await generateNoteSummary('Note',controller.signal)}],
+];let passed=0;for(const [name,test] of tests){try{await test();passed++;document.querySelector('#results').textContent+='PASS: '+name+'\n'}catch(e){document.querySelector('#results').textContent+='FAIL: '+name+': '+e.message+'\n'}}window.fetch=original;document.querySelector('#results').textContent+=`${passed}/${tests.length} passed`;
+</script></html>
