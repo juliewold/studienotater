@@ -120,3 +120,26 @@ The endpoint follows the existing Django AI endpoint/access patterns; the
 admin visibility check lives in EditableNote, as for flashcard generation.
 Strict JSON/summary validation retries once; provider errors use controlled
 502/503 responses. Tests mock the model and do not measure factual accuracy.
+
+## Compact note AI tools and selected-text explanations
+
+The admin reading view groups summaries, flashcards and selected-text explanations
+in “AI-verktøy”. Existing summary and flashcard components are reused. Selections
+must start and end inside the rendered note. The captured excerpt is previewed
+before sending and remains available when focus moves to the tools. A new
+selection replaces it; “Fjern valgt tekst” clears it. Explanations display their
+own source excerpt, so a later selection cannot relabel an earlier result.
+Changing the note/content resets the tools and aborts an active explanation.
+
+`/api/concepts/explain-selection/` accepts only the excerpt as `text` (1–10,000
+characters); no whole-note context is sent. It uses the existing NTNU client,
+strict output validation, one validation retry and controlled provider errors.
+The prompt requests simpler wording without guessing missing context. Results
+are temporary escaped text. Access follows the existing admin UI/AI endpoint
+pattern; no new authentication or persistence mechanism is introduced.
+
+Run `backend/.venv/bin/python backend/manage.py test concepts` and open
+`tests/selected-text.html` and `tests/note-summary.html` under the Vite base URL.
+`tests/note-ai-tools-preview.html` is an isolated mocked UI check: choose the test
+excerpt, expand “Forklar markert tekst”, and request an explanation. The fixture
+rejects a request containing anything except the exact selected excerpt.

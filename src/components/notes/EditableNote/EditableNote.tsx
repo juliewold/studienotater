@@ -40,8 +40,7 @@ import { ConceptSuggestions } from "../../concepts/ConceptSuggestions/ConceptSug
 
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
-import { NoteSummary } from "../NoteSummary/NoteSummary";
-import { FlashcardGenerator } from "../../flashcards/FlashcardGenerator/FlashcardGenerator";
+import { NoteAITools } from "../NoteAITools/NoteAITools";
 
 type EditableNoteProps = {
   note: DatabaseNote;
@@ -619,17 +618,11 @@ export const EditableNote = ({
         )}
       </div>
 
-      <ReadOnlyNote content={note.content} />
-
-      {isAdmin && !isEditing && <NoteSummary key={note.id + note.content} content={note.content} />}
-
-      {isAdmin && (
-        <FlashcardGenerator
-          noteId={note.id}
-          subjectId={note.subjectId}
-          content={note.content}
-        />
-      )}
+      {isAdmin ? (
+        <NoteAITools key={note.id + note.content} noteId={note.id} subjectId={note.subjectId} content={note.content}>
+          <ReadOnlyNote content={note.content} />
+        </NoteAITools>
+      ) : <ReadOnlyNote content={note.content} />}
 
       {isAdmin && (
         <ConceptSuggestions
