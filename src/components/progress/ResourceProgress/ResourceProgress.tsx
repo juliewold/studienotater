@@ -11,7 +11,7 @@ import {
 type ResourceProgressProps = {
   resourceId: string;
   resourceType?: "lest" | "sett";
-  variant?: "default" | "floating";
+  variant?: "default" | "floating" | "compact";
 };
 
 export const ResourceProgress = ({
@@ -92,7 +92,7 @@ export const ResourceProgress = ({
     );
   }
 
-  const isFloating = variant === "floating";
+  const isFloating = variant !== "default";
 
   return (
     <section className={`resource-progress resource-progress--${variant}`}>

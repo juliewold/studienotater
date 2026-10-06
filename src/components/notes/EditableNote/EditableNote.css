@@ -587,3 +587,31 @@
     height: 17px;
   }
 }
+
+/* A quiet document header, with all study controls in one top area. */
+.editable-note-reading { width: 100%; }
+.editable-note-reading .editable-note-topbar {
+  max-width: none; padding: 0; margin: 0; flex-wrap: wrap; justify-content: flex-start; gap: 12px;
+}
+.editable-note-reading .editable-note-subject { margin-right: auto; }
+.editable-note-reading .editable-note-document-header {
+  max-width: 720px; margin: 32px auto; padding: 0;
+}
+.editable-note-reading .editable-note-title { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.15; overflow-wrap: anywhere; }
+.editable-note-reading .editable-note-description { font-size: 1.08rem; line-height: 1.7; margin-top: 16px; }
+.note-reading-tools { padding-bottom: 14px; border-bottom: 1px solid #e5dced; }
+.note-reading-tools .note-ai-tools { max-width: none; margin: 12px 0 0; padding: 0; background: transparent; border: 0; }
+.note-reading-tools .note-ai-tools > h2 { font-size: .8rem; margin-bottom: 8px; }
+.note-reading-tools .note-ai-actions > details { padding: 6px 10px; background: #faf8fd; }
+.editable-note-reading .resource-progress--compact {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+  margin: 0; padding: 0; background: transparent; box-shadow: none; border-radius: 0;
+}
+.resource-progress--compact .resource-completed { margin: 0; gap: 6px; font-size: .82rem; }
+.resource-progress--compact .resource-rating { display: flex; align-items: center; gap: 6px; }
+.resource-progress--compact .resource-rating p { margin: 0; font-size: .78rem; color: #746d79; }
+.resource-progress--compact .stars { gap: 0; }
+.resource-progress--compact .stars button { font-size: 1.25rem; width: 26px; min-height: 32px; }
+@media (min-width: 1000px) {
+  .editable-note-reading .editable-note-document-header { margin-left: 252px; margin-right: 0; }
+}

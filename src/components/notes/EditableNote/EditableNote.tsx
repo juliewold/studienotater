@@ -1,4 +1,5 @@
 import "./EditableNote.css";
+import { ResourceProgress } from "../../progress/ResourceProgress/ResourceProgress";
 import { useEffect, useRef, useState } from "react";
 import {
   Check,
@@ -48,6 +49,7 @@ type EditableNoteProps = {
   isAdmin: boolean;
   onNoteUpdated: (updatedNote: DatabaseNote) => void;
   showClassification?: boolean;
+  resourceId?: string;
 };
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -68,6 +70,7 @@ export const EditableNote = ({
   isAdmin,
   onNoteUpdated,
   showClassification = true,
+  resourceId,
 }: EditableNoteProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -418,6 +421,7 @@ export const EditableNote = ({
   if (isEditing) {
     return (
       <article className="editable-note editable-note-editing">
+        {resourceId && <ResourceProgress resourceId={resourceId} variant="floating" />}
         <header className="editable-note-topbar">
           <span className="editable-note-subject">{subjectCode}</span>
 
@@ -560,11 +564,11 @@ export const EditableNote = ({
     );
   }
 
-  return (
-    <article className="editable-note">
+  const toolbar = (
       <header className="editable-note-topbar">
         <span className="editable-note-subject">{subjectCode}</span>
 
+        {resourceId && <ResourceProgress resourceId={resourceId} variant="compact" />}
         {isAdmin && (
           <button
             type="button"
@@ -576,6 +580,9 @@ export const EditableNote = ({
           </button>
         )}
       </header>
+  );
+
+  const documentHeader = <>
 
       {errorMessage && (
         <p className="editable-note-message editable-note-error">
@@ -618,11 +625,17 @@ export const EditableNote = ({
         )}
       </div>
 
+    </>;
+
+  const readingContent = <ReadOnlyNote key={note.id + note.content} content={note.content} header={documentHeader} />;
+
+  return (
+    <article className="editable-note editable-note-reading">
       {isAdmin ? (
-        <NoteAITools key={note.id + note.content} noteId={note.id} subjectId={note.subjectId} content={note.content}>
-          <ReadOnlyNote content={note.content} />
+        <NoteAITools key={note.id + note.content} noteId={note.id} subjectId={note.subjectId} content={note.content} toolbar={toolbar}>
+          {readingContent}
         </NoteAITools>
-      ) : <ReadOnlyNote content={note.content} />}
+      ) : <>{toolbar}{readingContent}</>}
 
       {isAdmin && (
         <ConceptSuggestions

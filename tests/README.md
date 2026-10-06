@@ -143,3 +143,14 @@ Run `backend/.venv/bin/python backend/manage.py test concepts` and open
 `tests/note-ai-tools-preview.html` is an isolated mocked UI check: choose the test
 excerpt, expand “Forklar markert tekst”, and request an explanation. The fixture
 rejects a request containing anything except the exact selected excerpt.
+
+## Read-only note layout
+
+Open `tests/note-reading-preview.html` under the Vite base URL. This isolated
+fixture mocks fetch and never writes notes or calls AI. Check at desktop and
+mobile widths: duplicate heading labels have separate anchors, outline links
+focus their headings below the navbar, the desktop outline stays visible while
+scrolling, and Previous/Next and study controls scroll with the document.
+The mobile outline can be collapsed. Check that Rediger restores the existing
+editor layout and floating progress. Live progress persistence and AI responses
+still require authenticated integration testing.
