@@ -635,9 +635,9 @@
 .read-only-note-content pre { box-shadow: none; }
 .read-only-note-content img { margin: 2rem auto; }
 @media (min-width: 1000px) {
-  .read-only-note { grid-template-columns: minmax(220px, 1fr) minmax(0, 720px); gap: 32px; }
-  .note-outline { position: sticky; top: 80px; align-self: start; max-height: calc(100vh - 104px); overflow-y: auto; }
-  .note-reading-body { grid-column: 2; }
+  .read-only-note { grid-template-columns: fit-content(220px) minmax(0, 1fr); gap: 32px; }
+  .note-outline { min-width: 0; position: sticky; top: 80px; align-self: start; max-height: calc(100vh - 104px); overflow-y: auto; }
+  .note-reading-body { grid-column: 2; max-width: 820px; }
 }
 @media (max-width: 999px) {
   .note-outline { width: 100%; max-width: 720px; margin: 0 auto; padding: 10px 14px; background: #faf8fd; border: 1px solid #e5dced; border-radius: 10px; }
@@ -651,7 +651,7 @@
   .note-reading-header { grid-column: 2; grid-row: 1; }
   .read-only-note-with-header .note-outline { grid-column: 1; grid-row: 1 / span 2; margin-top: 32px; }
   .read-only-note-with-header .note-reading-body { grid-row: 2; }
-  .editable-note-reading .note-reading-header .editable-note-document-header { margin-left: 0; }
+  .editable-note-reading .note-reading-header .editable-note-document-header { max-width: 820px; margin-right: auto; margin-left: auto; }
 }
 @media (max-width: 999px) {
   .read-only-note-with-header .note-outline { margin-bottom: 28px; }
