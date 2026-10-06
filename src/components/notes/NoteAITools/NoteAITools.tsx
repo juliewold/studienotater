@@ -5,8 +5,8 @@ import { FlashcardGenerator } from "../../flashcards/FlashcardGenerator/Flashcar
 import { explainSelectedText, getSelectedNoteText } from "../../../services/notes/selectedTextService";
 import "./NoteAITools.css";
 
-export function NoteAITools({ noteId, subjectId, content, children }: {
-  noteId: string; subjectId: string; content: string; children: ReactNode;
+export function NoteAITools({ noteId, subjectId, content, children, toolbar }: {
+  noteId: string; subjectId: string; content: string; children: ReactNode; toolbar?: ReactNode;
 }) {
   const noteRoot = useRef<HTMLDivElement>(null);
   const toolsRoot = useRef<HTMLElement>(null);
@@ -19,7 +19,8 @@ export function NoteAITools({ noteId, subjectId, content, children }: {
     const capture = () => {
       const current = window.getSelection();
       if (!noteRoot.current || current?.isCollapsed) return;
-      setSelection(getSelectedNoteText(noteRoot.current, current));
+      const contentRoot = noteRoot.current.querySelector<HTMLElement>(".read-only-note-content") ?? noteRoot.current;
+      setSelection(getSelectedNoteText(contentRoot, current));
     };
     const clearOutside = (event: PointerEvent) => {
       if (event.target instanceof Node && !noteRoot.current?.contains(event.target)
@@ -52,6 +53,8 @@ export function NoteAITools({ noteId, subjectId, content, children }: {
   }
 
   return <>
+    <div className={toolbar ? "note-reading-tools" : undefined}>
+    {toolbar}
     <aside className="note-ai-tools" aria-label="AI-verktøy" ref={toolsRoot}>
       <h2><Sparkles size={18} /> AI-verktøy</h2>
       <div className="note-ai-actions">
@@ -67,6 +70,7 @@ export function NoteAITools({ noteId, subjectId, content, children }: {
         </details>
       </div>
     </aside>
+    </div>
     <div ref={noteRoot}>{children}</div>
   </>;
 }

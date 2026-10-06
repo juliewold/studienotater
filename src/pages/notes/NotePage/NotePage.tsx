@@ -14,7 +14,7 @@ import { getOrderedNotes } from "../../../services/notes/noteNavigationService";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 
 import { EditableNote } from "../../../components/notes/EditableNote/EditableNote";
-import { ResourceProgress } from "../../../components/progress/ResourceProgress/ResourceProgress";
+
 
 export const NotePage = () => {
   const { subjectId, noteId } = useParams();
@@ -156,8 +156,8 @@ export const NotePage = () => {
         subjectCode={subject.code}
         isAdmin={isAdmin}
         onNoteUpdated={setNote}
-      />{" "}
-      <ResourceProgress resourceId={resourceId} variant="floating" />
+        resourceId={resourceId}
+      />
     </main>
   );
 };
