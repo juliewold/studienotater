@@ -627,10 +627,7 @@ export const EditableNote = ({
 
     </>;
 
-  const readingContent = <>
-    {documentHeader}
-    <ReadOnlyNote key={note.id + note.content} content={note.content} />
-  </>;
+  const readingContent = <ReadOnlyNote key={note.id + note.content} content={note.content} header={documentHeader} />;
 
   return (
     <article className="editable-note editable-note-reading">

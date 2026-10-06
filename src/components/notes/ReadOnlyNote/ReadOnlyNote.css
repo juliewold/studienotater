@@ -643,3 +643,16 @@
   .note-outline { width: 100%; max-width: 720px; margin: 0 auto; padding: 10px 14px; background: #faf8fd; border: 1px solid #e5dced; border-radius: 10px; }
   .note-outline ol { max-height: 200px; overflow-y: auto; }
 }
+
+/* Let the desktop outline begin alongside the header, regardless of its height. */
+.read-only-note-with-header { row-gap: 0; }
+.note-reading-header { min-width: 0; }
+@media (min-width: 1000px) {
+  .note-reading-header { grid-column: 2; grid-row: 1; }
+  .read-only-note-with-header .note-outline { grid-column: 1; grid-row: 1 / span 2; margin-top: 32px; }
+  .read-only-note-with-header .note-reading-body { grid-row: 2; }
+  .editable-note-reading .note-reading-header .editable-note-document-header { margin-left: 0; }
+}
+@media (max-width: 999px) {
+  .read-only-note-with-header .note-outline { margin-bottom: 28px; }
+}

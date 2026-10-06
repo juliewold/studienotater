@@ -1,7 +1,7 @@
 import "./ReadOnlyNote.css";
 import "katex/dist/katex.min.css";
 
-import { useEffect, useState, useId, useMemo } from "react";
+import { useEffect, useState, useId, useMemo, type ReactNode } from "react";
 import type { Concept } from "../../../data/concepts/types";
 import {
   getConceptByIdFromDatabase,
@@ -26,6 +26,7 @@ const lowlight = createLowlight(common);
 
 type ReadOnlyNoteProps = {
   content: string;
+  header?: ReactNode;
 };
 
 type PopoverPosition = {
@@ -33,7 +34,7 @@ type PopoverPosition = {
   top: number;
 };
 
-export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
+export const ReadOnlyNote = ({ content, header }: ReadOnlyNoteProps) => {
   const outlineId = useId();
   const [activeHeading, setActiveHeading] = useState("");
   const [concepts, setConcepts] = useState<Concept[]>([]);
@@ -202,7 +203,8 @@ export const ReadOnlyNote = ({ content }: ReadOnlyNoteProps) => {
   }
 
   return (
-    <div className="read-only-note">
+    <div className={`read-only-note${header ? " read-only-note-with-header" : ""}`}>
+      {header && <div className="note-reading-header">{header}</div>}
       {headings.length > 0 && <nav className="note-outline" aria-label="Innhold i notatet">
         <details open>
           <summary>På denne siden</summary>
