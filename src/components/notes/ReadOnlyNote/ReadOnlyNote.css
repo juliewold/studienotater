@@ -635,7 +635,7 @@
 .read-only-note-content pre { box-shadow: none; }
 .read-only-note-content img { margin: 2rem auto; }
 @media (min-width: 1000px) {
-  .read-only-note { grid-template-columns: 220px minmax(0, 720px); gap: 32px; }
+  .read-only-note { grid-template-columns: minmax(220px, 1fr) minmax(0, 720px); gap: 32px; }
   .note-outline { position: sticky; top: 80px; align-self: start; max-height: calc(100vh - 104px); overflow-y: auto; }
   .note-reading-body { grid-column: 2; }
 }
