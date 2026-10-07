@@ -421,11 +421,11 @@ export const EditableNote = ({
   if (isEditing) {
     return (
       <article className="editable-note editable-note-editing">
-        {resourceId && <ResourceProgress resourceId={resourceId} variant="floating" />}
         <header className="editable-note-topbar">
           <span className="editable-note-subject">{subjectCode}</span>
 
           <div className="editable-note-actions">
+            {resourceId && <ResourceProgress resourceId={resourceId} variant="compact" />}
             <span role="status" aria-live="polite">{renderSaveStatus()}</span>
 
             <button
@@ -446,126 +446,127 @@ export const EditableNote = ({
           </p>
         )}
 
-        <div className="editable-note-document-header">
-          <input
-            type="text"
-            className="editable-note-title-input"
-            aria-label="Notattittel"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Uten tittel"
-            autoFocus
-          />
-
-          {showClassification && (
-            <details className="editable-note-classification-details">
-              <summary>
-                Temaer og undertemaer
-                <span>
-                  {selectedSubtopics.length
-                    ? `${selectedSubtopics.length} valgt: ${selectedSubtopics.map(item => item.name).join(", ")}`
-                    : "Ingen valgt"}
-                </span>
-              </summary>
-              <div className="editable-note-multiple-subtopics">
-                <span className="editable-note-multiple-subtopics-title">
-                  Temaer og undertemaer
-                </span>
-
-                {topics.map((topic) => {
-                  const topicSubtopics = allSubtopics.filter(
-                    (subtopic) => subtopic.topicId === topic.id,
-                  );
-
-                  if (topicSubtopics.length === 0) {
-                    return null;
-                  }
-
-                  const selectedCount = topicSubtopics.filter((subtopic) =>
-                    selectedSubtopicIds.includes(subtopic.id),
-                  ).length;
-
-                  const isExpanded = expandedTopicIds.includes(topic.id);
-
-                  return (
-                    <div className="editable-note-topic-group" key={topic.id}>
-                      <button
-                        type="button"
-                        className="editable-note-topic-toggle"
-                        aria-expanded={isExpanded}
-                        onClick={() => {
-                          setExpandedTopicIds((current) =>
-                            current.includes(topic.id)
-                              ? current.filter((id) => id !== topic.id)
-                              : [...current, topic.id],
-                          );
-                        }}
-                      >
-                        <span className="editable-note-topic-toggle-main">
-                          {isExpanded ? (
-                            <ChevronDown size={17} />
-                          ) : (
-                            <ChevronRight size={17} />
-                          )}
-
-                          <span>
-                            Tema {topic.sortOrder}: {topic.name}
-                          </span>
-                        </span>
-
-                        {selectedCount > 0 && (
-                          <span className="editable-note-topic-selected-count">
-                            {selectedCount} valgt
-                          </span>
-                        )}
-                      </button>
-
-                      {isExpanded && (
-                        <div className="editable-note-subtopic-options">
-                          {topicSubtopics.map((subtopic) => {
-                            const isSelected = selectedSubtopicIds.includes(
-                              subtopic.id,
-                            );
-
-                            return (
-                              <label
-                                className="editable-note-subtopic-option"
-                                key={subtopic.id}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  onChange={() => toggleSubtopic(subtopic.id)}
-                                />
-
-                                <span>
-                                  {topic.sortOrder}.{subtopic.sortOrder}{" "}
-                                  {subtopic.name}
-                                </span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </details>
-          )}
-
-          <textarea
-            className="editable-note-description-input"
-            aria-label="Kort beskrivelse"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="Legg til en kort beskrivelse..."
-            rows={1}
-          />
-        </div>
-
         <div className="editable-note-editor">
           <NoteEditor
+            header={
+              <div className="editable-note-document-header">
+                <input
+                  type="text"
+                  className="editable-note-title-input"
+                  aria-label="Notattittel"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="Uten tittel"
+                  autoFocus
+                />
+
+                {showClassification && (
+                  <details className="editable-note-classification-details">
+                    <summary>
+                      Temaer og undertemaer
+                      <span>
+                        {selectedSubtopics.length
+                          ? `${selectedSubtopics.length} valgt: ${selectedSubtopics.map(item => item.name).join(", ")}`
+                          : "Ingen valgt"}
+                      </span>
+                    </summary>
+                    <div className="editable-note-multiple-subtopics">
+                      <span className="editable-note-multiple-subtopics-title">
+                        Temaer og undertemaer
+                      </span>
+
+                      {topics.map((topic) => {
+                        const topicSubtopics = allSubtopics.filter(
+                          (subtopic) => subtopic.topicId === topic.id,
+                        );
+
+                        if (topicSubtopics.length === 0) {
+                          return null;
+                        }
+
+                        const selectedCount = topicSubtopics.filter((subtopic) =>
+                          selectedSubtopicIds.includes(subtopic.id),
+                        ).length;
+
+                        const isExpanded = expandedTopicIds.includes(topic.id);
+
+                        return (
+                          <div className="editable-note-topic-group" key={topic.id}>
+                            <button
+                              type="button"
+                              className="editable-note-topic-toggle"
+                              aria-expanded={isExpanded}
+                              onClick={() => {
+                                setExpandedTopicIds((current) =>
+                                  current.includes(topic.id)
+                                    ? current.filter((id) => id !== topic.id)
+                                    : [...current, topic.id],
+                                );
+                              }}
+                            >
+                              <span className="editable-note-topic-toggle-main">
+                                {isExpanded ? (
+                                  <ChevronDown size={17} />
+                                ) : (
+                                  <ChevronRight size={17} />
+                                )}
+
+                                <span>
+                                  Tema {topic.sortOrder}: {topic.name}
+                                </span>
+                              </span>
+
+                              {selectedCount > 0 && (
+                                <span className="editable-note-topic-selected-count">
+                                  {selectedCount} valgt
+                                </span>
+                              )}
+                            </button>
+
+                            {isExpanded && (
+                              <div className="editable-note-subtopic-options">
+                                {topicSubtopics.map((subtopic) => {
+                                  const isSelected = selectedSubtopicIds.includes(
+                                    subtopic.id,
+                                  );
+
+                                  return (
+                                    <label
+                                      className="editable-note-subtopic-option"
+                                      key={subtopic.id}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => toggleSubtopic(subtopic.id)}
+                                      />
+
+                                      <span>
+                                        {topic.sortOrder}.{subtopic.sortOrder}{" "}
+                                        {subtopic.name}
+                                      </span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </details>
+                )}
+
+                <textarea
+                  className="editable-note-description-input"
+                  aria-label="Kort beskrivelse"
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  placeholder="Legg til en kort beskrivelse..."
+                  rows={1}
+                />
+              </div>
+            }
             value={content}
             onChange={(newContent, newContentJson) => {
               setContent(newContent);

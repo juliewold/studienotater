@@ -871,3 +871,6 @@
   .note-toolbar-group > button { padding: 6px; }
   .note-toolbar-history { margin-left: 0; }
 }
+
+.note-editor .note-reading-body .note-editor-content { max-width: none; }
+.note-editor .note-reading-body .note-editor-toolbar { max-width: none; }

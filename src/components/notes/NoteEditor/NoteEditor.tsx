@@ -4,7 +4,7 @@ import { Callout, type CalloutType } from "./Callout";
 import { ConceptLink } from "../../concepts/ConceptLink/ConceptLink";
 import { ConceptPicker } from "../../concepts/ConceptPicker/ConceptPicker";
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, useId, type ReactNode, type ChangeEvent } from "react";
 import {
   Bold,
   Braces,
@@ -30,7 +30,7 @@ import {
   Puzzle,
 } from "lucide-react";
 
-import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
+import { useEditor, useEditorState, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Mathematics } from "@tiptap/extension-mathematics";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
@@ -46,12 +46,16 @@ import { getConceptByIdFromDatabase } from "../../../services/concepts/conceptSe
 import type { Concept } from "../../../data/concepts/types";
 import type { NoteContentJson } from "../../../services/notes/notesService";
 
+import { NoteDocument } from "../NoteDocument/NoteDocument";
+import { createHeadingAnchors } from "../NoteDocument/headingAnchors";
+
 const lowlight = createLowlight(common);
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
 type NoteEditorProps = {
   value: string;
+  header?: ReactNode;
   onChange: (value: string, contentJson: NoteContentJson) => void;
 };
 
@@ -79,7 +83,8 @@ type FormulaControlsPosition = {
   top: number;
 };
 
-export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
+export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
+  const outlineId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
   const slashMenuRef = useRef<SlashMenuState | null>(null);
@@ -137,6 +142,7 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
 
   const editor = useEditor({
     extensions: [
+      createHeadingAnchors(outlineId),
       StarterKit.configure({
         codeBlock: false,
       }),
@@ -901,16 +907,7 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
     ? Math.max(12, Math.min(slashMenu.top, window.innerHeight - 356))
     : 0;
 
-  return (
-    <div className="note-editor">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
-        onChange={handleImageUpload}
-        hidden
-      />
-
+  const toolbar = (
       <div className="note-editor-toolbar" role="group" aria-label="Formatering og innsetting">
         <div className="note-toolbar-group" role="group" aria-label="Tekst og overskrifter">
         <button
@@ -1313,8 +1310,21 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
 
         </div>}
       </div>
+  );
 
-      <EditorContent editor={editor} />
+  return (
+    <div className="note-editor">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        onChange={handleImageUpload}
+        hidden
+      />
+
+      <NoteDocument editor={editor} outlineId={outlineId} header={header} toolbar={toolbar} />
+
+
 
       {conceptSelection?.type === "formula" &&
         selectedFormulaConcept &&
