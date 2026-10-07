@@ -207,12 +207,12 @@
   }
 }
 
-/* Reading mode only: keep navigation in the document flow. */
-.note-page:has(.editable-note-reading) { width: min(100%, 1280px); padding-bottom: 0; }
-.note-page:has(.editable-note-reading) .note-navigation-sticky {
+/* Keep navigation and page width consistent in reading and editing modes. */
+.note-page:has(:is(.editable-note-reading, .editable-note-editing)) { width: min(100%, 1280px); padding-bottom: 0; }
+.note-page:has(:is(.editable-note-reading, .editable-note-editing)) .note-navigation-sticky {
   position: static; margin: -3.25rem 0 1.4rem auto;
   background: transparent; box-shadow: none; backdrop-filter: none; border: 0;
 }
 @media (max-width: 700px) {
-  .note-page:has(.editable-note-reading) .note-navigation-sticky { margin: 0 0 1rem; }
+  .note-page:has(:is(.editable-note-reading, .editable-note-editing)) .note-navigation-sticky { margin: 0 0 1rem; }
 }
