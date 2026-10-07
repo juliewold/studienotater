@@ -216,3 +216,5 @@
 @media (max-width: 700px) {
   .note-page:has(.editable-note-reading) .note-navigation-sticky { margin: 0 0 1rem; }
 }
+
+.note-page:has(.editable-note-editing) { width: min(100%, 1280px); }

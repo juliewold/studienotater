@@ -154,3 +154,16 @@ scrolling, and Previous/Next and study controls scroll with the document.
 The mobile outline can be collapsed. Check that Rediger restores the existing
 editor layout and floating progress. Live progress persistence and AI responses
 still require authenticated integration testing.
+
+## Compact note editor
+
+Open `tests/note-editor-preview.html` under the Vite base URL and choose Rediger.
+All requests are intercepted: autosave and multi-subtopic links are stored in
+memory, and the checkbox simulates a save failure. No requests reach the database,
+image storage or AI. Check title autosave, both subtopic checkboxes, formatting
+and its active state, table insertion/row/column actions, undo/redo, content boxes,
+and Done returning to the reader. A failed save must retain the editable draft;
+uncheck the failure toggle and retry Done to recover. Check at 1280px and 390px.
+The formula dialog is unchanged; its existing entry points remain available in
+Sett inn and through shortcuts/slash commands. Real image uploads and concept/AI
+services still require authenticated integration testing.

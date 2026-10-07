@@ -615,3 +615,24 @@
 @media (min-width: 1000px) {
   .editable-note-reading .editable-note-document-header { margin-left: 252px; margin-right: 0; }
 }
+
+/* Editing uses the same document measure as the reading view. */
+.editable-note-editing { width: 100%; }
+.editable-note-editing .editable-note-topbar,
+.editable-note-editing .editable-note-document-header {
+  max-width: 820px;
+  padding: 0;
+  margin: 0 auto 16px;
+}
+.editable-note-editing .editable-note-topbar { flex-wrap: wrap; gap: 8px; }
+.editable-note-editing .editable-note-actions { margin-left: auto; }
+.editable-note-editing .editable-note-title-input { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.15; }
+.editable-note-editing .editable-note-description-input {
+  margin-top: 12px; resize: vertical; overflow: auto; line-height: 1.7;
+}
+.editable-note-editing .editable-note-save-status { font-size: .8rem; }
+.editable-note-classification-details { margin-top: 12px; font-size: .85rem; color: #5f5964; }
+.editable-note-classification-details > summary { cursor: pointer; font-weight: 650; line-height: 1.6; }
+.editable-note-classification-details > summary > span { font-weight: 400; margin-left: 8px; overflow-wrap: anywhere; }
+.editable-note-classification-details .editable-note-multiple-subtopics { margin: 10px 0 0; padding: 12px; max-height: 260px; overflow-y: auto; }
+.editable-note-editing :is(summary, input, textarea, button):focus-visible { outline: 2px solid #9b6ee8; outline-offset: 3px; }

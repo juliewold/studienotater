@@ -30,7 +30,7 @@ import {
   Puzzle,
 } from "lucide-react";
 
-import { EditorContent, useEditor, type Editor } from "@tiptap/react";
+import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Mathematics } from "@tiptap/extension-mathematics";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
@@ -375,6 +375,18 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML(), editor.getJSON());
     },
+  });
+
+  // Refresh formatting and contextual controls when the cursor/selection changes.
+  useEditorState({
+    editor,
+    selector: ({ editor: current }) => current ? {
+      active: ["bold", "italic", "heading", "bulletList", "orderedList", "blockquote", "codeBlock", "callout", "table", "conceptLink", "blockMath"].map(type => current.isActive(type)),
+      heading: current.getAttributes("heading").level,
+      concept: current.getAttributes("blockMath").conceptId,
+      undo: current.can().undo(),
+      redo: current.can().redo(),
+    } : null,
   });
 
   useEffect(() => {
@@ -899,26 +911,178 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
         hidden
       />
 
-      <div className="note-editor-toolbar">
+      <div className="note-editor-toolbar" role="group" aria-label="Formatering og innsetting">
+        <div className="note-toolbar-group" role="group" aria-label="Tekst og overskrifter">
         <button
           type="button"
+          aria-pressed={editor.isActive("bold")}
           className={editor.isActive("bold") ? "is-active" : ""}
           onClick={() => editor.chain().focus().toggleBold().run()}
           title="Fet"
+          aria-label="Fet"
         >
           <Bold size={18} />
         </button>
 
         <button
           type="button"
+          aria-pressed={editor.isActive("italic")}
           className={editor.isActive("italic") ? "is-active" : ""}
           onClick={() => editor.chain().focus().toggleItalic().run()}
           title="Kursiv"
+          aria-label="Kursiv"
         >
           <Italic size={18} />
         </button>
 
-        <div className="toolbar-divider" />
+        <button
+          type="button"
+          className={
+            editor.isActive("heading", { level: 1 }) ? "is-active" : ""
+          }
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+          aria-pressed={editor.isActive("heading", { level: 1 })}
+          title="Overskrift 1 (Ctrl/Cmd + Alt + 1)"
+          aria-label="Overskrift 1 (Ctrl/Cmd + Alt + 1)"
+        >
+          <Heading1 size={18} />
+          <span>Overskrift 1</span>
+        </button>
+
+        <button
+          type="button"
+          className={
+            editor.isActive("heading", { level: 2 }) ? "is-active" : ""
+          }
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+          aria-pressed={editor.isActive("heading", { level: 2 })}
+          title="Overskrift 2 (Ctrl/Cmd + Alt + 2)"
+          aria-label="Overskrift 2 (Ctrl/Cmd + Alt + 2)"
+        >
+          <Heading2 size={18} />
+          <span>Overskrift 2</span>
+        </button>
+
+        </div>
+        <div className="note-toolbar-group" role="group" aria-label="Lister og sitat">
+        <button
+          type="button"
+          aria-pressed={editor.isActive("bulletList")}
+          className={editor.isActive("bulletList") ? "is-active" : ""}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          title="Punktliste"
+          aria-label="Punktliste"
+        >
+          <List size={18} />
+        </button>
+
+        <button
+          type="button"
+          aria-pressed={editor.isActive("orderedList")}
+          className={editor.isActive("orderedList") ? "is-active" : ""}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          title="Nummerert liste"
+          aria-label="Nummerert liste"
+        >
+          <ListOrdered size={18} />
+        </button>
+
+        <button
+          type="button"
+          aria-pressed={editor.isActive("blockquote")}
+          className={editor.isActive("blockquote") ? "is-active" : ""}
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          title="Sitat"
+          aria-label="Sitat"
+        >
+          <Quote size={18} />
+        </button>
+
+        <button
+          type="button"
+          aria-pressed={editor.isActive("codeBlock")}
+          className={editor.isActive("codeBlock") ? "is-active" : ""}
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          title="Kodeblokk"
+          aria-label="Kodeblokk"
+        >
+          <Code2 size={18} />
+        </button>
+
+        </div>
+        <div className="note-toolbar-group note-toolbar-history" role="group" aria-label="Historikk">
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+          title="Angre"
+          aria-label="Angre"
+        >
+          <Undo2 size={18} />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+          title="Gjør om"
+          aria-label="Gjør om"
+        >
+          <Redo2 size={18} />
+        </button>
+        </div>
+        <details className="note-toolbar-menu">
+          <summary>Sett inn</summary>
+          <div className="note-toolbar-options">
+        <button
+          type="button"
+          onClick={handleInsertInlineMath}
+          title="Sett inn formel i tekst (Ctrl/Cmd + Alt + M)"
+          aria-label="Sett inn formel i tekst (Ctrl/Cmd + Alt + M)"
+        >
+          <Sigma size={18} />
+          <span>Formel i tekst</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleInsertBlockMath}
+          title="Sett inn formelblokk (Ctrl/Cmd + Shift + M)"
+          aria-label="Sett inn formelblokk (Ctrl/Cmd + Shift + M)"
+        >
+          <Braces size={18} />
+          <span>Formelblokk</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleChooseImage}
+          disabled={isUploadingImage}
+          title={isUploadingImage ? "Laster opp bilde..." : "Last opp bilde"}
+          aria-label="Last opp bilde"
+        >
+          {isUploadingImage ? (
+            <LoaderCircle size={18} className="image-upload-spinner" />
+          ) : (
+            <ImagePlus size={18} />
+          )}
+          <span>Bilde</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleInsertTable}
+          title="Sett inn tabell"
+          aria-label="Sett inn tabell"
+        >
+          <Table2 size={18} />
+          <span>Tabell</span>
+        </button>
+
         <div className="concept-picker-wrapper">
           <button
             type="button"
@@ -974,8 +1138,10 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
               setIsConceptPickerOpen(true);
             }}
             title="Koble markert tekst eller formel til begrep"
+          aria-label="Koble markert tekst eller formel til begrep"
           >
             <BookOpen size={18} />
+            <span>Begrepskobling</span>
           </button>
 
           {isConceptPickerOpen && (
@@ -1020,128 +1186,59 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
             />
           )}
         </div>
-        <button
-          type="button"
-          className={
-            editor.isActive("heading", { level: 1 }) ? "is-active" : ""
-          }
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          title="Overskrift 1 (Ctrl/Cmd + Alt + 1)"
-        >
-          <Heading1 size={18} />
-        </button>
-
-        <button
-          type="button"
-          className={
-            editor.isActive("heading", { level: 2 }) ? "is-active" : ""
-          }
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          title="Overskrift 2 (Ctrl/Cmd + Alt + 2)"
-        >
-          <Heading2 size={18} />
-        </button>
-
-        <div className="toolbar-divider" />
-
-        <button
-          type="button"
-          className={editor.isActive("bulletList") ? "is-active" : ""}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          title="Punktliste"
-        >
-          <List size={18} />
-        </button>
-
-        <button
-          type="button"
-          className={editor.isActive("orderedList") ? "is-active" : ""}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          title="Nummerert liste"
-        >
-          <ListOrdered size={18} />
-        </button>
-
-        <button
-          type="button"
-          className={editor.isActive("blockquote") ? "is-active" : ""}
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          title="Sitat"
-        >
-          <Quote size={18} />
-        </button>
-
-        <button
-          type="button"
-          className={editor.isActive("codeBlock") ? "is-active" : ""}
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          title="Kodeblokk"
-        >
-          <Code2 size={18} />
-        </button>
-
-        <div className="toolbar-divider" />
-
-        <button
-          type="button"
-          onClick={handleInsertInlineMath}
-          title="Sett inn formel i tekst (Ctrl/Cmd + Alt + M)"
-        >
-          <Sigma size={18} />
-        </button>
-
-        <button
-          type="button"
-          onClick={handleInsertBlockMath}
-          title="Sett inn formelblokk (Ctrl/Cmd + Shift + M)"
-        >
-          <Braces size={18} />
-        </button>
-
-        <div className="toolbar-divider" />
-
+          </div>
+        </details>
+        <details className="note-toolbar-menu">
+          <summary>Innholdsbokser</summary>
+          <div className="note-toolbar-options">
         <button
           type="button"
           onClick={() => handleInsertCallout("definition")}
           title="Sett inn definisjon (Ctrl/Cmd + Alt + D)"
+          aria-label="Sett inn definisjon (Ctrl/Cmd + Alt + D)"
         >
           <BookOpen size={18} />
+          <span>Definisjon</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleInsertCallout("tip")}
           title="Sett inn tips"
+          aria-label="Sett inn tips"
         >
           <Lightbulb size={18} />
+          <span>Tips</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleInsertCallout("theorem")}
           title="Sett inn teorem (Ctrl/Cmd + Alt + T)"
+          aria-label="Sett inn teorem (Ctrl/Cmd + Alt + T)"
         >
           <Sigma size={18} />
+          <span>Teorem</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleInsertCallout("example")}
           title="Sett inn eksempel (Ctrl/Cmd + Alt + E)"
+          aria-label="Sett inn eksempel (Ctrl/Cmd + Alt + E)"
         >
           <Puzzle size={18} />
+          <span>Eksempel</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleInsertCallout("exam")}
           title="Dette må du kunne til eksamen (Ctrl/Cmd + Alt + X)"
+          aria-label="Dette må du kunne til eksamen (Ctrl/Cmd + Alt + X)"
         >
           <BadgeCheck size={18} />
+          <span>Eksamen</span>
         </button>
 
         <button
@@ -1149,40 +1246,25 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           onClick={() => editor.chain().focus().deleteCallout().run()}
           disabled={!editor.isActive("callout")}
           title="Slett callout"
+          aria-label="Slett callout"
         >
           <Trash2 size={18} />
+          <span>Slett callout</span>
         </button>
 
-        <button
-          type="button"
-          onClick={handleChooseImage}
-          disabled={isUploadingImage}
-          title={isUploadingImage ? "Laster opp bilde..." : "Last opp bilde"}
-        >
-          {isUploadingImage ? (
-            <LoaderCircle size={18} className="image-upload-spinner" />
-          ) : (
-            <ImagePlus size={18} />
-          )}
-        </button>
-
-        <div className="toolbar-divider" />
-
-        <button
-          type="button"
-          onClick={handleInsertTable}
-          title="Sett inn tabell"
-        >
-          <Table2 size={18} />
-        </button>
-
+          </div>
+        </details>
+        {isInsideTable && <div className="note-toolbar-table" role="group" aria-label="Rediger tabell">
+          <span>Tabell</span>
         <button
           type="button"
           onClick={() => editor.chain().focus().addRowAfter().run()}
           disabled={!isInsideTable}
           title="Legg til rad"
+          aria-label="Legg til rad"
         >
           <Rows3 size={18} />
+          <span>Legg til rad</span>
         </button>
 
         <button
@@ -1190,8 +1272,10 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           onClick={() => editor.chain().focus().addColumnAfter().run()}
           disabled={!isInsideTable}
           title="Legg til kolonne"
+          aria-label="Legg til kolonne"
         >
           <Columns3 size={18} />
+          <span>Legg til kolonne</span>
         </button>
 
         <button
@@ -1199,8 +1283,10 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           onClick={() => editor.chain().focus().deleteRow().run()}
           disabled={!isInsideTable}
           title="Slett rad"
+          aria-label="Slett rad"
         >
           <Rows3 size={18} />
+          <span>Slett rad</span>
         </button>
 
         <button
@@ -1208,8 +1294,10 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           onClick={() => editor.chain().focus().deleteColumn().run()}
           disabled={!isInsideTable}
           title="Slett kolonne"
+          aria-label="Slett kolonne"
         >
           <Columns3 size={18} />
+          <span>Slett kolonne</span>
         </button>
 
         <button
@@ -1217,29 +1305,13 @@ export const NoteEditor = ({ value, onChange }: NoteEditorProps) => {
           onClick={() => editor.chain().focus().deleteTable().run()}
           disabled={!isInsideTable}
           title="Slett hele tabellen"
+          aria-label="Slett hele tabellen"
         >
           <Trash2 size={18} />
+          <span>Slett hele tabellen</span>
         </button>
 
-        <div className="toolbar-divider" />
-
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().undo()}
-          title="Angre"
-        >
-          <Undo2 size={18} />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
-          title="Gjør om"
-        >
-          <Redo2 size={18} />
-        </button>
+        </div>}
       </div>
 
       <EditorContent editor={editor} />
