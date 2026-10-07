@@ -176,3 +176,19 @@ must update immediately with distinct working anchors; clicking one places the
 cursor in its heading below the navbar/toolbar. Removing all headings hides the
 outline without hiding the editor. Done must display the saved headings in the
 reader. Heading anchors are view decorations, not persisted note content.
+
+## LaTeX symbols and templates
+
+Open `tests/math-dialog.html` under the Vite base URL. It runs 105 checks:
+all 101 symbols/templates render in KaTeX, editable fields select the correct
+placeholder, insertion preserves surrounding text, selection replacement and
+nested templates work, and Greek commands do not merge with following letters.
+The fixture needs no backend and offers empty/existing-formula dialogs.
+
+Browser checks: insert a fraction and type over its selected numerator; switch
+categories and insert a matrix using keyboard Enter; confirm Enter on a template
+does not submit the dialog, while Enter in the LaTeX input does. Invalid LaTeX
+must disable submission. Close/reopen an existing formula and check its preview.
+Check a 390px mobile viewport and both inline/block entry points in the editor.
+Templates are organized into eight categories; existing set/logic shortcuts
+remain available. No note persistence or formula rendering format is changed.

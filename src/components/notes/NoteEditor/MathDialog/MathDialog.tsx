@@ -1,36 +1,8 @@
 import "./MathDialog.css";
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import katex from "katex";
-
-const mathSymbolGroups = [
-  {
-    title: "Mengder",
-    symbols: [
-      { label: "∈", latex: String.raw`\in` },
-      { label: "∉", latex: String.raw`\notin` },
-      { label: "⊆", latex: String.raw`\subseteq` },
-      { label: "⊂", latex: String.raw`\subset` },
-      { label: "∪", latex: String.raw`\cup` },
-      { label: "∩", latex: String.raw`\cap` },
-      { label: "∅", latex: String.raw`\emptyset` },
-      { label: "Aᶜ", latex: String.raw`A^c` },
-      { label: "|A|", latex: String.raw`|A|` },
-    ],
-  },
-  {
-    title: "Logikk",
-    symbols: [
-      { label: "¬", latex: String.raw`\neg` },
-      { label: "∧", latex: String.raw`\land` },
-      { label: "∨", latex: String.raw`\lor` },
-      { label: "→", latex: String.raw`\to` },
-      { label: "↔", latex: String.raw`\leftrightarrow` },
-      { label: "∀", latex: String.raw`\forall` },
-      { label: "∃", latex: String.raw`\exists` },
-    ],
-  },
-];
+import { insertMathTemplate, mathSymbolGroups, type MathTemplate } from "./mathTemplates";
 
 type MathDialogProps = {
   open: boolean;
@@ -40,203 +12,118 @@ type MathDialogProps = {
   onInsert: (latex: string) => void;
 };
 
-export const MathDialog = ({
-  open,
-  title,
-  initialValue = "",
-  onClose,
-  onInsert,
-}: MathDialogProps) => {
+export const MathDialog = (props: MathDialogProps) => props.open
+  ? <MathDialogContent key={props.initialValue ?? ""} {...props} />
+  : null;
+
+function MathDialogContent({ title, initialValue = "", onClose, onInsert }: MathDialogProps) {
   const [latex, setLatex] = useState(initialValue);
+  const [category, setCategory] = useState(0);
   const latexInputRef = useRef<HTMLInputElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
-  const [latexError, setLatexError] = useState("");
-
-  const handleInsertSymbol = (symbolLatex: string) => {
-    const input = latexInputRef.current;
-
-    if (!input) {
-      return;
-    }
-
-    const selectionStart = input.selectionStart ?? latex.length;
-    const selectionEnd = input.selectionEnd ?? latex.length;
-
-    const beforeSelection = latex.slice(0, selectionStart);
-    const afterSelection = latex.slice(selectionEnd);
-
-    const nextLatex = `${beforeSelection}${symbolLatex}${afterSelection}`;
-
-    const nextCursorPosition = selectionStart + symbolLatex.length;
-
-    setLatex(nextLatex);
-
-    requestAnimationFrame(() => {
-      input.focus();
-      input.setSelectionRange(nextCursorPosition, nextCursorPosition);
-    });
-  };
-
-  useEffect(() => {
-    if (open) {
-      setLatex(initialValue);
-    }
-  }, [open, initialValue]);
-
-  useEffect(() => {
-    const previewElement = previewRef.current;
-
-    if (!previewElement) {
-      return;
-    }
-
-    if (!latex.trim()) {
-      previewElement.innerHTML = "";
-      setLatexError("");
-      return;
-    }
-
+  const preview = useMemo(() => {
+    if (!latex.trim()) return { html: "", error: "" };
     try {
-      katex.render(latex, previewElement, {
-        throwOnError: true,
-        displayMode: true,
-      });
-
-      setLatexError("");
+      return { html: katex.renderToString(latex, { throwOnError: true, displayMode: true, trust: false }), error: "" };
     } catch {
-      previewElement.innerHTML = "";
-      setLatexError("Formelen inneholder ugyldig LaTeX.");
+      return { html: "", error: "Formelen inneholder ugyldig LaTeX." };
     }
   }, [latex]);
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
-
-      if (event.key === "Enter" && latex.trim() && !latexError) {
-        event.preventDefault();
-        handleInsert();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open, latex, latexError, onClose]);
+  const handleInsertSymbol = (template: MathTemplate) => {
+    const input = latexInputRef.current;
+    if (!input) return;
+    const next = insertMathTemplate(latex, input.selectionStart ?? latex.length, input.selectionEnd ?? latex.length, template);
+    setLatex(next.value);
+    requestAnimationFrame(() => {
+      if (!input.isConnected) return;
+      input.focus();
+      input.setSelectionRange(next.selectionStart, next.selectionEnd);
+    });
+  };
 
   const handleInsert = () => {
-    const trimmedLatex = latex.trim();
-
-    if (!trimmedLatex) {
-      return;
-    }
-
-    onInsert(trimmedLatex);
+    if (latex.trim() && !preview.error) onInsert(latex.trim());
   };
-
-  const handleOverlayClick = () => {
-    onClose();
-  };
-
-  if (!open) {
-    return null;
-  }
 
   return (
-    <div className="math-dialog-overlay" onClick={handleOverlayClick}>
+    <div className="math-dialog-overlay" onClick={onClose}>
       <div
         className="math-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="math-dialog-title"
-        onClick={(event) => event.stopPropagation()}
+        onClick={event => event.stopPropagation()}
+        onKeyDown={event => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            onClose();
+          } else if (event.key === "Enter" && event.target === latexInputRef.current && !event.nativeEvent.isComposing) {
+            // Enter on a symbol/category control must not submit the formula.
+            event.preventDefault();
+            event.stopPropagation();
+            handleInsert();
+          }
+        }}
       >
         <div className="math-dialog-header">
           <h2 id="math-dialog-title">{title}</h2>
-
-          <button
-            type="button"
-            className="math-dialog-close-button"
-            onClick={onClose}
-            aria-label="Lukk"
-            title="Lukk"
-          >
+          <button type="button" className="math-dialog-close-button" onClick={onClose} aria-label="Lukk" title="Lukk">
             <X size={20} />
           </button>
         </div>
 
         <div className="math-dialog-content">
           <div className="math-symbol-groups">
-            {mathSymbolGroups.map((group) => (
-              <section key={group.title} className="math-symbol-group">
-                <h3>{group.title}</h3>
-
-                <div className="math-symbol-buttons">
-                  {group.symbols.map((symbol) => (
-                    <button
-                      key={`${group.title}-${symbol.label}`}
-                      type="button"
-                      className="math-symbol-button"
-                      onClick={() => handleInsertSymbol(symbol.latex)}
-                      title={`Sett inn ${symbol.label}`}
-                    >
-                      {symbol.label}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            ))}
+            <label htmlFor="math-dialog-category">Symboler og maler</label>
+            <select id="math-dialog-category" value={category} onChange={event => setCategory(Number(event.target.value))}>
+              {mathSymbolGroups.map((group, index) => <option key={group.title} value={index}>{group.title}</option>)}
+            </select>
+            <section className="math-symbol-group" aria-label={mathSymbolGroups[category].title}>
+              <div className="math-symbol-buttons">
+                {mathSymbolGroups[category].symbols.map(symbol => (
+                  <button
+                    key={symbol.name}
+                    type="button"
+                    className="math-symbol-button"
+                    onMouseDown={event => event.preventDefault()}
+                    onClick={() => handleInsertSymbol(symbol)}
+                    aria-label={`Sett inn ${symbol.name.toLowerCase()}`}
+                    title={`${symbol.name}: ${symbol.latex.trim()}`}
+                  >
+                    {symbol.label}
+                  </button>
+                ))}
+              </div>
+            </section>
           </div>
 
           <label htmlFor="math-dialog-latex">LaTeX</label>
-
           <input
             ref={latexInputRef}
             id="math-dialog-latex"
             type="text"
             value={latex}
-            onChange={(event) => setLatex(event.target.value)}
+            onChange={event => setLatex(event.target.value)}
             placeholder="For eksempel: x^2 + y^2 = z^2"
+            aria-describedby="math-dialog-help"
+            aria-invalid={Boolean(preview.error)}
             autoFocus
           />
+          <p id="math-dialog-help" className="math-dialog-help">Malene settes inn ved markøren og erstatter markert tekst. Skriv videre i det markerte feltet.</p>
 
           <div className="math-preview-section">
             <span className="math-preview-label">Forhåndsvisning</span>
-
-            <div ref={previewRef} className="math-preview" aria-live="polite" />
-
-            {latexError && <p className="math-preview-error">{latexError}</p>}
+            <div className="math-preview" aria-live="polite" dangerouslySetInnerHTML={{ __html: preview.html }} />
+            {preview.error && <p className="math-preview-error" role="status">{preview.error}</p>}
           </div>
         </div>
 
         <div className="math-dialog-actions">
-          <button
-            type="button"
-            className="math-dialog-cancel-button"
-            onClick={onClose}
-          >
-            Avbryt
-          </button>
-
-          <button
-            type="button"
-            className="math-dialog-insert-button"
-            onClick={handleInsert}
-            disabled={!latex.trim() || Boolean(latexError)}
-          >
-            Sett inn
-          </button>
+          <button type="button" className="math-dialog-cancel-button" onClick={onClose}>Avbryt</button>
+          <button type="button" className="math-dialog-insert-button" onClick={handleInsert} disabled={!latex.trim() || Boolean(preview.error)}>Sett inn</button>
         </div>
       </div>
     </div>
   );
-};
+}
