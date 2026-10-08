@@ -3,6 +3,14 @@ import { EditorContent, useEditorState, type Editor } from "@tiptap/react";
 import { getNoteHeadings } from "./headingAnchors";
 import "../ReadOnlyNote/ReadOnlyNote.css";
 
+// Notes can live in the page or in a scrollable PDF summary dialog.
+function getScrollContainer(element: HTMLElement): HTMLElement | null {
+  for (let parent = element.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
+    if (/(auto|scroll|overlay)/.test(getComputedStyle(parent).overflowY)) return parent;
+  }
+  return null;
+}
+
 export function NoteDocument({ editor, outlineId, header, toolbar }: {
   editor: Editor;
   outlineId: string;
@@ -17,27 +25,33 @@ export function NoteDocument({ editor, outlineId, header, toolbar }: {
   const baseLevel = Math.min(...headings.map(heading => heading.level));
 
   const scrollOffset = useCallback(() => {
-    const navbar = document.querySelector<HTMLElement>(".navbar");
+    const container = getScrollContainer(editor.view.dom);
+    const navbar = container ? null : document.querySelector<HTMLElement>(".navbar");
     const tools = editor.view.dom.closest(".note-reading-body")?.querySelector<HTMLElement>(".note-editor-toolbar");
     const stickyBottom = (element: HTMLElement | null | undefined) => {
       if (!element) return 0;
       const style = getComputedStyle(element);
       return style.position === "sticky" ? (parseFloat(style.top) || 0) + element.offsetHeight : 0;
     };
-    return Math.max(88, stickyBottom(navbar) + 16, stickyBottom(tools) + 16);
+    // A nested scrollport's sticky inset starts inside its padding box.
+    const containerPadding = container ? parseFloat(getComputedStyle(container).paddingTop) || 0 : 0;
+    return Math.max(container ? 16 : 88, stickyBottom(navbar) + 16, stickyBottom(tools) + containerPadding + 16);
   }, [editor]);
 
   useEffect(() => {
+    const container = getScrollContainer(editor.view.dom);
+    const scrollTarget = container ?? window;
     const updateActive = () => {
       const elements = Array.from(editor.view.dom.querySelectorAll<HTMLElement>("h1, h2, h3, h4, h5, h6"));
-      const current = elements.filter(element => element.id && element.getBoundingClientRect().top <= scrollOffset() + 4).at(-1);
+      const top = container ? container.getBoundingClientRect().top + container.clientTop : 0;
+      const current = elements.filter(element => element.id && element.getBoundingClientRect().top <= top + scrollOffset() + 4).at(-1);
       setActiveHeading(current?.id ?? headings[0]?.id ?? "");
     };
     const frame = requestAnimationFrame(updateActive);
-    window.addEventListener("scroll", updateActive, { passive: true });
+    scrollTarget.addEventListener("scroll", updateActive, { passive: true });
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", updateActive);
+      scrollTarget.removeEventListener("scroll", updateActive);
     };
   }, [editor, headings, scrollOffset]);
 
@@ -57,7 +71,16 @@ export function NoteDocument({ editor, outlineId, header, toolbar }: {
               } else {
                 target.focus({ preventScroll: true });
               }
-              window.scrollTo({ top: window.scrollY + target.getBoundingClientRect().top - scrollOffset(), behavior: "instant" });
+              const container = getScrollContainer(editor.view.dom);
+              const top = target.getBoundingClientRect().top - scrollOffset();
+              if (container) {
+                container.scrollTo({
+                  top: container.scrollTop + top - container.getBoundingClientRect().top - container.clientTop,
+                  behavior: "instant",
+                });
+              } else {
+                window.scrollTo({ top: window.scrollY + top, behavior: "instant" });
+              }
               setActiveHeading(heading.id);
             }}>{heading.text}</a>
         </li>)}</ol>

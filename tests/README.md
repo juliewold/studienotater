@@ -192,3 +192,18 @@ must disable submission. Close/reopen an existing formula and check its preview.
 Check a 390px mobile viewport and both inline/block entry points in the editor.
 Templates are organized into eight categories; existing set/logic shortcuts
 remain available. No note persistence or formula rendering format is changed.
+
+## PDF summary outline navigation
+
+Open `tests/pdf-summary-navigation.html` under the Vite base URL. The fixture
+uses the real PDF summary modal and note components with mocked backend requests.
+It renders identical section labels in a background note and the modal to check
+that navigation targets the correct document.
+
+At desktop and mobile widths, open the summary and click or keyboard-activate
+Del 5, then an earlier section. Only the modal should scroll; its active outline
+entry should follow manual scrolling too. Repeat after Rediger: the cursor must
+land in the selected heading below the sticky toolbar. Close the modal and check
+that the background note still scrolls normally. Closing/reopening must reset
+the summary and must not leave scroll listeners on the removed dialog. No PDF
+loading, summary design, editing, or save behavior is changed by this fix.
