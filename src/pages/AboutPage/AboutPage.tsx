@@ -35,7 +35,7 @@ const features = [
 
 export function AboutPage() {
   return (
-    <main className="about-page">
+    <main className="about-page site-container">
       <header className="about-header">
         <span className="about-label">OM NETTSIDEN</span>
         <h1>Alt til studiene samlet på ett sted</h1>

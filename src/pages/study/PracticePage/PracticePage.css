@@ -1,7 +1,6 @@
 .practice-page {
-  width: min(1180px, calc(100% - 2rem));
-  margin: 0 auto;
-  padding: 2rem 0 5rem;
+  margin-block: 0;
+  padding-block: 2rem 5rem;
 }
 
 /* -------------------------------------------------- */
@@ -386,7 +385,6 @@
 
 @media (max-width: 700px) {
   .practice-page {
-    width: min(100% - 1rem, 1180px);
     padding-top: 1rem;
   }
 

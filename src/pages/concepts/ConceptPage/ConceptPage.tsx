@@ -83,7 +83,7 @@ const ConceptDetails = ({ slug }: { slug: string | undefined }) => {
 
   if (isConceptLoading) {
     return (
-      <main className="concept-page">
+      <main className="concept-page site-container">
         <p>Henter konsept...</p>
       </main>
     );
@@ -91,7 +91,7 @@ const ConceptDetails = ({ slug }: { slug: string | undefined }) => {
 
   if (!concept) {
     return (
-      <main className="concept-page">
+      <main className="concept-page site-container">
         <h1>{conceptError ? "Kunne ikke hente konseptet" : "Fant ikke konseptet"}</h1>
 
         <p>{conceptError ? "Prøv å laste siden på nytt." : "Konseptet du prøver å åpne finnes ikke."}</p>
@@ -124,7 +124,7 @@ const ConceptDetails = ({ slug }: { slug: string | undefined }) => {
   );
 
   return (
-    <main className="concept-page">
+    <main className="concept-page site-container">
       <Link to="/" className="concept-page-back">
         ← Tilbake
       </Link>

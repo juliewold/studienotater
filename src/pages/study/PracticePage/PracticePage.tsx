@@ -675,7 +675,7 @@ export const PracticePage = () => {
         : numberAnswer.trim() !== "";
 
     return (
-      <main className="practice-page">
+      <main className="practice-page site-container">
         <Link to={`/fag/${subjectId}`} className="back-link">
           ← Tilbake til faget
         </Link>
@@ -874,7 +874,7 @@ export const PracticePage = () => {
             : "Se gjennom forklaringene under og prøv gjerne en ny økt.";
 
     return (
-      <main className="practice-page">
+      <main className="practice-page site-container">
         <Link to={`/fag/${subjectId}`} className="back-link">
           ← Tilbake til faget
         </Link>
@@ -1095,7 +1095,7 @@ export const PracticePage = () => {
   }
 
   return (
-    <main className="practice-page">
+    <main className="practice-page site-container">
       <Link to={`/fag/${subjectId}`} className="back-link">
         ← Tilbake til faget
       </Link>

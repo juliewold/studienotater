@@ -143,14 +143,14 @@ export const WeeklyUpdates = () => {
 
   if (isLoadingSemesterSubjects || isLoadingWeeklyUpdates) {
     return (
-      <section className="weekly-updates">
+      <section className="weekly-updates site-container">
         <p>Laster ukens innhold...</p>
       </section>
     );
   }
 
   return (
-    <section className="weekly-updates">
+    <section className="weekly-updates site-container">
       <div className="weekly-updates-header">
         <h2>Denne uken</h2>
 

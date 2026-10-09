@@ -1,7 +1,6 @@
 .semester-subjects {
-  max-width: 1280px;
-  margin: 42px auto 30px;
-  padding: 0 24px;
+  margin-block: 42px 30px;
+  padding-block: 0;
 }
 
 .semester-subjects-header {
@@ -182,8 +181,8 @@
 
 @media (max-width: 600px) {
   .semester-subjects {
-    margin: 36px auto 28px;
-    padding: 0 16px;
+    margin-block: 36px 28px;
+    padding-block: 0;
   }
 
   .semester-subjects-header {

@@ -1,6 +1,5 @@
 .exam-viewer-page {
-  width: calc(100% - 2rem);
-  max-width: 1550px;
+
   padding-top: 0.75rem;
 }
 
@@ -139,10 +138,6 @@
 }
 
 @media (max-width: 900px) {
-  .exam-viewer-page {
-    width: calc(100% - 2rem);
-  }
-
   .exam-compact-header {
     grid-template-columns: 1fr;
     gap: 0.45rem;
@@ -183,7 +178,6 @@
 
 @media (max-width: 600px) {
   .exam-viewer-page {
-    width: calc(100% - 1rem);
     padding-top: 0.25rem;
   }
 

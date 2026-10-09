@@ -11,9 +11,8 @@
 }
 
 .page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 48px 24px;
+  margin-block: 0;
+  padding-block: 48px;
 }
 
 .page-label {

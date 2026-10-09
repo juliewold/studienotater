@@ -1,7 +1,6 @@
 .weekly-updates {
-  max-width: 1280px;
-  margin: 36px auto;
-  padding: 0 24px;
+  margin-block: 36px;
+  padding-block: 0;
 }
 
 .weekly-updates-header {
@@ -190,8 +189,8 @@
 
 @media (max-width: 600px) {
   .weekly-updates {
-    margin: 28px auto;
-    padding: 0 16px;
+    margin-block: 28px;
+    padding-block: 0;
   }
 
   .weekly-updates-header {

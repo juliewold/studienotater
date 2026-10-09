@@ -1,7 +1,6 @@
 .page-container {
-  width: min(1100px, calc(100% - 3rem));
-  margin: 0 auto;
-  padding: 2rem 0 4rem;
+  margin-block: 0;
+  padding-block: 2rem 4rem;
 }
 
 .page-label {
@@ -416,10 +415,6 @@
 }
 
 @media (max-width: 650px) {
-  .page-container {
-    width: min(100% - 2rem, 1100px);
-  }
-
   .admin-pdf-card {
     padding: 1.25rem;
   }

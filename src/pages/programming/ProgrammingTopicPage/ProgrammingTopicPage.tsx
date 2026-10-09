@@ -22,7 +22,7 @@ export function ProgrammingTopicPage() {
 
   if (!topic) {
     return (
-      <main className="programming-topic-page">
+      <main className="programming-topic-page site-container">
         <Link to="/programmering" className="back-link">
           ← Tilbake til programmering
         </Link>
@@ -38,7 +38,7 @@ export function ProgrammingTopicPage() {
 
   if (lesson) {
     return (
-      <main className="programming-doc-layout">
+      <main className="programming-doc-layout site-container">
         <aside className="programming-sidebar">
           <Link to={`/programmering/${topic.id}`} className="back-link">
             ← Tilbake til {topic.title}
@@ -73,7 +73,7 @@ export function ProgrammingTopicPage() {
   }
 
   return (
-    <main className="programming-topic-page">
+    <main className="programming-topic-page site-container">
       <Link to="/programmering" className="back-link">
         ← Tilbake til programmering
       </Link>

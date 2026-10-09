@@ -1,7 +1,7 @@
 .programming-page {
-  padding: 48px 24px;
-  max-width: 1100px;
-  margin: 0 auto;
+  padding-block: 48px;
+
+  margin-block: 0;
 }
 
 .programming-hero {

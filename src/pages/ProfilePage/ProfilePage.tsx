@@ -91,14 +91,14 @@ export const ProfilePage = () => {
 
   if (isLoading) {
     return (
-      <main className="profile-page">
+      <main className="profile-page site-container">
         <p>Laster profil...</p>
       </main>
     );
   }
 
   return (
-    <main className="profile-page">
+    <main className="profile-page site-container">
       <section className="profile-card">
         <p className="profile-label">Min konto</p>
         <h1>Min profil</h1>

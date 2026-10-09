@@ -13,7 +13,7 @@ export const AuthLayout = ({
   children,
 }: AuthLayoutProps) => {
   return (
-    <main className="auth-page">
+    <main className="auth-page site-container">
       <section className="auth-card">
         <p className="auth-label">{label}</p>
         <h1>{title}</h1>

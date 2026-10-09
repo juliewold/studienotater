@@ -1,7 +1,6 @@
 .concept-page {
-  width: min(100% - 48px, 1040px);
-  margin: 0 auto;
-  padding: 40px 0 96px;
+  margin-block: 0;
+  padding-block: 40px 96px;
 }
 
 .concept-page-back {
@@ -320,8 +319,7 @@
 
 @media (max-width: 600px) {
   .concept-page {
-    width: min(100% - 32px, 1040px);
-    padding: 28px 0 64px;
+    padding-block: 28px 64px;
   }
 
   .concept-page-back {
