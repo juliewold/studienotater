@@ -55,7 +55,7 @@ export const TopicPage = () => {
 
   if (isLoading) {
     return (
-      <main className="topic-page">
+      <main className="topic-page site-container">
         <p>Laster tema...</p>
       </main>
     );
@@ -63,7 +63,7 @@ export const TopicPage = () => {
 
   if (errorMessage || !topic || !subjectId) {
     return (
-      <main className="topic-page">
+      <main className="topic-page site-container">
         <Link to={`/fag/${subjectId}`} className="back-link">
           ← Tilbake til faget
         </Link>
@@ -74,7 +74,7 @@ export const TopicPage = () => {
   }
 
   return (
-    <main className="topic-page">
+    <main className="topic-page site-container">
       <Link to={`/fag/${subjectId}`} className="back-link">
         ← Tilbake til faget
       </Link>

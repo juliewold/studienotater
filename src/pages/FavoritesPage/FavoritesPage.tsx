@@ -73,14 +73,14 @@ export const FavoritesPage = () => {
 
   if (isLoading) {
     return (
-      <main className="favorites-page">
+      <main className="favorites-page site-container">
         <p>Laster favoritter...</p>
       </main>
     );
   }
 
   return (
-    <main className="favorites-page">
+    <main className="favorites-page site-container">
       <p className="favorites-label">Mine studier</p>
       <h1>Favoritter</h1>
 

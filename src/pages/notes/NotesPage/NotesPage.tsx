@@ -458,7 +458,7 @@ export const NotesPage = () => {
 
   if (!subject) {
     return (
-      <main className="notes-page">
+      <main className="notes-page site-container">
         <h1>Fant ikke faget</h1>
       </main>
     );
@@ -547,7 +547,7 @@ export const NotesPage = () => {
   };
 
   return (
-    <main className="notes-page">
+    <main className="notes-page site-container">
       <Link to={`/fag/${subject.id}`} className="back-link">
         ← Tilbake til faget
       </Link>

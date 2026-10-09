@@ -1,7 +1,6 @@
 .subject-page {
-  max-width: 1280px;
-  margin: 28px auto 64px;
-  padding: 0 24px;
+  margin-block: 28px 64px;
+  padding-block: 0;
 }
 
 .subject-page-label {
@@ -392,8 +391,8 @@
 
 @media (max-width: 700px) {
   .subject-page {
-    margin: 24px auto 48px;
-    padding: 0 16px;
+    margin-block: 24px 48px;
+    padding-block: 0;
   }
 
   .subject-page h1 {

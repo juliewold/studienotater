@@ -1,7 +1,6 @@
 .programming-topic-page {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 48px 24px;
+  margin-block: 0;
+  padding-block: 48px;
 }
 
 .back-link {
@@ -49,9 +48,9 @@
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   gap: 48px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 48px 24px;
+
+  margin-block: 0;
+  padding-block: 48px;
 }
 
 .programming-sidebar {

@@ -1,6 +1,6 @@
 .profile-page {
   min-height: calc(100vh - 140px);
-  padding: 48px 20px;
+  padding-block: 48px;
 }
 
 .profile-card {

@@ -1,8 +1,6 @@
 .note-page {
-  width: min(100%, 1040px);
-
-  margin: 24px auto 56px;
-  padding: 0 24px;
+  margin-block: 24px 56px;
+  padding-block: 0;
 }
 
 /* Toppnavigasjon */
@@ -112,8 +110,8 @@
 
 @media (max-width: 700px) {
   .note-page {
-    margin: 18px auto 44px;
-    padding: 0 16px;
+    margin-block: 18px 44px;
+    padding-block: 0;
   }
 
   .note-page-topbar {
@@ -208,7 +206,7 @@
 }
 
 /* Keep navigation and page width consistent in reading and editing modes. */
-.note-page:has(:is(.editable-note-reading, .editable-note-editing)) { width: min(100%, 1280px); padding-bottom: 0; }
+.note-page:has(:is(.editable-note-reading, .editable-note-editing)) { padding-bottom: 0; }
 .note-page:has(:is(.editable-note-reading, .editable-note-editing)) .note-navigation-sticky {
   position: static; margin: -3.25rem 0 1.4rem auto;
   background: transparent; box-shadow: none; backdrop-filter: none; border: 0;

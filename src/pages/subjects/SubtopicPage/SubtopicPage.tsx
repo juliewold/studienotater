@@ -71,7 +71,7 @@ export const SubtopicPage = () => {
 
   if (isLoading) {
     return (
-      <main className="subtopic-page">
+      <main className="subtopic-page site-container">
         <p>Laster undertema...</p>
       </main>
     );
@@ -79,14 +79,14 @@ export const SubtopicPage = () => {
 
   if (errorMessage || !topic || !subtopic || !subjectId) {
     return (
-      <main className="subtopic-page">
+      <main className="subtopic-page site-container">
         <p>{errorMessage || "Fant ikke undertemaet."}</p>
       </main>
     );
   }
 
   return (
-    <main className="subtopic-page">
+    <main className="subtopic-page site-container">
       <Link to={`/fag/${subjectId}/tema/${topic.id}`} className="back-link">
         ← Tilbake til {topic.name}
       </Link>

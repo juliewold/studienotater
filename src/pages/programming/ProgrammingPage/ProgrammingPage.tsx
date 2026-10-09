@@ -65,7 +65,7 @@ const programmingSections = [
 
 export function ProgrammingPage() {
   return (
-    <main className="programming-page">
+    <main className="programming-page site-container">
       <section className="programming-hero">
         <p className="eyebrow">Programmering</p>
         <h1>Programmeringsbibliotek</h1>

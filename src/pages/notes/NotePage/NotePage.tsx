@@ -94,7 +94,7 @@ export const NotePage = () => {
 
   if (isLoadingNote) {
     return (
-      <main className="note-page">
+      <main className="note-page site-container">
         <p>Laster notat...</p>
       </main>
     );
@@ -102,7 +102,7 @@ export const NotePage = () => {
 
   if (!subject || !note) {
     return (
-      <main className="note-page">
+      <main className="note-page site-container">
         <Link to={`/fag/${subjectId}/notater`} className="back-link">
           ← Tilbake til notater
         </Link>
@@ -121,7 +121,7 @@ export const NotePage = () => {
   const resourceId = `note-${subject.id}-database-${note.slug}`;
 
   return (
-    <main className="note-page">
+    <main className="note-page site-container">
       <div className="note-page-topbar">
         <Link to={backUrl} className="back-link">
           ← Tilbake

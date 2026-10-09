@@ -28,14 +28,14 @@ export const SemesterSubjects = () => {
 
   if (isLoadingSemesterSubjects) {
     return (
-      <section className="semester-subjects">
+      <section className="semester-subjects site-container">
         <p>Laster semesterfag...</p>
       </section>
     );
   }
 
   return (
-    <section className="semester-subjects">
+    <section className="semester-subjects site-container">
       <div className="semester-subjects-header">
         <h2>Mine fag</h2>
 

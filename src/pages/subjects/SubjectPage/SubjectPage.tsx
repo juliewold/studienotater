@@ -104,14 +104,14 @@ export const SubjectPage = () => {
 
   if (!subject) {
     return (
-      <main className="subject-page">
+      <main className="subject-page site-container">
         <h1>Fant ikke faget</h1>
       </main>
     );
   }
 
   return (
-    <main className="subject-page">
+    <main className="subject-page site-container">
       <Link to="/" className="back-link">
         ← Tilbake til forsiden
       </Link>
@@ -231,15 +231,15 @@ export const SubjectPage = () => {
         />
 
         <SubjectFeatureCard
-          title="Flashcards"
-          description="Repeter med flashcards"
-          link={`/fag/${subject.id}/flashcards`}
+          title="Forelesningsnotater"
+          description="Forelesninger, presentasjoner og pensum"
+          link={`/fag/${subject.id}/pdfs`}
         />
 
         <SubjectFeatureCard
-          title="Oppgaver"
-          description="Øv med flervalg og tallsvar"
-          link={`/fag/${subject.id}/oppgaver`}
+          title="Flashcards"
+          description="Repeter med flashcards"
+          link={`/fag/${subject.id}/flashcards`}
         />
 
         <SubjectFeatureCard
@@ -255,9 +255,9 @@ export const SubjectPage = () => {
         />
 
         <SubjectFeatureCard
-          title="Forelesningsnotater"
-          description="Forelesninger, presentasjoner og pensum"
-          link={`/fag/${subject.id}/pdfs`}
+          title="Oppgaver"
+          description="Øv med flervalg og tallsvar"
+          link={`/fag/${subject.id}/oppgaver`}
         />
 
         <SubjectFeatureCard

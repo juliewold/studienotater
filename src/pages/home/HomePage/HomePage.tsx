@@ -27,7 +27,7 @@ export const HomePage = () => {
   if (!user) {
     return (
       <>
-        <main className="logged-out-home">
+        <main className="logged-out-home site-container">
           <section className="logged-out-hero">
             <div className="logged-out-hero-content">
               <h1>
@@ -111,7 +111,7 @@ export const HomePage = () => {
   if (semesterSubjects.length === 0) {
     return (
       <>
-        <main className="home-empty-page">
+        <main className="home-empty-page site-container">
           <section className="home-empty-state">
             <div className="home-empty-icon">
               <BookOpen size={26} />
@@ -143,7 +143,7 @@ export const HomePage = () => {
 
       <SemesterSubjects />
 
-      <div className="home-dashboard-grid">
+      <div className="home-dashboard-grid site-container">
         <div className="home-dashboard-column">
           <UpcomingTasks />
         </div>

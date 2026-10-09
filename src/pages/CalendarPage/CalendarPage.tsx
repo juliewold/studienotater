@@ -1120,7 +1120,7 @@ export const CalendarPage = () => {
   );
 
   return (
-    <main className="calendar-page">
+    <main className="calendar-page site-container">
       <section className="calendar-header">
         <div>
           <p className="calendar-label">Mine studier</p>
