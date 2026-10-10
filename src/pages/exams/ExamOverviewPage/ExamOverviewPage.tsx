@@ -1,3 +1,4 @@
+import "../../../components/subjects/SubjectCard/SubjectCard.css";
 import "./ExamOverviewPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { subjects } from "../../../data/subjects";
@@ -104,7 +105,7 @@ export const ExamOverviewPage = () => {
                 {upcomingExams.map((exam) => (
                   <article
                     key={exam.id}
-                    className="exam-page-card"
+                    className={`exam-page-card subject-card-${exam.subject?.color ?? "default"}`}
                   >
                     <p className="exam-page-code">
                       {exam.subject?.code ??
@@ -142,7 +143,7 @@ export const ExamOverviewPage = () => {
                 {pastExams.map((exam) => (
                   <article
                     key={exam.id}
-                    className="exam-page-card"
+                    className={`exam-page-card subject-card-${exam.subject?.color ?? "default"}`}
                   >
                     <p className="exam-page-code">
                       {exam.subject?.code ??

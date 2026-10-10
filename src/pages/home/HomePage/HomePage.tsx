@@ -9,7 +9,6 @@ import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
 import { Footer } from "../../../components/layout/Footer/Footer";
 import { HomeProgress } from "../../../components/home/HomeProgress/HomeProgress";
-import { SemesterSubjects } from "../../../components/subjects/SemesterSubjects/SemesterSubjects";
 import { ExamOverview } from "../../../components/exams/ExamOverview/ExamOverview";
 import { WeeklyUpdates } from "../../../components/home/WeeklyUpdates/WeeklyUpdates";
 import { UpcomingTasks } from "../../../components/home/UpcomingTasks/UpcomingTasks";
@@ -143,21 +142,13 @@ export const HomePage = () => {
 };
 
 const HomeDashboard = () => {
-  const { user } = useContext(AuthContext);
   const progress = useHomeProgress();
   const now = new Date();
-  const weekDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-  weekDate.setUTCDate(weekDate.getUTCDate() + 4 - (weekDate.getUTCDay() || 7));
-  const week = Math.ceil(((weekDate.getTime() - Date.UTC(weekDate.getUTCFullYear(), 0, 1)) / 86400000 + 1) / 7);
-  const name = user?.user_metadata?.full_name?.split(" ")[0];
   return <>
     <main className="home-dashboard site-container">
-      <header className="dashboard-greeting">
-        <div><p className="page-label">DITT STUDIEROM · UKE {week}</p>
-          <h1>Hei{name ? `, ${name}` : ""} 👋</h1>
-          <p>En ny oversikt. Ett steg videre.</p></div>
+      <div className="dashboard-date">
         <time dateTime={now.toISOString().slice(0, 10)}>{now.toLocaleDateString("nb-NO", { weekday: "long", day: "numeric", month: "long" })}</time>
-      </header>
+      </div>
       <div className="dashboard-focus-grid">
         <section className="dashboard-focus">
           <div className="dashboard-focus-intro"><p className="page-label">UKENS FOKUS</p>
@@ -169,7 +160,6 @@ const HomeDashboard = () => {
         </section>
         <UpcomingTasks />
       </div>
-      <SemesterSubjects progress={progress.isLoading || progress.resourcesError ? {} : Object.fromEntries(progress.progressSubjects.map(subject => [subject.id, subject.progress]))} />
       <HomeProgress {...progress} />
       <ExamOverview />
     </main>

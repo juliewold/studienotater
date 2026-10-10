@@ -73,125 +73,152 @@
 /* Purple */
 
 .subject-card-purple {
-  border-left-color: #8b5cf6;
+  --subject-accent: #8b5cf6;
+  --subject-text: #7c3aed;
+  --subject-soft: #f3ecff;
+  border-left-color: var(--subject-accent);
 }
 
 .subject-card-purple .subject-code {
-  color: #7c3aed;
+  color: var(--subject-text);
 }
 
 .subject-card-purple .subject-card-icon {
-  background: #f3ecff;
-  color: #7c3aed;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 }
 
 /* Pink */
 
 .subject-card-pink {
-  border-left-color: #ec4899;
+  --subject-accent: #ec4899;
+  --subject-text: #db2777;
+  --subject-soft: #fff0f5;
+  border-left-color: var(--subject-accent);
 }
 
 .subject-card-pink .subject-code {
-  color: #db2777;
+  color: var(--subject-text);
 }
 
 .subject-card-pink .subject-card-icon {
-  background: #fff0f5;
-  color: #db2777;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 }
 
 /* Green */
 
 .subject-card-green {
-  border-left-color: #4ade80;
+  --subject-accent: #4ade80;
+  --subject-text: #2f9e55;
+  --subject-soft: #eefaf1;
+  border-left-color: var(--subject-accent);
 }
 
 .subject-card-green .subject-code {
-  color: #2f9e55;
+  color: var(--subject-text);
 }
 
 .subject-card-green .subject-card-icon {
-  background: #eefaf1;
-  color: #2f9e55;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 }
 
 /* Blue */
 
 .subject-card-blue {
-  border-left-color: #60a5fa;
+  --subject-accent: #60a5fa;
+  --subject-text: #2563eb;
+  --subject-soft: #eef6ff;
+  border-left-color: var(--subject-accent);
 }
 
 .subject-card-blue .subject-code {
-  color: #2563eb;
+  color: var(--subject-text);
 }
 
 .subject-card-blue .subject-card-icon {
-  background: #eef6ff;
-  color: #2563eb;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 }
 
 /* Orange */
 
 .subject-card-orange {
-  border-left-color: #fb923c;
+  --subject-accent: #fb923c;
+  --subject-text: #ea580c;
+  --subject-soft: #fff7ed;
+  border-left-color: var(--subject-accent);
 }
 
 .subject-card-orange .subject-code {
-  color: #ea580c;
+  color: var(--subject-text);
 }
 
 .subject-card-orange .subject-card-icon {
-  background: #fff7ed;
-  color: #ea580c;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 }
 
 /* Teal */
 
 .subject-card-teal {
-  border-left-color: #2dd4bf;
+  --subject-accent: #2dd4bf;
+  --subject-text: #0d9488;
+  --subject-soft: #f0fdfa;
+  border-left-color: var(--subject-accent);
 }
 
 .subject-card-teal .subject-code {
-  color: #0d9488;
+  color: var(--subject-text);
 }
 
 .subject-card-teal .subject-card-icon {
-  background: #f0fdfa;
-  color: #0d9488;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 }
 
 /* Red */
 
 .subject-card-red {
-  border-left-color: #fb7185;
+  --subject-accent: #fb7185;
+  --subject-text: #e11d48;
+  --subject-soft: #fff1f2;
+  border-left-color: var(--subject-accent);
 }
 
 .subject-card-red .subject-code {
-  color: #e11d48;
+  color: var(--subject-text);
 }
 
 .subject-card-red .subject-card-icon {
-  background: #fff1f2;
-  color: #e11d48;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 }
 
 /* Yellow */
 
 .subject-card-yellow {
-  border-left-color: #facc15;
+  --subject-accent: #facc15;
+  --subject-text: #ca8a04;
+  --subject-soft: #fefce8;
+  border-left-color: var(--subject-accent);
 }
 
 .subject-card-yellow .subject-code {
-  color: #ca8a04;
+  color: var(--subject-text);
 }
 
 .subject-card-yellow .subject-card-icon {
-  background: #fefce8;
-  color: #ca8a04;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 }
 
 /* Default */
 
 .subject-card-default {
-  border-left-color: #d1d5db;
+  --subject-accent: #d1d5db;
+  --subject-text: #6b7280;
+  --subject-soft: #f3f4f6;
+  border-left-color: var(--subject-accent);
 }

@@ -13,17 +13,20 @@
 }
 
 .exam-page-card {
+  min-width: 0;
   background: white;
-  border-radius: 24px;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid var(--subject-accent);
+  border-radius: 20px;
   padding: 24px;
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
-.exam-page-code {
+.exam-page-card .exam-page-code {
   margin: 0 0 8px;
 
-  color: #8b5cf6;
+  color: var(--subject-text);
   font-weight: 700;
 }
 
@@ -39,8 +42,8 @@
 .exam-page-card span {
   display: inline-block;
 
-  background: #eee7fb;
-  color: #8b5cf6;
+  background: var(--subject-soft);
+  color: var(--subject-text);
 
   padding: 8px 14px;
   border-radius: 999px;
