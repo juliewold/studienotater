@@ -21,7 +21,7 @@ type UpcomingTaskOccurrence = {
   start: Date;
 };
 
-const INITIAL_VISIBLE_TASKS = 8;
+const INITIAL_VISIBLE_TASKS = 4;
 const TASKS_PER_LOAD = 5;
 
 const addDays = (date: Date, amount: number) => {
@@ -227,14 +227,6 @@ export const UpcomingTasks = () => {
 
   const isShowingMore = visibleTaskCount > INITIAL_VISIBLE_TASKS;
 
-  if (isLoadingSemesterSubjects || isLoadingEvents) {
-    return null;
-  }
-
-  if (upcomingTasks.length === 0) {
-    return null;
-  }
-
   return (
     <section className="upcoming-tasks">
       <div className="upcoming-tasks-header">
@@ -243,6 +235,9 @@ export const UpcomingTasks = () => {
         <Link to="/kalender">Se kalender →</Link>
       </div>
 
+      {(isLoadingSemesterSubjects || isLoadingEvents || upcomingTasks.length === 0) && <p className="upcoming-tasks-empty">
+        {isLoadingSemesterSubjects || isLoadingEvents ? "Laster kommende oppgaver…" : "Ingen kommende oppgaver. Se kalenderen for å planlegge studieuken."}
+      </p>}
       <div className="upcoming-tasks-list">
         {visibleTasks.map((event) => {
           const semesterSubject = semesterSubjects.find(

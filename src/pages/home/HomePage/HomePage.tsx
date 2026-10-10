@@ -1,5 +1,7 @@
 import "./HomePage.css";
 import { useContext } from "react";
+import { useHomeProgress } from "../../../hooks/useHomeProgress";
+import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
@@ -137,24 +139,40 @@ export const HomePage = () => {
     );
   }
 
-  return (
-    <>
-      <WeeklyUpdates />
+  return <HomeDashboard />;
+};
 
-      <SemesterSubjects />
-
-      <div className="home-dashboard-grid site-container">
-        <div className="home-dashboard-column">
-          <UpcomingTasks />
-        </div>
-
-        <div className="home-dashboard-column">
-          <HomeProgress />
-          <ExamOverview />
-        </div>
+const HomeDashboard = () => {
+  const { user } = useContext(AuthContext);
+  const progress = useHomeProgress();
+  const now = new Date();
+  const weekDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  weekDate.setUTCDate(weekDate.getUTCDate() + 4 - (weekDate.getUTCDay() || 7));
+  const week = Math.ceil(((weekDate.getTime() - Date.UTC(weekDate.getUTCFullYear(), 0, 1)) / 86400000 + 1) / 7);
+  const name = user?.user_metadata?.full_name?.split(" ")[0];
+  return <>
+    <main className="home-dashboard site-container">
+      <header className="dashboard-greeting">
+        <div><p className="page-label">DITT STUDIEROM · UKE {week}</p>
+          <h1>Hei{name ? `, ${name}` : ""} 👋</h1>
+          <p>En ny oversikt. Ett steg videre.</p></div>
+        <time dateTime={now.toISOString().slice(0, 10)}>{now.toLocaleDateString("nb-NO", { weekday: "long", day: "numeric", month: "long" })}</time>
+      </header>
+      <div className="dashboard-focus-grid">
+        <section className="dashboard-focus">
+          <div className="dashboard-focus-intro"><p className="page-label">UKENS FOKUS</p>
+            <h2>Finn flyten i fagene dine</h2>
+            <p>Nytt innhold og enkle veier videre i studieuken.</p>
+            <div className="dashboard-shortcuts"><Link to="/notater">Åpne notater →</Link><Link to="/flashcards">Repeter med flashcards</Link></div>
+          </div>
+          <WeeklyUpdates />
+        </section>
+        <UpcomingTasks />
       </div>
-
-      <Footer />
-    </>
-  );
+      <SemesterSubjects progress={progress.isLoading || progress.resourcesError ? {} : Object.fromEntries(progress.progressSubjects.map(subject => [subject.id, subject.progress]))} />
+      <HomeProgress {...progress} />
+      <ExamOverview />
+    </main>
+    <Footer />
+  </>;
 };

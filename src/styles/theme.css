@@ -1,0 +1,47 @@
+/* Shared dark surfaces; subject accents and media keep their original colors. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --app-surface: #231e2e;
+  --app-background: #191520;
+  --app-text: #eee9f5;
+  --app-muted: #b7abc8;
+  --app-border: #3b314a;
+  --app-soft: #30243f;
+  --app-accent: #c4a0ff;
+}
+[data-theme="dark"] body { background: var(--app-background); color: var(--app-text); }
+[data-theme="dark"] :is(h1,h2,h3,h4,h5,h6) { color: var(--app-text); }
+[data-theme="dark"] :is(.page-description,.subject-description,.weekly-update-name,.semester-subject-item h3,.home-progress-details,.home-progress-rating,.upcoming-task p,.upcoming-task time,.exam-card p,.search-description,.search-snippet,.search-message,.note-description,.read-only-note-content,.ProseMirror,.footer) { color: var(--app-muted); }
+[data-theme="dark"] :is(.upcoming-task,.semester-subject-item,.home-progress-item,.exam-card,.subject-card,.subject-feature-card,.subject-progress,.subject-knowledge-base,.note-card,.folder-card,.pdf-card,.video-card,.flashcard,.settings-card,.profile-card,.auth-card,.search-results,.exam-section,.calendar-card,.calendar-sidebar,.calendar-main,.note-editor-toolbar,.note-outline,.editable-note-editor-wrapper,.editor-toolbar,.note-reading-tools,.note-ai-tools) {
+  background: var(--app-surface); border-color: var(--app-border); color: var(--app-text);
+}
+[data-theme="dark"] :is(input,textarea,select) { background: var(--app-surface); color: var(--app-text); border-color: var(--app-border); }
+[data-theme="dark"] :is(.search-title,.read-only-note-content,.ProseMirror,.exam-card h3) { color: var(--app-text); }
+[data-theme="dark"] :is(.search-icon,.search-result:hover,.home-progress-bar,.subject-progress-bar,.resource-progress--compact,.note-outline-link:hover) { background: var(--app-soft); }
+[data-theme="dark"] :is(.page-label,.back-link,.semester-subjects-header a,.weekly-updates-week,.upcoming-tasks-header a,.exam-card span) { color: var(--app-accent); }
+[data-theme="dark"] :is(.upcoming-task-time-today,.upcoming-task-time-tomorrow) { color: var(--app-text) !important; }
+[data-theme="dark"] .read-only-note-content :is(blockquote,pre,th,td) { background: var(--app-surface); border-color: var(--app-border); color: var(--app-text); }
+[data-theme="dark"] .search-result { color: var(--app-text); }
+[data-theme="dark"] .weekly-update-details { color: var(--app-muted); }
+[data-theme="dark"] :is(.semester-subject-purple .semester-subject-code,.weekly-update-purple .weekly-update-code,.upcoming-task-purple .upcoming-task-code,.home-progress-purple strong) { color: #c4a0ff; }
+[data-theme="dark"] :is(.semester-subject-pink .semester-subject-code,.weekly-update-pink .weekly-update-code,.upcoming-task-pink .upcoming-task-code,.home-progress-pink strong) { color: #f59aca; }
+[data-theme="dark"] :is(.semester-subject-blue .semester-subject-code,.weekly-update-blue .weekly-update-code,.upcoming-task-blue .upcoming-task-code,.home-progress-blue strong) { color: #8cbfff; }
+[data-theme="dark"] :is(.semester-subject-green .semester-subject-code,.weekly-update-green .weekly-update-code,.upcoming-task-green .upcoming-task-code,.home-progress-green strong) { color: #86dc9c; }
+[data-theme="dark"] :is(.semester-subject-orange .semester-subject-code,.weekly-update-orange .weekly-update-code,.upcoming-task-orange .upcoming-task-code) { color: #ffb478; }
+[data-theme="dark"] :is(.semester-subject-teal .semester-subject-code,.weekly-update-teal .weekly-update-code,.upcoming-task-teal .upcoming-task-code) { color: #7be1d5; }
+[data-theme="dark"] :is(.semester-subject-red .semester-subject-code,.weekly-update-red .weekly-update-code,.upcoming-task-red .upcoming-task-code) { color: #ff9db0; }
+[data-theme="dark"] :is(.semester-subject-yellow .semester-subject-code,.weekly-update-yellow .weekly-update-code,.upcoming-task-yellow .upcoming-task-code) { color: #edd777; }
+[data-theme="dark"] :is(.read-only-note-content,.note-editor-content) .note-callout[data-callout-type] { background: var(--app-surface); border-color: var(--app-border); color: var(--app-text); }
+[data-theme="dark"] :is(.read-only-note-content,.note-editor-content) .note-callout[data-callout-type] .note-callout-header { background: var(--app-soft); color: var(--app-accent); }
+[data-theme="dark"] :is(.read-only-note-content,.note-editor-content) .tiptap-mathematics-render[data-type="block-math"] { background: var(--app-surface); color: var(--app-text); }
+[data-theme="dark"] .note-outline :is(summary,a[aria-current]) { color: var(--app-accent); }
+[data-theme="dark"] .note-outline a[aria-current] { background: var(--app-soft); }
+[data-theme="dark"] :is(.note-reading-tools,.note-editor-toolbar,.note-navigation,.note-ai-tools) :is(button,a,summary),
+[data-theme="dark"] :is(.note-toolbar-options,.math-dialog,.concept-picker,.slash-menu-popover) { background: var(--app-surface); color: var(--app-text); border-color: var(--app-border); }
+[data-theme="dark"] :is(.note-reading-tools,.note-editor-toolbar,.note-ai-tools) button:disabled { color: var(--app-muted); opacity: .5; }
+[data-theme="dark"] .note-reading-tools { background: transparent; }
+/* Legacy page cards use literal light backgrounds. Keep their dark surfaces consistent. */
+[data-theme="dark"] :is([class$="-card"],[class*="-card "],[class$="-panel"],.subject-syllabus-topic,.subject-progress-category,.topic-progress-item,.calendar-day,.calendar-day-header,.calendar-time-column,.calendar-week-grid,.programming-sidebar,.programming-content) { background: var(--app-surface); border-color: var(--app-border); color: var(--app-text); }
+[data-theme="dark"] :is(.subject-feature-card p,.subject-page-name,.subject-progress-summary,.subject-progress-category,.subject-knowledge-base-description,.subject-syllabus-description,.folder-card p,.pdf-card p,.video-card p,.note-card p,.settings-card p,.profile-card p,.auth-card p,.logged-out-hero-description,.logged-out-feature p,.home-empty-description) { color: var(--app-muted); }
+[data-theme="dark"] :is(.subject-feature-icon,.subject-progress-category,.subject-progress-bar) { background: var(--app-soft); }
+[data-theme="dark"] .subject-progress-category strong { color: var(--app-text); }

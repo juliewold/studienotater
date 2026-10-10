@@ -207,3 +207,18 @@ land in the selected heading below the sticky toolbar. Close the modal and check
 that the background note still scrolls normally. Closing/reopening must reset
 the summary and must not leave scroll listeners on the removed dialog. No PDF
 loading, summary design, editing, or save behavior is changed by this fix.
+
+## Appnavigasjon og forside
+
+Åpne `/studienotater/tests/app-layout.html` med Vite. Alle nettverkskall
+avskjæres; fagvalg og utlogging påvirker bare testvisningen.
+
+- Kontroller hovedlenkene og de tre sammenleggbare seksjonene.
+- Velg/fjern fag under Semesterstart og sjekk at Mine fag oppdateres direkte.
+- Kontroller lys/mørk modus i topplinjen og Innstillinger, også etter omlasting.
+- Ved mobilbredde: åpne navigasjon, bruk Tab/Escape og velg en side.
+  Fokus skal holdes i dialogen og returneres til åpneknappen ved lukking.
+- Logg ut og kontroller at innlogging/registrering fortsatt er tilgjengelig.
+- Med innlogget utviklingskonto: kontroller søk, ukens ressurser, kort/listenes
+  fremdrift, «Vis flere», eksamensdatoer og nedtelling uten å endre studiedata.
+- Test 390, 768, 1024 og 1440 px; ingen horisontal sidescrolling.

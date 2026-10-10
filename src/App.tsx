@@ -1,6 +1,8 @@
 import { LoginPage } from "./pages/auth/LoginPage/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage/RegisterPage";
 import { HashRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeProvider";
+import { SemesterSubjectsProvider } from "./context/SemesterSubjectsProvider";
 import { Navbar } from "./components/layout/Navbar/Navbar";
 import { HomePage } from "./pages/home/HomePage/HomePage";
 import { SubjectPage } from "./pages/subjects/SubjectPage/SubjectPage";
@@ -53,9 +55,12 @@ import { AdminConceptsPage } from "./pages/admin/AdminConceptsPage/AdminConcepts
 
 function App() {
   return (
+    <ThemeProvider>
+    <SemesterSubjectsProvider>
     <HashRouter>
       <Navbar />
 
+      <div className="app-workspace" id="app-content" tabIndex={-1}>
       <Routes>
         <Route
           path="/logg-inn"
@@ -465,7 +470,10 @@ function App() {
           }
         />
       </Routes>
+      </div>
     </HashRouter>
+    </SemesterSubjectsProvider>
+    </ThemeProvider>
   );
 }
 

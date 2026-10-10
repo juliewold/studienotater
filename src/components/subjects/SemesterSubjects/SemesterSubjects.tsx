@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
-export const SemesterSubjects = () => {
+export const SemesterSubjects = ({ progress }: { progress: Record<string, number> }) => {
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
 
   const displaySubjects = semesterSubjects.map((semesterSubject) => {
@@ -59,6 +59,10 @@ export const SemesterSubjects = () => {
               <div>
                 <p className="semester-subject-code">{subject.code}</p>
                 <h3>{subject.name}</h3>
+                {progress[subject.id] !== undefined && <div className="subject-card-progress">
+                  <span>{progress[subject.id]}% fullført</span>
+                  <progress aria-label={`Fremdrift i ${subject.code}`} value={progress[subject.id]} max={100} />
+                </div>}
               </div>
             </Link>
           ))}

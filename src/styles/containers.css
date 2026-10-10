@@ -6,8 +6,7 @@
 }
 
 .site-container,
-.page-container,
-.navbar {
+.page-container {
   width: min(var(--site-max-width), calc(100% - 2 * var(--site-gutter)));
   max-width: var(--site-max-width);
   margin-inline: auto;

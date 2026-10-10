@@ -1,6 +1,8 @@
 import "./SettingsPage.css";
+import { useTheme } from "../../hooks/useTheme";
 
 export const SettingsPage = () => {
+  const { dark, toggleTheme } = useTheme();
   return (
     <main className="page-container">
       <p className="page-label">Konto</p>
@@ -21,8 +23,8 @@ export const SettingsPage = () => {
               <p>Bytt mellom lyst og mørkt tema.</p>
             </div>
 
-            <button type="button" className="setting-button">
-              Kommer senere
+            <button type="button" className="setting-button" onClick={toggleTheme} aria-pressed={dark}>
+              {dark ? "Bruk lyst tema" : "Bruk mørkt tema"}
             </button>
           </div>
         </section>
