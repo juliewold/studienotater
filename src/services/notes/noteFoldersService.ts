@@ -1,3 +1,4 @@
+import { notifyNotesChanged } from "./notesNavigationEvents";
 import { supabase } from "../../lib/supabase";
 
 export type NoteFolder = {
@@ -119,6 +120,8 @@ export async function createNoteFolder(
     throw error;
   }
 
+  notifyNotesChanged();
+
   return mapNoteFolder(data as NoteFolderRow);
 }
 
@@ -136,6 +139,8 @@ export async function updateNoteFolder(
   if (error) {
     throw error;
   }
+
+  notifyNotesChanged();
 }
 
 export async function updateNoteFolderTopic(
@@ -152,6 +157,8 @@ export async function updateNoteFolderTopic(
   if (error) {
     throw error;
   }
+
+  notifyNotesChanged();
 }
 
 export async function deleteNoteFolder(id: string): Promise<void> {
@@ -160,4 +167,6 @@ export async function deleteNoteFolder(id: string): Promise<void> {
   if (error) {
     throw error;
   }
+
+  notifyNotesChanged();
 }

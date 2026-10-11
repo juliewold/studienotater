@@ -231,3 +231,15 @@ Bytt mellom lyst og mørkt tema og kontroller notatkort, tema/undertema,
 progresjonsbokser, underordnede kort og søkefelt. Kontroller også hover,
 tastaturfokus og at rosa fagaksent og grønne vurderingsstjerner beholdes.
 Størrelser og plassering skal være identiske i begge temaer.
+
+## Subject notes sidebar
+
+Open `/studienotater/tests/notes-sidebar.html` with the Vite dev server. This uses
+local in-memory fixtures; reads and saves never reach the backend.
+
+Check folder expansion (including empty folders), current folder/note highlights,
+direct note switching, unfiled notes, and sidebar collapse. Edit a title and
+immediately switch notes: the title must save and update in the sidebar. An empty
+title must prevent navigation and preserve the editor. Check light/dark themes,
+a narrow desktop and a 390px mobile viewport; the mobile drawer must close after
+navigation and with Escape. A different subject route must show no fixture notes.
