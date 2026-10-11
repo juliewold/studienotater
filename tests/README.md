@@ -222,3 +222,12 @@ avskjæres; fagvalg og utlogging påvirker bare testvisningen.
 - Med innlogget utviklingskonto: kontroller søk, ukens ressurser, kort/listenes
   fremdrift, «Vis flere», eksamensdatoer og nedtelling uten å endre studiedata.
 - Test 390, 768, 1024 og 1440 px; ingen horisontal sidescrolling.
+
+## Mørke flater
+
+Åpne `/studienotater/tests/dark-surfaces.html` med Vite. Testvisningen bruker
+samme CSS og notat-/fagkort som appen, uten nettverkskall til studiedata.
+Bytt mellom lyst og mørkt tema og kontroller notatkort, tema/undertema,
+progresjonsbokser, underordnede kort og søkefelt. Kontroller også hover,
+tastaturfokus og at rosa fagaksent og grønne vurderingsstjerner beholdes.
+Størrelser og plassering skal være identiske i begge temaer.
