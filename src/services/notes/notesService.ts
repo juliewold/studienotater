@@ -1,3 +1,4 @@
+import { notifyNotesChanged } from "./notesNavigationEvents";
 import { supabase } from "../../lib/supabase";
 
 export type NoteContentJson = Record<string, unknown> | null;
@@ -186,6 +187,8 @@ export async function moveAllNotesOutOfFolder(folderId: string): Promise<void> {
   if (error) {
     throw error;
   }
+
+  notifyNotesChanged();
 }
 
 export async function getNotesWithoutFolder(
@@ -276,6 +279,8 @@ export async function createNote({
     throw error;
   }
 
+  notifyNotesChanged();
+
   return mapDatabaseNote(data as NoteRow);
 }
 
@@ -326,6 +331,8 @@ export async function updateNote(
     throw error;
   }
 
+  notifyNotesChanged();
+
   return mapDatabaseNote(data as NoteRow);
 }
 
@@ -369,6 +376,8 @@ export async function updateNoteTitle(
   if (error) {
     throw error;
   }
+
+  notifyNotesChanged();
 }
 
 export async function updateNoteSubtopic(
@@ -385,6 +394,8 @@ export async function updateNoteSubtopic(
   if (error) {
     throw error;
   }
+
+  notifyNotesChanged();
 }
 
 export async function moveNoteToFolder(
@@ -401,6 +412,8 @@ export async function moveNoteToFolder(
   if (error) {
     throw error;
   }
+
+  notifyNotesChanged();
 }
 
 export async function deleteNote(id: string): Promise<void> {
@@ -409,4 +422,6 @@ export async function deleteNote(id: string): Promise<void> {
   if (error) {
     throw error;
   }
+
+  notifyNotesChanged();
 }

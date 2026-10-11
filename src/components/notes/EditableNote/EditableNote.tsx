@@ -1,3 +1,4 @@
+import { registerNotesNavigationGuard } from "../../../services/notes/notesNavigationEvents";
 import "./EditableNote.css";
 import { ResourceProgress } from "../../progress/ResourceProgress/ResourceProgress";
 import { useEffect, useRef, useState } from "react";
@@ -218,7 +219,8 @@ export const EditableNote = ({
     );
   };
 
-  const saveDraft = async (draft: NoteDraft): Promise<boolean> => {
+  const saveQueue = useRef<Promise<boolean>>(Promise.resolve(true));
+  const persistDraft = async (draft: NoteDraft): Promise<boolean> => {
     if (!draft.title) {
       setErrorMessage("Notatet må ha en tittel.");
       setSaveStatus("error");
@@ -279,6 +281,25 @@ export const EditableNote = ({
       return false;
     }
   };
+
+  const saveDraft = (draft: NoteDraft): Promise<boolean> => {
+    const result = saveQueue.current.then(() => persistDraft(draft));
+    saveQueue.current = result;
+    return result;
+  };
+
+  const navigationDraft = useRef(getCurrentDraft);
+  useEffect(() => { navigationDraft.current = getCurrentDraft; });
+
+  // Flush queued saves and any typing that happens while navigation is waiting.
+  useEffect(() => registerNotesNavigationGuard(async () => {
+    if (!isEditing) return true;
+    if (!(await saveDraft(navigationDraft.current()))) return false;
+    while (hasUnsavedChanges(navigationDraft.current())) {
+      if (!(await saveDraft(navigationDraft.current()))) return false;
+    }
+    return true;
+  }));
 
   useEffect(() => {
     if (!isEditing) {

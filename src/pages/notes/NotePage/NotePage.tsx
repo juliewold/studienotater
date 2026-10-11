@@ -35,6 +35,7 @@ export const NotePage = () => {
   );
 
   useEffect(() => {
+    let cancelled = false;
     const loadNote = async () => {
       if (!subjectId || !noteId) {
         setNote(null);
@@ -55,6 +56,7 @@ export const NotePage = () => {
           getOrderedNotes(subjectId),
         ]);
 
+        if (cancelled) return;
         if (!loadedNote) {
           setNote(null);
           setErrorMessage("Fant ikke notatet.");
@@ -77,6 +79,7 @@ export const NotePage = () => {
             : null,
         );
       } catch (error) {
+        if (cancelled) return;
         console.error("Kunne ikke hente notat:", error);
 
         setNote(null);
@@ -85,11 +88,12 @@ export const NotePage = () => {
 
         setErrorMessage("Kunne ikke hente notatet.");
       } finally {
-        setIsLoadingNote(false);
+        if (!cancelled) setIsLoadingNote(false);
       }
     };
 
     loadNote();
+    return () => { cancelled = true; };
   }, [noteId, subjectId]);
 
   if (isLoadingNote) {
@@ -152,6 +156,7 @@ export const NotePage = () => {
         )}
       </nav>
       <EditableNote
+        key={note.id}
         note={note}
         subjectCode={subject.code}
         isAdmin={isAdmin}

@@ -1,3 +1,4 @@
+import { NotesLayout } from "./components/notes/NotesLayout/NotesLayout";
 import { LoginPage } from "./pages/auth/LoginPage/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage/RegisterPage";
 import { HashRouter, Routes, Route } from "react-router-dom";
@@ -128,32 +129,11 @@ function App() {
           }
         />
 
-        <Route
-          path="/fag/:subjectId/notater"
-          element={
-            <ProtectedRoute>
-              <NotesPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/fag/:subjectId/notater/mappe/:folderId"
-          element={
-            <ProtectedRoute>
-              <FolderPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/fag/:subjectId/notater/:noteId"
-          element={
-            <ProtectedRoute>
-              <NotePage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/fag/:subjectId/notater" element={<ProtectedRoute><NotesLayout /></ProtectedRoute>}>
+          <Route index element={<NotesPage />} />
+          <Route path="mappe/:folderId" element={<FolderPage />} />
+          <Route path=":noteId" element={<NotePage />} />
+        </Route>
 
         <Route
           path="/fag/:subjectId/flashcards"
