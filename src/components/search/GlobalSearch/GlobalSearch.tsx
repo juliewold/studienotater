@@ -15,6 +15,7 @@ type Props = {
 
 export const GlobalSearch = ({ onNavigate }: Props) => {
   const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
 
   const [items, setItems] = useState<GlobalSearchResult[]>([]);
 
@@ -26,6 +27,8 @@ export const GlobalSearch = ({ onNavigate }: Props) => {
         const results = await getGlobalSearchItems();
 
         setItems(results);
+      } catch {
+        setItems([]);
       } finally {
         setLoading(false);
       }
@@ -39,15 +42,17 @@ export const GlobalSearch = ({ onNavigate }: Props) => {
   }, [items, query]);
 
   return (
-    <div className="global-search">
+    <div className="global-search" onFocus={() => setFocused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
       <input
-        type="text"
+        type="search"
+        aria-label="Søk i alle ressurser"
+        onKeyDown={(event) => { if (event.key === "Escape") setQuery(""); }}
         placeholder="Hva leter du etter?"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
 
-      {query.length >= 2 && (
+      {focused && query.length >= 2 && (
         <div className="search-results">
           {loading ? (
             <p className="search-message">Laster...</p>
@@ -58,7 +63,7 @@ export const GlobalSearch = ({ onNavigate }: Props) => {
               <Link
                 key={`${result.type}-${result.id}`}
                 to={result.path}
-                onClick={onNavigate}
+                onClick={() => { setQuery(""); onNavigate(); }}
                 className="search-result"
               >
                 <div className="search-icon">

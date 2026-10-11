@@ -1,5 +1,7 @@
 import "./HomePage.css";
 import { useContext } from "react";
+import { useHomeProgress } from "../../../hooks/useHomeProgress";
+import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
@@ -7,7 +9,6 @@ import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
 import { Footer } from "../../../components/layout/Footer/Footer";
 import { HomeProgress } from "../../../components/home/HomeProgress/HomeProgress";
-import { SemesterSubjects } from "../../../components/subjects/SemesterSubjects/SemesterSubjects";
 import { ExamOverview } from "../../../components/exams/ExamOverview/ExamOverview";
 import { WeeklyUpdates } from "../../../components/home/WeeklyUpdates/WeeklyUpdates";
 import { UpcomingTasks } from "../../../components/home/UpcomingTasks/UpcomingTasks";
@@ -137,24 +138,31 @@ export const HomePage = () => {
     );
   }
 
-  return (
-    <>
-      <WeeklyUpdates />
+  return <HomeDashboard />;
+};
 
-      <SemesterSubjects />
-
-      <div className="home-dashboard-grid site-container">
-        <div className="home-dashboard-column">
-          <UpcomingTasks />
-        </div>
-
-        <div className="home-dashboard-column">
-          <HomeProgress />
-          <ExamOverview />
-        </div>
+const HomeDashboard = () => {
+  const progress = useHomeProgress();
+  const now = new Date();
+  return <>
+    <main className="home-dashboard site-container">
+      <div className="dashboard-date">
+        <time dateTime={now.toISOString().slice(0, 10)}>{now.toLocaleDateString("nb-NO", { weekday: "long", day: "numeric", month: "long" })}</time>
       </div>
-
-      <Footer />
-    </>
-  );
+      <div className="dashboard-focus-grid">
+        <section className="dashboard-focus">
+          <div className="dashboard-focus-intro"><p className="page-label">UKENS FOKUS</p>
+            <h2>Finn flyten i fagene dine</h2>
+            <p>Nytt innhold og enkle veier videre i studieuken.</p>
+            <div className="dashboard-shortcuts"><Link to="/notater">Åpne notater →</Link><Link to="/flashcards">Repeter med flashcards</Link></div>
+          </div>
+          <WeeklyUpdates />
+        </section>
+        <UpcomingTasks />
+      </div>
+      <HomeProgress {...progress} />
+      <ExamOverview />
+    </main>
+    <Footer />
+  </>;
 };

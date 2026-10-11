@@ -26,7 +26,7 @@ export function NoteDocument({ editor, outlineId, header, toolbar }: {
 
   const scrollOffset = useCallback(() => {
     const container = getScrollContainer(editor.view.dom);
-    const navbar = container ? null : document.querySelector<HTMLElement>(".navbar");
+    const navbar = container ? null : document.querySelector<HTMLElement>(".app-topbar");
     const tools = editor.view.dom.closest(".note-reading-body")?.querySelector<HTMLElement>(".note-editor-toolbar");
     const stickyBottom = (element: HTMLElement | null | undefined) => {
       if (!element) return 0;

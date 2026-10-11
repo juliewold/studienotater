@@ -1,8 +1,12 @@
+:root {
+  --footer-purple: rgb(179, 139, 243);
+}
+
 .footer {
   margin-top: 56px;
   padding: 32px 24px;
 
-  background-color: rgb(179, 139, 243);
+  background-color: var(--footer-purple);
   color: white;
 }
 
