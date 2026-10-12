@@ -84,3 +84,21 @@ Tests use a disposable local PostgreSQL schema, not the deployed Supabase schema
 `tests/subject-structure.sql` validates reuse, retries, both note linkage fields,
 manual placements, RLS, scope checks and transaction rollback. The deployment
 migration has not been applied automatically to a live database.
+
+### Placement quality
+
+The structure call now proposes only the topic tree. Its noteIds are ignored.
+Before returning any plan, Django classifies each eligible note independently
+against the proposed paths and all existing paths, including existing subtopics
+omitted from the proposal. The server attaches the note ID; the classifier never
+chooses or copies one. Title and full cleaned content travel together; there is
+no excerpt truncation. HTML layout is removed while paragraph/headings, code,
+LaTeX attributes and image alternative text are retained.
+
+Each choice requires an exact source quote and a reason. An unknown/uncertain
+choice, evidence belonging to another note, or a truncated response rejects the
+request before any structure RPC. This guards identity and grounding, but a
+valid quote is not a proof of semantic correctness. The model still makes the
+academic judgment. The added calls cost time proportional to eligible notes.
+Existing protected placements are not reclassified or changed, and the database
+transaction/permission behavior is unchanged.
