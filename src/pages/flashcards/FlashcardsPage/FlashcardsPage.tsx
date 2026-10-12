@@ -1,4 +1,5 @@
 import "./FlashcardsPage.css";
+import { MathText } from "../../../components/common/MathText/MathText";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -238,7 +239,9 @@ export const FlashcardsPage = () => {
           <p className="flashcard-label">{isFlipped ? "Svar" : "Spørsmål"}</p>
 
           <h2>
-            {isFlipped ? currentFlashcard.answer : currentFlashcard.question}
+            <MathText>
+              {isFlipped ? currentFlashcard.answer : currentFlashcard.question}
+            </MathText>
           </h2>
 
           <span className="flashcard-hint">

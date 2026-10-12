@@ -15,7 +15,7 @@ type TextPart = {
 const splitTextAndMath = (text: string): TextPart[] => {
   const parts: TextPart[] = [];
 
-  const mathPattern = /(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g;
+  const mathPattern = /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g;
 
   let lastIndex = 0;
 
@@ -31,7 +31,7 @@ const splitTextAndMath = (text: string): TextPart[] => {
 
     const matchedText = match[0];
 
-    if (matchedText.startsWith("$$")) {
+    if (matchedText.startsWith("$$") || matchedText.startsWith("\\[")) {
       parts.push({
         type: "block-math",
         content: matchedText.slice(2, -2),
@@ -39,7 +39,9 @@ const splitTextAndMath = (text: string): TextPart[] => {
     } else {
       parts.push({
         type: "inline-math",
-        content: matchedText.slice(1, -1),
+        content: matchedText.startsWith("\\(")
+          ? matchedText.slice(2, -2)
+          : matchedText.slice(1, -1),
       });
     }
 
