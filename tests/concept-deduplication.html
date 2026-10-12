@@ -13,6 +13,9 @@ async function run({existing=[canonical],outputs,callout=false}){
  window.fetch=async(input,init={})=>{
   const url=new URL(typeof input==='string'?input:input.url),method=init.method??'GET',table=url.pathname.split('/').at(-1),body=init.body?JSON.parse(init.body):null;
   if(url.pathname.endsWith('/extract/')){requests.push(body);return response({candidates:outputs[index++]})}
+  if(url.pathname.endsWith('/generate-structure/'))return response({topics:[]});
+  if(table==='complete_subject_structure')return response({topicsCreated:0,subtopicsCreated:0,topicsReused:0,subtopicsReused:0,notesOrganized:0,notesSkipped:0});
+  if(table==='note_subtopics')return response([]);
   if(method==='GET'){
    if(table==='topics')return response([{id:'topic',name:'Tema',subject_id:'subject'}]);
    if(table==='subtopics')return response([{id:'sub',name:'Undertema',topic_id:'topic'}]);

@@ -11,7 +11,7 @@ export type SubjectTopic = DatabaseTopic & {
   subtopics: DatabaseSubtopic[];
 };
 
-export const useSubjectStructure = (subjectId: string | undefined) => {
+export const useSubjectStructure = (subjectId: string | undefined, refreshKey = 0) => {
   const [topics, setTopics] = useState<SubjectTopic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -53,7 +53,7 @@ export const useSubjectStructure = (subjectId: string | undefined) => {
     };
 
     loadSubjectStructure();
-  }, [subjectId]);
+  }, [subjectId, refreshKey]);
 
   return {
     topics,

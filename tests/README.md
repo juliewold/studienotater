@@ -49,13 +49,20 @@ fagstruktur skjer før begrepsanalysen og er ikke del av samme transaksjon.
 
 ## Validering av generert struktur
 
-`/studienotater/tests/subject-structure.html` kjører seks tester med simulerte
-API-svar: eksisterende struktur, struktur opprettet under AI-kallet, AI-feil uten
-lagring, tydelig feil ved delvis lagring uten sletting, vellykket lagring og tomt
-notatutvalg. Backend-testene dekker ugyldige kandidater, strukturfelt, ukjente og
-repeterte ID-er, glemte notater og kontrollerte feil fra begge AI-endepunktene.
-Se `database/README.md` for valideringsregler og transaksjonsbegrensningene.
+`/studienotater/tests/subject-structure.html` tester eksisterende struktur som
+AI-kontekst, beskyttelse av plasserte/manuelt koblede notater, ett RPC-kall,
+samtidige plasseringer, API-/lagringsfeil og tomt notatutvalg. Kjør også
+`knowledge-base.html` og `concept-deduplication.html` for begrepsregresjoner.
+Backend: `backend/.venv/bin/python backend/manage.py test concepts`.
 
+`psql -v ON_ERROR_STOP=1 -d <tom-testdatabase> -f tests/subject-structure.sql`
+krever en **tom, disponibel UTF-8 PostgreSQL-database** og en lokal testadministrator.
+Skriptet oppretter fixture-tabeller og RLS-regler; det må aldri kjøres i Supabase
+eller en database med eksisterende data. Det laster den faktiske RPC-migrasjonen
+og verifiserer gjenbruk, navnededuplisering, idempotens, beskyttelse av primær-/
+manuelle koblinger, konsistent ny plassering, RLS og full rollback ved feil.
+
+Se `database/README.md` for migrasjonen som kreves før frontend-deploy.
 
 ## Sporadisk ugyldig AI-svar
 

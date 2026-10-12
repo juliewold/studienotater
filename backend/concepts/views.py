@@ -150,10 +150,25 @@ def generate_structure(request):
             status=400,
         )
 
+    existing_topics = body.get("existingTopics", [])
+    if not isinstance(existing_topics, list) or any(
+        not isinstance(topic, dict)
+        or any(not isinstance(topic.get(key), str) or not topic[key].strip() for key in ("id", "name"))
+        or not isinstance(topic.get("subtopics"), list)
+        or any(
+            not isinstance(subtopic, dict)
+            or any(not isinstance(subtopic.get(key), str) or not subtopic[key].strip() for key in ("id", "name"))
+            for subtopic in topic.get("subtopics", [])
+        )
+        for topic in existing_topics
+    ) or any(not isinstance(note.get("organize", True), bool) for note in notes):
+        return JsonResponse({"error": "Invalid existing structure or note placement flags."}, status=400)
+
     try:
         structure = generate_subject_structure(
             subject_name.strip(),
             notes,
+            existing_topics,
         )
     except APIConnectionError:
         return JsonResponse(

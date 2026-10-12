@@ -311,3 +311,55 @@ class ConceptCanonicalContextTests(SimpleTestCase):
         for bad in (None, [], 3, " "):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 helper.call_service("concept_extraction_service", {"candidates": [helper.candidate(sourceName=bad)]})
+
+
+class StructureCompletionTests(SimpleTestCase):
+    existing = [{"id": "t1", "name": "Original topic", "subtopics": [{"id": "s1", "name": "Original subtopic"}]}]
+    notes = [{"id": "n1", "title": "New", "content": "Source", "organize": True},
+             {"id": "n2", "title": "Manual", "content": "Source", "organize": False}]
+
+    def generate(self, plan):
+        import json
+        from .subject_structure_service import generate_subject_structure
+        client = Mock()
+        client.chat.completions.create.return_value = Mock(choices=[Mock(message=Mock(content=json.dumps(plan)))])
+        with patch("concepts.subject_structure_service.get_client", return_value=client):
+            result = generate_subject_structure("Subject", self.notes, self.existing)
+        prompt = client.chat.completions.create.call_args.kwargs["messages"]
+        self.assertIn('"id": "t1"', prompt[1]["content"])
+        self.assertIn("KAN_ORGANISERES: False", prompt[1]["content"])
+        return result
+
+    def test_reuses_ids_preserves_names_and_filters_protected_notes(self):
+        result = self.generate({"topics": [{"id": "t1", "name": "AI rename", "subtopics": [
+            {"id": "s1", "name": "AI rename", "noteIds": ["n1", "n2"]}]}]})
+        self.assertEqual(result["topics"][0]["name"], "Original topic")
+        self.assertEqual(result["topics"][0]["subtopics"], [{"id": "s1", "name": "Original subtopic", "noteIds": ["n1"]}])
+
+    def test_unknown_ids_and_wrong_parent_rejected(self):
+        for topic_id, subtopic_id in [("unknown", "s1"), ("t1", "unknown"), (None, "s1")]:
+            with self.subTest(topic=topic_id, subtopic=subtopic_id), self.assertRaises(ValueError):
+                self.generate({"topics": [{"id": topic_id, "name": "New", "subtopics": [
+                    {"id": subtopic_id, "name": "Sub", "noteIds": ["n1"]}]}]})
+
+    def test_existing_empty_topic_can_receive_new_subtopics(self):
+        result = self.generate({"topics": [{"id": "t1", "name": "Original topic", "subtopics": [
+            {"name": "Missing", "noteIds": ["n1"]}]}]})
+        self.assertNotIn("id", result["topics"][0]["subtopics"][0])
+
+    def test_request_rejects_malformed_context_before_ai(self):
+        for context in [None, [None], [{"id": "t1", "name": "T", "subtopics": [None]}]]:
+            with patch("concepts.views.generate_subject_structure") as ai:
+                response = self.client.post("/api/concepts/generate-structure/", {
+                    "subjectName": "Subject", "notes": self.notes, "existingTopics": context,
+                }, content_type="application/json")
+                self.assertEqual(response.status_code, 400)
+                ai.assert_not_called()
+
+    def test_context_reaches_service(self):
+        with patch("concepts.views.generate_subject_structure", return_value={"topics": []}) as ai:
+            response = self.client.post("/api/concepts/generate-structure/", {
+                "subjectName": "Subject", "notes": self.notes, "existingTopics": self.existing,
+            }, content_type="application/json")
+            self.assertEqual(response.status_code, 200)
+            ai.assert_called_once_with("Subject", self.notes, self.existing)

@@ -46,35 +46,41 @@ check (
 The columns are nullable so existing concept suggestions remain valid.
 
 
-## AI validation and partial structure saves
+## AI structure completion
 
-AI candidates are validated before being returned to the frontend. Invalid
-required fields reject the entire response; unknown subtopic IDs are removed
-and repeated IDs are deduplicated. An empty valid candidates list is allowed.
-Classification is deliberately conservative but remains a model judgment; it
-does not remove existing concept links, including overly broad older links.
+Apply `migrations/20261012_complete_subject_structure.sql` in Supabase **before**
+deploying the updated frontend. It adds one SECURITY INVOKER RPC and does not
+change existing tables, rows or RLS policies. Verify the deployed schema has the
+existing `topics`, `subtopics`, `notes`, `note_subtopics` columns/FKs and default
+IDs used by the REST services. The authenticated admin must already have the
+appropriate SELECT/INSERT/UPDATE rights through RLS; this migration does not
+grant those rights or bypass RLS. Do not weaken policies to make generation work.
 
-Generated structures must have valid topic/subtopic names and lists. Only input
-note IDs are accepted, and the first occurrence of each ID wins. Missing notes
-reject the complete plan before frontend writes; no fallback curriculum is
-invented. Empty noteIds lists are allowed for subtopics supported by the notes.
+Django receives existing topic/subtopic IDs and names, plus all nonempty notes
+as context. Only notes with neither a primary subtopic nor a note_subtopics link
+are eligible for placement. Protected notes still provide content for completing
+missing academic structure. Folders are preserved and do not determine academic
+subtopic placement. Unknown IDs, wrong parents and omitted eligible notes reject
+the plan. The LLM is instructed to reuse semantically matching structure; exact
+normalized names are also reused deterministically at save time. Semantic
+synonym matching remains a model judgment.
 
-The current frontend uses separate Supabase REST requests for each topic,
-subtopic and note placement. These requests cannot share a transaction. The
-structure service checks for existing topics both before requesting AI output
-and immediately before saving. It does not regenerate existing structure.
-If saving fails, it reports confirmed counts and asks the administrator to
-inspect the partial structure. Counts cannot include writes whose response was
-lost. No automatic rollback/deletion is attempted, since created rows might
-already be referenced or manually edited. Before retrying, inspect the existing
-structure and finish it manually; automatic generation refuses an existing one.
+`complete_subject_structure` saves the plan in one PostgreSQL transaction. It
+serializes AI completions per subject, reuses current IDs/names, appends new rows
+without renaming/reordering old rows, and locks eligible notes before checking
+primary/manual links again. Notes placed during the AI request are skipped.
+New placements update notes.subtopic_id and insert note_subtopics together.
+Existing manual placements, including legacy inconsistencies, are left untouched.
+Repeated plans reuse the same structure. No rollback via destructive REST deletes
+is used. A database error rolls back the entire structure step. If a network
+response is lost, the outcome is unknown; the UI says so rather than claiming
+nothing was saved. There is no non-atomic fallback when the RPC is unavailable.
 
-These checks reduce risk but do not prevent two concurrent clients from both
-passing the final check, nor do they make saves atomic. A future bounded fix is
-a Supabase Postgres function invoked through RPC: validate the subject and note
-ownership, serialize generation per subject, reject existing structure, and
-insert the entire validated plan in one database transaction. Its authorization,
-RLS behavior and migrations need verification against the deployed schema first.
-No RPC, schema migration, database redesign or many-to-many change is included
-in this update. Existing concepts, callout links and Concept ↔ Subtopic links
-are preserved; preserveExisting continues to retain existing concept content.
+The existing concept extraction/save step is separate. Its failure reports the
+confirmed structure result; it does not roll that result back. Concept generation
+continues to preserve existing content and manual links.
+
+Tests use a disposable local PostgreSQL schema, not the deployed Supabase schema.
+`tests/subject-structure.sql` validates reuse, retries, both note linkage fields,
+manual placements, RLS, scope checks and transaction rollback. The deployment
+migration has not been applied automatically to a live database.

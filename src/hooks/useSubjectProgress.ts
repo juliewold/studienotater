@@ -83,7 +83,7 @@ const getTopicInformation = (resource: unknown) => {
   };
 };
 
-export const useSubjectProgress = (subjectId: string | undefined) => {
+export const useSubjectProgress = (subjectId: string | undefined, refreshKey = 0) => {
   const { getProgress, isLoadingProgress } = useProgress();
 
   const [pdfs, setPdfs] = useState<DatabasePdf[]>([]);
@@ -131,7 +131,7 @@ export const useSubjectProgress = (subjectId: string | undefined) => {
     };
 
     loadResources();
-  }, [subjectId]);
+  }, [subjectId, refreshKey]);
 
   const subjectProgress = useMemo<SubjectProgress>(() => {
     if (!subjectId) {

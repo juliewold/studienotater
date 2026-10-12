@@ -6,13 +6,16 @@ from .concept_extraction_service import (
 )
 
 
-def generate_subject_structure(subject_name, notes):
+def generate_subject_structure(subject_name, notes, existing_topics=None):
+    existing_topics = existing_topics or []
+    topic_lookup = {topic["id"]: topic for topic in existing_topics}
     client = get_client()
 
     notes_text = "\n\n".join(
         (
             f"NOTE_ID: {note['id']}\n"
             f"TITTEL: {note['title']}\n"
+            f"KAN_ORGANISERES: {note.get('organize', True)}\n"
             f"INNHOLD:\n{note['content']}"
         )
         for note in notes
@@ -66,7 +69,13 @@ def generate_subject_structure(subject_name, notes):
                     "Et undertema trenger ikke ha et notat direkte plassert i seg. "
 
                     "Bruk NOTE_ID nøyaktig slik den er oppgitt. "
-                    "Hver NOTE_ID skal forekomme i noteIds for nøyaktig ett undertema. "
+                    "Bare notater med KAN_ORGANISERES=True skal plasseres, nøyaktig én gang. "
+                    "Andre notater er kun faglig kontekst og skal ikke finnes i noteIds. "
+                    "Kompletter EKSISTERENDE STRUKTUR: gjenbruk temaer og undertemaer "
+                    "med samme faglige betydning, også ved alternative navn. "
+                    "Ved gjenbruk, returner eksisterende id og navn. Et undertema må "
+                    "beholdes under sitt eksisterende tema. Nye elementer skal ikke ha id. "
+                    "Opprett bare faglig manglende elementer; ikke duplikater. "
 
                     "Bruk bare fagstoff som støttes av notatene. "
                     "Ikke legg til pensumområder bare fordi de vanligvis finnes i faget. "
@@ -83,6 +92,7 @@ def generate_subject_structure(subject_name, notes):
                 "role": "user",
                 "content": (
                     f"FAG: {subject_name}\n\n"
+                    f"EKSISTERENDE STRUKTUR:\n{json.dumps(existing_topics, ensure_ascii=False)}\n\n"
                     f"NOTATER:\n{notes_text}"
                 ),
             },
@@ -102,7 +112,7 @@ def generate_subject_structure(subject_name, notes):
     if not isinstance(result, dict) or not isinstance(result.get("topics"), list):
         raise ValueError("LLM response does not contain a valid topics list.")
 
-    valid_note_ids = {note["id"] for note in notes}
+    valid_note_ids = {note["id"] for note in notes if note.get("organize", True)}
     assigned = set()
     validated_topics = []
     for topic in result["topics"]:
@@ -110,6 +120,11 @@ def generate_subject_structure(subject_name, notes):
             raise ValueError("Topic must have a non-empty name.")
         if not isinstance(topic.get("subtopics"), list) or not topic["subtopics"]:
             raise ValueError("Topic must have a non-empty subtopics list.")
+        topic_id = topic.get("id")
+        existing_topic = topic_lookup.get(topic_id) if isinstance(topic_id, str) else None
+        if topic_id is not None and existing_topic is None:
+            raise ValueError("Unknown existing topic ID.")
+        subtopic_lookup = {item["id"]: item for item in (existing_topic or {}).get("subtopics", [])}
         validated_subtopics = []
         for subtopic in topic["subtopics"]:
             if not isinstance(subtopic, dict) or not isinstance(subtopic.get("name"), str) or not subtopic["name"].strip():
@@ -121,8 +136,20 @@ def generate_subject_structure(subject_name, notes):
                 if isinstance(note_id, str) and note_id in valid_note_ids and note_id not in assigned:
                     note_ids.append(note_id)
                     assigned.add(note_id)
-            validated_subtopics.append({"name": subtopic["name"].strip(), "noteIds": note_ids})
-        validated_topics.append({"name": topic["name"].strip(), "subtopics": validated_subtopics})
+            subtopic_id = subtopic.get("id")
+            existing_subtopic = subtopic_lookup.get(subtopic_id) if isinstance(subtopic_id, str) else None
+            if subtopic_id is not None and existing_subtopic is None:
+                raise ValueError("Unknown subtopic ID or wrong parent.")
+            validated_subtopics.append({
+                **({"id": subtopic_id} if existing_subtopic else {}),
+                "name": existing_subtopic["name"] if existing_subtopic else subtopic["name"].strip(),
+                "noteIds": note_ids,
+            })
+        validated_topics.append({
+            **({"id": topic_id} if existing_topic else {}),
+            "name": existing_topic["name"] if existing_topic else topic["name"].strip(),
+            "subtopics": validated_subtopics,
+        })
 
     # Do not invent a fallback topic or save an incomplete plan. The caller can
     # retry or organize the notes manually; no frontend writes have started yet.
