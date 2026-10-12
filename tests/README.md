@@ -277,3 +277,19 @@ For UI integration, restart Django and use a disposable subject with new,
 unlinked test notes. Existing placed notes remain protected, including old AI
 mistakes: generating again deliberately does not repair their placements.
 No new Supabase migration is required beyond the existing completion RPC.
+
+## Flashcard generation
+
+- `backend/.venv/bin/python backend/manage.py test concepts --noinput` covers
+  content-only prompts, formula preservation, grounding/retry, deduplication,
+  stable card IDs, uncertain classifications and notes without existing links.
+- Open `http://localhost:5173/studienotater/tests/flashcard-generation.html` on a
+  local origin without a signed-in Supabase session. Three service checks run
+  automatically; all test requests are mocked. Generate the two fixture cards,
+  verify saving is blocked until the second card has a placement, deselect the
+  first, edit the second and choose Kø. Save and inspect the displayed mock body:
+  only the edited card, `note_id: source-note`, `subtopic_id: queue`.
+  Generate again, then click “Bytt testnotat”: the old preview must disappear.
+- Run `psql -d <disposable_database> -f tests/flashcard-source.sql` only in an
+  empty local test database. It tests migration reruns, old-card preservation,
+  source foreign keys and keeping cards when the source note is deleted.

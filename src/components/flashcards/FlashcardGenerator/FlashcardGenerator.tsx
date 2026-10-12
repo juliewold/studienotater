@@ -6,11 +6,10 @@ import { Check, LoaderCircle, Save, Sparkles } from "lucide-react";
 import {
   generateFlashcards,
   type GeneratedFlashcard,
+  type AvailableFlashcardSubtopic,
 } from "../../../services/flashcards/flashcardGenerationService";
 
-import { getSubtopicIdsByNote } from "../../../services/notes/noteSubtopicsService";
-
-import { getAllSubtopicsBySubject } from "../../../services/subjects/subjectStructureService";
+import { getAllSubtopicsBySubject, getTopicsBySubject } from "../../../services/subjects/subjectStructureService";
 
 import { createFlashcard } from "../../../services/study/flashcardsService";
 
@@ -30,11 +29,16 @@ const createSlug = (value: string) => {
     .replace(/^-+|-+$/g, "");
 };
 
-export const FlashcardGenerator = ({
+export const FlashcardGenerator = (props: FlashcardGeneratorProps) => (
+  <FlashcardGeneratorContent key={`${props.subjectId}:${props.noteId}:${props.content}`} {...props} />
+);
+
+const FlashcardGeneratorContent = ({
   noteId,
   subjectId,
   content,
 }: FlashcardGeneratorProps) => {
+  const [subtopics, setSubtopics] = useState<AvailableFlashcardSubtopic[]>([]);
   const [flashcards, setFlashcards] = useState<GeneratedFlashcard[]>([]);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
@@ -50,25 +54,20 @@ export const FlashcardGenerator = ({
     setSuccessMessage("");
 
     try {
-      const [linkedSubtopicIds, allSubtopics] = await Promise.all([
-        getSubtopicIdsByNote(noteId),
+      const [topics, allSubtopics] = await Promise.all([
+        getTopicsBySubject(subjectId),
         getAllSubtopicsBySubject(subjectId),
       ]);
-
-      const linkedSubtopics = allSubtopics
-        .filter((subtopic) => linkedSubtopicIds.includes(subtopic.id))
-        .map((subtopic) => ({
-          id: subtopic.id,
-          name: subtopic.name,
-        }));
-
-      if (linkedSubtopics.length === 0) {
-        throw new Error(
-          "Notatet må være koblet til minst ett undertema før du kan generere flashcards.",
-        );
+      const options = allSubtopics.map((subtopic) => ({
+        id: subtopic.id,
+        name: subtopic.name,
+        topicName: topics.find((topic) => topic.id === subtopic.topicId)?.name ?? "",
+      }));
+      setSubtopics(options);
+      const generated = await generateFlashcards(content, options);
+      if (generated.length === 0) {
+        setSuccessMessage("Notatet ga ikke grunnlag for flashcards.");
       }
-
-      const generated = await generateFlashcards(content, linkedSubtopics);
 
       setFlashcards(generated);
       setSelectedIndexes(generated.map((_, index) => index));
@@ -112,6 +111,11 @@ export const FlashcardGenerator = ({
     setSuccessMessage("");
 
     try {
+      const currentSubtopics = await getAllSubtopicsBySubject(subjectId);
+      if (selectedFlashcards.some((card) => !card.subtopicId ||
+        !currentSubtopics.some((subtopic) => subtopic.id === card.subtopicId))) {
+        throw new Error("Velg et gyldig tema/undertema for alle valgte kort før lagring.");
+      }
       for (const flashcard of selectedFlashcards) {
         const question = flashcard.question.trim();
         const answer = flashcard.answer.trim();
@@ -129,11 +133,14 @@ export const FlashcardGenerator = ({
 
         await createFlashcard(
           subjectId,
-          flashcard.subtopicId,
+          flashcard.subtopicId!,
           slug,
           question,
           answer,
+          noteId,
         );
+        // Keep successfully saved cards deselected if a later insert fails.
+        setSelectedIndexes((current) => current.filter((index) => flashcards[index] !== flashcard));
       }
 
       setSuccessMessage(
@@ -246,7 +253,7 @@ export const FlashcardGenerator = ({
               type="button"
               className="flashcard-save-button"
               onClick={handleSave}
-              disabled={isSaving || selectedIndexes.length === 0}
+              disabled={isSaving || isGenerating || selectedIndexes.length === 0}
             >
               {isSaving ? (
                 <>
@@ -270,7 +277,7 @@ export const FlashcardGenerator = ({
 
             return (
               <article
-                key={`${flashcard.subtopicId}-${index}`}
+                key={index}
                 className={`flashcard-generator-card ${
                   isSelected ? "is-selected" : ""
                 }`}
@@ -278,6 +285,7 @@ export const FlashcardGenerator = ({
                 <label className="flashcard-generator-select">
                   <input
                     type="checkbox"
+                    disabled={isSaving || isGenerating}
                     checked={isSelected}
                     onChange={() => toggleFlashcard(index)}
                   />
@@ -287,6 +295,7 @@ export const FlashcardGenerator = ({
                 <label>
                   Spørsmål
                   <textarea
+                    disabled={isSaving || isGenerating}
                     value={flashcard.question}
                     onChange={(event) =>
                       updateQuestion(index, event.target.value)
@@ -298,12 +307,33 @@ export const FlashcardGenerator = ({
                 <label>
                   Svar
                   <textarea
+                    disabled={isSaving || isGenerating}
                     value={flashcard.answer}
                     onChange={(event) =>
                       updateAnswer(index, event.target.value)
                     }
                     rows={3}
                   />
+                </label>
+                <label className="flashcard-generator-placement">
+                  Tema / undertema
+                  <select
+                    value={flashcard.subtopicId ?? ""}
+                    disabled={isSaving || isGenerating}
+                    onChange={(event) => {
+                      const subtopicId = event.target.value || null;
+                      setFlashcards((current) => current.map((card, i) =>
+                        i === index ? { ...card, subtopicId } : card));
+                    }}
+                  >
+                    <option value="">Velg plassering før lagring</option>
+                    {subtopics.map((subtopic) => (
+                      <option key={subtopic.id} value={subtopic.id}>
+                        {subtopic.topicName} → {subtopic.name}
+                      </option>
+                    ))}
+                  </select>
+                  {subtopics.length === 0 && "Opprett tema/undertema i fagets kunnskapsbase for å lagre kortene."}
                 </label>
               </article>
             );

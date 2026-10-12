@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 export type DatabaseFlashcard = {
   id: string;
   subjectId: string;
+  noteId?: string | null;
 
   topicId: string;
   topicName: string;
@@ -45,6 +46,7 @@ export async function getFlashcardsBySubject(
   return (data ?? []).map((flashcard) => ({
     id: flashcard.id,
     subjectId: flashcard.subject_id,
+    noteId: flashcard.note_id ?? null,
 
     topicId: flashcard.subtopics?.topics?.id ?? "",
 
@@ -87,6 +89,7 @@ export async function getAllFlashcards(): Promise<DatabaseFlashcard[]> {
   return (data ?? []).map((flashcard) => ({
     id: flashcard.id,
     subjectId: flashcard.subject_id,
+    noteId: flashcard.note_id ?? null,
 
     topicId: flashcard.subtopics?.topics?.id ?? "",
     topicName: flashcard.subtopics?.topics?.name ?? "",
@@ -107,8 +110,10 @@ export async function createFlashcard(
   slug: string,
   question: string,
   answer: string,
+  noteId?: string,
 ) {
   const { error } = await supabase.from("flashcards").insert({
+    ...(noteId ? { note_id: noteId } : {}),
     subject_id: subjectId,
     subtopic_id: subtopicId,
     slug,

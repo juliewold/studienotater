@@ -220,9 +220,9 @@ def generate_flashcard_suggestions(request):
             status=400,
         )
 
-    if not isinstance(subtopics, list) or not subtopics:
+    if not isinstance(subtopics, list):
         return JsonResponse(
-            {"error": "At least one subtopic is required."},
+            {"error": "Subtopics must be a list."},
             status=400,
         )
 
