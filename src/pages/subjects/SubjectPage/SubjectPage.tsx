@@ -29,18 +29,20 @@ export const SubjectPage = () => {
     INITIAL_VISIBLE_TOPICS,
   );
 
+  const [structureRevision, setStructureRevision] = useState(0);
+
   const subject = subjects.find(
     (currentSubject) => currentSubject.id === subjectId,
   );
 
   const { subjectProgress, isLoading, errorMessage } =
-    useSubjectProgress(subjectId);
+    useSubjectProgress(subjectId, structureRevision);
 
   const {
     topics,
     isLoading: isLoadingStructure,
     errorMessage: structureErrorMessage,
-  } = useSubjectStructure(subjectId);
+  } = useSubjectStructure(subjectId, structureRevision);
 
   const visibleTopics = subjectProgress.topicProgress.slice(
     0,
@@ -57,8 +59,8 @@ export const SubjectPage = () => {
 
     const shouldGenerate = window.confirm(
       `Vil du generere kunnskapsbasen for ${subject?.code ?? "dette faget"}? ` +
-        "Hvis fagstruktur mangler, kan AI opprette temaer og undertemaer og organisere notatene først. " +
-        "Deretter analyseres notatene som er knyttet til undertemaer, og begreper, forklaringer og koblinger genereres. " +
+        "AI kompletterer fagstrukturen og organiserer bare notater uten undertemaplassering eller manuelle undertemakoblinger. " +
+        "Deretter analyseres notatene, og begreper, forklaringer og koblinger genereres. " +
         "Eksisterende fagstruktur, begrepsinnhold og manuelle koblinger bevares.",
     );
 
@@ -76,9 +78,11 @@ export const SubjectPage = () => {
       );
 
       setKnowledgeBaseMessage(
-        `${result.topicsCreated} temaer og ` +
+        (result.structureStatus === "no-content" ? "Struktursteget ble hoppet over: ingen notater med tekstinnhold. " : "Struktursteget fullført. ") +
+          `${result.topicsCreated} temaer og ` +
           `${result.subtopicsCreated} undertemaer opprettet. ` +
-          `${result.notesOrganized} notater organisert. ` +
+          `${result.topicsReused} temaer og ${result.subtopicsReused} undertemaer gjenbrukt. ` +
+          `${result.notesOrganized} notater organisert; ${result.notesSkipped} beholdt uendret eller uten tekstinnhold. ` +
           `${result.processedNotes} notater analysert og ` +
           `${result.conceptsProcessed} begreper behandlet. ` +
           `${result.linkedCallouts} definisjons- og teorembokser koblet til begreper. ` +
@@ -99,6 +103,7 @@ export const SubjectPage = () => {
       );
     } finally {
       setIsGeneratingKnowledgeBase(false);
+      setStructureRevision(value => value + 1);
     }
   };
 

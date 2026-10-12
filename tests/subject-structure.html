@@ -6,23 +6,20 @@ const assert=(ok,message)=>{if(!ok)throw new Error(message)};
 const response=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});
 const originalFetch=window.fetch;
 async function scenario(mode){
- let topicReads=0;const calls=[];
+ const calls=[];
  window.fetch=async(input,init={})=>{
-  const url=new URL(typeof input==='string'?input:input.url), method=init.method??'GET';
-  calls.push({path:url.pathname,method});const table=url.pathname.split('/').at(-1);
-  if(method==='GET'&&table==='topics'){
-   topicReads++;
-   return response(mode==='existing'||(mode==='concurrent'&&topicReads===2)?[{id:'old',name:'Old',subject_id:'subject',sort_order:0}]:[]);
-  }
-  if(method==='GET'&&table==='notes')return response(mode==='empty'?[]:[{id:'n1',subject_id:'subject',title:'Note',slug:'note',description:'',content:'Source',content_json:null,created_at:'',subtopics:null}]);
+  const url=new URL(typeof input==='string'?input:input.url), method=init.method??'GET',body=init.body?JSON.parse(init.body):null;
+  calls.push({path:url.pathname,method,body});const table=url.pathname.split('/').at(-1);
+  if(method==='GET'&&table==='topics')return response([{id:'old',name:'Old',subject_id:'subject',sort_order:0}]);
+  if(method==='GET'&&table==='subtopics')return response([{id:'sub',name:'Sub',topic_id:'old',sort_order:0}]);
+  if(method==='GET'&&table==='note_subtopics')return response([{note_id:'manual',subtopic_id:'sub'}]);
+  if(method==='GET'&&table==='notes')return response(mode==='empty'?[]:['free','primary','manual'].map(id=>({id,subject_id:'subject',title:id,slug:id,description:'',content:'Source',content_json:null,created_at:'',subtopics:null,subtopic_id:id==='primary'?'sub':null})));
   if(url.pathname.endsWith('/api/concepts/generate-structure/'))return mode==='ai-error'
    ?response({error:'AI-tjenesten er utilgjengelig.'},503)
-   :response({topics:[{name:'Topic',subtopics:[{name:'Subtopic',noteIds:['n1']}]}]});
-  if(method==='POST'&&table==='topics')return response({id:'t1',name:'Topic',subject_id:'subject',sort_order:0},201);
-  if(method==='POST'&&table==='subtopics')return mode==='partial'
-   ?response({message:'Write failed'},400)
-   :response({id:'s1',topic_id:'t1',name:'Subtopic',sort_order:0},201);
-  if(method==='PATCH'&&table==='notes')return response(null);
+   :response({topics:[{id:'old',name:'Old',subtopics:[{name:'New',noteIds:['free']}]}]});
+  if(table==='complete_subject_structure')return mode==='save-error'
+   ?response({message:'Transaction rejected'},400)
+   :response({topicsCreated:0,subtopicsCreated:1,topicsReused:1,subtopicsReused:0,notesOrganized:mode==='concurrent'?0:1,notesSkipped:mode==='concurrent'?1:0});
   throw new Error('Unexpected request '+method+' '+url.pathname);
  };
  let result,error;
@@ -32,12 +29,22 @@ async function scenario(mode){
 }
 const writes=s=>s.calls.filter(c=>c.path.includes('/rest/v1/')&&c.method!=='GET');
 const tests=[
- ['Eksisterende fagstruktur stopper både AI og lagring',async()=>{const s=await scenario('existing');assert(s.error,'Expected rejection');assert(s.calls.length===1&&writes(s).length===0,'Existing structure changed')}],
- ['Struktur opprettet under AI-kallet bevares',async()=>{const s=await scenario('concurrent');assert(s.error,'Expected rejection');assert(writes(s).length===0,'Concurrent structure changed')}],
- ['AI-feil vises før noen lagring',async()=>{const s=await scenario('ai-error');assert(s.error?.message==='AI-tjenesten er utilgjengelig.','Missing error message');assert(writes(s).length===0,'Unexpected writes')}],
- ['Delvis lagring gir beskjed uten sletting',async()=>{const s=await scenario('partial');assert(s.error?.message.includes('delvis lagret (1 temaer'),'Missing partial status');assert(!s.calls.some(c=>c.method==='DELETE'),'Unsafe rollback')}],
- ['Gyldig plan lagres og notatet organiseres',async()=>{const s=await scenario('success');assert(!s.error,s.error?.message);assert(s.result.topicsCreated===1&&s.result.subtopicsCreated===1&&s.result.notesOrganized===1,'Incorrect result')}],
- ['Ingen notater gir ingen endringer',async()=>{const s=await scenario('empty');assert(!s.error,s.error?.message);assert(s.result.topicsCreated===0&&writes(s).length===0,'Unexpected creation')}],
+ ['Eksisterende struktur sendes til AI, med vern av primær- og manuelle koblinger',async()=>{
+  const s=await scenario('existing');assert(!s.error,s.error?.message);
+  const payload=s.calls.find(c=>c.path.endsWith('/generate-structure/')).body;
+  assert(payload.existingTopics[0].id==='old'&&payload.existingTopics[0].subtopics[0].id==='sub','Missing context');
+  assert(payload.notes.filter(n=>n.organize).map(n=>n.id).join()==='free','Protected notes were eligible');
+  assert(s.result.notesSkipped===2&&s.result.topicsReused===1,'Incorrect counts');
+ }],
+ ['Plan lagres i ett atomisk RPC-kall med bare uorganiserte ID-er',async()=>{
+  const s=await scenario('success');assert(!s.error,s.error?.message);
+  assert(writes(s).length===1&&writes(s)[0].path.endsWith('/rpc/complete_subject_structure'),'Non-atomic writes');
+  assert(writes(s)[0].body.p_note_ids.join()==='free','Wrong eligible IDs');
+ }],
+ ['Plassering gjort under AI-kallet rapporteres som hoppet over',async()=>{const s=await scenario('concurrent');assert(s.result.notesOrganized===0&&s.result.notesSkipped===3,'Incorrect concurrent skip count')}],
+ ['AI-feil vises før noen lagring',async()=>{const s=await scenario('ai-error');assert(s.error?.message==='AI-tjenesten er utilgjengelig.','Missing error');assert(writes(s).length===0,'Unexpected writes')}],
+ ['RPC-feil gir tydelig beskjed uten REST-fallback eller sletting',async()=>{const s=await scenario('save-error');assert(s.error?.message.includes('Kunne ikke bekrefte lagring'),'Missing error');assert(writes(s).length===1,'Unsafe fallback')}],
+ ['Ingen notater rapporteres som hoppet over uten AI eller lagring',async()=>{const s=await scenario('empty');assert(!s.error,s.error?.message);assert(s.result.structureStatus==='no-content'&&writes(s).length===0,'Unexpected creation')}],
 ];
 let passed=0;
 for(const[name,test]of tests){try{await test();passed++;document.querySelector('#results').textContent+='BESTÅTT: '+name+'\n'}catch(e){document.querySelector('#results').textContent+='FEIL: '+name+': '+e.message+'\n'}}

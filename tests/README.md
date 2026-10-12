@@ -49,13 +49,20 @@ fagstruktur skjer før begrepsanalysen og er ikke del av samme transaksjon.
 
 ## Validering av generert struktur
 
-`/studienotater/tests/subject-structure.html` kjører seks tester med simulerte
-API-svar: eksisterende struktur, struktur opprettet under AI-kallet, AI-feil uten
-lagring, tydelig feil ved delvis lagring uten sletting, vellykket lagring og tomt
-notatutvalg. Backend-testene dekker ugyldige kandidater, strukturfelt, ukjente og
-repeterte ID-er, glemte notater og kontrollerte feil fra begge AI-endepunktene.
-Se `database/README.md` for valideringsregler og transaksjonsbegrensningene.
+`/studienotater/tests/subject-structure.html` tester eksisterende struktur som
+AI-kontekst, beskyttelse av plasserte/manuelt koblede notater, ett RPC-kall,
+samtidige plasseringer, API-/lagringsfeil og tomt notatutvalg. Kjør også
+`knowledge-base.html` og `concept-deduplication.html` for begrepsregresjoner.
+Backend: `backend/.venv/bin/python backend/manage.py test concepts`.
 
+`psql -v ON_ERROR_STOP=1 -d <tom-testdatabase> -f tests/subject-structure.sql`
+krever en **tom, disponibel UTF-8 PostgreSQL-database** og en lokal testadministrator.
+Skriptet oppretter fixture-tabeller og RLS-regler; det må aldri kjøres i Supabase
+eller en database med eksisterende data. Det laster den faktiske RPC-migrasjonen
+og verifiserer gjenbruk, navnededuplisering, idempotens, beskyttelse av primær-/
+manuelle koblinger, konsistent ny plassering, RLS og full rollback ved feil.
+
+Se `database/README.md` for migrasjonen som kreves før frontend-deploy.
 
 ## Sporadisk ugyldig AI-svar
 
@@ -243,3 +250,30 @@ immediately switch notes: the title must save and update in the sidebar. An empt
 title must prevent navigation and preserve the editor. Check light/dark themes,
 a narrow desktop and a 390px mobile viewport; the mobile drawer must close after
 navigation and with Escape. A different subject route must show no fixture notes.
+
+## Quality of AI structure placement
+
+`backend/.venv/bin/python backend/manage.py test concepts` includes
+`test_structure_quality.py`. It checks intentionally shifted batch note IDs,
+reversed note order, existing choices omitted by the structure proposal,
+protected notes, source quotes from the wrong note, unknown/uncertain choices,
+truncated responses, and preservation of complete text/LaTeX when removing HTML.
+The mocked tests verify the contract and safeguards, not model accuracy.
+
+Optional live smoke test using **synthetic notes only**, with no database writes
+(requires the existing backend LLM configuration):
+
+```sh
+backend/.venv/bin/python backend/manage.py shell -c 'from concepts.subject_structure_service import generate_subject_structure; from concepts.test_structure_quality import StructureQualityTests; import json; print(json.dumps(generate_subject_structure("Algoritmer og datastrukturer", StructureQualityTests.notes), ensure_ascii=False))'
+```
+
+Check that `id-data` belongs to data structures, `id-reductions` to problem
+reductions, and `id-divide` to divide-and-conquer/Merge Sort. Repeat with
+`list(reversed(StructureQualityTests.notes))`; classification should not follow
+input position. Names/language may vary. This invokes one structure call plus
+one classification call per eligible note and does not persist the returned plan.
+
+For UI integration, restart Django and use a disposable subject with new,
+unlinked test notes. Existing placed notes remain protected, including old AI
+mistakes: generating again deliberately does not repair their placements.
+No new Supabase migration is required beyond the existing completion RPC.

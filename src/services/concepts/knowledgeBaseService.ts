@@ -7,7 +7,6 @@ import { linkCalloutsToConcepts } from "./calloutConceptLinkingService";
 import { getConceptCallouts } from "./conceptCalloutService";
 import {
   getAllSubtopicsBySubject,
-  getTopicsBySubject,
 } from "../subjects/subjectStructureService";
 import {
   extractConceptCandidates,
@@ -17,12 +16,9 @@ import {
 } from "./conceptExtractionService";
 import { createConcept, getConceptsFromDatabase, normalizeConceptName } from "./conceptService";
 import { addConceptSubtopic } from "./conceptSubtopicsService";
-import { generateAndSaveSubjectStructure } from "./subjectStructureGenerationService";
+import { generateAndSaveSubjectStructure, emptyStructureResult, type GenerateSubjectStructureResult } from "./subjectStructureGenerationService";
 
-export type KnowledgeBaseGenerationResult = {
-  topicsCreated: number;
-  subtopicsCreated: number;
-  notesOrganized: number;
+export type KnowledgeBaseGenerationResult = GenerateSubjectStructureResult & {
   processedNotes: number;
   skippedNotes: number;
   failedNotes: { id: string; title: string }[];
@@ -36,23 +32,29 @@ export async function generateKnowledgeBaseForSubject(
   subjectName: string,
   options: { noteId?: string } = {},
 ): Promise<KnowledgeBaseGenerationResult> {
-  const existingTopics = await getTopicsBySubject(subjectId);
+  const structureResult = options.noteId
+    ? emptyStructureResult()
+    : await generateAndSaveSubjectStructure(subjectId, subjectName);
 
-  let topicsCreated = 0;
-  let subtopicsCreated = 0;
-  let notesOrganized = 0;
-
-  if (existingTopics.length === 0 && !options.noteId) {
-    const structureResult = await generateAndSaveSubjectStructure(
-      subjectId,
-      subjectName,
+  try {
+    return await extractAndSaveConcepts(subjectId, options, structureResult);
+  } catch (error) {
+    if (structureResult.structureStatus !== "completed") throw error;
+    const detail = error instanceof Error ? error.message : "Ukjent feil.";
+    throw new Error(
+      `Struktursteget ble lagret: ${structureResult.topicsCreated} temaer og ${structureResult.subtopicsCreated} undertemaer opprettet, ` +
+      `${structureResult.topicsReused} temaer og ${structureResult.subtopicsReused} undertemaer gjenbrukt, ` +
+      `${structureResult.notesOrganized} notater organisert og ${structureResult.notesSkipped} hoppet over. ` +
+      `Begrepssteget ble avbrutt: ${detail}`, { cause: error },
     );
-
-    topicsCreated = structureResult.topicsCreated;
-    subtopicsCreated = structureResult.subtopicsCreated;
-    notesOrganized = structureResult.notesOrganized;
   }
+}
 
+async function extractAndSaveConcepts(
+  subjectId: string,
+  options: { noteId?: string },
+  structureResult: GenerateSubjectStructureResult,
+): Promise<KnowledgeBaseGenerationResult> {
   const subjectNotes = await getNotesBySubject(subjectId);
   const notes = options.noteId
     ? subjectNotes.filter((note) => note.id === options.noteId)
@@ -207,9 +209,7 @@ export async function generateKnowledgeBaseForSubject(
   }
 
   return {
-    topicsCreated,
-    subtopicsCreated,
-    notesOrganized,
+    ...structureResult,
     processedNotes,
     skippedNotes,
     failedNotes,
