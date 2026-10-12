@@ -102,3 +102,17 @@ valid quote is not a proof of semantic correctness. The model still makes the
 academic judgment. The added calls cost time proportional to eligible notes.
 Existing protected placements are not reclassified or changed, and the database
 transaction/permission behavior is unchanged.
+
+## Flashcard source notes
+
+Apply `migrations/20261012_flashcard_source_note.sql` in Supabase before deploying
+note-generated flashcard saving. It adds nullable `flashcards.note_id` with a
+foreign key and index. Existing rows are not backfilled or reclassified; deleting
+a note preserves its cards and clears their source reference. Existing RLS is
+unchanged. This migration is not automatically applied to the live database.
+
+Generation uses the full note content (including LaTeX) before a separate call
+classifies the resulting cards against all subject topic/subtopic paths. Existing
+note placements do not enter either prompt. Users can correct the proposed path
+in the preview; uncertain classifications require a choice before saving. Source
+quotes and duplicate checks are safeguards, not proof of academic correctness.

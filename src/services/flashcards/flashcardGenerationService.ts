@@ -1,14 +1,14 @@
-import { getPlainTextFromNote } from "../concepts/conceptExtractionService";
 
 export type AvailableFlashcardSubtopic = {
   id: string;
   name: string;
+  topicName?: string;
 };
 
 export type GeneratedFlashcard = {
   question: string;
   answer: string;
-  subtopicId: string;
+  subtopicId: string | null;
 };
 
 type FlashcardGenerationResponse = {
@@ -25,16 +25,11 @@ export async function generateFlashcards(
     throw new Error("VITE_API_URL is not configured.");
   }
 
-  const text = getPlainTextFromNote(content);
+  // Send editor HTML so the backend can retain LaTeX attributes and block boundaries.
+  const text = content.trim();
 
   if (!text) {
     throw new Error("Notatet inneholder ingen tekst.");
-  }
-
-  if (subtopics.length === 0) {
-    throw new Error(
-      "Notatet må være koblet til minst ett undertema før du kan generere flashcards.",
-    );
   }
 
   const response = await fetch(`${apiUrl}/api/concepts/generate-flashcards/`, {
@@ -61,7 +56,11 @@ export async function generateFlashcards(
 
   const data = (await response.json()) as FlashcardGenerationResponse;
 
-  if (!Array.isArray(data.flashcards)) {
+  if (!data || !Array.isArray(data.flashcards) || data.flashcards.some((card) =>
+    !card || typeof card.question !== "string" || !card.question.trim() ||
+    typeof card.answer !== "string" || !card.answer.trim() ||
+    (card.subtopicId !== null && !subtopics.some((s) => s.id === card.subtopicId))
+  )) {
     throw new Error("AI-tjenesten returnerte et ugyldig svar.");
   }
 
