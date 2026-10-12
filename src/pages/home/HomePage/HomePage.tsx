@@ -152,8 +152,8 @@ const HomeDashboard = () => {
       <div className="dashboard-focus-grid">
         <section className="dashboard-focus">
           <div className="dashboard-focus-intro"><p className="page-label">UKENS FOKUS</p>
-            <h2>Finn flyten i fagene dine</h2>
-            <p>Nytt innhold og enkle veier videre i studieuken.</p>
+            <h2>Fortsett studiene</h2>
+            <p>Kom raskt tilbake til notater og repetisjon.</p>
             <div className="dashboard-shortcuts"><Link to="/notater">Åpne notater →</Link><Link to="/flashcards">Repeter med flashcards</Link></div>
           </div>
           <WeeklyUpdates />
