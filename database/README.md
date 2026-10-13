@@ -165,3 +165,28 @@ Normal admin writes remain allowed subject to existing SELECT/restrictive rules.
 Privileged service-role/database-owner maintenance retains its standard bypass.
 The new migration is tested locally and is **not applied to live Supabase**;
 the UI change alone does not protect the database until it is applied.
+
+## Persistent note ordering
+
+Manually apply `migrations/20261013_note_order.sql` after the folder-order,
+folder-admin and shared-note-admin migrations. It adds `notes.sort_order` and
+initializes existing rows once by title/ID within subject + folder (including
+NULL/unfiled). Subsequent reads/navigation use only the saved position, with ID
+as a deterministic tie-breaker, never title, topic or creation time.
+New or moved notes append to the destination group via an invoker trigger.
+Concurrent appends can share a position; ID breaks the tie until the next reorder.
+
+`reorder_notes` requires the protected admin role, validates a complete list from
+one subject/folder, and commits the whole permutation atomically. RLS continues
+to reject normal users' direct writes. Stale/incomplete/foreign IDs fail; a partial
+RLS update rolls back. No contents, favorites, read states or folder memberships
+are changed by sorting. Existing saved positions survive migration reruns.
+
+The common navigation helper flattens stored folder order, each folder's saved
+note order, then unfiled notes. Sidebar and Previous/Next use that same helper.
+Empty folders contribute no notes. Unknown/inaccessible folder references use the
+sidebar's existing unfiled fallback. Sorting controls are disabled during title
+search so a filtered list cannot overwrite a full group's order.
+
+The migration is tested in a disposable local database and has **not** been run
+on the live Supabase database. Apply it before deploying these frontend changes.

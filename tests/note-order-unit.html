@@ -1,0 +1,19 @@
+<!doctype html><html lang="nb"><meta charset="utf-8"><title>Note order tests</title><h1>Note order tests</h1><pre id="results"></pre><script type="module">
+import {sortNotes,orderNotesForNavigation,moveNoteInOrder} from '../src/services/notes/noteOrder.ts';
+import {getOrderedNotes} from '../src/services/notes/noteNavigationService.ts';
+import {reorderNotes} from '../src/services/notes/notesService.ts';
+import {NOTES_CHANGED} from '../src/services/notes/notesNavigationEvents.ts';
+const assert=(value,message)=>{if(!value)throw Error(message)};
+const ids=items=>items.map(item=>item.id).join(',');
+const folders=[{id:'a',sortOrder:1,createdAt:'2020'},{id:'b',sortOrder:0,createdAt:'2025'},{id:'empty',sortOrder:2,createdAt:'2024'}];
+const notes=[{id:'a1',folderId:'a',sortOrder:1},{id:'a2',folderId:'a',sortOrder:0},{id:'b1',folderId:'b',sortOrder:0},{id:'u1',folderId:null,sortOrder:1},{id:'u2',folderId:null,sortOrder:0}].map((n,i)=>({...n,title:String(5-i),createdAt:String(5-i),subjectId:'subject'}));
+let notifications=0;window.addEventListener(NOTES_CHANGED,()=>notifications++);
+const tests=[
+ ['Folder order, saved note order and unfiled last; no creation/title ordering',()=>assert(ids(orderNotesForNavigation(notes,folders))==='b1,a2,a1,u2,u1','Wrong sidebar sequence')],
+ ['Previous/next boundaries match the flattened sidebar',()=>{const ordered=orderNotesForNavigation(notes,folders);assert(ordered[ordered.findIndex(n=>n.id==='b1')+1].id==='a2','Folder transition');assert(ordered[ordered.findIndex(n=>n.id==='a1')+1].id==='u2','Unfiled transition');assert(ordered.at(-1).id==='u1','Last note')}],
+ ['Move persists positions without changing source membership',()=>{const group=notes.filter(n=>n.folderId==='a');const moved=moveNoteInOrder(group,'a1','a2');assert(ids(moved)==='a1,a2'&&moved[0].sortOrder===0,'Bad move');assert(group[0].sortOrder===1&&moved.every(n=>n.folderId==='a'),'Mutated source or folder')}],
+ ['Missing folder follows the sidebar unfiled fallback, exactly once',()=>{const ordered=orderNotesForNavigation([...notes,{id:'orphan',folderId:'missing',sortOrder:2}],folders);assert(ids(ordered)==='b1,a2,a1,u2,u1,orphan','Lost or duplicated note')}],
+ ['Navigation service uses actual folder and note positions',async()=>{window.fetch=async input=>String(input).includes('/note_folders?')?Response.json(folders.map(f=>({id:f.id,sort_order:f.sortOrder,created_at:f.createdAt,topics:null}))):Response.json(notes.map(n=>({id:n.id,folder_id:n.folderId,sort_order:n.sortOrder,title:n.title,created_at:n.createdAt,subtopics:null})));assert(ids(await getOrderedNotes('subject'))==='b1,a2,a1,u2,u1','Service diverged')}],
+ ['Save scope includes null folder and invalidates navigation only on success',async()=>{window.fetch=async(input,options)=>{const body=JSON.parse(options.body);assert(String(input).endsWith('/rpc/reorder_notes')&&body.p_subject_id==='subject'&&body.p_folder_id===null&&body.p_note_ids.join(',')==='u2,u1','Wrong RPC');return new Response(null,{status:204})};await reorderNotes('subject',null,['u2','u1']);assert(notifications===1,'Missing event');window.fetch=async()=>Response.json({message:'Denied'},{status:403});let failed=false;try{await reorderNotes('subject',null,['u1','u2'])}catch{failed=true}assert(failed&&notifications===1,'Failure falsely notified')}],
+];let passed=0;for(const[name,test]of tests){try{await test();passed++;document.querySelector('#results').textContent+='PASS: '+name+'\n'}catch(e){document.querySelector('#results').textContent+='FAIL: '+name+': '+e.message+'\n'}}document.querySelector('#results').textContent+=`${passed}/${tests.length} passed`;
+</script></html>

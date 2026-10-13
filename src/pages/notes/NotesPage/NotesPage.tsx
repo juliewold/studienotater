@@ -1,3 +1,5 @@
+import { sortNotes } from "../../../services/notes/noteOrder";
+import { SortableNotes } from "../../../components/notes/SortableNotes/SortableNotes";
 import { NOTES_CHANGED } from "../../../services/notes/notesNavigationEvents";
 import { sortNoteFolders } from "../../../services/notes/noteFolderOrder";
 import { SortableFolders } from "../../../components/notes/SortableFolders/SortableFolders";
@@ -435,7 +437,7 @@ export const NotesPage = () => {
 
   // Without a search, preserve the original folder + loose-notes overview.
   // A title search also finds notes inside folders without moving them.
-  const visibleNotes = notes.filter(note => query.trim()
+  const visibleNotes = sortNotes(notes).filter(note => query.trim()
     ? note.title.normalize("NFC").toLocaleLowerCase("nb").includes(query.trim().normalize("NFC").toLocaleLowerCase("nb"))
     : note.folderId === null);
   const renderNote = (note: DatabaseNote) => {
@@ -619,10 +621,14 @@ export const NotesPage = () => {
         view === "topics" ? (
           <StructuredNotes key={subject.id} subjectId={subject.id} notes={notes} query={query} renderNote={renderNote} />
         ) : (
-          <div className="notes-list">
-            {visibleNotes.map(renderNote)}
+          <>
+            <SortableNotes key={subject.id} subjectId={subject.id} folderId={null}
+              notes={visibleNotes} className="notes-list" enabled={isAdmin && !query.trim() && !isGeneratingStructure}
+              onReordered={(ordered) => setNotes(current => [...current.filter(note => note.folderId !== null), ...ordered])}>
+              {renderNote}
+            </SortableNotes>
             {query.trim() && visibleNotes.length === 0 && <p>Ingen notater matcher søket.</p>}
-          </div>
+          </>
         )
       )}
 
