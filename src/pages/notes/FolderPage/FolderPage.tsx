@@ -1,5 +1,7 @@
+import { sortNotes } from "../../../services/notes/noteOrder";
+import { SortableNotes } from "../../../components/notes/SortableNotes/SortableNotes";
 import "./FolderPage.css";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 
@@ -57,39 +59,7 @@ export const FolderPage = () => {
 
   const [error, setError] = useState("");
 
-  const sortedNotes = useMemo(() => {
-    const subtopicSortOrderById = new Map(
-      subtopics.map((subtopic) => [subtopic.id, subtopic.sortOrder]),
-    );
-
-    return [...notes].sort((firstNote, secondNote) => {
-      const firstSortOrder = firstNote.subtopicId
-        ? subtopicSortOrderById.get(firstNote.subtopicId)
-        : undefined;
-
-      const secondSortOrder = secondNote.subtopicId
-        ? subtopicSortOrderById.get(secondNote.subtopicId)
-        : undefined;
-
-      if (firstSortOrder !== undefined && secondSortOrder !== undefined) {
-        if (firstSortOrder !== secondSortOrder) {
-          return firstSortOrder - secondSortOrder;
-        }
-
-        return firstNote.title.localeCompare(secondNote.title, "nb");
-      }
-
-      if (firstSortOrder !== undefined) {
-        return -1;
-      }
-
-      if (secondSortOrder !== undefined) {
-        return 1;
-      }
-
-      return firstNote.title.localeCompare(secondNote.title, "nb");
-    });
-  }, [notes, subtopics]);
+  const sortedNotes = sortNotes(notes);
 
   useEffect(() => {
     const loadData = async () => {
@@ -300,8 +270,9 @@ export const FolderPage = () => {
       {notes.length === 0 ? (
         <p>Denne mappen er tom.</p>
       ) : (
-        <div className="folder-notes-grid">
-          {sortedNotes.map((note) => (
+        <SortableNotes key={`${subjectId}:${folderId}`} subjectId={subjectId!} folderId={folderId!}
+          notes={sortedNotes} className="folder-notes-grid" enabled={isAdmin && !isCreatingNote} onReordered={setNotes}>
+          {(note) => (
             <FolderNoteCard
               key={note.id}
               note={note}
@@ -347,8 +318,8 @@ export const FolderPage = () => {
                 }
               }}
             />
-          ))}
-        </div>
+          )}
+        </SortableNotes>
       )}
 
       {isAdmin && isCreateNoteModalOpen && (

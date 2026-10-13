@@ -334,3 +334,23 @@ No new Supabase migration is required beyond the existing completion RPC.
   tests direct note CRUD/moving and secondary-link writes under permissive legacy
   RLS, verifies admin operations, and checks personal favorites and progress still
   work. No production schema/data is used.
+
+## Persistent note order
+
+- `/studienotater/tests/note-order-unit.html`: six automated service tests cover
+  stored positions, cross-folder Previous/Next sequence, unfiled last, orphan
+  fallback, scoped RPC payloads and failed-save notifications.
+- `/studienotater/tests/note-order.html`: full App mock fixture, order retained in
+  test-only sessionStorage. Reorder notes in Uke 1 and Uten mappe with handles or
+  arrow keys, refresh, compare card/sidebar order, and follow Next from the last
+  note in Uke 1 through Uke 2 into Uten mappe. Add `?role=user` to check read-only
+  controls, or `?fail` to simulate an RPC failure without changing stored order.
+- `psql -d <empty_disposable_database> -f tests/note-order.sql`: includes the
+  existing folder/note permission suites, then verifies saved order in both kinds
+  of groups, scope/duplicate/stale lists, partial-RLS rollback, admin-only RPC and
+  direct writes, migration reruns, and append-on-create/move. Never run the test
+  fixture in Supabase. The deployment SQL is in database/migrations instead.
+- `/studienotater/tests/note-order-drag.html` dispatches synthetic pointer events
+  through the actual SortableNotes component, performs real DOM hit testing and
+  verifies one correctly scoped save. Native pointer capture is stubbed because
+  synthetic events do not create a native active pointer.

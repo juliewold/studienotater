@@ -6,7 +6,8 @@ import { ChevronDown, FileText, Folder, PanelLeftClose, PanelLeftOpen, X } from 
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 import { getNoteFoldersBySubject, type NoteFolder } from "../../../services/notes/noteFoldersService";
-import { getOrderedNotes } from "../../../services/notes/noteNavigationService";
+import { getNotesBySubject } from "../../../services/notes/notesService";
+import { orderNotesForNavigation } from "../../../services/notes/noteOrder";
 import type { DatabaseNote } from "../../../services/notes/notesService";
 import { NOTES_CHANGED, prepareNotesNavigation } from "../../../services/notes/notesNavigationEvents";
 import "./NotesLayout.css";
@@ -44,9 +45,9 @@ const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
     const load = async () => {
       const current = ++request;
       try {
-        const [folders, notes] = await Promise.all([getNoteFoldersBySubject(subjectId), getOrderedNotes(subjectId)]);
+        const [folders, notes] = await Promise.all([getNoteFoldersBySubject(subjectId), getNotesBySubject(subjectId)]);
         if (cancelled || current !== request) return;
-        setData({ folders, notes });
+        setData({ folders, notes: orderNotesForNavigation(notes, folders) });
         setError("");
       } catch {
         if (!cancelled && current === request) setError("Kunne ikke hente notatoversikten.");

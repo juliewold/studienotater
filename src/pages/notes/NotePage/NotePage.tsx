@@ -1,3 +1,4 @@
+import { NOTES_CHANGED } from "../../../services/notes/notesNavigationEvents";
 import "./NotePage.css";
 import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -74,7 +75,7 @@ export const NotePage = () => {
         );
 
         setNextNote(
-          currentIndex < orderedNotes.length - 1
+          currentIndex >= 0 && currentIndex < orderedNotes.length - 1
             ? orderedNotes[currentIndex + 1]
             : null,
         );
@@ -95,6 +96,30 @@ export const NotePage = () => {
     loadNote();
     return () => { cancelled = true; };
   }, [noteId, subjectId]);
+
+  // Refresh links when the shared outline changes, without resetting an editor draft.
+  useEffect(() => {
+    if (!subjectId || !note?.id) return;
+    let cancelled = false;
+    let request = 0;
+    const refresh = async () => {
+      const current = ++request;
+      try {
+        const ordered = await getOrderedNotes(subjectId);
+        if (cancelled || current !== request) return;
+        const index = ordered.findIndex(item => item.id === note.id);
+        setPreviousNote(index > 0 ? ordered[index - 1] : null);
+        setNextNote(index >= 0 && index + 1 < ordered.length ? ordered[index + 1] : null);
+      } catch {
+        if (!cancelled && current === request) {
+          setPreviousNote(null);
+          setNextNote(null);
+        }
+      }
+    };
+    window.addEventListener(NOTES_CHANGED, refresh);
+    return () => { cancelled = true; window.removeEventListener(NOTES_CHANGED, refresh); };
+  }, [subjectId, note?.id]);
 
   if (isLoadingNote) {
     return (

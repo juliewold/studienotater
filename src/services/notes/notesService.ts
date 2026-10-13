@@ -1,3 +1,4 @@
+import { sortNotes } from "./noteOrder";
 import { notifyNotesChanged } from "./notesNavigationEvents";
 import { supabase } from "../../lib/supabase";
 
@@ -19,6 +20,7 @@ export type DatabaseNote = {
   content: string;
   contentJson: NoteContentJson;
   createdAt: string;
+  sortOrder?: number;
 };
 
 type CreateNoteInput = {
@@ -65,6 +67,7 @@ type NoteRow = {
   content: string | null;
   content_json: NoteContentJson;
   created_at: string;
+  sort_order: number;
   subtopics: SubtopicRelation | SubtopicRelation[] | null;
 };
 
@@ -79,6 +82,7 @@ const noteSelect = `
   content,
   content_json,
   created_at,
+  sort_order,
   subtopics!notes_subtopic_id_fkey (
     id,
     name,
@@ -120,6 +124,7 @@ function mapDatabaseNote(note: NoteRow): DatabaseNote {
     content: note.content ?? "",
     contentJson: note.content_json ?? null,
     createdAt: note.created_at,
+    sortOrder: note.sort_order,
   };
 }
 
@@ -130,30 +135,26 @@ export async function getNotesBySubject(
     .from("notes")
     .select(noteSelect)
     .eq("subject_id", subjectId)
-    .order("created_at", {
-      ascending: true,
-    });
+    .order("sort_order", { ascending: true }).order("id", { ascending: true });
 
   if (error) {
     throw error;
   }
 
-  return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
+  return sortNotes(((data ?? []) as NoteRow[]).map(mapDatabaseNote));
 }
 
 export async function getAllNotes(): Promise<DatabaseNote[]> {
   const { data, error } = await supabase
     .from("notes")
     .select(noteSelect)
-    .order("created_at", {
-      ascending: true,
-    });
+    .order("sort_order", { ascending: true }).order("id", { ascending: true });
 
   if (error) {
     throw error;
   }
 
-  return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
+  return sortNotes(((data ?? []) as NoteRow[]).map(mapDatabaseNote));
 }
 
 export async function getNotesByFolder(
@@ -165,15 +166,13 @@ export async function getNotesByFolder(
     .select(noteSelect)
     .eq("subject_id", subjectId)
     .eq("folder_id", folderId)
-    .order("created_at", {
-      ascending: true,
-    });
+    .order("sort_order", { ascending: true }).order("id", { ascending: true });
 
   if (error) {
     throw error;
   }
 
-  return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
+  return sortNotes(((data ?? []) as NoteRow[]).map(mapDatabaseNote));
 }
 
 export async function moveAllNotesOutOfFolder(folderId: string): Promise<void> {
@@ -199,15 +198,13 @@ export async function getNotesWithoutFolder(
     .select(noteSelect)
     .eq("subject_id", subjectId)
     .is("folder_id", null)
-    .order("created_at", {
-      ascending: true,
-    });
+    .order("sort_order", { ascending: true }).order("id", { ascending: true });
 
   if (error) {
     throw error;
   }
 
-  return ((data ?? []) as NoteRow[]).map(mapDatabaseNote);
+  return sortNotes(((data ?? []) as NoteRow[]).map(mapDatabaseNote));
 }
 
 export async function getNoteById(id: string): Promise<DatabaseNote | null> {
@@ -423,5 +420,13 @@ export async function deleteNote(id: string): Promise<void> {
     throw error;
   }
 
+  notifyNotesChanged();
+}
+
+export async function reorderNotes(subjectId: string, folderId: string | null, noteIds: string[]): Promise<void> {
+  const { error } = await supabase.rpc("reorder_notes", {
+    p_subject_id: subjectId, p_folder_id: folderId, p_note_ids: noteIds,
+  });
+  if (error) throw error;
   notifyNotesChanged();
 }
