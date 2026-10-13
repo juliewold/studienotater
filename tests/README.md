@@ -293,3 +293,17 @@ No new Supabase migration is required beyond the existing completion RPC.
 - Run `psql -d <disposable_database> -f tests/flashcard-source.sql` only in an
   empty local test database. It tests migration reruns, old-card preservation,
   source foreign keys and keeping cards when the source note is deleted.
+
+## Folder colors and ordering
+
+- Open `/studienotater/tests/folder-order-unit.html` on localhost (without a
+  signed-in Supabase session): six checks cover shared sorting, stable colors,
+  appending new folders, loading saved order, RPC scope and save failure events.
+- Open `/studienotater/tests/folder-order.html`: an isolated App fixture mocks
+  every request and persists mock order only in sessionStorage. Drag a card by
+  its handle; compare sidebar and cards, then refresh. Colors must stay with
+  folders. Focus a handle and press an arrow key to test keyboard reordering.
+  Test dark mode and the mobile notes drawer with the same fixture.
+- `psql -d <empty_disposable_database> -f tests/folder-order.sql` verifies the
+  migration, reruns, colors, subject scope, incomplete/duplicate lists and atomic
+  rollback when RLS permits only part of an order. Requires role authenticated.

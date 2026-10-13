@@ -1,0 +1,17 @@
+<!doctype html><html lang="nb"><meta charset="utf-8"><title>Folder order tests</title><h1>Folder order tests</h1><pre id="results"></pre><script type="module">
+import {sortNoteFolders,moveNoteFolder,folderToneClass} from '../src/services/notes/noteFolderOrder.ts';
+import {getNoteFoldersBySubject,reorderNoteFolders} from '../src/services/notes/noteFoldersService.ts';
+import {NOTES_CHANGED} from '../src/services/notes/notesNavigationEvents.ts';
+const assert=(value,message)=>{if(!value)throw Error(message)};
+const folders=[{id:'b',subjectId:'subject',name:'Z',createdAt:'2026-01-02',colorIndex:1},{id:'a',subjectId:'subject',name:'A',createdAt:'2026-01-01',colorIndex:0},{id:'c',subjectId:'subject',name:'C',createdAt:'2026-01-03',colorIndex:2}];
+const ids=items=>items.map(item=>item.id).join(',');
+let notifications=0;window.addEventListener(NOTES_CHANGED,()=>notifications++);
+const tests=[
+ ['Default creation order and deterministic tie-break',()=>{assert(ids(sortNoteFolders(folders))==='a,b,c','Wrong default');assert(ids(sortNoteFolders(folders.map(f=>({...f,createdAt:'same'}))))==='a,b,c','Unstable tie')}],
+ ['Drag order wins, source is unchanged and colors follow folders',()=>{const moved=moveNoteFolder(folders,'c','a');assert(ids(moved)==='c,a,b','Wrong order');assert(ids(folders)==='b,a,c','Mutated source');assert(folderToneClass(moved[0])==='notes-folder-tone-2','Color changed');assert(ids(moveNoteFolder(moved,'missing','a'))==='c,a,b','Invalid drag moved folders')}],
+ ['New unordered folder follows saved order',()=>{assert(ids(sortNoteFolders([{...folders[0],sortOrder:1},{...folders[1],sortOrder:0},folders[2]]))==='a,b,c','New folder not appended')}],
+ ['Both consumers receive saved order from shared loader',async()=>{window.fetch=async()=>Response.json(folders.map((f,i)=>({id:f.id,subject_id:f.subjectId,name:f.name,created_at:f.createdAt,color_index:f.colorIndex,sort_order:2-i,topics:null,topic_id:null})));const loaded=await getNoteFoldersBySubject('subject');assert(ids(loaded)==='c,a,b','Loader ignored saved order');assert(loaded[0].colorIndex===2,'Loader lost palette')}],
+ ['Save is one subject-scoped RPC and notifies both views',async()=>{window.fetch=async(url,options)=>{assert(String(url).endsWith('/rpc/reorder_note_folders'),'Not atomic RPC');const body=JSON.parse(options.body);assert(body.p_subject_id==='subject'&&body.p_folder_ids.join(',')==='c,a,b','Wrong scope');return new Response(null,{status:204})};await reorderNoteFolders('subject',['c','a','b']);assert(notifications===1,'Missing notification')}],
+ ['Failed save does not announce a new order',async()=>{window.fetch=async()=>Response.json({message:'Denied'},{status:403});let failed=false;try{await reorderNoteFolders('subject',['a','b','c'])}catch{failed=true}assert(failed&&notifications===1,'Failure swallowed/notified')}],
+];let passed=0;for(const[name,test]of tests){try{await test();passed++;document.querySelector('#results').textContent+='PASS: '+name+'\n'}catch(e){document.querySelector('#results').textContent+='FAIL: '+name+': '+e.message+'\n'}}document.querySelector('#results').textContent+=`${passed}/${tests.length} passed`;
+</script></html>

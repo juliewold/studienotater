@@ -116,3 +116,16 @@ classifies the resulting cards against all subject topic/subtopic paths. Existin
 note placements do not enter either prompt. Users can correct the proposed path
 in the preview; uncertain classifications require a choice before saving. Source
 quotes and duplicate checks are safeguards, not proof of academic correctness.
+
+## Folder order and colors
+
+Apply `migrations/20261013_note_folder_order.sql` in Supabase before deploying
+this frontend. It adds nullable `sort_order` and `color_index`, preserving the
+sidebar's existing five-color sequence by creation order. New folders append
+after explicitly ordered folders and get a color from the same palette.
+Renaming, deleting or moving another folder does not change a folder's color.
+The invoker RPC saves one complete subject order atomically, validates IDs and
+honors existing RLS. No grants on tables or policies are changed. Sorting controls
+use the same admin permission as existing folder editing. Existing notes and
+folder membership are untouched. This migration was tested locally, not applied
+to the live Supabase database.

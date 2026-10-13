@@ -1,7 +1,9 @@
+import { folderToneClass } from "../../../services/notes/noteFolderOrder";
+import "./folderColors.css";
 import "./FolderCard.css";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { MoreVertical, Pencil, Trash2, X } from "lucide-react";
+import { Folder, MoreVertical, Pencil, Trash2, X } from "lucide-react";
 
 import {
   deleteNoteFolder,
@@ -178,13 +180,13 @@ export const FolderCard = ({
 
   return (
     <>
-      <div className="folder-card-wrapper">
+      <div className={`folder-card-wrapper ${folderToneClass(folder)}`}>
         <Link
           to={`/fag/${subjectId}/notater/mappe/${folder.id}`}
           className="folder-card"
         >
           <span className="folder-card-icon" aria-hidden="true">
-            📁
+            <Folder size={24} />
           </span>
 
           <span className="folder-card-content">

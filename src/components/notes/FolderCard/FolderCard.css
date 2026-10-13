@@ -259,3 +259,9 @@
   font-size: 0.84rem;
   font-weight: 500;
 }
+.folder-card-wrapper .folder-card,
+html[data-theme="dark"] .folder-card-wrapper .folder-card {
+  background: color-mix(in srgb, var(--folder-tone) 12%, var(--app-surface, #fff));
+  border-left: 3px solid color-mix(in srgb, var(--folder-tone) 55%, var(--app-surface, #fff));
+}
+.folder-card-icon { color: var(--folder-tone); }

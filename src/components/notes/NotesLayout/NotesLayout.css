@@ -9,11 +9,7 @@
 .notes-outline-header h2 { margin: 6px 0 0; font-size: .96rem; line-height: 1.4; overflow-wrap: anywhere; }
 .notes-outline-all { display: block; padding: 10px; margin-bottom: 16px; color: var(--app-muted); font-size: .8rem; text-decoration: none; border-radius: 8px; }
 .notes-outline-all[aria-current] { background: var(--app-soft); color: var(--app-accent); font-weight: 650; }
-.notes-outline-folder { --folder-tone: #a879ee; margin-bottom: 8px; }
-.notes-folder-tone-1 { --folder-tone: #60a5fa; }
-.notes-folder-tone-2 { --folder-tone: #4ade80; }
-.notes-folder-tone-3 { --folder-tone: #fb923c; }
-.notes-folder-tone-4 { --folder-tone: #ec4899; }
+.notes-outline-folder { margin-bottom: 8px; }
 .notes-outline-folder-heading { display: flex; align-items: center; border-radius: 9px; background: color-mix(in srgb,var(--folder-tone) 12%,var(--app-surface)); border-left: 3px solid color-mix(in srgb,var(--folder-tone) 55%,var(--app-surface)); }
 .notes-outline-folder-heading > button { display: grid; place-items: center; flex: 0 0 28px; padding: 12px 0; border: 0; background: transparent; color: var(--app-muted); cursor: pointer; }
 .notes-outline-folder-heading > button[aria-expanded="false"] svg { transform: rotate(-90deg); }

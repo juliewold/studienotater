@@ -1,3 +1,4 @@
+import { sortNoteFolders } from "./noteFolderOrder";
 import { notifyNotesChanged } from "./notesNavigationEvents";
 import { supabase } from "../../lib/supabase";
 
@@ -10,6 +11,8 @@ export type NoteFolder = {
 
   name: string;
   createdAt: string;
+  sortOrder?: number | null;
+  colorIndex?: number;
 };
 
 type TopicRelation = {
@@ -24,6 +27,8 @@ type NoteFolderRow = {
   topic_id: string | null;
   name: string;
   created_at: string;
+  sort_order: number | null;
+  color_index: number;
   topics: TopicRelation | TopicRelation[] | null;
 };
 
@@ -33,6 +38,8 @@ const noteFolderSelect = `
   topic_id,
   name,
   created_at,
+  sort_order,
+  color_index,
   topics (
     id,
     name,
@@ -60,6 +67,8 @@ const mapNoteFolder = (folder: NoteFolderRow): NoteFolder => {
 
     name: folder.name,
     createdAt: folder.created_at,
+    sortOrder: folder.sort_order,
+    colorIndex: folder.color_index,
   };
 };
 
@@ -78,7 +87,7 @@ export async function getNoteFoldersBySubject(
     throw error;
   }
 
-  return ((data ?? []) as NoteFolderRow[]).map(mapNoteFolder);
+  return sortNoteFolders(((data ?? []) as NoteFolderRow[]).map(mapNoteFolder));
 }
 
 export async function getNoteFolderById(
@@ -168,5 +177,14 @@ export async function deleteNoteFolder(id: string): Promise<void> {
     throw error;
   }
 
+  notifyNotesChanged();
+}
+
+export async function reorderNoteFolders(subjectId: string, folderIds: string[]): Promise<void> {
+  const { error } = await supabase.rpc("reorder_note_folders", {
+    p_subject_id: subjectId,
+    p_folder_ids: folderIds,
+  });
+  if (error) throw error;
   notifyNotesChanged();
 }
