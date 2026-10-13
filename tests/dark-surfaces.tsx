@@ -1,3 +1,6 @@
+import { FolderNoteCard } from "../src/components/notes/FolderNoteCard/FolderNoteCard";
+import { Footer } from "../src/components/layout/Footer/Footer";
+import "../src/pages/flashcards/FlashcardsPage/FlashcardsPage.css";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { ThemeProvider } from "../src/context/ThemeProvider";
@@ -18,6 +21,12 @@ export function SurfacePreview() {
   const { dark, toggleTheme } = useTheme();
   return <main className="page-container">
     <h1>Flater og kontrast</h1><button onClick={toggleTheme}>{dark ? "Lyst tema" : "Mørkt tema"}</button>
+    <FolderNoteCard note={note} subjectId="tma4240" progress={{ completed: false, rating: 3 }} />
+    <section className="flashcard-topic-section">
+      <header className="flashcard-topic-header"><div><p className="flashcard-topic-label">Tema</p><h2>Sannsynlighet</h2><p>8 flashcards</p></div></header>
+      <div className="flashcard-subtopic-card"><div><p className="flashcard-subtopic-label">Undertema</p><h3>Forventning</h3><span>4 flashcards</span></div><button className="flashcard-secondary-button">Øv</button></div>
+    </section>
+    <Footer />
     <div className="notes-search"><label htmlFor="search">Søk i notater</label><input id="search" placeholder="Søk etter tema…" /></div>
     <section className="notes-topic"><h2><button>Stokastiske variabler</button></h2><div className="notes-subtopic"><h3>Forventning</h3><NoteCard note={note} subjectId="tma4240" progress={{ completed: true, rating: 4 }} /></div></section>
     <section className="topic-page-section"><a className="topic-page-subtopic" href="#test"><span className="topic-page-subtopic-number">1</span><span className="topic-page-subtopic-name">Diskrete fordelinger</span></a></section>

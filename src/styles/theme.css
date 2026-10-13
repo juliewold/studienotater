@@ -11,7 +11,7 @@
 }
 [data-theme="dark"] body { background: var(--app-background); color: var(--app-text); }
 [data-theme="dark"] :is(h1,h2,h3,h4,h5,h6) { color: var(--app-text); }
-[data-theme="dark"] :is(.page-description,.subject-description,.weekly-update-name,.semester-subject-item h3,.home-progress-details,.home-progress-rating,.upcoming-task p,.upcoming-task time,.exam-card p,.search-description,.search-snippet,.search-message,.note-description,.read-only-note-content,.ProseMirror,.footer) { color: var(--app-muted); }
+[data-theme="dark"] :is(.page-description,.subject-description,.weekly-update-name,.semester-subject-item h3,.home-progress-details,.home-progress-rating,.upcoming-task p,.upcoming-task time,.exam-card p,.search-description,.search-snippet,.search-message,.note-description,.read-only-note-content,.ProseMirror) { color: var(--app-muted); }
 [data-theme="dark"] :is(.upcoming-task,.semester-subject-item,.home-progress-item,.exam-card,.subject-card,.subject-feature-card,.subject-progress,.subject-knowledge-base,.note-card,.folder-card,.pdf-card,.video-card,.flashcard,.settings-card,.profile-card,.auth-card,.search-results,.exam-section,.calendar-card,.calendar-sidebar,.calendar-main,.note-editor-toolbar,.note-outline,.editable-note-editor-wrapper,.editor-toolbar,.note-reading-tools,.note-ai-tools) {
   background: var(--app-surface); border-color: var(--app-border); color: var(--app-text);
 }
@@ -163,3 +163,37 @@
 
 /* Generic dark card borders must not erase a subject's existing accent. */
 [data-theme="dark"] :is(.subject-card,.exam-page-card) { border-left-color: var(--subject-accent); }
+
+/* Folder notes, flashcard topic groups and the homepage footer. */
+[data-theme="dark"] :is(.folder-note-item, .flashcard-topic-section) {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+[data-theme="dark"] .folder-note-item:hover {
+  background: var(--app-surface-hover);
+  border-color: var(--app-control-border);
+}
+[data-theme="dark"] .flashcard-topic-section .flashcard-subtopic-card {
+  background: var(--app-surface-raised);
+  border-color: var(--app-border);
+}
+[data-theme="dark"] :is(.folder-note-title, .flashcard-topic-header h2, .flashcard-subtopic-card h3) {
+  color: var(--app-text);
+}
+[data-theme="dark"] :is(.folder-note-description, .folder-note-read, .folder-note-menu .note-menu-button,
+  .flashcard-topic-header p:not(.flashcard-topic-label), .flashcard-subtopic-card span) {
+  color: var(--app-muted);
+}
+[data-theme="dark"] :is(.folder-note-icon, .flashcard-topic-section .flashcard-secondary-button) {
+  background: var(--app-soft);
+  color: var(--app-accent);
+}
+[data-theme="dark"] .flashcard-topic-section .flashcard-secondary-button:hover {
+  background: var(--app-surface-hover);
+}
+[data-theme="dark"] :is(.flashcard-topic-label, .flashcard-subtopic-label) { color: var(--app-accent); }
+[data-theme="dark"] .footer,
+[data-theme="dark"] .footer :is(h3, p) { color: var(--app-background); }
+[data-theme="dark"] .footer-content p { opacity: 1; }
+[data-theme="dark"] .footer-copy { opacity: 1 !important; }
