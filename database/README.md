@@ -146,3 +146,22 @@ provisioning and existing admins can still manage roles. No existing profile row
 are modified. Tests run on a disposable local database; the migration has **not**
 been applied automatically in Supabase. Until it is applied, UI hiding alone does
 not protect the deployed database.
+
+## Shared subject-note permissions
+
+Manually apply `migrations/20261013_shared_note_admin.sql` **after**
+`20261013_note_folder_admin.sql` (and its folder-order prerequisite). It reuses
+that migration's protected `profiles.role` admin check. Both `notes` and
+`note_subtopics` receive restrictive INSERT/UPDATE/DELETE policies, so legacy
+permissive/ALL policies cannot authorize reader writes. This includes moving a
+note by changing folder/subject/primary subtopic, and altering secondary links.
+The existing structure RPC runs as invoker and therefore also obeys these rules.
+All rows in these tables are shared subject data; no personal notebook feature
+or ownership column is present in this application.
+
+No SELECT policies, table grants, favorites/progress policies or existing rows
+are modified. Readers retain their current read access and personal study state.
+Normal admin writes remain allowed subject to existing SELECT/restrictive rules.
+Privileged service-role/database-owner maintenance retains its standard bypass.
+The new migration is tested locally and is **not applied to live Supabase**;
+the UI change alone does not protect the database until it is applied.

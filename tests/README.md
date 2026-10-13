@@ -321,3 +321,16 @@ No new Supabase migration is required beyond the existing completion RPC.
   preserved reads/colors, admin success, profile-role escalation and migration
   reruns against deliberately permissive legacy policies. Never run this test
   schema against Supabase/production.
+
+## Shared note permissions
+
+- `/studienotater/tests/note-admin.html` checks actual note cards for each role:
+  admin-only menu, preserved read links, favorites and read-state display.
+- In `/studienotater/tests/folder-order.html?role=user`, open a folder and note:
+  no creation/edit/move/delete controls should appear. Reading and the personal
+  favorite/read-state controls remain. This fixture never writes real data.
+- Run `tests/shared-note-admin.sql` only in an empty disposable PostgreSQL database
+  with `anon`/`authenticated` roles. It includes the previous folder/role checks,
+  tests direct note CRUD/moving and secondary-link writes under permissive legacy
+  RLS, verifies admin operations, and checks personal favorites and progress still
+  work. No production schema/data is used.
