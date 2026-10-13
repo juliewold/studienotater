@@ -73,6 +73,8 @@ export const EditableNote = ({
   showClassification = true,
   resourceId,
 }: EditableNoteProps) => {
+  const adminAccess = useRef(isAdmin);
+  useEffect(() => { adminAccess.current = isAdmin; }, [isAdmin]);
   const [isEditing, setIsEditing] = useState(false);
 
   const [title, setTitle] = useState(note.title);
@@ -221,6 +223,7 @@ export const EditableNote = ({
 
   const saveQueue = useRef<Promise<boolean>>(Promise.resolve(true));
   const persistDraft = async (draft: NoteDraft): Promise<boolean> => {
+    if (!adminAccess.current) return false;
     if (!draft.title) {
       setErrorMessage("Notatet må ha en tittel.");
       setSaveStatus("error");
@@ -293,7 +296,7 @@ export const EditableNote = ({
 
   // Flush queued saves and any typing that happens while navigation is waiting.
   useEffect(() => registerNotesNavigationGuard(async () => {
-    if (!isEditing) return true;
+    if (!isAdmin || !isEditing) return true;
     if (!(await saveDraft(navigationDraft.current()))) return false;
     while (hasUnsavedChanges(navigationDraft.current())) {
       if (!(await saveDraft(navigationDraft.current()))) return false;
@@ -302,7 +305,7 @@ export const EditableNote = ({
   }));
 
   useEffect(() => {
-    if (!isEditing) {
+    if (!isAdmin || !isEditing) {
       return;
     }
 
@@ -328,9 +331,11 @@ export const EditableNote = ({
     contentJson,
     selectedSubtopicIds,
     isEditing,
+    isAdmin,
   ]);
 
   const handleStartEditing = () => {
+    if (!isAdmin) return;
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
@@ -439,7 +444,7 @@ export const EditableNote = ({
     selectedTopicIds.has(topic.id),
   );
 
-  if (isEditing) {
+  if (isAdmin && isEditing) {
     return (
       <article className="editable-note editable-note-editing">
         <header className="editable-note-topbar">

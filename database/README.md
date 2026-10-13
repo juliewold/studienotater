@@ -116,3 +116,52 @@ classifies the resulting cards against all subject topic/subtopic paths. Existin
 note placements do not enter either prompt. Users can correct the proposed path
 in the preview; uncertain classifications require a choice before saving. Source
 quotes and duplicate checks are safeguards, not proof of academic correctness.
+
+## Folder order and colors
+
+Apply `migrations/20261013_note_folder_order.sql` in Supabase before deploying
+this frontend. It adds nullable `sort_order` and `color_index`, preserving the
+sidebar's existing five-color sequence by creation order. New folders append
+after explicitly ordered folders and get a color from the same palette.
+Renaming, deleting or moving another folder does not change a folder's color.
+The invoker RPC saves one complete subject order atomically, validates IDs and
+honors existing RLS. No grants on tables or policies are changed. Sorting controls
+use the same admin permission as existing folder editing. Existing notes and
+folder membership are untouched. This migration was tested locally, not applied
+to the live Supabase database.
+
+## Shared folder administration
+
+Apply `migrations/20261013_note_folder_admin.sql` after the folder-order migration.
+The role source matches the app: `profiles.role = 'admin'` for `auth.uid()`.
+Restrictive INSERT/UPDATE/DELETE policies deny normal/anonymous clients even if
+legacy permissive policies exist. The reorder RPC explicitly checks admin status.
+SELECT policies, table grants, note contents, membership, colors and order remain
+unchanged. Service-role/database-owner maintenance retains its normal RLS bypass.
+
+Because profile roles authorize these operations, a trigger prevents API clients
+from assigning themselves admin privileges or reassigning profile IDs; normal
+profile fields remain editable under existing policies. Trusted database/service
+provisioning and existing admins can still manage roles. No existing profile rows
+are modified. Tests run on a disposable local database; the migration has **not**
+been applied automatically in Supabase. Until it is applied, UI hiding alone does
+not protect the deployed database.
+
+## Shared subject-note permissions
+
+Manually apply `migrations/20261013_shared_note_admin.sql` **after**
+`20261013_note_folder_admin.sql` (and its folder-order prerequisite). It reuses
+that migration's protected `profiles.role` admin check. Both `notes` and
+`note_subtopics` receive restrictive INSERT/UPDATE/DELETE policies, so legacy
+permissive/ALL policies cannot authorize reader writes. This includes moving a
+note by changing folder/subject/primary subtopic, and altering secondary links.
+The existing structure RPC runs as invoker and therefore also obeys these rules.
+All rows in these tables are shared subject data; no personal notebook feature
+or ownership column is present in this application.
+
+No SELECT policies, table grants, favorites/progress policies or existing rows
+are modified. Readers retain their current read access and personal study state.
+Normal admin writes remain allowed subject to existing SELECT/restrictive rules.
+Privileged service-role/database-owner maintenance retains its standard bypass.
+The new migration is tested locally and is **not applied to live Supabase**;
+the UI change alone does not protect the database until it is applied.

@@ -1,6 +1,9 @@
+import { NOTES_CHANGED } from "../../../services/notes/notesNavigationEvents";
+import { sortNoteFolders } from "../../../services/notes/noteFolderOrder";
+import { SortableFolders } from "../../../components/notes/SortableFolders/SortableFolders";
 import "./NotesPage.css";
 import { StructuredNotes } from "./StructuredNotes";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart, Plus, Sparkles, X } from "lucide-react";
 
@@ -98,46 +101,7 @@ export const NotesPage = () => {
 
   const { getProgress, isLoadingProgress } = useProgress();
 
-  const normalizeName = (value: string) => value.trim().toLocaleLowerCase("nb");
-
-  const sortedFolders = useMemo(() => {
-    const getTopicForFolder = (folder: NoteFolder) => {
-      if (folder.topicId) {
-        const topicById = topics.find((topic) => topic.id === folder.topicId);
-
-        if (topicById) {
-          return topicById;
-        }
-      }
-
-      return topics.find(
-        (topic) => normalizeName(topic.name) === normalizeName(folder.name),
-      );
-    };
-
-    return [...folders].sort((folderA, folderB) => {
-      const topicA = getTopicForFolder(folderA);
-      const topicB = getTopicForFolder(folderB);
-
-      if (topicA && topicB) {
-        if (topicA.sortOrder !== topicB.sortOrder) {
-          return topicA.sortOrder - topicB.sortOrder;
-        }
-
-        return topicA.name.localeCompare(topicB.name, "nb");
-      }
-
-      if (topicA && !topicB) {
-        return -1;
-      }
-
-      if (!topicA && topicB) {
-        return 1;
-      }
-
-      return folderA.name.localeCompare(folderB.name, "nb");
-    });
-  }, [folders, topics]);
+  const sortedFolders = sortNoteFolders(folders);
 
   useEffect(() => {
     const loadNotes = async () => {
@@ -183,30 +147,35 @@ export const NotesPage = () => {
   }, [subjectId, notesRevision]);
 
   useEffect(() => {
+    let cancelled = false;
+    let request = 0;
     const loadFolders = async () => {
+      const current = ++request;
       if (!subjectId) {
         setFolders([]);
         setIsLoadingFolders(false);
         return;
       }
 
-      setIsLoadingFolders(true);
       setFoldersError("");
 
       try {
         const loadedFolders = await getNoteFoldersBySubject(subjectId);
 
-        setFolders(loadedFolders);
+        if (!cancelled && current === request) setFolders(loadedFolders);
       } catch (error) {
         console.error("Kunne ikke hente mapper:", error);
 
-        setFoldersError("Kunne ikke hente mappene.");
+        if (!cancelled && current === request) setFoldersError("Kunne ikke hente mappene.");
       } finally {
-        setIsLoadingFolders(false);
+        if (!cancelled && current === request) setIsLoadingFolders(false);
       }
     };
 
-    loadFolders();
+    void loadFolders();
+    const refresh = () => { void loadFolders(); };
+    window.addEventListener(NOTES_CHANGED, refresh);
+    return () => { cancelled = true; window.removeEventListener(NOTES_CHANGED, refresh); };
   }, [subjectId]);
 
   useEffect(() => {
@@ -605,8 +574,9 @@ export const NotesPage = () => {
       {isLoadingFolders && <p>Laster mapper...</p>}
 
       {view === "all" && !isLoadingFolders && folders.length > 0 && (
-        <div className="notes-folders">
-          {sortedFolders.map((folder) => (
+        <SortableFolders key={subject.id} subjectId={subject.id} folders={sortedFolders}
+          enabled={isAdmin && !isGeneratingStructure && !isCreatingFolder} onReordered={setFolders}>
+          {(folder) => (
             <FolderCard
               key={folder.id}
               folder={folder}
@@ -630,8 +600,8 @@ export const NotesPage = () => {
                 );
               }}
             />
-          ))}
-        </div>
+          )}
+        </SortableFolders>
       )}
 
       {(isLoadingProgress || isLoadingNotes) && <p>Laster notater...</p>}
@@ -656,7 +626,7 @@ export const NotesPage = () => {
         )
       )}
 
-      {isFolderModalOpen && (
+      {isAdmin && isFolderModalOpen && (
         <div className="folder-modal-backdrop" onMouseDown={closeFolderModal}>
           <section
             className="folder-modal"

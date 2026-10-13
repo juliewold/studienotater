@@ -293,3 +293,44 @@ No new Supabase migration is required beyond the existing completion RPC.
 - Run `psql -d <disposable_database> -f tests/flashcard-source.sql` only in an
   empty local test database. It tests migration reruns, old-card preservation,
   source foreign keys and keeping cards when the source note is deleted.
+
+## Folder colors and ordering
+
+- Open `/studienotater/tests/folder-order-unit.html` on localhost (without a
+  signed-in Supabase session): six checks cover shared sorting, stable colors,
+  appending new folders, loading saved order, RPC scope and save failure events.
+- Open `/studienotater/tests/folder-order.html`: an isolated App fixture mocks
+  every request and persists mock order only in sessionStorage. Drag a card by
+  its handle; compare sidebar and cards, then refresh. Colors must stay with
+  folders. Focus a handle and press an arrow key to test keyboard reordering.
+  Test dark mode and the mobile notes drawer with the same fixture.
+- `psql -d <empty_disposable_database> -f tests/folder-order.sql` verifies the
+  migration, reruns, colors, subject scope, incomplete/duplicate lists and atomic
+  rollback when RLS permits only part of an order. Requires role authenticated.
+
+## Shared folder permissions
+
+- `/studienotater/tests/folder-admin.html` checks the actual FolderCard and
+  SortableFolders components under both roles: reader links/colors remain, menus
+  and drag controls appear only for admins (even with enabled=true).
+- `/studienotater/tests/folder-order.html?role=user` renders the complete reader
+  view with mock data. Verify no create/rename/delete/reorder controls, then open
+  a folder. Without the query parameter the fixture uses admin permissions.
+- `psql -d <empty_disposable_database> -f tests/folder-admin.sql` needs local
+  roles `anon` and `authenticated`. It tests direct CRUD and the sorting RPC,
+  preserved reads/colors, admin success, profile-role escalation and migration
+  reruns against deliberately permissive legacy policies. Never run this test
+  schema against Supabase/production.
+
+## Shared note permissions
+
+- `/studienotater/tests/note-admin.html` checks actual note cards for each role:
+  admin-only menu, preserved read links, favorites and read-state display.
+- In `/studienotater/tests/folder-order.html?role=user`, open a folder and note:
+  no creation/edit/move/delete controls should appear. Reading and the personal
+  favorite/read-state controls remain. This fixture never writes real data.
+- Run `tests/shared-note-admin.sql` only in an empty disposable PostgreSQL database
+  with `anon`/`authenticated` roles. It includes the previous folder/role checks,
+  tests direct note CRUD/moving and secondary-link writes under permissive legacy
+  RLS, verifies admin operations, and checks personal favorites and progress still
+  work. No production schema/data is used.

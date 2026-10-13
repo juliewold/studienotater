@@ -1,5 +1,6 @@
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import "./NoteMenu.css";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FolderInput, MoreVertical, Pencil, Trash2, X } from "lucide-react";
 import {
@@ -32,6 +33,7 @@ export const NoteMenu = ({
   currentFolderId,
   onNoteChanged,
 }: NoteMenuProps) => {
+  const { isAdmin } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
 
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
@@ -135,6 +137,7 @@ export const NoteMenu = ({
   };
 
   const handleMove = async () => {
+    if (!isAdmin) return;
     setIsMoving(true);
 
     try {
@@ -157,6 +160,7 @@ export const NoteMenu = ({
   };
 
   const handleRename = async () => {
+    if (!isAdmin) return;
     const trimmedTitle = newTitle.trim();
 
     if (!trimmedTitle) {
@@ -188,6 +192,7 @@ export const NoteMenu = ({
   };
 
   const handleDelete = async () => {
+    if (!isAdmin) return;
     setIsDeleting(true);
 
     try {
@@ -208,6 +213,8 @@ export const NoteMenu = ({
       setIsDeleting(false);
     }
   };
+
+  if (!isAdmin) return null;
 
   return (
     <>

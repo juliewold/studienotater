@@ -186,6 +186,7 @@ export const FolderPage = () => {
   };
 
   const handleCreateNote = async () => {
+    if (!isAdmin) return;
     if (!subjectId || !folderId) {
       return;
     }
@@ -350,7 +351,7 @@ export const FolderPage = () => {
         </div>
       )}
 
-      {isCreateNoteModalOpen && (
+      {isAdmin && isCreateNoteModalOpen && (
         <div
           className="folder-modal-backdrop"
           onMouseDown={closeCreateNoteModal}
