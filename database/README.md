@@ -129,3 +129,20 @@ honors existing RLS. No grants on tables or policies are changed. Sorting contro
 use the same admin permission as existing folder editing. Existing notes and
 folder membership are untouched. This migration was tested locally, not applied
 to the live Supabase database.
+
+## Shared folder administration
+
+Apply `migrations/20261013_note_folder_admin.sql` after the folder-order migration.
+The role source matches the app: `profiles.role = 'admin'` for `auth.uid()`.
+Restrictive INSERT/UPDATE/DELETE policies deny normal/anonymous clients even if
+legacy permissive policies exist. The reorder RPC explicitly checks admin status.
+SELECT policies, table grants, note contents, membership, colors and order remain
+unchanged. Service-role/database-owner maintenance retains its normal RLS bypass.
+
+Because profile roles authorize these operations, a trigger prevents API clients
+from assigning themselves admin privileges or reassigning profile IDs; normal
+profile fields remain editable under existing policies. Trusted database/service
+provisioning and existing admins can still manage roles. No existing profile rows
+are modified. Tests run on a disposable local database; the migration has **not**
+been applied automatically in Supabase. Until it is applied, UI hiding alone does
+not protect the deployed database.

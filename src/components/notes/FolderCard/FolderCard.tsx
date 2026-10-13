@@ -1,7 +1,8 @@
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import { folderToneClass } from "../../../services/notes/noteFolderOrder";
 import "./folderColors.css";
 import "./FolderCard.css";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Folder, MoreVertical, Pencil, Trash2, X } from "lucide-react";
 
@@ -26,6 +27,7 @@ export const FolderCard = ({
   onFolderUpdated,
   onFolderDeleted,
 }: FolderCardProps) => {
+  const { isAdmin } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [isRenaming, setIsRenaming] = useState(false);
@@ -125,6 +127,7 @@ export const FolderCard = ({
 
   const handleRename = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!isAdmin) return;
 
     const trimmedName = folderName.trim();
 
@@ -161,6 +164,7 @@ export const FolderCard = ({
   };
 
   const handleDelete = async () => {
+    if (!isAdmin) return;
     try {
       setIsDeleteLoading(true);
       setDeleteErrorMessage("");
@@ -198,7 +202,7 @@ export const FolderCard = ({
           </span>
         </Link>
 
-        <div className="folder-card-menu" ref={menuRef}>
+        {isAdmin && <div className="folder-card-menu" ref={menuRef}>
           <button
             type="button"
             className="folder-card-menu-button"
@@ -227,10 +231,10 @@ export const FolderCard = ({
               </button>
             </div>
           )}
-        </div>
+        </div>}
       </div>
 
-      {isRenaming && (
+      {isAdmin && isRenaming && (
         <div
           className="folder-modal-backdrop"
           onMouseDown={(event) => {
@@ -312,7 +316,7 @@ export const FolderCard = ({
         </div>
       )}
 
-      {isDeleting && (
+      {isAdmin && isDeleting && (
         <div
           className="folder-modal-backdrop"
           onMouseDown={(event) => {

@@ -626,7 +626,7 @@ export const NotesPage = () => {
         )
       )}
 
-      {isFolderModalOpen && (
+      {isAdmin && isFolderModalOpen && (
         <div className="folder-modal-backdrop" onMouseDown={closeFolderModal}>
           <section
             className="folder-modal"

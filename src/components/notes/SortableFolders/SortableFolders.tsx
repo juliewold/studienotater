@@ -1,4 +1,5 @@
-import { useRef, useState, type ReactNode } from "react";
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
+import { useContext, useRef, useState, type ReactNode } from "react";
 import { GripVertical } from "lucide-react";
 import { getNoteFoldersBySubject, reorderNoteFolders, type NoteFolder } from "../../../services/notes/noteFoldersService";
 import { moveNoteFolder } from "../../../services/notes/noteFolderOrder";
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export const SortableFolders = ({ subjectId, folders, enabled, onReordered, children }: Props) => {
+  const { isAdmin } = useContext(AuthContext);
   const drag = useRef<{ source: string; target: string } | null>(null);
   const pending = useRef(false);
   const [target, setTarget] = useState<string | null>(null);
@@ -20,7 +22,7 @@ export const SortableFolders = ({ subjectId, folders, enabled, onReordered, chil
   const [message, setMessage] = useState("");
   const cancel = () => { drag.current = null; setTarget(null); };
   const save = async (source: string, destination: string) => {
-    if (pending.current || source === destination) return;
+    if (!isAdmin || !enabled || pending.current || source === destination) return;
     pending.current = true;
     setSaving(true);
     setMessage("");
@@ -43,7 +45,7 @@ export const SortableFolders = ({ subjectId, folders, enabled, onReordered, chil
       {folders.map((folder, index) => <div key={folder.id} data-folder-id={folder.id}
         className={`sortable-folder${target === folder.id ? " is-drop-target" : ""}`}>
         {children(folder)}
-        {enabled && folders.length > 1 && <button type="button" className="folder-drag-handle"
+        {isAdmin && enabled && folders.length > 1 && <button type="button" className="folder-drag-handle"
           aria-label={`Flytt ${folder.name}`} title="Dra for å flytte. Bruk piltaster med tastatur."
           disabled={saving}
           onPointerDown={event => {

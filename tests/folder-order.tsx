@@ -44,6 +44,7 @@ window.fetch = async (input, init) => {
   const single = new Headers(init?.headers).get("accept")?.includes("vnd.pgrst.object");
   return Response.json(single ? rows[0] ?? null : rows);
 };
+const isAdmin = new URLSearchParams(location.search).get("role") !== "user";
 const user = { id: "sidebar-test", email: "student@example.test", user_metadata: {} } as User;
 if (!location.hash) location.hash = "#/fag/tma4240/notater";
-createRoot(document.getElementById("root")!).render(<AuthContext.Provider value={{ user, role: "admin", isAdmin: true, isLoading: false, signOut: async () => {} }}><App /></AuthContext.Provider>);
+createRoot(document.getElementById("root")!).render(<AuthContext.Provider value={{ user, role: isAdmin ? "admin" : "user", isAdmin, isLoading: false, signOut: async () => {} }}><App /></AuthContext.Provider>);

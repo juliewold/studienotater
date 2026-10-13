@@ -307,3 +307,17 @@ No new Supabase migration is required beyond the existing completion RPC.
 - `psql -d <empty_disposable_database> -f tests/folder-order.sql` verifies the
   migration, reruns, colors, subject scope, incomplete/duplicate lists and atomic
   rollback when RLS permits only part of an order. Requires role authenticated.
+
+## Shared folder permissions
+
+- `/studienotater/tests/folder-admin.html` checks the actual FolderCard and
+  SortableFolders components under both roles: reader links/colors remain, menus
+  and drag controls appear only for admins (even with enabled=true).
+- `/studienotater/tests/folder-order.html?role=user` renders the complete reader
+  view with mock data. Verify no create/rename/delete/reorder controls, then open
+  a folder. Without the query parameter the fixture uses admin permissions.
+- `psql -d <empty_disposable_database> -f tests/folder-admin.sql` needs local
+  roles `anon` and `authenticated`. It tests direct CRUD and the sorting RPC,
+  preserved reads/colors, admin success, profile-role escalation and migration
+  reruns against deliberately permissive legacy policies. Never run this test
+  schema against Supabase/production.
