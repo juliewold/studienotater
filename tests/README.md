@@ -354,3 +354,33 @@ No new Supabase migration is required beyond the existing completion RPC.
   through the actual SortableNotes component, performs real DOM hit testing and
   verifies one correctly scoped save. Native pointer capture is stubbed because
   synthetic events do not create a native active pointer.
+
+## Temasider
+
+Åpne `/studienotater/tests/topic-learning.html` med Vite. Tolv tester kontrollerer
+primær-/ekstrakoblinger, avgrensing, duplikater, uttrekk av eksempelbokser og
+formler (inkludert nøstet matematikk), kildebevaring, introduksjonslagring og
+manglende migrering. Siden bruker kun simulerte nettverkskall. Bytt mellom
+leser/admin og light/dark; som admin kan introduksjonen redigeres og lagres.
+
+`tests/topic-introductions.sql` kjøres med `psql -v ON_ERROR_STOP=1 -f ...` i en
+**tom disponibel lokal database** med rollene `anon` og `authenticated`.
+Testen kjører migreringene og kontrollerer adminlagring, lengdegrense, lesetilgang
+og avvisning av vanlige brukeres/anonymes skriving, inkludert direkte upsert.
+
+Kjør `database/migrations/20261014_topic_introductions.sql` manuelt i Supabase
+etter `20261013_note_folder_admin.sql`. Den nye tabellen inneholder kun
+introduksjoner; eksisterende temaer, koblinger og notater endres ikke.
+Uten migreringen vises eksisterende temainnhold sammen med en feilmelding,
+og redigering av introduksjon er utilgjengelig.
+
+Manuell kontroll med eksisterende data: TDT4120 → Sorting algorithms. Kontroller
+seksjonsrekkefølge, lenker til begreper/undertemaer/notater, og matematikk.
+Test lagring/refresh som admin etter migreringen, og lesetilgang uten
+redigeringsknapp som vanlig bruker. Eksemplene følger dagens notatplasseringer;
+ingen koblinger korrigeres automatisk.
+
+Temasiden viser bare navngitte/begrepskoblede formler og teorembokser i
+sammendraget, med duplikater fjernet. Andre uttrykk finnes fortsatt i
+kildenotatene. Testene kontrollerer dette utvalget og begrepskonteksten.
+Eksempelbokser kan åpnes, og kildelenker er samlet nederst.
