@@ -298,6 +298,8 @@ class ConceptCanonicalContextTests(SimpleTestCase):
             self.assertIn("0 eller 1", messages[1]["content"])
             self.assertIn("ikke slå sammen", messages[0]["content"])
             self.assertIn("canonical-navn", messages[0]["content"])
+            self.assertIn("shortDefinition og explanation skal følge språket i notatets forklarende tekst", messages[0]["content"])
+            self.assertIn("navn, ikke språket i forklaringene", messages[0]["content"])
 
     def test_context_request_validation_and_forwarding(self):
         context = [{"name": "Begrep", "type": "definition", "shortDefinition": "Definisjon"}]

@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer } from "@tiptap/react";
 
 import { CalloutNodeView } from "./CalloutNodeView";
 
-export type CalloutType = "definition" | "tip" | "theorem" | "example" | "exam";
+export type CalloutType = "definition" | "tip" | "theorem" | "example" | "exam" | "method" | "formula";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

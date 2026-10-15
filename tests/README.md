@@ -396,3 +396,54 @@ skal bli stående, og eksisterende SubtopicPage skal vise begrepslenkene.
 Kontroller også light/dark og «Vis temaer» ved mobilbredde. TopicPage skal ikke
 lenger ha en egen Undertemaer-seksjon. Fagsiden har et Temaer-ressurskort som
 åpner `/fag/:subjectId/tema`, i stedet for den tidligere store temalisten.
+
+## Strukturert innhold i kunnskapsbasen
+
+Åpne `/studienotater/tests/structured-content.html`. Testen bruker simulerte
+Supabase-svar og faktisk notatrenderer. Den verifiserer fem innholdstyper,
+bevaring av LaTeX/tabeller/lister, kildehenvisninger, nøstede bokser og
+filtrering av et forelesningsnotat som inneholder flere undertemaer/temaer.
+Lenkene øverst lar deg kontrollere samme innhold på begreps-, tema- og
+undertemasiden, inkludert bytte mellom undertemaer.
+
+Innholdsavgrensingen bruker `concept_subtopics` og eksplisitte begreps-ID-er i
+notatboksene. Notatets primær-/ekstrakoblinger brukes fortsatt for videre lesing,
+men er ikke tilstrekkelig bevis for at alle boksene tilhører samme undertema.
+Eldre HTML-bokser kan også kobles ved et entydig lagret begrepsnavn eller en definisjon som begynner med «En **algoritme** er …». Vanlige omtaler, tvetydige navn og eksisterende ID-koblinger overstyres ikke. Dette skjer kun ved lesing, uten databaseendringer. Testen dekker HTML-formatet fra «Forelesning 1 - Algoritmer og kompleksitet», og bevarer inline-lenker til andre begreper.
+Visningen endrer ingen lagrede notater, koblinger eller navn.
+
+Kildekoblingen støtter også entydige nummererte overskrifter (inkludert undertitler),
+navn inne i bokser og overskriftshierarkiet. En ny overskrift på samme eller høyere
+nivå avslutter seksjonen. Dette gjelder alle begreper og bokstyper, ikke en navneliste.
+Frittstående formler beholder foregående forklarende avsnitt fra sin seksjon.
+Tvetydige navn og vanlige omtaler gir fortsatt ingen kobling.
+
+Manuell kontroll med eksisterende Supabase-data (kun lesing):
+- `#/concepts/algoritme`: hele definisjonen og punktlisten fra Forelesning 1.
+- `#/concepts/big-o`, `big-omega`, `big-theta`: norske definisjoner og eksempler med LaTeX.
+- `#/concepts/de-morgans-lover`: teoremboks fra Logisk ekvivalens.
+- `#/concepts/kjoretid`: frittstående formler med norsk kildekontekst.
+- Følg «Tilhører» til undertema og videre til tema; kontroller at hovedinnholdet
+  bruker kildebokser og at begreper uten kilde vises som korte forklaringer separat.
+- Kontroller mobilbredde og lys/mørk modus. Metodebokser dekkes i testfiksturen;
+  det undersøkte live-utvalget hadde ingen koblede metodebokser.
+
+Språk: AI-prompten tillot engelske canonical-navn uten å angi språk separat for
+forklaringene. `preserveExisting` bevarer tidligere `short_definition`/`explanation`.
+Prompten angir nå at nye forklaringer følger notatets språk selv med engelsk navn.
+Eksisterende tekster oversettes ikke; kildeinnholdet prioriteres i visningen.
+
+### Eldre kunnskapsbaser uten concept_subtopics
+
+`structured-content.html` tester også notater uten begrepskoblinger. Lesefallbacken
+krever én unik plassering samlet fra `notes.subtopic_id` og `note_subtopics`, og
+samme normaliserte tittel som undertemaet. Den viser eksisterende kildebokser,
+ikke oppdiktede begreper. Brede forelesninger, flere plasseringer, eksplisitt
+blokkeierskap og allerede viste begrepsbokser blir ikke overstyrt/duplisert.
+Dette er bare leselogikk; det kreves ingen migrering eller databaseoppdatering.
+
+Verifisert med ekte TMA4412-data: «Mengder» hadde null `concept_subtopics`, men
+samme undertema i både primærplasseringen og `note_subtopics`. Notatet hadde
+17 definisjons-/eksempelbokser uten begreps-ID; disse vises nå med original LaTeX.
+Temaoversikten bruker samme kildeutvalg. Tidligere fungerte TDT4120 fordi
+begrepskoblingene der var utfylt, mens notatkoblinger bare ga videre-lesing-lenker.

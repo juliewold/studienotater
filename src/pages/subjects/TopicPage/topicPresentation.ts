@@ -12,7 +12,7 @@ export function selectTopicRules(blocks: TopicBlock[], concepts: Concept[]) {
     if (!element) return [];
     const conceptId = element.getAttribute("data-formula-concept-id") ?? element.getAttribute("data-concept-id");
     const concept = conceptId ? byId.get(conceptId) : undefined;
-    const name = concept?.name ?? element.getAttribute("data-concept-name") ?? "";
+    const name = concept?.name ?? element.getAttribute("data-concept-name") ?? block.conceptName ?? "";
     const theorem = element.getAttribute("data-callout-type") === "theorem";
     if (!theorem && !name) return [];
     const key = block.latex?.trim() ?? element.textContent?.replace(/\s+/g, " ").trim();
@@ -25,6 +25,6 @@ export function selectTopicRules(blocks: TopicBlock[], concepts: Concept[]) {
 export function exampleTitle(block: TopicBlock, index: number) {
   const doc = new DOMParser().parseFromString(block.html, "text/html");
   const name = doc.querySelector("[data-concept-name]")?.getAttribute("data-concept-name");
-  const text = name || doc.querySelector(".note-callout-body h2, .note-callout-body h3, .note-callout-body p")?.textContent?.trim();
+  const text = name || block.conceptName || doc.querySelector(".note-callout-body h2, .note-callout-body h3, .note-callout-body p")?.textContent?.trim();
   return text ? `${text.slice(0, 90)}${text.length > 90 ? "…" : ""}` : `Eksempel ${index + 1}`;
 }
