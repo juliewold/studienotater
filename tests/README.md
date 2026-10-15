@@ -384,3 +384,15 @@ Temasiden viser bare navngitte/begrepskoblede formler og teorembokser i
 sammendraget, med duplikater fjernet. Andre uttrykk finnes fortsatt i
 kildenotatene. Testene kontrollerer dette utvalget og begrepskonteksten.
 Eksempelbokser kan åpnes, og kildelenker er samlet nederst.
+
+### Pensumnavigasjon
+
+`topic-learning.html` inkluderer den faktiske `CurriculumLayout` og to simulerte
+temaer. Inngangen `/tema` skal åpne det første temaet i den returnerte
+sorteringsrekkefølgen. Bytt fra Sorting algorithms til Data structures: bare
+Stacks skal foldes ut. Åpne Stacks, og kontroller at både temaet og undertemaet
+er markert. Bytt tilbake til Sorting algorithms → Insertion sort. Sidebaren
+skal bli stående, og eksisterende SubtopicPage skal vise begrepslenkene.
+Kontroller også light/dark og «Vis temaer» ved mobilbredde. TopicPage skal ikke
+lenger ha en egen Undertemaer-seksjon. Fagsiden har et Temaer-ressurskort som
+åpner `/fag/:subjectId/tema`, i stedet for den tidligere store temalisten.

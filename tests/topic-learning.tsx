@@ -1,3 +1,5 @@
+import { CurriculumLayout, CurriculumIndex } from "../src/components/subjects/CurriculumLayout/CurriculumLayout";
+import { SubtopicPage } from "../src/pages/subjects/SubtopicPage/SubtopicPage";
 import { selectTopicRules } from "../src/pages/subjects/TopicPage/topicPresentation";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -39,8 +41,8 @@ let writes = 0;
 window.fetch = async (input, init) => {
   const url = new URL(String(input));
   const table = url.pathname.split("/").at(-1);
-  if (table === "topics") return Response.json([{ id: "t", subject_id: "tdt4120", name: "Sorting algorithms", sort_order: 0 }]);
-  if (table === "subtopics") return Response.json([{ id: "s", topic_id: "t", name: "Insertion sort", sort_order: 0 }]);
+  if (table === "topics") return Response.json([{ id: "t", subject_id: "tdt4120", name: "Sorting algorithms", sort_order: 0 }, { id: "t2", subject_id: "tdt4120", name: "Data structures", sort_order: 1 }]);
+  if (table === "subtopics") return Response.json(url.searchParams.get("topic_id") === "eq.t2" ? [{ id: "s2", topic_id: "t2", name: "Stacks", sort_order: 0 }] : [{ id: "s", topic_id: "t", name: "Insertion sort", sort_order: 0 }]);
   if (table === "notes") return Response.json(notes.map(n => ({ ...n, subject_id: n.subjectId, subtopic_id: n.subtopicId })));
   if (table === "note_subtopics") return Response.json(links.map(l => ({ note_id: l.noteId, subtopic_id: l.subtopicId })));
   const concept = { id: "c", name: "Tidskompleksitet", slug: "tidskompleksitet", type: "definition", short_definition: "Antall operasjoner som funksjon av $n$." };
@@ -66,6 +68,6 @@ document.getElementById("results")!.textContent = `${results.length} tester best
 export function Preview() {
   const [admin, setAdmin] = useState(false);
   const [dark, setDark] = useState(false);
-  return <><button onClick={() => setAdmin(!admin)}>{admin ? "Vis som leser" : "Vis som admin"}</button><button onClick={() => { document.documentElement.dataset.theme = dark ? "light" : "dark"; setDark(!dark); }}>{dark ? "Lyst tema" : "Mørkt tema"}</button><AuthContext.Provider value={{ user: null, isAdmin: admin, role: admin ? "admin" : "user", isLoading: false, signOut: async () => {} }}><MemoryRouter initialEntries={["/fag/tdt4120/tema/t"]}><Routes><Route path="/fag/:subjectId/tema/:topicId" element={<TopicPage />} /></Routes></MemoryRouter></AuthContext.Provider></>;
+  return <><button onClick={() => setAdmin(!admin)}>{admin ? "Vis som leser" : "Vis som admin"}</button><button onClick={() => { document.documentElement.dataset.theme = dark ? "light" : "dark"; setDark(!dark); }}>{dark ? "Lyst tema" : "Mørkt tema"}</button><AuthContext.Provider value={{ user: null, isAdmin: admin, role: admin ? "admin" : "user", isLoading: false, signOut: async () => {} }}><MemoryRouter initialEntries={["/fag/tdt4120/tema"]}><Routes><Route path="/fag/:subjectId/tema" element={<CurriculumLayout />}><Route index element={<CurriculumIndex />} /><Route path=":topicId" element={<TopicPage />} /><Route path=":topicId/undertema/:subtopicId" element={<SubtopicPage />} /></Route></Routes></MemoryRouter></AuthContext.Provider></>;
 }
 createRoot(document.getElementById("root")!).render(<Preview />);

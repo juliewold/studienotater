@@ -2,12 +2,11 @@ import "./SubjectPage.css";
 
 import { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { subjects } from "../../../data/subjects";
 import { SubjectFeatureCard } from "../../../components/subjects/SubjectFeatureCard/SubjectFeatureCard";
 import { useSubjectProgress } from "../../../hooks/useSubjectProgress";
-import { useSubjectStructure } from "../../../hooks/useSubjectStructure";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import { generateKnowledgeBaseForSubject } from "../../../services/concepts/knowledgeBaseService";
 
@@ -37,12 +36,6 @@ export const SubjectPage = () => {
 
   const { subjectProgress, isLoading, errorMessage } =
     useSubjectProgress(subjectId, structureRevision);
-
-  const {
-    topics,
-    isLoading: isLoadingStructure,
-    errorMessage: structureErrorMessage,
-  } = useSubjectStructure(subjectId, structureRevision);
 
   const visibleTopics = subjectProgress.topicProgress.slice(
     0,
@@ -229,6 +222,7 @@ export const SubjectPage = () => {
       </section>
 
       <div className="subject-features-grid">
+        <SubjectFeatureCard title="Temaer" description="Utforsk temaer, undertemaer og begreper" link={`/fag/${subject.id}/tema`} />
         <SubjectFeatureCard
           title="Notater"
           description="Les fagnotater og sammendrag"
@@ -271,35 +265,6 @@ export const SubjectPage = () => {
           link={`/fag/${subject.id}/studieplan`}
         />
       </div>
-
-      <section className="subject-syllabus">
-        <div className="subject-syllabus-header">
-          <div>
-            <p className="subject-progress-label">Pensum</p>
-            <h2>Temaer og undertemaer</h2>
-          </div>
-        </div>
-
-        {isLoadingStructure ? (
-          <p>Laster pensum...</p>
-        ) : structureErrorMessage ? (
-          <p>{structureErrorMessage}</p>
-        ) : (
-          <div className="subject-syllabus-list">
-            {topics.map((topic) => (
-              <article key={topic.id} className="subject-syllabus-topic">
-                <Link
-                  to={`/fag/${subject.id}/tema/${topic.id}`}
-                  className="subject-syllabus-topic-link"
-                >
-                  <h3>{topic.name}</h3>
-                  <ChevronRight size={20} />
-                </Link>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
 
       {!isLoading &&
         !errorMessage &&

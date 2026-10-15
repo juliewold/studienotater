@@ -74,9 +74,6 @@ function TopicDetails({ subjectId, topicId }: { subjectId?: string; topicId?: st
           {examples.map((block, index) => <details className="topic-example" key={`${block.note.id}-${index}`}><summary><MathText>{exampleTitle(block, index)}</MathText></summary><ReadOnlyNote content={block.html} /></details>)}
         </CompactCollection>
       </Section>
-      <Section title="Undertemaer" empty={data.subtopics.length === 0}>
-        <ul className="topic-link-list">{data.subtopics.map(subtopic => <li key={subtopic.id}><Link to={`/fag/${subjectId}/tema/${topicId}/undertema/${subtopic.id}`}>{subtopic.name}</Link></li>)}</ul>
-      </Section>
       <Section title="Kilder og videre lesing" empty={data.notes.length === 0}>
         <ul className="topic-link-list topic-sources">{data.notes.map(note => <li key={note.id}><Link to={`/fag/${note.subjectId}/notater/${note.slug}`}>{note.title}</Link></li>)}</ul>
       </Section>
