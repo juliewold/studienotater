@@ -92,6 +92,10 @@ def _extract_concept_candidates_once(
 
                     "For hvert begrep skal du lage: "
                     "1. shortDefinition: én kort og presis definisjon. "
+                    "shortDefinition og explanation skal følge språket i notatets forklarende tekst. "
+                    "Når forklaringene i notatet er norske, skriv begge feltene på norsk, "
+                    "selv om canonical-navnet eller eksisterende beskrivelser er engelske. "
+                    "Regelen om å bevare fagtermer gjelder navn, ikke språket i forklaringene. "
                     "2. explanation: en pedagogisk forklaring som kan vises direkte "
                     "på en begrepsside for en universitetsstudent. "
                     "Forklar hva begrepet betyr, hvordan det brukes og det viktigste "

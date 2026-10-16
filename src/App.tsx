@@ -1,3 +1,4 @@
+import { CurriculumLayout, CurriculumIndex } from "./components/subjects/CurriculumLayout/CurriculumLayout";
 import { NotesLayout } from "./components/notes/NotesLayout/NotesLayout";
 import { LoginPage } from "./pages/auth/LoginPage/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage/RegisterPage";
@@ -111,23 +112,11 @@ function App() {
           }
         />
 
-        <Route
-          path="/fag/:subjectId/tema/:topicId"
-          element={
-            <ProtectedRoute>
-              <TopicPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/fag/:subjectId/tema/:topicId/undertema/:subtopicId"
-          element={
-            <ProtectedRoute>
-              <SubtopicPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/fag/:subjectId/tema" element={<ProtectedRoute><CurriculumLayout /></ProtectedRoute>}>
+          <Route index element={<CurriculumIndex />} />
+          <Route path=":topicId" element={<TopicPage />} />
+          <Route path=":topicId/undertema/:subtopicId" element={<SubtopicPage />} />
+        </Route>
 
         <Route path="/fag/:subjectId/notater" element={<ProtectedRoute><NotesLayout /></ProtectedRoute>}>
           <Route index element={<NotesPage />} />

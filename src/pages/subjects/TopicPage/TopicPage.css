@@ -1,142 +1,19 @@
-.topic-page {
-  margin-block: 0;
-  padding-block: 48px 80px;
-}
-
-.topic-page .back-link {
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: 40px;
-
-  color: #7c3aed;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.topic-page .back-link:hover {
-  color: #5b21b6;
-}
-
-.topic-page-label {
-  margin: 0 0 8px;
-
-  color: #7c3aed;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.topic-page > h1 {
-  margin: 0;
-
-  color: #18181b;
-  font-size: clamp(2.2rem, 5vw, 3.4rem);
-  line-height: 1.1;
-}
-
-.topic-page-section {
-  margin-top: 48px;
-}
-
-.topic-page-section-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-
-  margin-bottom: 20px;
-}
-
-.topic-page-section-header h2 {
-  margin: 0;
-
-  color: #18181b;
-  font-size: 1.5rem;
-}
-
-.topic-page-section-header > span {
-  color: #71717a;
-  font-size: 0.9rem;
-}
-
-.topic-page-subtopics {
-  display: grid;
-  gap: 12px;
-}
-
-.topic-page-subtopic {
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px;
-
-  min-height: 72px;
-  padding: 12px 18px;
-
-  background: #ffffff;
-  border: 1px solid #ede9fe;
-  border-radius: 14px;
-
-  color: #18181b;
-  text-decoration: none;
-
-  transition:
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.topic-page-subtopic:hover {
-  border-color: #c4b5fd;
-  transform: translateY(-1px);
-}
-
-.topic-page-subtopic-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 38px;
-  height: 38px;
-
-  background: #f3e8ff;
-  border-radius: 10px;
-
-  color: #7c3aed;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.topic-page-subtopic-name {
-  font-weight: 600;
-  line-height: 1.35;
-}
-
-.topic-page-subtopic svg {
-  color: #a78bfa;
-}
-
+@import "../../../components/concepts/LearningPage/LearningPage.css";
+.topic-learning .topic-introduction { margin: 16px 0 0; white-space: pre-wrap; }
+.topic-learning .topic-page-section-header h2 { margin: 0 0 12px; font-size: 1.25rem; color: inherit; }
+.topic-learning .topic-learning-empty { color: var(--app-muted, #716879); font-size: .93rem; }
+.topic-learning .topic-concept-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; padding: 0; margin: 0; list-style: none; }
+.topic-learning .topic-concept-list a { display: flex; justify-content: space-between; gap: 12px; padding-block: 9px; border-bottom: 1px solid var(--app-border, #e6dfed); color: inherit; text-decoration: none; font-size: .95rem; }
+.topic-learning .topic-concept-list a span { color: var(--app-muted, #716879); }
+.topic-learning .topic-rule { margin-block: 16px; }
+.topic-learning .topic-rule h3 { margin: 0 0 8px; font-size: 1rem; }
+.topic-learning :is(.topic-example, .topic-more) { margin-top: 12px; }
+.topic-learning summary { cursor: pointer; color: var(--app-text, #29252f); font-size: .94rem; padding-block: 6px; }
+.topic-learning .topic-introduction-editor { display: grid; gap: 8px; margin-top: 12px; }
+.topic-learning textarea { width: 100%; box-sizing: border-box; resize: vertical; padding: 10px; font: inherit; color: inherit; background: var(--app-surface, #fff); border: 1px solid var(--app-border, #ddd); border-radius: 8px; }
+.topic-learning button { font: inherit; font-size: .9rem; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--app-border, #ede9fe); color: var(--app-accent, #7c3aed); background: var(--app-surface, #fff); cursor: pointer; }
+.topic-learning button.topic-introduction-control { padding: 0; border: 0; margin-top: 8px; background: transparent; color: var(--app-muted, #716879); }
+.topic-learning button:disabled { opacity: .6; cursor: wait; }
 @media (max-width: 700px) {
-  .topic-page {
-    padding-top: 32px;
-  }
-
-  .topic-page-section-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .topic-page-subtopic {
-    grid-template-columns: 36px minmax(0, 1fr) auto;
-    gap: 12px;
-
-    min-height: 64px;
-    padding: 10px 14px;
-  }
-
-  .topic-page-subtopic-number {
-    width: 34px;
-    height: 34px;
-  }
+  .topic-learning .topic-concept-list { grid-template-columns: 1fr; }
 }

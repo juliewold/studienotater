@@ -21,6 +21,8 @@ import { ConceptPicker } from "../../concepts/ConceptPicker/ConceptPicker";
 import type { CalloutType } from "./Callout";
 
 const calloutInformation = {
+  method: { title: "Metode", icon: BookOpen },
+  formula: { title: "Formel", icon: Sigma },
   definition: {
     title: "Definisjon",
     icon: BookOpen,

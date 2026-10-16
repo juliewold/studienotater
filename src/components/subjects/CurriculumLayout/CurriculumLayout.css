@@ -1,0 +1,23 @@
+.curriculum-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); align-items: start; min-height: calc(100dvh - 76px); }
+.curriculum-sidebar { position: sticky; top: 76px; height: calc(100dvh - 76px); box-sizing: border-box; max-height: calc(100dvh - 76px); overflow-y: auto; overscroll-behavior: contain; padding: 20px 12px; background: var(--app-surface, #fff); border-right: 1px solid var(--app-border, #e6dfed); color: var(--app-text, #29252f); }
+.curriculum-sidebar header { padding: 0 10px 16px; }
+.curriculum-sidebar header a { font-size: .8rem; color: var(--app-accent, #7c3aed); text-decoration: none; }
+.curriculum-sidebar h2 { margin: 4px 0 0; font-size: 1rem; }
+.curriculum-navigation ul { list-style: none; padding: 0; margin: 0; }
+.curriculum-navigation a { display: block; padding: 8px 10px; border-radius: 6px; text-decoration: none; font-size: .9rem; line-height: 1.4; color: inherit; overflow-wrap: anywhere; }
+.curriculum-navigation a:hover { background: var(--app-soft, #f3edfa); }
+.curriculum-navigation .is-active, .curriculum-navigation a[aria-current="page"] { background: var(--app-soft, #f3edfa); color: var(--app-accent, #7c3aed); font-weight: 650; }
+.curriculum-navigation .curriculum-subtopics { margin: 4px 0 10px 14px; padding-left: 8px; border-left: 1px solid var(--app-border, #e6dfed); }
+.curriculum-subtopics a { font-size: .84rem; color: var(--app-muted, #655c70); }
+.curriculum-subtopics a[aria-current="page"] { box-shadow: inset 3px 0 var(--app-accent, #7c3aed); }
+.curriculum-content { min-width: 0; }
+.curriculum-index { padding-block: 32px; }
+.curriculum-toggle { display: none; }
+@media (max-width: 900px) {
+  .curriculum-layout { grid-template-columns: minmax(0, 1fr); }
+  .curriculum-sidebar { position: static; height: auto; max-height: none; border-right: 0; border-bottom: 1px solid var(--app-border, #e6dfed); padding: 12px var(--site-gutter); }
+  .curriculum-sidebar header { display: inline-block; padding: 0; }
+  .curriculum-toggle { display: block; margin-top: 10px; font: inherit; font-size: .9rem; border: 1px solid var(--app-border, #e6dfed); border-radius: 6px; padding: 6px 10px; background: var(--app-surface, #fff); color: var(--app-accent, #7c3aed); }
+  .curriculum-navigation { display: none; }
+  .curriculum-navigation.is-open { display: block; margin-top: 12px; max-height: 50dvh; overflow-y: auto; }
+}
