@@ -71,3 +71,20 @@ export function Preview() {
   return <><button onClick={() => setAdmin(!admin)}>{admin ? "Vis som leser" : "Vis som admin"}</button><button onClick={() => { document.documentElement.dataset.theme = dark ? "light" : "dark"; setDark(!dark); }}>{dark ? "Lyst tema" : "Mørkt tema"}</button><AuthContext.Provider value={{ user: null, isAdmin: admin, role: admin ? "admin" : "user", isLoading: false, signOut: async () => {} }}><MemoryRouter initialEntries={["/fag/tdt4120/tema"]}><Routes><Route path="/fag/:subjectId/tema" element={<CurriculumLayout />}><Route index element={<CurriculumIndex />} /><Route path=":topicId" element={<TopicPage />} /><Route path=":topicId/undertema/:subtopicId" element={<SubtopicPage />} /></Route></Routes></MemoryRouter></AuthContext.Provider></>;
 }
 createRoot(document.getElementById("root")!).render(<Preview />);
+
+// Verify the rendered disclosure, including its native keyboard-accessible control.
+await new Promise<void>(resolve => {
+  const observer = new MutationObserver(() => {
+    if (document.querySelector(".topic-sources summary")) { observer.disconnect(); resolve(); }
+  });
+  observer.observe(document.getElementById("root")!, { childList: true, subtree: true });
+});
+const sources = document.querySelector<HTMLDetailsElement>(".topic-sources")!;
+const summary = sources.querySelector<HTMLElement>("summary")!;
+check(!document.querySelector("main")!.textContent!.includes("Dette lærer du"), "Den gjentatte læringsoversikten er fjernet");
+check(!sources.open && summary.innerText === "▶ Vis kilder (2)", "Kilder er lukket som standard med riktig antall");
+summary.click();
+check(sources.open && summary.innerText === "▼ Skjul kilder (2)" && sources.querySelectorAll("a").length === 2, "Åpning viser kildelisten og oppdatert kontroll");
+summary.click();
+check(!sources.open && summary.innerText === "▶ Vis kilder (2)" && writes === 1, "Kildelisten kan lukkes uten dataskriving");
+document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
