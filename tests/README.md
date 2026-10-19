@@ -447,3 +447,15 @@ samme undertema i både primærplasseringen og `note_subtopics`. Notatet hadde
 17 definisjons-/eksempelbokser uten begreps-ID; disse vises nå med original LaTeX.
 Temaoversikten bruker samme kildeutvalg. Tidligere fungerte TDT4120 fordi
 begrepskoblingene der var utfylt, mens notatkoblinger bare ga videre-lesing-lenker.
+
+### Undertemasidens seksjonslayout
+
+`structured-content.html` tester presentasjonsgruppering, utelatelse av tomme
+seksjoner, stabil rekkefølge og deduplisering av nøyaktig samme boks fra samme
+kilde. Ulike kilder eller forskjellig kontekst beholdes. Hele bokser, inkludert
+nøstet matematikk, sendes uendret til eksisterende `StructuredConceptContent`.
+Bruk «Undertema 1» for alle fire seksjonene og «Undertema 2» for kun eksempler.
+Kontroller seksjonslenkene med mus og tastatur; de skal rulle innen siden uten
+å endre HashRouter-ruten. Test også 390 px mobilbredde og mørkt tema.
+Live-regresjon: TMA4412 → Mengder skal vise 9 definisjonsbokser og 8 eksempler,
+uten gjentatt notattittel eller tomme formel-/metodeseksjoner.

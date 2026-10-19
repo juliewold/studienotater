@@ -1,1 +1,30 @@
 @import "../../../components/concepts/LearningPage/LearningPage.css";
+
+/* Page structure only. The shared source renderer and callout styles are unchanged. */
+.subtopic-page .subtopic-sections-nav {
+  margin-top: 16px;
+  padding-block: 10px;
+  border-block: 1px solid var(--app-border, #e6dfed);
+}
+.subtopic-page .subtopic-sections-nav > span,
+.subtopic-page .subtopic-concept-links > span { color: var(--app-muted, #716879); font-size: .8rem; }
+.subtopic-page .subtopic-sections-nav ul,
+.subtopic-page .subtopic-concept-links ul { display: flex; flex-wrap: wrap; gap: 6px 20px; list-style: none; padding: 0; margin: 4px 0 0; }
+.subtopic-page .subtopic-sections-nav ul { gap: 8px; margin-top: 8px; }
+.subtopic-page .subtopic-sections-nav a { display: inline-flex; align-items: center; min-height: 36px; padding: 4px 12px; border: 1px solid var(--app-border, #e6dfed); border-radius: 8px; background: var(--app-surface, #fff); color: var(--app-text, #29252f); text-decoration: none; font-size: .92rem; font-weight: 600; }
+.subtopic-page .subtopic-sections-nav a:hover { color: var(--app-accent, #7c3aed); text-decoration: underline; }
+.subtopic-page .subtopic-sections-nav a:hover { border-color: var(--app-accent, #7c3aed); }
+.subtopic-page .subtopic-sections-nav + .subtopic-content-section { margin-top: 20px; }
+.subtopic-page .subtopic-content-section { margin-top: 32px; scroll-margin-top: 96px; }
+.subtopic-page .subtopic-section-heading { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.subtopic-page .subtopic-section-heading h2 { margin: 0; font-size: 1.3rem; line-height: 1.4; color: inherit; }
+.subtopic-page .subtopic-section-heading > span { display: inline-flex; justify-content: center; align-items: center; min-width: 24px; height: 24px; padding-inline: 6px; border: 1px solid var(--app-border, #e6dfed); border-radius: 999px; background: var(--app-surface, #fff); color: var(--app-muted, #716879); font-size: .75rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.subtopic-page .subtopic-concept-links { margin-top: 12px; }
+.subtopic-page .subtopic-concept-links a { color: var(--app-muted, #716879); font-size: .88rem; text-decoration: none; }
+.subtopic-page .subtopic-concept-links a:hover { color: var(--app-accent, #7c3aed); text-decoration: underline; }
+.subtopic-page .subtopic-sources { padding-top: 22px; border-top: 1px solid var(--app-border, #e6dfed); }
+@media (max-width: 700px) {
+  .subtopic-page .subtopic-sections-nav ul { gap: 8px; }
+  .subtopic-page .subtopic-content-section { margin-top: 26px; scroll-margin-top: 80px; }
+  .subtopic-page .subtopic-section-heading h2 { font-size: 1.15rem; }
+}
