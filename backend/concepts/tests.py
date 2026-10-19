@@ -58,7 +58,7 @@ class AIValidationTests(SimpleTestCase):
             side_effect=lambda client, note, choices: 1 if note["id"] == "n2" and len(choices) > 1 else 0,
         ):
             if service == "concept_extraction_service":
-                return extract_concept_candidates("Source notes", [
+                return extract_concept_candidates("Source notes: Induction", [
                     {"id": "s1", "name": "Induction"}, {"id": "s2", "name": "Proofs"},
                 ])
             return generate_subject_structure("Algorithms", [
@@ -216,7 +216,7 @@ class ConceptRetryTests(SimpleTestCase):
         with patch("concepts.concept_extraction_service.get_client", return_value=client), self.assertLogs(
             "concepts.concept_extraction_service", level="WARNING"
         ) as logs:
-            result = extract_concept_candidates("secret-note-content", [])
+            result = extract_concept_candidates("secret-note-content Induksjon", [])
         self.assertEqual(result[0]["name"], "Induksjon")
         self.assertEqual(client.chat.completions.create.call_count, 2)
         self.assertIn("invalid type", logs.output[0])
@@ -372,3 +372,45 @@ class StructureCompletionTests(SimpleTestCase):
             }, content_type="application/json")
             self.assertEqual(response.status_code, 200)
             ai.assert_called_once_with("Subject", self.notes, self.existing)
+
+
+class ConceptSourceLanguageTests(SimpleTestCase):
+    def extract(self, text, name, source_name=None, existing=None):
+        import json
+        from .concept_extraction_service import extract_concept_candidates
+        candidate = dict(name=name, type="definition", shortDefinition="En norsk definisjon.",
+                         explanation="En norsk forklaring.", subtopicIds=[])
+        if source_name is not None:
+            candidate["sourceName"] = source_name
+        client = Mock()
+        client.chat.completions.create.return_value = Mock(choices=[Mock(
+            message=Mock(content=json.dumps({"candidates": [candidate]})), finish_reason="stop")])
+        with patch("concepts.concept_extraction_service.get_client", return_value=client):
+            return extract_concept_candidates(text, [], existing), client
+
+    def test_new_translation_and_invented_alias_are_rejected(self):
+        for name, source in [("A priori probability", None),
+                             ("A priori probability", "A priori sannsynlighet"),
+                             ("Prior", "Prior")]:
+            with self.subTest(name=name, source=source), self.assertLogs("concepts.concept_extraction_service"), self.assertRaises(ValueError):
+                self.extract("A priori sannsynlighet beskrives før observasjonen.", name, source)
+
+    def test_source_language_and_established_english_terms_are_preserved(self):
+        for term in ["A priori sannsynlighet", "A posteriori sannsynlighet", "Insertion Sort"]:
+            result, client = self.extract(f"{term} forklares her på norsk.", term, term)
+            self.assertEqual(result[0]["name"], term)
+            prompt = client.chat.completions.create.call_args.kwargs["messages"][0]["content"]
+            self.assertIn("shortDefinition og explanation skal følge språket", prompt)
+            self.assertIn("Undertemanavn og eksisterende beskrivelser er ikke språklige forbilder", prompt)
+
+    def test_existing_identity_is_reused_without_requiring_translation(self):
+        existing = [{"name": "A priori probability", "type": "definition", "shortDefinition": "Old definition"}]
+        result, _ = self.extract("A priori sannsynlighet før observasjonen.",
+                                 "A priori probability", "A priori sannsynlighet", existing)
+        self.assertEqual(result[0]["name"], existing[0]["name"])
+        self.assertEqual(existing[0]["shortDefinition"], "Old definition")
+
+    def test_case_and_whitespace_are_allowed_but_substrings_are_not(self):
+        self.assertEqual(self.extract("insertion\n sort brukes her.", "Insertion Sort")[0][0]["name"], "Insertion Sort")
+        with self.assertLogs("concepts.concept_extraction_service"), self.assertRaises(ValueError):
+            self.extract("Prioritet", "Prior")
