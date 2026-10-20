@@ -1,0 +1,6 @@
+.concept-review-filters { display: flex; flex-wrap: wrap; gap: 16px; }
+.concept-review-filters label { display: grid; gap: 6px; }
+.concept-review-filters :is(input, select) { padding: 8px; font: inherit; max-width: 100%; }
+.concept-review-item { border-top: 1px solid var(--app-border, #e6dfed); padding-block: 14px; }
+.concept-review-item summary { cursor: pointer; font-weight: 600; }
+.concept-review-item h2 { margin-top: 24px; font-size: 1.15rem; }

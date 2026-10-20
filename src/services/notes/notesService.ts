@@ -144,11 +144,13 @@ export async function getNotesBySubject(
   return sortNotes(((data ?? []) as NoteRow[]).map(mapDatabaseNote));
 }
 
-export async function getAllNotes(): Promise<DatabaseNote[]> {
-  const { data, error } = await supabase
+export async function getAllNotes(range?: { from: number; to: number }): Promise<DatabaseNote[]> {
+  let query = supabase
     .from("notes")
     .select(noteSelect)
     .order("sort_order", { ascending: true }).order("id", { ascending: true });
+  if (range) query = query.range(range.from, range.to);
+  const { data, error } = await query;
 
   if (error) {
     throw error;

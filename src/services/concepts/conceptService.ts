@@ -23,11 +23,13 @@ function mapConceptRow(row: ConceptRow): Concept {
   };
 }
 
-export async function getConceptsFromDatabase(): Promise<Concept[]> {
-  const { data, error } = await supabase
+export async function getConceptsFromDatabase(range?: { from: number; to: number }): Promise<Concept[]> {
+  let query = supabase
     .from("concepts")
     .select("id, name, slug, type, short_definition, explanation")
-    .order("name");
+    .order("name").order("id");
+  if (range) query = query.range(range.from, range.to);
+  const { data, error } = await query;
 
   if (error) {
     throw error;

@@ -1,3 +1,4 @@
+import { ConceptReviewPage } from "./pages/admin/ConceptReviewPage/ConceptReviewPage";
 import { CurriculumLayout, CurriculumIndex } from "./components/subjects/CurriculumLayout/CurriculumLayout";
 import { NotesLayout } from "./components/notes/NotesLayout/NotesLayout";
 import { LoginPage } from "./pages/auth/LoginPage/LoginPage";
@@ -430,6 +431,7 @@ function App() {
           }
         />
 
+        <Route path="/admin/concepts/review" element={<AdminRoute><ConceptReviewPage /></AdminRoute>} />
         <Route
           path="/admin/concepts"
           element={

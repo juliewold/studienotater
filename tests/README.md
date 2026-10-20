@@ -459,3 +459,9 @@ Kontroller seksjonslenkene med mus og tastatur; de skal rulle innen siden uten
 å endre HashRouter-ruten. Test også 390 px mobilbredde og mørkt tema.
 Live-regresjon: TMA4412 → Mengder skal vise 9 definisjonsbokser og 8 eksempler,
 uten gjentatt notattittel eller tomme formel-/metodeseksjoner.
+
+### Skrivebeskyttet begrepsgjennomgang
+
+Åpne `/studienotater/tests/concept-review.html`. Testene kontrollerer ordrette forslag, bevaring av engelske kildetermer, tvetydighet, manglende kilder, uendrede objekter/koblinger, paginert lesing, admin-tilgang og at UI-et ikke har skrivehandlinger. Nettverket er mocket og avviser skrivekall.
+
+I appen: Administrer konsepter → «Gjennomgå begreper mot kilder» (`/admin/concepts/review`). Søk etter navn/fag, åpne et begrep og sammenlign førtekst, forslag og original kildeboks. «Alle begreper» inkluderer også begreper uten påviste avvik og uten kilde. Forslag er konservative utdrag, ikke en automatisk semantisk vurdering eller sikker identifikasjon av AI-generert tekst. Ingen LLM-kall, databaseendringer eller migreringer inngår.
