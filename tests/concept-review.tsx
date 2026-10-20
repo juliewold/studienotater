@@ -1,4 +1,4 @@
-import { reviewConcept, buildConceptReviews, readReviewPages, loadConceptReviews, findConceptTextMatches } from "../src/services/concepts/conceptReviewService";
+import { reviewConcept, buildConceptReviews, readReviewPages, loadConceptReviews, findConceptTextMatches, findConceptTextWithFallback } from "../src/services/concepts/conceptReviewService";
 import type { Concept } from "../src/data/concepts/types";
 import type { ConceptContentSource } from "../src/services/concepts/conceptContentService";
 import type { DatabaseNote } from "../src/services/notes/notesService";
@@ -35,16 +35,16 @@ window.fetch = async (input, init) => {
   const url = new URL(String(input));
   const table = url.pathname.split("/").at(-1);
   if (Number(url.searchParams.get("offset") ?? 0) > 0) return Response.json([]);
-  if (table === "concepts") return Response.json([{ ...concept, short_definition: concept.shortDefinition }, ...["missing", "unlinked", "failed", "textname"].map(id => ({ ...concept, id, name: id, slug: id, short_definition: concept.shortDefinition }))]);
+  if (table === "concepts") return Response.json([{ ...concept, short_definition: concept.shortDefinition }, ...["missing", "unlinked", "failed", "textname", "fallbackname"].map(id => ({ ...concept, id, name: id, slug: id, short_definition: concept.shortDefinition }))]);
   if (table === "concept_subtopics") {
     const id = url.searchParams.get("concept_id");
     if (id === "eq.failed") return Response.json({ message: "Unavailable" }, { status: 500 });
-    return Response.json((id === "eq.missing" || id === "eq.textname") ? [{ subtopic_id: "s" }, { subtopic_id: "s2" }] : []);
+    return Response.json((id === "eq.missing" || id === "eq.textname" || id === "eq.fallbackname") ? [{ subtopic_id: "s" }, { subtopic_id: "s2" }] : []);
   }
   if (table === "subtopics") return Response.json([{ id: "s", topic_id: "t", name: "Sannsynlighet" }, { id: "s2", topic_id: "t2", name: "Mengder" }]);
   if (table === "topics") return Response.json([{ id: "t", subject_id: "tma4240", name: "Statistikk" }, { id: "t2", subject_id: "tma4412", name: "Mengder og relasjoner" }]);
   if (table === "note_subtopics") return Response.json([]);
-  if (table === "notes") return Response.json([{ ...note, subject_id: note.subjectId }, { ...note, id: "text-note", slug: "text-note", content: "<p>Her forklares TEXTNAME i et relevant notat.</p>", subject_id: note.subjectId, subtopic_id: "s" }]);
+  if (table === "notes") return Response.json([{ ...note, subject_id: note.subjectId }, { ...note, id: "text-note", slug: "text-note", content: "<p>Her forklares TEXTNAME i et relevant notat.</p>", subject_id: note.subjectId, subtopic_id: "s" }, { ...note, id: "fallback-note", slug: "fallback-note", content: "<p>FALLBACKNAME står i et annet notat i faget.</p>", subject_id: note.subjectId, subtopic_id: "outside" }]);
   throw Error(`Unexpected read ${table}`);
 };
 const root = createRoot(document.getElementById("root")!);
@@ -98,5 +98,21 @@ check(loadedReviews.find(item => item.concept.id === "textname")?.status === "te
 flushSync(() => { filter.value = "text"; filter.dispatchEvent(new Event("change", { bubbles: true })); });
 const textItem = document.querySelector<HTMLDetailsElement>(".concept-review-item")!;
 textItem.querySelector<HTMLElement>("summary")!.click();
-check(textItem.textContent?.includes("Finnes i notattekst") && textItem.querySelector("blockquote")?.textContent?.includes("TEXTNAME") && textItem.querySelector('a[href*="text-note"]'), "UI viser kildeutdrag og lenke til notat");
+check(textItem.textContent?.includes("Finnes i tilknyttet notat") && textItem.querySelector("blockquote")?.textContent?.includes("TEXTNAME") && textItem.querySelector('a[href*="text-note"]'), "UI viser kildeutdrag og lenke til notat");
+document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
+
+const unrelatedPlacement = { ...textNote, id: "other-placement", subtopicId: "other", slug: "other-placement" };
+check(findConceptTextWithFallback(concept.name, [unrelatedPlacement], [], scope, ["tma4240"]).status === "subject-text", "Søker i hele tilknyttet fag når lokalt søk ikke gir treff");
+check(findConceptTextWithFallback(concept.name, [{ ...unrelatedPlacement, subtopicId: null }], [], scope, ["tma4240"]).textMatches.length === 1, "Reservesøk inkluderer notater uten mappe/undertema");
+const preferred = findConceptTextWithFallback(concept.name, [textNote, unrelatedPlacement], [], scope, ["tma4240"]);
+check(preferred.status === "text" && preferred.textMatches.length === 1 && preferred.textMatches[0].noteId === textNote.id, "Tilknyttede treff prioriteres uten ekstra fagtreff");
+check(findConceptTextWithFallback(concept.name, [{ ...unrelatedPlacement, subjectId: "another" }], [], scope, ["tma4240"]).status === "missing", "Reservesøk lekker ikke til andre fag");
+check(findConceptTextWithFallback(concept.name, [unrelatedPlacement], [], [], []).textMatches.length === 0, "Ingen fagkobling utløser ikke globalt søk");
+check(findConceptTextWithFallback("Ikke nevnt", [textNote, unrelatedPlacement], [], scope, ["tma4240"]).status === "missing", "Ingen treff i hele faget gir manglende kilde");
+document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
+
+flushSync(() => { filter.value = "subject-text"; filter.dispatchEvent(new Event("change", { bubbles: true })); });
+const fallbackItem = document.querySelector<HTMLDetailsElement>(".concept-review-item")!;
+fallbackItem.querySelector<HTMLElement>("summary")!.click();
+check(fallbackItem.textContent?.includes("Finnes i annet notat i faget") && fallbackItem.querySelector("blockquote")?.textContent?.includes("FALLBACKNAME") && fallbackItem.querySelector('a[href*="fallback-note"]'), "Reservesøk viser egen status, riktig utdrag og notatlenke i UI");
 document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;

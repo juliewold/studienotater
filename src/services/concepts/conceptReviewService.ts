@@ -15,7 +15,7 @@ export type ConceptReview = {
   textSearchError?: boolean;
   contextError?: boolean;
   sources: ConceptContentSource[];
-  status: "review" | "consistent" | "missing" | "text";
+  status: "review" | "consistent" | "missing" | "text" | "subject-text";
   reasons: string[];
   proposedName?: string;
   proposedText?: string;
@@ -89,7 +89,7 @@ export async function readReviewPages<T>(read: (range: { from: number; to: numbe
   }
 }
 
-export function findConceptTextMatches(name: string, notes: DatabaseNote[], links: NoteSubtopicLink[], scope: { subjectId: string; subtopicId: string }[]) {
+export function findConceptTextMatches(name: string, notes: DatabaseNote[], links: NoteSubtopicLink[], scope: { subjectId: string; subtopicId?: string }[]) {
   const term = name.normalize("NFKC").trim().replace(/\s+/g, " ");
   if (!term) return [];
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+");
@@ -97,7 +97,7 @@ export function findConceptTextMatches(name: string, notes: DatabaseNote[], link
   const seen = new Set<string>();
   return notes.flatMap(note => {
     if (seen.has(note.id) || !scope.some(item => item.subjectId === note.subjectId &&
-      (item.subtopicId === note.subtopicId || links.some(link => link.noteId === note.id && link.subtopicId === item.subtopicId)))) return [];
+      (!item.subtopicId || item.subtopicId === note.subtopicId || links.some(link => link.noteId === note.id && link.subtopicId === item.subtopicId)))) return [];
     seen.add(note.id);
     const doc = new DOMParser().parseFromString(note.content, "text/html");
     doc.querySelectorAll("script,style").forEach(node => node.remove());
@@ -111,6 +111,13 @@ export function findConceptTextMatches(name: string, notes: DatabaseNote[], link
     return [{ noteId: note.id, noteTitle: note.title, noteSlug: note.slug, subjectId: note.subjectId,
       excerpt: `${start ? "…" : ""}${text.slice(start, end)}${end < text.length ? "…" : ""}` }];
   });
+}
+
+export function findConceptTextWithFallback(name: string, notes: DatabaseNote[], links: NoteSubtopicLink[], scope: { subjectId: string; subtopicId: string }[], subjectIds: string[]) {
+  const linked = findConceptTextMatches(name, notes, links, scope);
+  if (linked.length) return { textMatches: linked, status: "text" as const };
+  const subjectMatches = findConceptTextMatches(name, notes, [], [...new Set(subjectIds)].map(subjectId => ({ subjectId })));
+  return { textMatches: subjectMatches, status: subjectMatches.length ? "subject-text" as const : "missing" as const };
 }
 
 export async function loadConceptReviews() {
@@ -135,9 +142,9 @@ export async function loadConceptReviews() {
       }
       for (const review of missing) {
         if (review.contextError) continue;
-        review.textMatches = findConceptTextMatches(review.concept.name, notes, links,
-          (review.contexts ?? []).flatMap(context => scope.get(context.topicId) ?? []));
-        if (review.textMatches.length) review.status = "text";
+        Object.assign(review, findConceptTextWithFallback(review.concept.name, notes, links,
+          (review.contexts ?? []).flatMap(context => scope.get(context.topicId) ?? []),
+          (review.contexts ?? []).map(context => context.subjectId)));
       }
     } catch { for (const review of missing) review.textSearchError = true; }
   }

@@ -30,11 +30,11 @@ export function ConceptReviewPage() {
     {loading ? <p role="status">Sammenligner begreper med tilgjengelige kildenotater…</p> : error ? <p role="alert">Kunne ikke hente hele grunnlaget. Last siden på nytt.</p> : <>
       <div className="concept-review-filters"><label>Søk etter begrep eller fag<input value={query} onChange={event => setQuery(event.target.value)} /></label>
         <label>Vis<select value={filter} onChange={event => setFilter(event.target.value)}>
-          <option value="review">Avvik til vurdering</option><option value="all">Alle begreper</option><option value="missing">Ingen kilde funnet</option><option value="text">Finnes i notattekst</option><option value="consistent">Ingen påviste avvik</option>
+          <option value="review">Avvik til vurdering</option><option value="all">Alle begreper</option><option value="missing">Ingen kilde funnet i faget</option><option value="text">Finnes i tilknyttet notat</option><option value="subject-text">Finnes i annet notat i faget</option><option value="consistent">Ingen påviste avvik</option>
         </select></label></div>
       <p role="status">{visible.length} av {reviews.length} begreper</p>
       {visible.map(item => <details className="concept-review-item" key={item.concept.id}>
-        <summary><MathText>{item.concept.name}</MathText> · {item.sources.length === 0 ? <span className="concept-review-missing">{item.contextError || item.textSearchError ? "Kildesøk ufullstendig" : item.textMatches?.length ? "Finnes i notattekst" : "Ingen kilde funnet"}</span> : `${item.sources.length} kildebokser`}</summary>
+        <summary><MathText>{item.concept.name}</MathText> · {item.sources.length === 0 ? <span className="concept-review-missing">{item.contextError || item.textSearchError ? "Kildesøk ufullstendig" : item.status === "text" ? "Finnes i tilknyttet notat" : item.status === "subject-text" ? "Finnes i annet notat i faget" : item.contexts?.length ? "Ingen kilde funnet i faget" : "Ingen fagkobling – kan ikke søke i faget"}</span> : `${item.sources.length} kildebokser`}</summary>
         {item.sources.length === 0 && <section aria-label="Pensumkoblinger">
           <h2>Koblet til pensum</h2>
           {item.contextError ? <p role="alert">Kunne ikke hente koblingene. Ikke vurder begrepet som foreldreløst før koblingene er kontrollert. Last siden på nytt.</p> : item.contexts?.length ? <ul>{item.contexts.map(context => {
@@ -48,7 +48,7 @@ export function ConceptReviewPage() {
           <p>Manglende kildebokser er ikke i seg selv bevis på feil eller AI-opphav.</p>
         </section>}
         {item.sources.length === 0 && item.textSearchError && <p role="alert">Tekstsøket kunne ikke fullføres. Last siden på nytt før du vurderer om kilden mangler.</p>}
-        {!!item.textMatches?.length && <section aria-label="Treff i notattekst"><h2>Finnes i notattekst</h2>
+        {!!item.textMatches?.length && <section aria-label="Treff i notattekst"><h2>{item.status === "subject-text" ? "Finnes i annet notat i faget" : "Finnes i tilknyttet notat"}</h2>
           <p>Navnet er nevnt i et relevant notat. Dette bekrefter ikke en definisjon eller en kildebokskobling.</p>
           {item.textMatches.map(match => <article key={match.noteId}><blockquote>{match.excerpt}</blockquote>
             <Link to={`/fag/${match.subjectId}/notater/${match.noteSlug}`}>{match.noteTitle} →</Link></article>)}
