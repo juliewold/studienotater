@@ -1,3 +1,5 @@
+import { getSubtopicsByTopic } from "../subjects/subjectStructureService";
+import { getSubtopicLinksForNotes, type NoteSubtopicLink } from "../notes/noteSubtopicsService";
 import { getConceptContexts, type ConceptContext } from "./conceptContextService";
 import type { Concept } from "../../data/concepts/types";
 import type { DatabaseNote } from "../notes/notesService";
@@ -9,9 +11,11 @@ import { resolveSourceConcepts } from "./sourceConceptResolver";
 export type ConceptReview = {
   concept: Concept;
   contexts?: ConceptContext[];
+  textMatches?: { noteId: string; noteTitle: string; noteSlug: string; subjectId: string; excerpt: string }[];
+  textSearchError?: boolean;
   contextError?: boolean;
   sources: ConceptContentSource[];
-  status: "review" | "consistent" | "missing";
+  status: "review" | "consistent" | "missing" | "text";
   reasons: string[];
   proposedName?: string;
   proposedText?: string;
@@ -85,6 +89,30 @@ export async function readReviewPages<T>(read: (range: { from: number; to: numbe
   }
 }
 
+export function findConceptTextMatches(name: string, notes: DatabaseNote[], links: NoteSubtopicLink[], scope: { subjectId: string; subtopicId: string }[]) {
+  const term = name.normalize("NFKC").trim().replace(/\s+/g, " ");
+  if (!term) return [];
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+");
+  const pattern = new RegExp(`(?<![\\p{L}\\p{N}_])${escaped}(?![\\p{L}\\p{N}_])`, "iu");
+  const seen = new Set<string>();
+  return notes.flatMap(note => {
+    if (seen.has(note.id) || !scope.some(item => item.subjectId === note.subjectId &&
+      (item.subtopicId === note.subtopicId || links.some(link => link.noteId === note.id && link.subtopicId === item.subtopicId)))) return [];
+    seen.add(note.id);
+    const doc = new DOMParser().parseFromString(note.content, "text/html");
+    doc.querySelectorAll("script,style").forEach(node => node.remove());
+    // Preserve block boundaries while matching inline formatting as normal text.
+    doc.querySelectorAll("p,li,h1,h2,h3,h4,h5,h6,div,br").forEach(node => node.append(doc.createTextNode(" ")));
+    const text = (doc.body.textContent ?? "").normalize("NFKC").replace(/\s+/g, " ").trim();
+    const match = pattern.exec(text);
+    if (!match) return [];
+    const start = Math.max(0, match.index - 100);
+    const end = Math.min(text.length, match.index + match[0].length + 160);
+    return [{ noteId: note.id, noteTitle: note.title, noteSlug: note.slug, subjectId: note.subjectId,
+      excerpt: `${start ? "…" : ""}${text.slice(start, end)}${end < text.length ? "…" : ""}` }];
+  });
+}
+
 export async function loadConceptReviews() {
   const [concepts, notes] = await Promise.all([readReviewPages(getConceptsFromDatabase), readReviewPages(getAllNotes)]);
   const reviews = buildConceptReviews(concepts, notes);
@@ -95,6 +123,23 @@ export async function loadConceptReviews() {
       try { review.contexts = await getConceptContexts(review.concept.id); }
       catch { review.contextError = true; }
     }));
+  }
+  if (missing.length) {
+    try {
+      const links = await getSubtopicLinksForNotes(notes.map(note => note.id));
+      const topics = new Map<string, string>();
+      for (const review of missing) for (const context of review.contexts ?? []) topics.set(context.topicId, context.subjectId);
+      const scope = new Map<string, { subjectId: string; subtopicId: string }[]>();
+      for (const [topicId, subjectId] of topics) {
+        scope.set(topicId, (await getSubtopicsByTopic(topicId)).map(subtopic => ({ subjectId, subtopicId: subtopic.id })));
+      }
+      for (const review of missing) {
+        if (review.contextError) continue;
+        review.textMatches = findConceptTextMatches(review.concept.name, notes, links,
+          (review.contexts ?? []).flatMap(context => scope.get(context.topicId) ?? []));
+        if (review.textMatches.length) review.status = "text";
+      }
+    } catch { for (const review of missing) review.textSearchError = true; }
   }
   return reviews;
 }

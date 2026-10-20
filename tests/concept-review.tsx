@@ -1,4 +1,4 @@
-import { reviewConcept, buildConceptReviews, readReviewPages, loadConceptReviews } from "../src/services/concepts/conceptReviewService";
+import { reviewConcept, buildConceptReviews, readReviewPages, loadConceptReviews, findConceptTextMatches } from "../src/services/concepts/conceptReviewService";
 import type { Concept } from "../src/data/concepts/types";
 import type { ConceptContentSource } from "../src/services/concepts/conceptContentService";
 import type { DatabaseNote } from "../src/services/notes/notesService";
@@ -35,15 +35,16 @@ window.fetch = async (input, init) => {
   const url = new URL(String(input));
   const table = url.pathname.split("/").at(-1);
   if (Number(url.searchParams.get("offset") ?? 0) > 0) return Response.json([]);
-  if (table === "concepts") return Response.json([{ ...concept, short_definition: concept.shortDefinition }, ...["missing", "unlinked", "failed"].map(id => ({ ...concept, id, name: id, slug: id, short_definition: concept.shortDefinition }))]);
+  if (table === "concepts") return Response.json([{ ...concept, short_definition: concept.shortDefinition }, ...["missing", "unlinked", "failed", "textname"].map(id => ({ ...concept, id, name: id, slug: id, short_definition: concept.shortDefinition }))]);
   if (table === "concept_subtopics") {
     const id = url.searchParams.get("concept_id");
     if (id === "eq.failed") return Response.json({ message: "Unavailable" }, { status: 500 });
-    return Response.json(id === "eq.missing" ? [{ subtopic_id: "s" }, { subtopic_id: "s2" }] : []);
+    return Response.json((id === "eq.missing" || id === "eq.textname") ? [{ subtopic_id: "s" }, { subtopic_id: "s2" }] : []);
   }
   if (table === "subtopics") return Response.json([{ id: "s", topic_id: "t", name: "Sannsynlighet" }, { id: "s2", topic_id: "t2", name: "Mengder" }]);
   if (table === "topics") return Response.json([{ id: "t", subject_id: "tma4240", name: "Statistikk" }, { id: "t2", subject_id: "tma4412", name: "Mengder og relasjoner" }]);
-  if (table === "notes") return Response.json([{ ...note, subject_id: note.subjectId }]);
+  if (table === "note_subtopics") return Response.json([]);
+  if (table === "notes") return Response.json([{ ...note, subject_id: note.subjectId }, { ...note, id: "text-note", slug: "text-note", content: "<p>Her forklares TEXTNAME i et relevant notat.</p>", subject_id: note.subjectId, subtopic_id: "s" }]);
   throw Error(`Unexpected read ${table}`);
 };
 const root = createRoot(document.getElementById("root")!);
@@ -83,4 +84,19 @@ const missingItem = [...document.querySelectorAll<HTMLDetailsElement>(".concept-
 missingItem.querySelector<HTMLElement>("summary")!.click();
 check(missingItem.textContent?.includes("TMA4240") && missingItem.textContent?.includes("Mengder og relasjoner") && missingItem.querySelectorAll('section a').length === 6, "Viser fag, tema og undertema med navigerbare lenker");
 check(document.body.textContent?.includes("Kunne ikke hente koblingene"), "Feilet lesing vises eksplisitt i UI");
+document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
+
+const textNote = { ...note, subtopicId: "s", content: "<p>Vi bruker <strong>A priori</strong> probability her.</p>" };
+const scope = [{ subjectId: "tma4240", subtopicId: "s" }];
+check(findConceptTextMatches(concept.name, [textNote], [], scope).length === 1, "Navn finnes på tvers av inline-formattering");
+check(findConceptTextMatches("PRIOR", [{ ...textNote, content: "<p>prioritet</p>" }], [], scope).length === 0, "Delord regnes ikke som treff");
+check(findConceptTextMatches(concept.name, [{ ...textNote, subtopicId: "other" }], [], scope).length === 0, "Notater utenfor temaet utelates");
+check(findConceptTextMatches(concept.name, [{ ...textNote, subjectId: "other" }], [], scope).length === 0, "Andre fag utelates selv ved lik undertema-ID");
+check(findConceptTextMatches(concept.name, [{ ...textNote, subtopicId: null }], [{ noteId: note.id, subtopicId: "s" }], scope).length === 1, "Ekstrakoblinger gir relevant notat");
+check(findConceptTextMatches("A priori sannsynlighet", [textNote], [], scope).length === 0, "Søket finner ikke på oversettelser");
+check(loadedReviews.find(item => item.concept.id === "textname")?.status === "text", "Treff klassifiseres separat fra ingen kilde");
+flushSync(() => { filter.value = "text"; filter.dispatchEvent(new Event("change", { bubbles: true })); });
+const textItem = document.querySelector<HTMLDetailsElement>(".concept-review-item")!;
+textItem.querySelector<HTMLElement>("summary")!.click();
+check(textItem.textContent?.includes("Finnes i notattekst") && textItem.querySelector("blockquote")?.textContent?.includes("TEXTNAME") && textItem.querySelector('a[href*="text-note"]'), "UI viser kildeutdrag og lenke til notat");
 document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
