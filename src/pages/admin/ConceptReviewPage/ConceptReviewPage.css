@@ -6,3 +6,8 @@
 .concept-review-item h2 { margin-top: 24px; font-size: 1.15rem; }
 
 .concept-review-missing { display: inline-block; padding: 2px 8px; border: 1px solid var(--app-border, #e6dfed); border-radius: 6px; color: var(--app-accent, #7c3aed); background: var(--app-surface, #fff); font-size: .85em; }
+
+.concept-review-actions { border-top: 1px solid var(--app-border, #e6dfed); margin-top: 24px; }
+.concept-review-actions label { display: grid; gap: 6px; margin-block: 12px; }
+.concept-review-actions :is(input,textarea) { width: 100%; box-sizing: border-box; padding: 8px; font: inherit; }
+.concept-review-actions button { padding: 6px 12px; cursor: pointer; }

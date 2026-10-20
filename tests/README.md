@@ -465,3 +465,21 @@ uten gjentatt notattittel eller tomme formel-/metodeseksjoner.
 Åpne `/studienotater/tests/concept-review.html`. Testene kontrollerer ordrette forslag, bevaring av engelske kildetermer, tvetydighet, manglende kilder, uendrede objekter/koblinger, paginert lesing, admin-tilgang og at UI-et ikke har skrivehandlinger. Nettverket er mocket og avviser skrivekall.
 
 I appen: Administrer konsepter → «Gjennomgå begreper mot kilder» (`/admin/concepts/review`). Søk etter navn/fag, åpne et begrep og sammenlign førtekst, forslag og original kildeboks. «Alle begreper» inkluderer også begreper uten påviste avvik og uten kilde. Forslag er konservative utdrag, ikke en automatisk semantisk vurdering eller sikker identifikasjon av AI-generert tekst. Ingen LLM-kall, databaseendringer eller migreringer inngår.
+
+### Manuell begrepsopprydding (admin)
+
+Gjennomgangen har nå enkeltvise Behold/Rediger/Slett-handlinger. Tidligere omtale av helt skrivebeskyttet UI gjelder før disse handlingene ble lagt til. Ingen automatisk eller massevis opprydding utføres.
+
+**Kjør `database/migrations/20261020_concept_review_actions.sql` manuelt i Supabase før bruk**, etter migreringen for beskyttede admin-roller (`20261013_note_folder_admin.sql`). Den endrer ingen eksisterende innholdsrader. Restriktive RLS-regler beskytter `concepts` og `concept_subtopics` også mot permissive eldre policyer. RPC-en validerer admin og forventet gammel tekst. ID, slug, type og koblinger beholdes ved redigering.
+
+Sletting krever inntasting av navnet. DB-triggeren avviser sletting når notatenes HTML/JSON/radinnhold inneholder ID eller begreps-URL, eller andre FK-referanser fortsatt finnes. Dette er konservativt og kan blokkere også en ren omtale av ID/URL. Bare `concept_subtopics` ryddes automatisk, atomisk med slettingen. Notater og tema-/undertemastruktur endres aldri. «Behold» gjelder inneværende gjennomgang og skriver ingen data. En vellykket endring laster kildeanalysen på nytt; feil beholder utkastet.
+
+- `/studienotater/tests/concept-review-actions.html`: 11 UI/service-tester med mock-RPC, ingen ekte skriving.
+- `/studienotater/tests/concept-review.html`: kilde/status- og tilgangsregresjoner.
+- `tests/concept-review-actions.sql`: kjør kun i en tom, disponibel lokal PostgreSQL-database. Tester migration/RLS/RPC, vanlig bruker, anonym bruker, bevarte ID-er/slug/koblinger, konflikt, ugyldig tekst, navnekollisjon, blokkering av notatreferanser/andre FK-er og atomisk opprydding. Skal ikke kjøres mot produksjon.
+
+#### Lazy lasting i gjennomgangen
+
+Listen henter kun begreper og lett pensummetadata. Ingen notattekst, kilderendering eller begrepsanalyse hentes ved første sidevisning. Åpning starter analyse for ett begrep, med lokal loading/feil og «Prøv igjen». Notatgrunnlaget og løste kildekoblinger deles i sidens sesjon; individuelle resultater og samtidige forespørsler caches. Lukk/åpne gjentar ikke analysen. Lagret redigering/sletting ugyldiggjør sesjonen og laster en ny lett indeks.
+
+Kildestatus kan ikke kjennes før analyse uten en ny databaseindeks. Uåpnede begreper merkes derfor «Ikke undersøkt ennå». Eksisterende statusfiltre gjelder undersøkte begreper, med uundersøkte i egen gruppe. Et åpent begrep forblir synlig til det lukkes selv om den nye statusen avviker fra filteret. Fagsøk bruker lette pensumkoblinger fra første lasting. Testfixture `concept-review.html` dekker fravær av tidlige notatlesinger, åpning, cache, samtidige åpninger, retry og eksisterende kilde-/statusregresjoner.

@@ -1,4 +1,4 @@
-import { reviewConcept, buildConceptReviews, readReviewPages, loadConceptReviews, findConceptTextMatches, findConceptTextWithFallback } from "../src/services/concepts/conceptReviewService";
+import { reviewConcept, buildConceptReviews, readReviewPages, loadConceptReviews, createConceptReviewSession, loadConceptReviewIndex, findConceptTextMatches, findConceptTextWithFallback } from "../src/services/concepts/conceptReviewService";
 import type { Concept } from "../src/data/concepts/types";
 import type { ConceptContentSource } from "../src/services/concepts/conceptContentService";
 import type { DatabaseNote } from "../src/services/notes/notesService";
@@ -29,6 +29,7 @@ check(buildConceptReviews([concept], [{ ...note, content: html.replace('data-con
 let reads = 0;
 check((await readReviewPages(async () => ++reads < 3 ? [reads] : [])).join() === "1,2", "Alle sider leses selv om serveren returnerer korte sider");
 let networkReads = 0;
+let noteReads = 0;
 window.fetch = async (input, init) => {
   if (init?.method && init.method !== "GET") throw Error("Write attempted");
   networkReads++;
@@ -36,7 +37,9 @@ window.fetch = async (input, init) => {
   const table = url.pathname.split("/").at(-1);
   if (Number(url.searchParams.get("offset") ?? 0) > 0) return Response.json([]);
   if (table === "concepts") return Response.json([{ ...concept, short_definition: concept.shortDefinition }, ...["missing", "unlinked", "failed", "textname", "fallbackname"].map(id => ({ ...concept, id, name: id, slug: id, short_definition: concept.shortDefinition }))]);
+  if (table === "notes") noteReads++;
   if (table === "concept_subtopics") {
+    if (!url.searchParams.get("concept_id")) return Response.json(["missing", "textname", "fallbackname"].flatMap(id => [{ concept_id: id, subtopic_id: "s" }, { concept_id: id, subtopic_id: "s2" }]));
     const id = url.searchParams.get("concept_id");
     if (id === "eq.failed") return Response.json({ message: "Unavailable" }, { status: 500 });
     return Response.json((id === "eq.missing" || id === "eq.textname" || id === "eq.fallbackname") ? [{ subtopic_id: "s" }, { subtopic_id: "s2" }] : []);
@@ -68,22 +71,38 @@ await new Promise<void>(resolve => {
   });
   observer.observe(document.getElementById("root")!, { childList: true, subtree: true });
 });
-check(!document.querySelector(".concept-review button, .concept-review form"), "Forhåndsvisningen har ingen lagre-, slette- eller sammenslåingskontroller");
-document.querySelector<HTMLElement>(".concept-review-item summary")!.click();
+async function until(predicate: () => unknown) {
+  for (let attempt = 0; attempt < 200; attempt++) { if (predicate()) return; await new Promise(resolve => setTimeout(resolve, 10)); }
+  throw Error("Timed out waiting for UI");
+}
+check(noteReads === 0 && !document.querySelector(".concept-review-actions"), "Begrepslisten henter ikke notater eller monterer detaljer før åpning");
+const firstRow = document.querySelector<HTMLDetailsElement>(".concept-review-item")!;
+firstRow.querySelector<HTMLElement>("summary")!.click();
+await until(() => document.querySelector(".structured-source-link"));
+check(document.querySelector(".concept-review-actions button"), "Admin får handlinger etter åpning");
 check(document.querySelector(".structured-source-link")?.getAttribute("href")?.includes("note"), "Kildeforslaget viser original boks og lenke til notatet");
-document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
-
+const readsAfterOpening = noteReads;
+firstRow.querySelector<HTMLElement>("summary")!.click();
+await until(() => !firstRow.open);
+await new Promise(resolve => setTimeout(resolve, 10));
+firstRow.querySelector<HTMLElement>("summary")!.click();
+await until(() => firstRow.querySelector(".structured-source-link"));
+check(noteReads === readsAfterOpening, "Gjenåpning bruker cache uten nye lesinger");
+for (const row of document.querySelectorAll<HTMLDetailsElement>(".concept-review-item")) if (!row.open) row.querySelector<HTMLElement>("summary")!.click();
+await until(() => document.querySelectorAll(".concept-review-actions").length === 5 && document.querySelector('[role="alert"]'));
 const loadedReviews = await loadConceptReviews();
 check(loadedReviews.find(item => item.concept.id === "missing")?.contexts?.length === 2, "Manglende kilde beholder koblinger på tvers av fag");
 check(loadedReviews.find(item => item.concept.id === "unlinked")?.contexts?.length === 0, "Ingen koblinger rapporteres som tom liste");
 check(loadedReviews.find(item => item.concept.id === "failed")?.contextError, "Lesefeil skilles fra foreldreløse begreper");
 const filter = document.querySelector<HTMLSelectElement>(".concept-review select")!;
 flushSync(() => { filter.value = "missing"; filter.dispatchEvent(new Event("change", { bubbles: true })); });
-check(document.querySelectorAll(".concept-review-missing").length === 3, "Alle begreper uten kilde har tydelig merking");
+check(document.querySelectorAll(".concept-review-missing").length === 2, "Undersøkte begreper uten kilde har tydelig merking");
+await until(() => document.querySelectorAll(".concept-review-missing").length >= 2);
 const missingItem = [...document.querySelectorAll<HTMLDetailsElement>(".concept-review-item")].find(item => item.querySelector("summary")?.textContent?.startsWith("missing"))!;
 missingItem.querySelector<HTMLElement>("summary")!.click();
+await until(() => missingItem.querySelector("section"));
 check(missingItem.textContent?.includes("TMA4240") && missingItem.textContent?.includes("Mengder og relasjoner") && missingItem.querySelectorAll('section a').length === 6, "Viser fag, tema og undertema med navigerbare lenker");
-check(document.body.textContent?.includes("Kunne ikke hente koblingene"), "Feilet lesing vises eksplisitt i UI");
+check(loadedReviews.find(item => item.concept.id === "failed")?.contextError, "Feilet lesing klassifiseres ikke som manglende kilde");
 document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
 
 const textNote = { ...note, subtopicId: "s", content: "<p>Vi bruker <strong>A priori</strong> probability her.</p>" };
@@ -98,6 +117,7 @@ check(loadedReviews.find(item => item.concept.id === "textname")?.status === "te
 flushSync(() => { filter.value = "text"; filter.dispatchEvent(new Event("change", { bubbles: true })); });
 const textItem = document.querySelector<HTMLDetailsElement>(".concept-review-item")!;
 textItem.querySelector<HTMLElement>("summary")!.click();
+await until(() => textItem.querySelector("blockquote"));
 check(textItem.textContent?.includes("Finnes i tilknyttet notat") && textItem.querySelector("blockquote")?.textContent?.includes("TEXTNAME") && textItem.querySelector('a[href*="text-note"]'), "UI viser kildeutdrag og lenke til notat");
 document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
 
@@ -114,5 +134,26 @@ document.getElementById("results")!.textContent = `${results.length} tester best
 flushSync(() => { filter.value = "subject-text"; filter.dispatchEvent(new Event("change", { bubbles: true })); });
 const fallbackItem = document.querySelector<HTMLDetailsElement>(".concept-review-item")!;
 fallbackItem.querySelector<HTMLElement>("summary")!.click();
+await until(() => fallbackItem.querySelector("blockquote"));
 check(fallbackItem.textContent?.includes("Finnes i annet notat i faget") && fallbackItem.querySelector("blockquote")?.textContent?.includes("FALLBACKNAME") && fallbackItem.querySelector('a[href*="fallback-note"]'), "Reservesøk viser egen status, riktig utdrag og notatlenke i UI");
+document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
+
+const beforeIndex = noteReads;
+const lazyIndex = await loadConceptReviewIndex();
+check(noteReads === beforeIndex && lazyIndex.find(item => item.concept.id === "missing")?.contexts.length === 2, "Lett indeks beholder fagsøk uten notatlesing");
+const cacheSession = createConceptReviewSession(lazyIndex.map(item => item.concept));
+const firstPromise = cacheSession.load(concept);
+check(firstPromise === cacheSession.load(concept), "Parallelle åpninger deler samme forespørsel");
+await firstPromise;
+check(await cacheSession.load(concept) === await firstPromise, "Fullførte detaljer caches i samme sesjon");
+const failedConcept = lazyIndex.find(item => item.concept.id === "failed")!.concept;
+const failPromise = cacheSession.load(failedConcept);
+await failPromise.catch(() => undefined);
+const retryPromise = cacheSession.load(failedConcept);
+check(failPromise !== retryPromise, "Feilede detaljer kan prøves på nytt");
+await retryPromise.catch(() => undefined);
+document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
+const editedConcept = { ...concept, name: "Manuelt endret" };
+const refreshedSession = createConceptReviewSession(lazyIndex.map(item => item.concept.id === concept.id ? editedConcept : item.concept));
+check((await refreshedSession.load(editedConcept)).concept.name === "Manuelt endret", "Ny sesjon etter endring bruker oppdatert begrep, ikke gammel cache");
 document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;

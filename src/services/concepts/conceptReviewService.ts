@@ -1,3 +1,4 @@
+import { supabase } from "../../lib/supabase";
 import { getSubtopicsByTopic } from "../subjects/subjectStructureService";
 import { getSubtopicLinksForNotes, type NoteSubtopicLink } from "../notes/noteSubtopicsService";
 import { getConceptContexts, type ConceptContext } from "./conceptContextService";
@@ -120,33 +121,83 @@ export function findConceptTextWithFallback(name: string, notes: DatabaseNote[],
   return { textMatches: subjectMatches, status: subjectMatches.length ? "subject-text" as const : "missing" as const };
 }
 
+export type ConceptReviewIndex = { concept: Concept; contexts: ConceptContext[] };
+
+export async function loadConceptReviewIndex(): Promise<ConceptReviewIndex[]> {
+  const [concepts, links, subtopics, topics] = await Promise.all([
+    readReviewPages(getConceptsFromDatabase),
+    readReviewPages(async ({ from, to }) => {
+      const { data, error } = await supabase.from("concept_subtopics").select("concept_id,subtopic_id").order("concept_id").order("subtopic_id").range(from, to);
+      if (error) throw error; return data ?? [];
+    }),
+    readReviewPages(async ({ from, to }) => {
+      const { data, error } = await supabase.from("subtopics").select("id,topic_id,name").order("id").range(from, to);
+      if (error) throw error; return data ?? [];
+    }),
+    readReviewPages(async ({ from, to }) => {
+      const { data, error } = await supabase.from("topics").select("id,subject_id,name").order("id").range(from, to);
+      if (error) throw error; return data ?? [];
+    }),
+  ]);
+  const subtopicMap = new Map(subtopics.map(item => [item.id, item]));
+  const topicMap = new Map(topics.map(item => [item.id, item]));
+  return concepts.map(concept => ({ concept, contexts: links.filter(link => link.concept_id === concept.id).flatMap(link => {
+    const subtopic = subtopicMap.get(link.subtopic_id);
+    const topic = subtopic && topicMap.get(subtopic.topic_id);
+    return subtopic && topic ? [{ subjectId: topic.subject_id, topicId: topic.id, topicName: topic.name,
+      subtopicId: subtopic.id, subtopicName: subtopic.name }] : [];
+  }) }));
+}
+
+// A page-owned session: promises deduplicate concurrent opens; failed reads can retry.
+export function createConceptReviewSession(concepts: Concept[]) {
+  let notesPromise: Promise<DatabaseNote[]> | undefined;
+  const resolved = new Map<string, string>();
+  const details = new Map<string, Promise<ConceptReview>>();
+  function notes() {
+    if (!notesPromise) notesPromise = readReviewPages(getAllNotes).catch(error => { notesPromise = undefined; throw error; });
+    return notesPromise;
+  }
+  return {
+    load(concept: Concept): Promise<ConceptReview> {
+      const cached = details.get(concept.id);
+      if (cached) return cached;
+      const pending = (async () => {
+        const sourceNotes = await notes();
+        const sources = sourceNotes.flatMap(note => {
+          let content = resolved.get(note.id);
+          if (content === undefined) { content = resolveSourceConcepts(note.content, concepts); resolved.set(note.id, content); }
+          if (!content.includes(concept.id)) return [];
+          // Only extract and compare the requested concept, not all concepts.
+          return getConceptContentFromNote(content, concept.id).map(block => ({ ...block, noteId: note.id,
+            noteTitle: note.title, noteSlug: note.slug, subjectId: note.subjectId }));
+        });
+        const review = reviewConcept(concept, sources);
+        if (sources.length) return review;
+        review.contexts = await getConceptContexts(concept.id);
+        const links = await getSubtopicLinksForNotes(sourceNotes.map(note => note.id));
+        const scope: { subjectId: string; subtopicId: string }[] = [];
+        const seen = new Set<string>();
+        for (const context of review.contexts) {
+          if (seen.has(context.topicId)) continue;
+          seen.add(context.topicId);
+          scope.push(...(await getSubtopicsByTopic(context.topicId)).map(subtopic => ({ subjectId: context.subjectId, subtopicId: subtopic.id })));
+        }
+        Object.assign(review, findConceptTextWithFallback(concept.name, sourceNotes, links, scope, review.contexts.map(context => context.subjectId)));
+        return review;
+      })().catch(error => { details.delete(concept.id); throw error; });
+      details.set(concept.id, pending);
+      return pending;
+    },
+  };
+}
+
+// Explicit batch helper for regression tests/tools, never used by the list page.
 export async function loadConceptReviews() {
-  const [concepts, notes] = await Promise.all([readReviewPages(getConceptsFromDatabase), readReviewPages(getAllNotes)]);
-  const reviews = buildConceptReviews(concepts, notes);
-  const missing = reviews.filter(review => review.sources.length === 0);
-  // Bound parallel reads; one failed lookup must not hide the remaining review.
-  for (let start = 0; start < missing.length; start += 5) {
-    await Promise.all(missing.slice(start, start + 5).map(async review => {
-      try { review.contexts = await getConceptContexts(review.concept.id); }
-      catch { review.contextError = true; }
-    }));
-  }
-  if (missing.length) {
-    try {
-      const links = await getSubtopicLinksForNotes(notes.map(note => note.id));
-      const topics = new Map<string, string>();
-      for (const review of missing) for (const context of review.contexts ?? []) topics.set(context.topicId, context.subjectId);
-      const scope = new Map<string, { subjectId: string; subtopicId: string }[]>();
-      for (const [topicId, subjectId] of topics) {
-        scope.set(topicId, (await getSubtopicsByTopic(topicId)).map(subtopic => ({ subjectId, subtopicId: subtopic.id })));
-      }
-      for (const review of missing) {
-        if (review.contextError) continue;
-        Object.assign(review, findConceptTextWithFallback(review.concept.name, notes, links,
-          (review.contexts ?? []).flatMap(context => scope.get(context.topicId) ?? []),
-          (review.contexts ?? []).map(context => context.subjectId)));
-      }
-    } catch { for (const review of missing) review.textSearchError = true; }
-  }
-  return reviews;
+  const index = await loadConceptReviewIndex();
+  const session = createConceptReviewSession(index.map(item => item.concept));
+  return Promise.all(index.map(async ({ concept }) => {
+    try { return await session.load(concept); }
+    catch { return { ...reviewConcept(concept, []), contextError: true }; }
+  }));
 }
