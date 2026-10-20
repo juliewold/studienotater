@@ -1,3 +1,4 @@
+import { getConceptContexts, type ConceptContext } from "./conceptContextService";
 import type { Concept } from "../../data/concepts/types";
 import type { DatabaseNote } from "../notes/notesService";
 import { getAllNotes } from "../notes/notesService";
@@ -7,6 +8,8 @@ import { resolveSourceConcepts } from "./sourceConceptResolver";
 
 export type ConceptReview = {
   concept: Concept;
+  contexts?: ConceptContext[];
+  contextError?: boolean;
   sources: ConceptContentSource[];
   status: "review" | "consistent" | "missing";
   reasons: string[];
@@ -84,5 +87,14 @@ export async function readReviewPages<T>(read: (range: { from: number; to: numbe
 
 export async function loadConceptReviews() {
   const [concepts, notes] = await Promise.all([readReviewPages(getConceptsFromDatabase), readReviewPages(getAllNotes)]);
-  return buildConceptReviews(concepts, notes);
+  const reviews = buildConceptReviews(concepts, notes);
+  const missing = reviews.filter(review => review.sources.length === 0);
+  // Bound parallel reads; one failed lookup must not hide the remaining review.
+  for (let start = 0; start < missing.length; start += 5) {
+    await Promise.all(missing.slice(start, start + 5).map(async review => {
+      try { review.contexts = await getConceptContexts(review.concept.id); }
+      catch { review.contextError = true; }
+    }));
+  }
+  return reviews;
 }

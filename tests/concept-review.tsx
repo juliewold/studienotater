@@ -1,4 +1,4 @@
-import { reviewConcept, buildConceptReviews, readReviewPages } from "../src/services/concepts/conceptReviewService";
+import { reviewConcept, buildConceptReviews, readReviewPages, loadConceptReviews } from "../src/services/concepts/conceptReviewService";
 import type { Concept } from "../src/data/concepts/types";
 import type { ConceptContentSource } from "../src/services/concepts/conceptContentService";
 import type { DatabaseNote } from "../src/services/notes/notesService";
@@ -35,7 +35,14 @@ window.fetch = async (input, init) => {
   const url = new URL(String(input));
   const table = url.pathname.split("/").at(-1);
   if (Number(url.searchParams.get("offset") ?? 0) > 0) return Response.json([]);
-  if (table === "concepts") return Response.json([{ ...concept, short_definition: concept.shortDefinition }]);
+  if (table === "concepts") return Response.json([{ ...concept, short_definition: concept.shortDefinition }, ...["missing", "unlinked", "failed"].map(id => ({ ...concept, id, name: id, slug: id, short_definition: concept.shortDefinition }))]);
+  if (table === "concept_subtopics") {
+    const id = url.searchParams.get("concept_id");
+    if (id === "eq.failed") return Response.json({ message: "Unavailable" }, { status: 500 });
+    return Response.json(id === "eq.missing" ? [{ subtopic_id: "s" }, { subtopic_id: "s2" }] : []);
+  }
+  if (table === "subtopics") return Response.json([{ id: "s", topic_id: "t", name: "Sannsynlighet" }, { id: "s2", topic_id: "t2", name: "Mengder" }]);
+  if (table === "topics") return Response.json([{ id: "t", subject_id: "tma4240", name: "Statistikk" }, { id: "t2", subject_id: "tma4412", name: "Mengder og relasjoner" }]);
   if (table === "notes") return Response.json([{ ...note, subject_id: note.subjectId }]);
   throw Error(`Unexpected read ${table}`);
 };
@@ -63,4 +70,17 @@ await new Promise<void>(resolve => {
 check(!document.querySelector(".concept-review button, .concept-review form"), "Forhåndsvisningen har ingen lagre-, slette- eller sammenslåingskontroller");
 document.querySelector<HTMLElement>(".concept-review-item summary")!.click();
 check(document.querySelector(".structured-source-link")?.getAttribute("href")?.includes("note"), "Kildeforslaget viser original boks og lenke til notatet");
+document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;
+
+const loadedReviews = await loadConceptReviews();
+check(loadedReviews.find(item => item.concept.id === "missing")?.contexts?.length === 2, "Manglende kilde beholder koblinger på tvers av fag");
+check(loadedReviews.find(item => item.concept.id === "unlinked")?.contexts?.length === 0, "Ingen koblinger rapporteres som tom liste");
+check(loadedReviews.find(item => item.concept.id === "failed")?.contextError, "Lesefeil skilles fra foreldreløse begreper");
+const filter = document.querySelector<HTMLSelectElement>(".concept-review select")!;
+flushSync(() => { filter.value = "missing"; filter.dispatchEvent(new Event("change", { bubbles: true })); });
+check(document.querySelectorAll(".concept-review-missing").length === 3, "Alle begreper uten kilde har tydelig merking");
+const missingItem = [...document.querySelectorAll<HTMLDetailsElement>(".concept-review-item")].find(item => item.querySelector("summary")?.textContent?.startsWith("missing"))!;
+missingItem.querySelector<HTMLElement>("summary")!.click();
+check(missingItem.textContent?.includes("TMA4240") && missingItem.textContent?.includes("Mengder og relasjoner") && missingItem.querySelectorAll('section a').length === 6, "Viser fag, tema og undertema med navigerbare lenker");
+check(document.body.textContent?.includes("Kunne ikke hente koblingene"), "Feilet lesing vises eksplisitt i UI");
 document.getElementById("results")!.textContent = `${results.length} tester bestått\n${results.join("\n")}`;

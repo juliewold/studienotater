@@ -1,3 +1,4 @@
+import { subjects } from "../../../data/subjects";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { loadConceptReviews, type ConceptReview } from "../../../services/concepts/conceptReviewService";
@@ -20,7 +21,7 @@ export function ConceptReviewPage() {
     return () => { cancelled = true; };
   }, []);
   const visible = reviews.filter(item => (filter === "all" || item.status === filter) &&
-    `${item.concept.name} ${item.sources.map(source => source.subjectId).join(" ")}`.toLocaleLowerCase("nb").includes(query.toLocaleLowerCase("nb")));
+    `${item.concept.name} ${item.sources.map(source => source.subjectId).join(" ")} ${(item.contexts ?? []).map(context => `${context.subjectId} ${subjects.find(subject => subject.id === context.subjectId)?.name ?? ""}`).join(" ")}`.toLocaleLowerCase("nb").includes(query.toLocaleLowerCase("nb")));
   return <main className="concept-review learning-page site-container">
     <Link to="/admin/concepts">← Begrepsadministrasjon</Link>
     <h1>Gjennomgå begreper</h1>
@@ -33,7 +34,19 @@ export function ConceptReviewPage() {
         </select></label></div>
       <p role="status">{visible.length} av {reviews.length} begreper</p>
       {visible.map(item => <details className="concept-review-item" key={item.concept.id}>
-        <summary><MathText>{item.concept.name}</MathText> · {item.sources.length} kildebokser</summary>
+        <summary><MathText>{item.concept.name}</MathText> · {item.sources.length === 0 ? <span className="concept-review-missing">Ingen kilde funnet</span> : `${item.sources.length} kildebokser`}</summary>
+        {item.sources.length === 0 && <section aria-label="Pensumkoblinger">
+          <h2>Koblet til pensum</h2>
+          {item.contextError ? <p role="alert">Kunne ikke hente koblingene. Ikke vurder begrepet som foreldreløst før koblingene er kontrollert. Last siden på nytt.</p> : item.contexts?.length ? <ul>{item.contexts.map(context => {
+            const subject = subjects.find(subject => subject.id === context.subjectId);
+            return <li key={`${context.subjectId}-${context.topicId}-${context.subtopicId}`}>
+              <Link to={`/fag/${context.subjectId}`}>{subject ? `${subject.code} – ${subject.name}` : context.subjectId.toUpperCase()}</Link>
+              {" → "}<Link to={`/fag/${context.subjectId}/tema/${context.topicId}`}><MathText>{context.topicName}</MathText></Link>
+              {" → "}<Link to={`/fag/${context.subjectId}/tema/${context.topicId}/undertema/${context.subtopicId}`}><MathText>{context.subtopicName}</MathText></Link>
+            </li>;
+          })}</ul> : <p>Ingen fag-, tema- eller undertemakoblinger funnet.</p>}
+          <p>Manglende kildebokser er ikke i seg selv bevis på feil eller AI-opphav.</p>
+        </section>}
         <h2>Eksisterende innhold</h2>
         <p><strong>Navn:</strong> <MathText>{item.concept.name}</MathText></p>
         <p><strong>Definisjon:</strong> <MathText>{item.concept.shortDefinition || "Ingen definisjon"}</MathText></p>

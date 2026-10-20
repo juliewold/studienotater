@@ -4,3 +4,5 @@
 .concept-review-item { border-top: 1px solid var(--app-border, #e6dfed); padding-block: 14px; }
 .concept-review-item summary { cursor: pointer; font-weight: 600; }
 .concept-review-item h2 { margin-top: 24px; font-size: 1.15rem; }
+
+.concept-review-missing { display: inline-block; padding: 2px 8px; border: 1px solid var(--app-border, #e6dfed); border-radius: 6px; color: var(--app-accent, #7c3aed); background: var(--app-surface, #fff); font-size: .85em; }
