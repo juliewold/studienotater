@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import re
+import unicodedata
 
 from openai import OpenAI
 
@@ -9,6 +11,15 @@ logger = logging.getLogger(__name__)
 
 NTNU_LLM_BASE_URL = "https://llm.hpc.ntnu.no/v1"
 NTNU_LLM_MODEL = "openai/gpt-oss-120b"
+
+
+def _normalize_source_term(value):
+    return " ".join(unicodedata.normalize("NFKC", value).casefold().split())
+
+
+def _term_in_source(term, text):
+    return re.search(r"(?<!\w)" + re.escape(_normalize_source_term(term)) + r"(?!\w)",
+                     _normalize_source_term(text)) is not None
 
 
 def get_client():
@@ -71,12 +82,17 @@ def _extract_concept_candidates_once(
                     "og som egner seg til en egen begrepsside. "
                     "Ikke ta med vanlige ord, overskrifter eller generelle formuleringer. "
 
-                    "Skriv hvert begrep i naturlig grunnform med stor forbokstav. "
+                    "For nye begreper: bruk navnet som faktisk står i kildenotatet, "
+                    "ikke en oversettelse, alternativ betegnelse eller oppfunnet grunnform. "
+                    "Du kan justere stor forbokstav og mellomrom. Hvis et navn ikke finnes "
+                    "i notatet, utelat kandidaten. Oppgi sourceName som et ordrett navn fra "
+                    "notatet for alle kandidater. For nye begreper skal name være sourceName. "
                     "Bruk samme fagterminologi som brukes i notatet for nye begreper. "
                     "Sammenlign først med EKSISTERENDE BEGREPER (navn, type og definisjon). "
                     "Hvis kandidaten er nøyaktig samme faglige konsept, bruk eksisterende name "
                     "ordrett som canonical-navn, også ved oversettelser og navnevariasjoner. "
-                    "Denne regelen har prioritet foran språkvalget i notatet. "
+                    "Dette er kun gjenbruk av eksisterende identitet for å unngå duplikater, "
+                    "ikke tillatelse til å gi nye begreper engelske navn. "
                     "Likhet eller faglig slektskap er ikke nok: ikke slå sammen et generelt "
                     "begrep med en spesialisering, eller begreper med ulik betydning. "
                     "Ved tvil behold et eget navn. Ikke trekk inn begreper som ikke støttes "
@@ -96,6 +112,9 @@ def _extract_concept_candidates_once(
                     "Når forklaringene i notatet er norske, skriv begge feltene på norsk, "
                     "selv om canonical-navnet eller eksisterende beskrivelser er engelske. "
                     "Regelen om å bevare fagtermer gjelder navn, ikke språket i forklaringene. "
+                    "Undertemanavn og eksisterende beskrivelser er ikke språklige forbilder. "
+                    "I flerspråklige notater følger forklaringen språket i avsnittet som "
+                    "forklarer akkurat dette begrepet. Behold fagtermene fra det avsnittet. "
                     "2. explanation: en pedagogisk forklaring som kan vises direkte "
                     "på en begrepsside for en universitetsstudent. "
                     "Forklar hva begrepet betyr, hvordan det brukes og det viktigste "
@@ -194,6 +213,18 @@ def _extract_concept_candidates_once(
                 f"Candidate {index} has an invalid sourceName."
             )
 
+        source_name = candidate.get("sourceName", candidate["name"]).strip()
+        if not _term_in_source(source_name, text):
+            raise ValueError(f"Candidate {index} source name is not present in note.")
+        existing_names = {
+            _normalize_source_term(item["name"]) for item in (existing_concepts or [])
+        }
+        if (
+            _normalize_source_term(candidate["name"]) not in existing_names
+            and _normalize_source_term(candidate["name"]) != _normalize_source_term(source_name)
+        ):
+            raise ValueError(f"Candidate {index} new name differs from source name.")
+
         validated.append(
             {
                 **(
@@ -252,7 +283,7 @@ def extract_concept_candidates(
                 "Lag et nytt komplett svar fra kildeteksten. Alle kandidater må ha "
                 "name, type, shortDefinition og explanation som ikke-tomme strenger, "
                 "og subtopicIds som liste. Bruk bare de fire tillatte typene. "
-                "Hvis du gjenbruker et eksisterende begrep, bruk også sourceName "
+                "Bruk sourceName for alle kandidater, og samme name for nye begreper, "
                 "med navnet som faktisk står i notatet. "
                 "Hold forklaringene konsise slik at hele JSON-svaret får plass. "
             )
