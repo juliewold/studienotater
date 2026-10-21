@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./AdminConceptsPage.css";
 
 import { subjects } from "../../../data/subjects";
@@ -37,6 +38,7 @@ export const AdminConceptsPage = () => {
       <p className="page-label">Administrasjon</p>
 
       <h1>Administrer konsepter</h1>
+      <Link to="/admin/concepts/review">Gjennomgå begreper mot kilder (kun forhåndsvisning)</Link>
 
       <p className="page-description">
         Koble konsepter til temaer og undertemaer i pensum.
