@@ -6,7 +6,7 @@ export const FormulaConceptLink = Extension.create({
   addGlobalAttributes() {
     return [
       {
-        types: ["blockMath"],
+        types: ["blockMath", "inlineMath"],
 
         attributes: {
           conceptId: {

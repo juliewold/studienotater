@@ -8,6 +8,7 @@ type MathDialogProps = {
   open: boolean;
   title: string;
   initialValue?: string;
+  submitLabel?: string;
   onClose: () => void;
   onInsert: (latex: string) => void;
 };
@@ -16,10 +17,10 @@ export const MathDialog = (props: MathDialogProps) => props.open
   ? <MathDialogContent key={props.initialValue ?? ""} {...props} />
   : null;
 
-function MathDialogContent({ title, initialValue = "", onClose, onInsert }: MathDialogProps) {
+function MathDialogContent({ title, initialValue = "", submitLabel = "Sett inn", onClose, onInsert }: MathDialogProps) {
   const [latex, setLatex] = useState(initialValue);
   const [category, setCategory] = useState(0);
-  const latexInputRef = useRef<HTMLInputElement>(null);
+  const latexInputRef = useRef<HTMLTextAreaElement>(null);
   const preview = useMemo(() => {
     if (!latex.trim()) return { html: "", error: "" };
     try {
@@ -42,7 +43,7 @@ function MathDialogContent({ title, initialValue = "", onClose, onInsert }: Math
   };
 
   const handleInsert = () => {
-    if (latex.trim() && !preview.error) onInsert(latex.trim());
+    if (latex.trim() && !preview.error) onInsert(latex);
   };
 
   return (
@@ -58,7 +59,7 @@ function MathDialogContent({ title, initialValue = "", onClose, onInsert }: Math
             event.preventDefault();
             event.stopPropagation();
             onClose();
-          } else if (event.key === "Enter" && event.target === latexInputRef.current && !event.nativeEvent.isComposing) {
+          } else if (event.key === "Enter" && !event.shiftKey && event.target === latexInputRef.current && !event.nativeEvent.isComposing) {
             // Enter on a symbol/category control must not submit the formula.
             event.preventDefault();
             event.stopPropagation();
@@ -99,10 +100,10 @@ function MathDialogContent({ title, initialValue = "", onClose, onInsert }: Math
           </div>
 
           <label htmlFor="math-dialog-latex">LaTeX</label>
-          <input
+          <textarea
             ref={latexInputRef}
             id="math-dialog-latex"
-            type="text"
+            rows={2}
             value={latex}
             onChange={event => setLatex(event.target.value)}
             placeholder="For eksempel: x^2 + y^2 = z^2"
@@ -121,7 +122,7 @@ function MathDialogContent({ title, initialValue = "", onClose, onInsert }: Math
 
         <div className="math-dialog-actions">
           <button type="button" className="math-dialog-cancel-button" onClick={onClose}>Avbryt</button>
-          <button type="button" className="math-dialog-insert-button" onClick={handleInsert} disabled={!latex.trim() || Boolean(preview.error)}>Sett inn</button>
+          <button type="button" className="math-dialog-insert-button" onClick={handleInsert} disabled={!latex.trim() || Boolean(preview.error)}>{submitLabel}</button>
         </div>
       </div>
     </div>

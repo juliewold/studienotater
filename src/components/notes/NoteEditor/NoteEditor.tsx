@@ -1,3 +1,4 @@
+import { getMathTarget, applyMathEdit, type MathTarget } from "./mathEditing";
 import "./NoteEditor.css";
 import "katex/dist/katex.min.css";
 import { Callout, type CalloutType } from "./Callout";
@@ -107,6 +108,26 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
     "inline" | "block" | null
   >(null);
 
+  const [mathTarget, setMathTarget] = useState<MathTarget | null>(null);
+  const [mathError, setMathError] = useState("");
+  const openMath = (type: "inline" | "block", position?: number) => {
+    const current = editorRef.current;
+    if (!current) return;
+    if (position !== undefined) current.commands.setNodeSelection(position);
+    setMathTarget(getMathTarget(current, position));
+    if (position !== undefined && current.state.doc.nodeAt(position)?.type.name === "blockMath") {
+      const node = current.state.doc.nodeAt(position)!;
+      setConceptSelection({ type: "formula", from: position });
+      setSelectedFormulaConceptId(node.attrs.conceptId as string | null);
+      const dom = current.view.nodeDOM(position);
+      if (dom instanceof HTMLElement) {
+        const rect = dom.getBoundingClientRect();
+        setFormulaControlsPosition({ left: rect.left + rect.width / 2, top: rect.bottom + 12 });
+      }
+    }
+    setMathError(""); setIsConceptPickerOpen(false); setMathDialogType(type);
+  };
+
   useEffect(() => {
     let isCancelled = false;
 
@@ -151,7 +172,11 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
         lowlight,
       }),
 
+      // Callbacks run on node clicks, never during extension configuration.
+      // eslint-disable-next-line react-hooks/refs
       Mathematics.configure({
+        inlineOptions: { onClick: (_node, pos) => openMath("inline", pos) },
+        blockOptions: { onClick: (_node, pos) => openMath("block", pos) },
         katexOptions: {
           throwOnError: false,
         },
@@ -277,7 +302,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
               .run();
 
             selectedItem.command(currentEditor, {
-              openMathDialog: (type) => setMathDialogType(type),
+              openMathDialog: (type) => openMath(type),
 
               insertCallout: (type) => {
                 currentEditor.chain().focus().insertCallout(type).run();
@@ -324,13 +349,13 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
 
         if (event.altKey && key === "m") {
           event.preventDefault();
-          setMathDialogType("inline");
+          openMath("inline");
           return true;
         }
 
         if (event.shiftKey && key === "m") {
           event.preventDefault();
-          setMathDialogType("block");
+          openMath("block");
           return true;
         }
 
@@ -370,18 +395,19 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
       },
     },
 
-    onCreate: ({ editor }) => {
-      editorRef.current = editor;
-    },
-
-    onDestroy: () => {
-      editorRef.current = null;
-    },
-
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML(), editor.getJSON());
     },
   });
+
+  // React StrictMode can tear down/reuse the editor before onCreate runs.
+  // Bind to the live hook instance, not asynchronous lifecycle callbacks.
+  useEffect(() => {
+    editorRef.current = editor;
+    return () => {
+      if (editorRef.current === editor) editorRef.current = null;
+    };
+  }, [editor]);
 
   // Refresh formatting and contextual controls when the cursor/selection changes.
   useEditorState({
@@ -479,76 +505,12 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
     };
   }, [editor]);
 
-  useEffect(() => {
-    if (!editor) {
-      return;
-    }
-
-    const editorElement = editor.view.dom;
-
-    const handleFormulaClick = (event: MouseEvent) => {
-      const target = event.target;
-
-      if (!(target instanceof HTMLElement)) {
-        return;
-      }
-
-      const formulaElement = target.closest<HTMLElement>(
-        '[data-type="block-math"]',
-      );
-
-      if (!formulaElement || !editorElement.contains(formulaElement)) {
-        return;
-      }
-
-      let formulaPosition: number;
-
-      try {
-        formulaPosition = editor.view.posAtDOM(formulaElement, 0);
-      } catch {
-        return;
-      }
-
-      const formulaNode = editor.state.doc.nodeAt(formulaPosition);
-
-      if (!formulaNode || formulaNode.type.name !== "blockMath") {
-        return;
-      }
-
-      const conceptId = formulaNode.attrs.conceptId as string | null;
-
-      setConceptSelection({
-        type: "formula",
-        from: formulaPosition,
-      });
-
-      setSelectedFormulaConceptId(conceptId);
-
-      const formulaRect = formulaElement.getBoundingClientRect();
-
-      setFormulaControlsPosition({
-        left: formulaRect.left + formulaRect.width / 2,
-        top: formulaRect.bottom + 12,
-      });
-
-      if (!conceptId) {
-        setIsConceptPickerOpen(true);
-      }
-    };
-
-    editorElement.addEventListener("click", handleFormulaClick);
-
-    return () => {
-      editorElement.removeEventListener("click", handleFormulaClick);
-    };
-  }, [editor]);
-
   const handleInsertInlineMath = () => {
-    setMathDialogType("inline");
+    openMath("inline");
   };
 
   const handleInsertBlockMath = () => {
-    setMathDialogType("block");
+    openMath("block");
   };
 
   const handleChooseImage = () => {
@@ -761,7 +723,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
       .run();
 
     item.command(editor, {
-      openMathDialog: (type) => setMathDialogType(type),
+      openMathDialog: (type) => openMath(type),
       insertCallout: handleInsertCallout,
       chooseImage: handleChooseImage,
     });
@@ -859,7 +821,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
           .run();
 
         selectedItem.command(editor, {
-          openMathDialog: (type) => setMathDialogType(type),
+          openMathDialog: (type) => openMath(type),
 
           insertCallout: handleInsertCallout,
 
@@ -1033,10 +995,12 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
         </button>
         </div>
         <details className="note-toolbar-menu">
-          <summary>Sett inn</summary>
+          {/* Keep the editor selection when opening the menu with the mouse. */}
+          <summary onMouseDown={event => event.preventDefault()}>Sett inn</summary>
           <div className="note-toolbar-options">
         <button
           type="button"
+          onMouseDown={event => event.preventDefault()}
           onClick={handleInsertInlineMath}
           title="Sett inn formel i tekst (Ctrl/Cmd + Alt + M)"
           aria-label="Sett inn formel i tekst (Ctrl/Cmd + Alt + M)"
@@ -1047,6 +1011,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
 
         <button
           type="button"
+          onMouseDown={event => event.preventDefault()}
           onClick={handleInsertBlockMath}
           title="Sett inn formelblokk (Ctrl/Cmd + Shift + M)"
           aria-label="Sett inn formelblokk (Ctrl/Cmd + Shift + M)"
@@ -1395,34 +1360,20 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
         </div>
       )}
 
+      {mathError && <p role="alert">{mathError}</p>}
       <MathDialog
         open={mathDialogType !== null}
-        title={
-          mathDialogType === "block"
-            ? "Sett inn formelblokk"
-            : "Sett inn formel i tekst"
-        }
+        title={`${mathTarget && mathTarget.to > mathTarget.from ? "Rediger / konverter" : "Sett inn"} ${mathDialogType === "block" ? "formelblokk" : "formel i tekst"}`}
+        submitLabel={mathTarget && mathTarget.to > mathTarget.from ? "Bruk endring" : "Sett inn"}
         onClose={() => setMathDialogType(null)}
+        initialValue={mathTarget?.latex ?? ""}
         onInsert={(latex) => {
-          if (mathDialogType === "block") {
-            editor
-              .chain()
-              .focus()
-              .insertBlockMath({
-                latex,
-              })
-              .run();
-          } else {
-            editor
-              .chain()
-              .focus()
-              .insertInlineMath({
-                latex,
-              })
-              .run();
+          if (!mathTarget || !mathDialogType) return;
+          if (!applyMathEdit(editor, mathTarget, mathDialogType, latex)) {
+            setMathError("Notatet er endret mens dialogen var åpen. Lukk dialogen og velg formelen på nytt.");
+            return;
           }
-
-          setMathDialogType(null);
+          setMathDialogType(null); setMathTarget(null);
         }}
       />
     </div>
