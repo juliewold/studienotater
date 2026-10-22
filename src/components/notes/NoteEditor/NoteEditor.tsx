@@ -1151,10 +1151,11 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
           </div>
         </details>
         <details className="note-toolbar-menu">
-          <summary>Innholdsbokser</summary>
+          <summary onMouseDown={event => event.preventDefault()}>Innholdsbokser</summary>
           <div className="note-toolbar-options">
         <button
           type="button"
+          onMouseDown={event => event.preventDefault()}
           onClick={() => handleInsertCallout("definition")}
           title="Sett inn definisjon (Ctrl/Cmd + Alt + D)"
           aria-label="Sett inn definisjon (Ctrl/Cmd + Alt + D)"
@@ -1165,6 +1166,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
 
         <button
           type="button"
+          onMouseDown={event => event.preventDefault()}
           onClick={() => handleInsertCallout("tip")}
           title="Sett inn tips"
           aria-label="Sett inn tips"
@@ -1175,6 +1177,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
 
         <button
           type="button"
+          onMouseDown={event => event.preventDefault()}
           onClick={() => handleInsertCallout("theorem")}
           title="Sett inn teorem (Ctrl/Cmd + Alt + T)"
           aria-label="Sett inn teorem (Ctrl/Cmd + Alt + T)"
@@ -1185,6 +1188,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
 
         <button
           type="button"
+          onMouseDown={event => event.preventDefault()}
           onClick={() => handleInsertCallout("example")}
           title="Sett inn eksempel (Ctrl/Cmd + Alt + E)"
           aria-label="Sett inn eksempel (Ctrl/Cmd + Alt + E)"
@@ -1195,6 +1199,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
 
         <button
           type="button"
+          onMouseDown={event => event.preventDefault()}
           onClick={() => handleInsertCallout("exam")}
           title="Dette må du kunne til eksamen (Ctrl/Cmd + Alt + X)"
           aria-label="Dette må du kunne til eksamen (Ctrl/Cmd + Alt + X)"
