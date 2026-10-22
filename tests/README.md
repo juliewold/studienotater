@@ -483,3 +483,9 @@ Sletting krever inntasting av navnet. DB-triggeren avviser sletting når notaten
 Listen henter kun begreper og lett pensummetadata. Ingen notattekst, kilderendering eller begrepsanalyse hentes ved første sidevisning. Åpning starter analyse for ett begrep, med lokal loading/feil og «Prøv igjen». Notatgrunnlaget og løste kildekoblinger deles i sidens sesjon; individuelle resultater og samtidige forespørsler caches. Lukk/åpne gjentar ikke analysen. Lagret redigering/sletting ugyldiggjør sesjonen og laster en ny lett indeks.
 
 Kildestatus kan ikke kjennes før analyse uten en ny databaseindeks. Uåpnede begreper merkes derfor «Ikke undersøkt ennå». Eksisterende statusfiltre gjelder undersøkte begreper, med uundersøkte i egen gruppe. Et åpent begrep forblir synlig til det lukkes selv om den nye statusen avviker fra filteret. Fagsøk bruker lette pensumkoblinger fra første lasting. Testfixture `concept-review.html` dekker fravær av tidlige notatlesinger, åpning, cache, samtidige åpninger, retry og eksisterende kilde-/statusregresjoner.
+
+### Redigering og konvertering av matematikk
+
+Åpne `/studienotater/tests/math-editing.html`: tester bruker ekte TipTap-editor med de eksisterende matematikknodene. Dekker kodeblokk → blokk/inline, blokk ↔ inline, erstatning uten duplikater, tekst rundt inline-formler, bevaring av LaTeX inkludert whitespace, begrepskoblinger, HTML-rundtur, undo/redo, utdatert dialog og klikkredigering i faktisk NoteEditor.
+
+Manuelt: sett markøren i en LaTeX-kodeblokk og velg Formelblokk/Formel i tekst. Dialogen viser originalkilden; «Bruk endring» erstatter hele kodeblokken. Klikk en formel for å redigere kilden. Lukk dialogen og bruk motsatt matteknapp for å konvertere valgt formel. Kontroller Angre/Gjør om og last notatet på nytt. Shift+Enter gir linjeskift i kildefeltet; Enter bekrefter som før. Ingen LaTeX blir generert eller trimmet.
