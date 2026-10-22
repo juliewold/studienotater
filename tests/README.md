@@ -489,3 +489,7 @@ Kildestatus kan ikke kjennes før analyse uten en ny databaseindeks. Uåpnede be
 Åpne `/studienotater/tests/math-editing.html`: tester bruker ekte TipTap-editor med de eksisterende matematikknodene. Dekker kodeblokk → blokk/inline, blokk ↔ inline, erstatning uten duplikater, tekst rundt inline-formler, bevaring av LaTeX inkludert whitespace, begrepskoblinger, HTML-rundtur, undo/redo, utdatert dialog og klikkredigering i faktisk NoteEditor.
 
 Manuelt: sett markøren i en LaTeX-kodeblokk og velg Formelblokk/Formel i tekst. Dialogen viser originalkilden; «Bruk endring» erstatter hele kodeblokken. Klikk en formel for å redigere kilden. Lukk dialogen og bruk motsatt matteknapp for å konvertere valgt formel. Kontroller Angre/Gjør om og last notatet på nytt. Shift+Enter gir linjeskift i kildefeltet; Enter bekrefter som før. Ingen LaTeX blir generert eller trimmet.
+
+### Markert innhold til innholdsboks
+Åpne `tests/callout-selection.html`: tester alle fem bokstyper med avsnitt, liste, marks, inline- og blokkmatematikk, delvis utvalg, tomt utvalg og undo. Toolbar-testene kjører den faktiske NoteEditor i StrictMode med kontrollert lagring av HTML.
+Bruk `tests/callout-selection.html?manual` for manuell prøve: marker innhold, åpne Innholdsbokser, velg type, og bruk Cmd+Z. Markeringen skal flyttes én gang og formatering/formler skal beholdes.

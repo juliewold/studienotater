@@ -1,3 +1,4 @@
+import { closeHistory } from "@tiptap/pm/history";
 import { mergeAttributes, Node } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 
@@ -107,22 +108,30 @@ export const Callout = Node.create({
     return {
       insertCallout:
         (type) =>
-        ({ commands }) =>
-          commands.insertContent({
-            type: this.name,
+        ({ commands, tr, dispatch }) => {
+          if (tr.selection.empty) {
+            return commands.insertContent({
+              type: this.name,
+              attrs: { type, conceptId: null, conceptName: null },
+              content: [{ type: "paragraph" }],
+            });
+          }
 
-            attrs: {
-              type,
-              conceptId: null,
-              conceptName: null,
-            },
-
-            content: [
-              {
-                type: "paragraph",
-              },
-            ],
-          }),
+          // Capture the actual slice before replacing the selection. Do not
+          // serialize/reparse it: retain node attributes, marks and math sources.
+          const slice = tr.selection.content();
+          const calloutType = tr.doc.type.schema.nodes[this.name];
+          if (!calloutType.validContent(slice.content)) return false;
+          const callout = calloutType.createChecked(
+            { type, conceptId: null, conceptName: null },
+            slice.content,
+          );
+          if (dispatch) {
+            closeHistory(tr);
+            tr.replaceSelectionWith(callout, false).scrollIntoView();
+          }
+          return true;
+        },
 
       deleteCallout:
         () =>
