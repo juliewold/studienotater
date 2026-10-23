@@ -24,7 +24,7 @@
 
   padding: 1.25rem 3rem 3rem;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
   border-radius: 22px;
 
@@ -49,11 +49,11 @@
   margin-bottom: -44px;
   padding: 0;
 
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--theme-border, #e5e7eb);
   border-radius: 12px;
 
-  background: rgba(255, 255, 255, 0.96);
-  color: #374151;
+  background: var(--theme-surface, rgba(255, 255, 255, 0.96));
+  color: var(--theme-text, #374151);
 
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 
@@ -69,9 +69,9 @@
 }
 
 .pdf-summary-modal-close:hover {
-  background: #f5f3ff;
-  border-color: #ddd6fe;
-  color: #6d28d9;
+  background: var(--theme-soft, #f5f3ff);
+  border-color: var(--theme-border, #ddd6fe);
+  color: var(--theme-accent, #6d28d9);
 
   transform: translateY(-1px);
 }

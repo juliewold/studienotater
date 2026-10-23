@@ -6,7 +6,7 @@
 .page-label,
 .admin-study-plan-section-label {
   margin: 0 0 0.5rem;
-  color: #9b6ee8;
+  color: var(--theme-accent, #9b6ee8);
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -15,7 +15,7 @@
 
 .page-description {
   margin: 0.5rem 0 2rem;
-  color: #666;
+  color: var(--theme-muted, #666);
 }
 
 .admin-study-plan-card {
@@ -23,7 +23,7 @@
   padding: 1.75rem;
   border: 1px solid rgba(167, 116, 255, 0.15);
   border-radius: 22px;
-  background: #fff;
+  background: var(--theme-surface, #fff);
   box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
 }
 
@@ -48,7 +48,7 @@
   padding: 0.9rem 1rem;
   border: 1px solid rgba(167, 116, 255, 0.25);
   border-radius: 12px;
-  background: #fff;
+  background: var(--theme-surface, #fff);
   color: inherit;
   font: inherit;
 }
@@ -62,12 +62,12 @@
 .admin-study-plan-form select:focus,
 .admin-study-plan-form textarea:focus {
   outline: 2px solid rgba(155, 110, 232, 0.22);
-  border-color: #9b6ee8;
+  border-color: var(--theme-accent, #9b6ee8);
 }
 
 .admin-study-plan-form input:disabled,
 .admin-study-plan-form select:disabled {
-  background: #f6f3fa;
+  background: var(--theme-surface-raised, #f6f3fa);
   cursor: not-allowed;
 }
 
@@ -102,7 +102,7 @@
 
 .admin-study-plan-resource-heading p {
   margin: 0 0 1rem;
-  color: #666;
+  color: var(--theme-muted, #666);
 }
 
 .admin-resource-columns {
@@ -115,7 +115,7 @@
   min-width: 0;
   padding: 1rem;
   border-radius: 16px;
-  background: #faf8ff;
+  background: var(--theme-surface-raised, #faf8ff);
 }
 
 .admin-resource-group h3 {
@@ -124,7 +124,7 @@
 
 .admin-resource-group > p {
   margin: 0;
-  color: #777;
+  color: var(--theme-muted, #777);
   font-size: 0.9rem;
 }
 
@@ -142,13 +142,13 @@
   margin: 0 !important;
   padding: 0.6rem;
   border-radius: 10px;
-  background: #fff;
+  background: var(--theme-surface, #fff);
   font-weight: 500 !important;
   cursor: pointer;
 }
 
 .admin-resource-option:hover {
-  background: #f2edff;
+  background: var(--theme-soft, #f2edff);
 }
 
 .admin-resource-option input {
@@ -158,7 +158,7 @@
 
 .admin-study-plan-help {
   margin: 0;
-  color: #777;
+  color: var(--theme-muted, #777);
   font-size: 0.9rem;
 }
 
@@ -170,13 +170,13 @@
 }
 
 .admin-study-plan-error {
-  background: #fff0f0;
-  color: #b42318;
+  background: var(--theme-danger-surface, #fff0f0);
+  color: var(--theme-danger-text, #b42318);
 }
 
 .admin-study-plan-success {
-  background: #effaf2;
-  color: #247a3c;
+  background: var(--theme-success-surface, #effaf2);
+  color: var(--theme-success-text, #247a3c);
 }
 
 .admin-study-plan-form-actions {
@@ -202,7 +202,7 @@
 
 .cancel-study-topic-button,
 .edit-study-topic-button {
-  background: #f3efff;
+  background: var(--theme-soft, #f3efff);
   color: #7048bd;
 }
 
@@ -234,7 +234,7 @@
   padding: 1.2rem;
   border: 1px solid rgba(167, 116, 255, 0.15);
   border-radius: 16px;
-  background: #faf9fd;
+  background: var(--theme-surface-raised, #faf9fd);
 }
 
 .study-topic-content {
@@ -246,14 +246,14 @@
 }
 
 .study-topic-heading span {
-  color: #9b6ee8;
+  color: var(--theme-accent, #9b6ee8);
   font-size: 0.9rem;
   font-weight: 600;
 }
 
 .study-topic-order {
   margin: 0;
-  color: #777;
+  color: var(--theme-muted, #777);
   font-size: 0.82rem;
 }
 
@@ -267,7 +267,7 @@
 .study-topic-summary span {
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
-  background: #eee8fb;
+  background: var(--theme-surface-raised, #eee8fb);
   color: #6543a6;
   font-size: 0.82rem;
   font-weight: 600;

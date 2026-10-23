@@ -59,8 +59,8 @@
 }
 
 .hero-button.secondary {
-  background: white;
-  color: #17142a;
+  background: var(--theme-surface, white);
+  color: var(--theme-text, #17142a);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 

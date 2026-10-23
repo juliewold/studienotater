@@ -22,45 +22,45 @@
 
 .lesson-callout-tip {
   border-color: #facc15;
-  background: #fefce8;
+  background: var(--theme-warning-surface, #fefce8);
 }
 
 .lesson-callout-tip .lesson-callout-header {
-  color: #854d0e;
-  background: #fde68a;
+  color: var(--theme-warning-text, #854d0e);
+  background: var(--theme-warning-surface, #fde68a);
   border-color: #facc15;
 }
 
 .lesson-callout-tip p {
-  color: #44403c;
+  color: var(--theme-text, #44403c);
 }
 
 .lesson-callout-warning {
   border-color: #fb7185;
-  background: #fff1f2;
+  background: var(--theme-danger-surface, #fff1f2);
 }
 
 .lesson-callout-warning .lesson-callout-header {
-  color: #9f1239;
-  background: #ffe4e6;
+  color: var(--theme-danger-text, #9f1239);
+  background: var(--theme-danger-surface, #ffe4e6);
   border-color: #fb7185;
 }
 
 .lesson-callout-warning p {
-  color: #4c0519;
+  color: var(--theme-text, #4c0519);
 }
 
 .lesson-callout-note {
   border-color: #93c5fd;
-  background: #eff6ff;
+  background: var(--theme-soft, #eff6ff);
 }
 
 .lesson-callout-note .lesson-callout-header {
-  color: #1d4ed8;
-  background: #dbeafe;
+  color: var(--theme-accent, #1d4ed8);
+  background: var(--theme-soft, #dbeafe);
   border-color: #93c5fd;
 }
 
 .lesson-callout-note p {
-  color: #1e3a8a;
+  color: var(--theme-text, #1e3a8a);
 }

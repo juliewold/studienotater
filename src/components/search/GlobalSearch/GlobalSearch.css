@@ -9,8 +9,8 @@
   border: 1px solid transparent;
   border-radius: 18px;
   padding: 16px 20px;
-  background: #eee8ff;
-  color: #252133;
+  background: var(--theme-surface-raised, #eee8ff);
+  color: var(--theme-text, #252133);
   font: inherit;
   outline: none;
   transition:
@@ -32,9 +32,9 @@
   max-height: 430px;
   overflow-y: auto;
   padding: 8px;
-  border: 1px solid #e7ddf5;
+  border: 1px solid var(--theme-border, #e7ddf5);
   border-radius: 18px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   box-shadow: 0 18px 45px rgb(55 37 88 / 16%);
 }
 
@@ -50,7 +50,7 @@
 }
 
 .search-result:hover {
-  background: #f4efff;
+  background: var(--theme-soft, #f4efff);
 }
 
 .search-icon {
@@ -60,7 +60,7 @@
   height: 34px;
   place-items: center;
   border-radius: 10px;
-  background: #eee8ff;
+  background: var(--theme-surface-raised, #eee8ff);
   font-size: 17px;
 }
 
@@ -70,7 +70,7 @@
 
 .search-title {
   overflow: hidden;
-  color: #211c2d;
+  color: var(--theme-text, #211c2d);
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -79,7 +79,7 @@
 .search-description {
   margin-top: 3px;
   overflow: hidden;
-  color: #756c82;
+  color: var(--theme-muted, #756c82);
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -88,7 +88,7 @@
 .search-message {
   margin: 0;
   padding: 18px;
-  color: #756c82;
+  color: var(--theme-muted, #756c82);
   text-align: center;
 }
 
@@ -96,7 +96,7 @@
   display: -webkit-box;
   margin-top: 5px;
   overflow: hidden;
-  color: #51495e;
+  color: var(--theme-text, #51495e);
   font-size: 13px;
   line-height: 1.45;
   -webkit-box-orient: vertical;

@@ -6,9 +6,9 @@
   margin-top: 1.5rem;
   padding: 1.5rem;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #eadff5;
+  border: 1px solid var(--theme-border, #eadff5);
   border-radius: 20px;
 
   box-shadow: 0 8px 25px rgba(139, 92, 246, 0.04);
@@ -26,7 +26,7 @@
 .topic-progress-heading .page-label {
   margin: 0 0 0.3rem;
 
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
 
   font-size: 0.78rem;
   font-weight: 800;
@@ -37,7 +37,7 @@
 .topic-progress-heading h2 {
   margin: 0;
 
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 
   font-size: 1.3rem;
 }
@@ -45,13 +45,13 @@
 .topic-progress-heading p {
   margin: 0.4rem 0 0;
 
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 
   font-size: 0.9rem;
 }
 
 .topic-progress-heading > span {
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 
   font-size: 0.88rem;
   white-space: nowrap;
@@ -79,7 +79,7 @@
 .topic-progress-group-header h3 {
   margin: 0;
 
-  color: #3f3952;
+  color: var(--theme-text, #3f3952);
 
   font-size: 1.1rem;
   font-weight: 700;
@@ -90,8 +90,8 @@
 
   border-radius: 999px;
 
-  background: #f4edff;
-  color: #7c3aed;
+  background: var(--theme-soft, #f4edff);
+  color: var(--theme-accent, #7c3aed);
 
   font-size: 0.9rem;
   font-weight: 600;
@@ -110,9 +110,9 @@
 
   padding: 1rem;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  border: 1px solid #e6ddea;
+  border: 1px solid var(--theme-border, #e6ddea);
   border-radius: 14px;
 }
 
@@ -131,7 +131,7 @@
 }
 
 .topic-progress-card-header > div > strong {
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
 
   font-size: 0.9rem;
 }
@@ -139,13 +139,13 @@
 .topic-progress-card-header > strong {
   flex: 0 0 auto;
 
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
 
   font-size: 1rem;
 }
 
 .topic-progress-card-header span {
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 
   font-size: 0.88rem;
 }
@@ -156,7 +156,7 @@
 
   overflow: hidden;
 
-  background: #eee7f5;
+  background: var(--theme-soft, #eee7f5);
 
   border-radius: 999px;
 }
@@ -187,13 +187,13 @@
 }
 
 .topic-mastery-list span {
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 
   font-size: 0.9rem;
 }
 
 .topic-mastery-list strong {
-  color: #3f3952;
+  color: var(--theme-text, #3f3952);
 
   font-size: 0.95rem;
 }
@@ -221,14 +221,14 @@
 .topic-group-header h3 {
   margin: 0;
 
-  color: #3f3952;
+  color: var(--theme-text, #3f3952);
 
   font-size: 1.1rem;
   font-weight: 700;
 }
 
 .topic-group-header span {
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 
   font-size: 0.9rem;
 

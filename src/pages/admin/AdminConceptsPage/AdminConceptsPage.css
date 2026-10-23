@@ -3,8 +3,8 @@
   margin-top: 32px;
   padding: 28px;
 
-  background: #ffffff;
-  border: 1px solid #ede9fe;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #ede9fe);
   border-radius: 16px;
 }
 
@@ -20,7 +20,7 @@
 .admin-concepts-form label {
   margin-top: 10px;
 
-  color: #374151;
+  color: var(--theme-text, #374151);
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -29,16 +29,16 @@
   width: 100%;
   padding: 11px 12px;
 
-  background: #ffffff;
-  border: 1px solid #d1d5db;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #d1d5db);
   border-radius: 8px;
 
-  color: #18181b;
+  color: var(--theme-text, #18181b);
   font: inherit;
 }
 
 .admin-concepts-form select:focus {
-  border-color: #7c3aed;
+  border-color: var(--theme-accent, #7c3aed);
   outline: none;
 }
 
@@ -69,26 +69,26 @@
 }
 
 .admin-concepts-error {
-  color: #b91c1c;
+  color: var(--theme-danger-text, #b91c1c);
 }
 
 .admin-concepts-success {
-  color: #15803d;
+  color: var(--theme-success-text, #15803d);
 }
 
 .admin-concept-links {
   margin: 12px 0 8px;
   padding: 16px;
 
-  background: #faf8ff;
-  border: 1px solid #ede9fe;
+  background: var(--theme-surface-raised, #faf8ff);
+  border: 1px solid var(--theme-border, #ede9fe);
   border-radius: 10px;
 }
 
 .admin-concept-links-label {
   margin: 0 0 10px;
 
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -96,7 +96,7 @@
 
 .admin-concept-links-empty {
   margin: 0;
-  color: #71717a;
+  color: var(--theme-muted, #71717a);
   font-size: 0.9rem;
 }
 
@@ -114,7 +114,7 @@
 }
 
 .admin-concept-link span {
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
 }
 
 .admin-concept-link {
@@ -133,7 +133,7 @@
 }
 
 .admin-concept-link-name span {
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
 }
 
 .admin-concept-link-remove {
@@ -142,12 +142,12 @@
   background: transparent;
   border: 0;
 
-  color: #71717a;
+  color: var(--theme-muted, #71717a);
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
 }
 
 .admin-concept-link-remove:hover {
-  color: #b91c1c;
+  color: var(--theme-danger-text, #b91c1c);
 }

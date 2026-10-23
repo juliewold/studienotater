@@ -14,8 +14,8 @@
 
 .exam-page-card {
   min-width: 0;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--theme-surface, white);
+  border: 1px solid var(--theme-border, #e5e7eb);
   border-left: 4px solid var(--subject-accent);
   border-radius: 20px;
   padding: 24px;
@@ -36,7 +36,7 @@
 
 .exam-page-card p {
   margin: 0 0 12px;
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 }
 
 .exam-page-card span {

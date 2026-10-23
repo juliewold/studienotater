@@ -8,10 +8,10 @@
   gap: 12px;
   min-height: 78px;
   padding: 18px 64px 18px 20px;
-  border: 1px solid #e9e3f1;
+  border: 1px solid var(--theme-border, #e9e3f1);
   border-radius: 16px;
-  background: #ffffff;
-  color: #28232d;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #28232d);
   font-weight: 700;
   text-decoration: none;
   box-shadow: 0 6px 20px rgb(48 35 61 / 6%);
@@ -52,7 +52,7 @@
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   cursor: pointer;
   transition:
     background-color 0.2s ease,
@@ -60,8 +60,8 @@
 }
 
 .folder-card-menu-button:hover {
-  background: #f3eff8;
-  color: #4b5563;
+  background: var(--theme-surface-raised, #f3eff8);
+  color: var(--theme-muted, #4b5563);
 }
 
 .folder-card-dropdown {
@@ -72,9 +72,9 @@
   display: grid;
   min-width: 180px;
   padding: 8px;
-  border: 1px solid #e5dff0;
+  border: 1px solid var(--theme-border, #e5dff0);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   box-shadow: 0 14px 32px rgb(30 20 42 / 12%);
 }
 
@@ -93,15 +93,15 @@
 }
 
 .folder-card-dropdown button:hover {
-  background: #f5f1fa;
+  background: var(--theme-surface-raised, #f5f1fa);
 }
 
 .folder-card-dropdown button:last-child {
-  color: #b42318;
+  color: var(--theme-danger-text, #b42318);
 }
 
 .folder-card-dropdown button:last-child:hover {
-  background: #fff1f0;
+  background: var(--theme-surface-raised, #fff1f0);
 }
 
 .folder-modal-backdrop {
@@ -117,9 +117,9 @@
 .folder-modal {
   width: min(100%, 440px);
   padding: 24px;
-  border: 1px solid #e7deef;
+  border: 1px solid var(--theme-border, #e7deef);
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   box-shadow: 0 24px 70px rgb(31 22 40 / 24%);
 }
 
@@ -133,7 +133,7 @@
 
 .folder-modal-header h2 {
   margin: 4px 0 0;
-  color: #28232d;
+  color: var(--theme-text, #28232d);
   font-size: 1.4rem;
 }
 
@@ -155,13 +155,13 @@
   border: none;
   border-radius: 10px;
   background: transparent;
-  color: #6b6370;
+  color: var(--theme-muted, #6b6370);
   cursor: pointer;
 }
 
 .folder-modal-close:hover {
-  background: #f4f0f7;
-  color: #312a36;
+  background: var(--theme-surface-raised, #f4f0f7);
+  color: var(--theme-text, #312a36);
 }
 
 .folder-modal-close:disabled {
@@ -172,7 +172,7 @@
 .folder-modal-field {
   display: grid;
   gap: 8px;
-  color: #403847;
+  color: var(--theme-text, #403847);
   font-size: 0.9rem;
   font-weight: 700;
 }
@@ -180,10 +180,10 @@
 .folder-modal-field input {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #dcd3e5;
+  border: 1px solid var(--theme-border, #dcd3e5);
   border-radius: 12px;
-  background: #ffffff;
-  color: #28232d;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #28232d);
   font: inherit;
   outline: none;
   transition:
@@ -197,13 +197,13 @@
 }
 
 .folder-modal-field input:disabled {
-  background: #f6f4f7;
+  background: var(--theme-surface-raised, #f6f4f7);
   cursor: not-allowed;
 }
 
 .folder-modal-error {
   margin: 10px 0 0;
-  color: #b42318;
+  color: var(--theme-danger-text, #b42318);
   font-size: 0.88rem;
 }
 
@@ -229,13 +229,13 @@
 }
 
 .folder-modal-cancel {
-  border: 1px solid #ddd5e5;
-  background: #ffffff;
-  color: #4c4452;
+  border: 1px solid var(--theme-border, #ddd5e5);
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #4c4452);
 }
 
 .folder-modal-cancel:hover:not(:disabled) {
-  background: #f7f4f9;
+  background: var(--theme-surface-raised, #f7f4f9);
 }
 
 .folder-modal-submit {
@@ -255,7 +255,7 @@
 }
 
 .folder-card-count {
-  color: #817788;
+  color: var(--theme-muted, #817788);
   font-size: 0.84rem;
   font-weight: 500;
 }

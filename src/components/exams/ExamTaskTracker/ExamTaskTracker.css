@@ -1,9 +1,9 @@
 .exam-task-tracker {
   margin: 1.5rem 0;
   padding: 1.25rem;
-  border: 1px solid #ece8f7;
+  border: 1px solid var(--theme-border, #ece8f7);
   border-radius: 20px;
-  background: white;
+  background: var(--theme-surface, white);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
 }
 
@@ -32,8 +32,8 @@
   margin: 0;
   padding: 0.8rem 0.9rem;
 
-  background: #faf8ff;
-  border: 1px solid #ece8f7;
+  background: var(--theme-surface-raised, #faf8ff);
+  border: 1px solid var(--theme-border, #ece8f7);
   border-radius: 12px;
 
   cursor: pointer;
@@ -45,7 +45,7 @@
 }
 
 .exam-task-item:hover {
-  background: #f5efff;
+  background: var(--theme-soft, #f5efff);
   border-color: #d8c7ff;
   transform: translateY(-2px);
 }
@@ -73,11 +73,11 @@
   border-radius: 999px;
   overflow: hidden;
 
-  background: #f1eefb;
+  background: var(--theme-soft, #f1eefb);
 }
 
 .exam-task-tracker progress::-webkit-progress-bar {
-  background: #f1eefb;
+  background: var(--theme-soft, #f1eefb);
   border-radius: 999px;
 }
 

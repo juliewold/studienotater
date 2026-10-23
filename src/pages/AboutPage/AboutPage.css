@@ -27,7 +27,7 @@
 .about-header p {
   margin: 0;
   max-width: 650px;
-  color: #686372;
+  color: var(--theme-muted, #686372);
   font-size: 1.08rem;
   line-height: 1.7;
 }
@@ -43,7 +43,7 @@
   display: flex;
   gap: 18px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.72));
   border: 1px solid rgba(142, 105, 210, 0.12);
   border-radius: 18px;
   transition:
@@ -62,7 +62,7 @@
   width: 46px;
   height: 46px;
   place-items: center;
-  background: #f0e7ff;
+  background: var(--theme-soft, #f0e7ff);
   border-radius: 14px;
   font-size: 1.25rem;
 }
@@ -74,7 +74,7 @@
 
 .about-feature-card p {
   margin: 0;
-  color: #716b78;
+  color: var(--theme-muted, #716b78);
   font-size: 0.94rem;
   line-height: 1.55;
 }
@@ -95,14 +95,14 @@
 
 .about-info p {
   margin: 0;
-  color: #686372;
+  color: var(--theme-muted, #686372);
   line-height: 1.8;
 }
 
 .about-development {
   margin-top: 40px;
   padding: 32px;
-  background: #f4ecff;
+  background: var(--theme-soft, #f4ecff);
   border-radius: 20px;
 }
 
@@ -113,14 +113,14 @@
 
 .about-development p {
   margin: 0;
-  color: #666;
+  color: var(--theme-muted, #666);
   line-height: 1.7;
 }
 
 .about-development span {
   flex-shrink: 0;
   padding: 8px 12px;
-  background: white;
+  background: var(--theme-surface, white);
   border-radius: 999px;
   color: #7752b6;
   font-size: 0.8rem;

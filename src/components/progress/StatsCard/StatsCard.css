@@ -1,5 +1,5 @@
 .stats-card {
-  background: white;
+  background: var(--theme-surface, white);
   border-radius: 24px;
   padding: 24px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
@@ -7,7 +7,7 @@
 
 .stats-card h3 {
   margin: 0 0 8px;
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
   font-size: 0.95rem;
 }
 

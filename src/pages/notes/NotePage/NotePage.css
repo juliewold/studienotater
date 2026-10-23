@@ -17,7 +17,7 @@
 .note-page-topbar .back-link {
   margin: 0;
 
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
 
   font-size: 0.92rem;
   font-weight: 650;
@@ -27,7 +27,7 @@
 }
 
 .note-page-topbar .back-link:hover {
-  color: #5b21b6;
+  color: var(--theme-accent, #5b21b6);
 }
 
 .note-navigation {
@@ -47,8 +47,8 @@
   border: 1px solid rgba(139, 92, 246, 0.14);
   border-radius: 9px;
 
-  background: rgba(255, 255, 255, 0.55);
-  color: #7c3aed;
+  background: var(--theme-surface, rgba(255, 255, 255, 0.55));
+  color: var(--theme-accent, #7c3aed);
 
   font-size: 0.84rem;
   font-weight: 650;
@@ -64,8 +64,8 @@
 .note-navigation-button:hover {
   border-color: rgba(139, 92, 246, 0.28);
 
-  background: rgba(255, 255, 255, 0.9);
-  color: #5b21b6;
+  background: var(--theme-surface, rgba(255, 255, 255, 0.9));
+  color: var(--theme-accent, #5b21b6);
 
   transform: translateY(-1px);
 }
@@ -73,7 +73,7 @@
 /* Gammel note-content-styling */
 
 .note-label {
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
   font-weight: 700;
 }
 
@@ -83,7 +83,7 @@
 
   border-radius: 20px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
 }
@@ -170,7 +170,7 @@
   border: 1px solid rgba(139, 92, 246, 0.08);
   border-radius: 12px;
 
-  background: rgba(250, 248, 253, 0.88);
+  background: var(--theme-surface-raised, rgba(250, 248, 253, 0.88));
 
   box-shadow: 0 6px 20px rgba(31, 24, 40, 0.05);
 
@@ -187,7 +187,7 @@
     margin: 0 0 1rem;
     padding: 0.3rem;
 
-    background: #faf8fd;
+    background: var(--theme-surface-raised, #faf8fd);
 
     box-shadow: 0 6px 16px rgba(31, 24, 40, 0.06);
   }

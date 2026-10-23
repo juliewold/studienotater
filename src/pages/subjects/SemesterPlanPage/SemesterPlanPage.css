@@ -31,8 +31,8 @@
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 12px;
 
-  background: #ffffff;
-  color: #7c3aed;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-accent, #7c3aed);
 
   font-size: 0.9rem;
   font-weight: 700;
@@ -45,7 +45,7 @@
 }
 
 .edit-semester-subjects-button:hover {
-  background: #f8f5ff;
+  background: var(--theme-surface-raised, #f8f5ff);
   border-color: rgba(139, 92, 246, 0.4);
   transform: translateY(-1px);
 }

@@ -21,9 +21,9 @@
       rgba(179, 139, 243, 0.2),
       transparent 38%
     ),
-    linear-gradient(135deg, #fbf7ff 0%, #ffffff 70%);
+    linear-gradient(135deg, var(--theme-surface-raised, #fbf7ff) 0%, var(--theme-surface, #ffffff) 70%);
 
-  border: 1px solid #eadcfb;
+  border: 1px solid var(--theme-border, #eadcfb);
   border-radius: 24px;
 }
 
@@ -45,7 +45,7 @@
 .practice-hero .page-label {
   margin: 0 0 0.35rem;
 
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
 
   font-size: 0.8rem;
   font-weight: 800;
@@ -56,7 +56,7 @@
 .practice-hero h1 {
   margin: 0;
 
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 
   font-size: clamp(1.75rem, 4vw, 2.4rem);
   line-height: 1.15;
@@ -66,7 +66,7 @@
   max-width: 680px;
   margin-top: 0.75rem;
 
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 
   line-height: 1.65;
 }
@@ -78,11 +78,11 @@
 .secondary-button {
   padding: 0.55rem 0.85rem;
 
-  border: 1px solid #ddd2ea;
+  border: 1px solid var(--theme-border, #ddd2ea);
   border-radius: 9px;
 
-  background: #fff;
-  color: #5f5873;
+  background: var(--theme-surface, #fff);
+  color: var(--theme-muted, #5f5873);
 
   font: inherit;
   font-size: 0.85rem;
@@ -94,8 +94,8 @@
 }
 
 .secondary-button:hover {
-  background: #faf7ff;
-  border-color: #c8b7dd;
+  background: var(--theme-surface-raised, #faf7ff);
+  border-color: var(--theme-control-border, #c8b7dd);
 }
 
 .start-practice-button {
@@ -135,7 +135,7 @@
 }
 
 .start-practice-button:disabled {
-  background: #d4cfdd;
+  background: var(--theme-soft, #d4cfdd);
   color: #ffffff;
 
   box-shadow: none;
@@ -161,10 +161,10 @@
   margin-top: 1.25rem;
   padding: 1.25rem 1.4rem;
 
-  border: 1px solid #e4d5f7;
+  border: 1px solid var(--theme-border, #e4d5f7);
   border-radius: 18px;
 
-  background: linear-gradient(135deg, #f8f2ff, #ffffff);
+  background: linear-gradient(135deg, #f8f2ff, var(--theme-surface, #ffffff));
 }
 
 .active-session-information {
@@ -188,7 +188,7 @@
 .active-session-information .page-label {
   margin: 0;
 
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
 
   font-size: 0.75rem;
   font-weight: 800;
@@ -205,7 +205,7 @@
 }
 
 .active-session-information span {
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
   font-size: 0.78rem;
 }
 
@@ -243,7 +243,7 @@
 .practice-stats-label {
   margin: 0 0 0.25rem;
 
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
 
   font-size: 0.75rem;
   font-weight: 800;
@@ -254,7 +254,7 @@
 .practice-stats h3 {
   margin: 0;
 
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 
   font-size: 1.1rem;
 }
@@ -273,10 +273,10 @@
 
   padding: 1rem;
 
-  border: 1px solid #eadff5;
+  border: 1px solid var(--theme-border, #eadff5);
   border-radius: 16px;
 
-  background: linear-gradient(135deg, #faf7ff, #ffffff);
+  background: linear-gradient(135deg, var(--theme-surface-raised, #faf7ff), var(--theme-surface, #ffffff));
 
   transition:
     transform 0.18s,
@@ -287,13 +287,13 @@
 .practice-stat-card:hover {
   transform: translateY(-2px);
 
-  border-color: #d6c1ed;
+  border-color: var(--theme-control-border, #d6c1ed);
 
   box-shadow: 0 10px 24px rgba(139, 92, 246, 0.08);
 }
 
 .practice-stat-card strong {
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 
   font-size: 1.65rem;
   line-height: 1;
@@ -302,7 +302,7 @@
 .practice-stat-card span {
   margin-top: 0.5rem;
 
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 
   font-size: 0.78rem;
   font-weight: 600;
@@ -310,7 +310,7 @@
 }
 
 .practice-divider {
-  border-top-color: #eee7f5;
+  border-top-color: var(--theme-border, #eee7f5);
 }
 
 /* -------------------------------------------------- */
@@ -362,7 +362,7 @@
 .practice-reset-topic select {
   padding: 0.7rem;
 
-  border: 1px solid #ddd2ea;
+  border: 1px solid var(--theme-border, #ddd2ea);
   border-radius: 9px;
 }
 
@@ -371,12 +371,12 @@
 }
 
 .reset-all-data-button {
-  color: #b42318;
+  color: var(--theme-danger-text, #b42318);
   border-color: #fecdca;
 }
 
 .reset-all-data-button:hover {
-  background: #fef3f2;
+  background: var(--theme-danger-surface, #fef3f2);
 }
 
 /* -------------------------------------------------- */

@@ -493,3 +493,6 @@ Manuelt: sett markøren i en LaTeX-kodeblokk og velg Formelblokk/Formel i tekst.
 ### Markert innhold til innholdsboks
 Åpne `tests/callout-selection.html`: tester alle fem bokstyper med avsnitt, liste, marks, inline- og blokkmatematikk, delvis utvalg, tomt utvalg og undo. Toolbar-testene kjører den faktiske NoteEditor i StrictMode med kontrollert lagring av HTML.
 Bruk `tests/callout-selection.html?manual` for manuell prøve: marker innhold, åpne Innholdsbokser, velg type, og bruk Cmd+Z. Markeringen skal flyttes én gang og formatering/formler skal beholdes.
+
+### Theme consistency
+See `tests/theme-audit.md`. Run `node tests/theme-light-regression.mjs` to verify all migrated styles preserve original light colors/layout. Open `tests/theme-consistency.html`, click **Kjør kontrasttester**, and switch between the five representative views and themes. Uses isolated data-free previews; no Supabase writes.

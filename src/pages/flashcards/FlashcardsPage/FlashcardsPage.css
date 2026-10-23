@@ -1,5 +1,5 @@
 .flashcards-error {
-  color: #dc2626;
+  color: var(--theme-danger-text, #dc2626);
 }
 
 .flashcard-all-practice-card {
@@ -14,19 +14,19 @@
   border: 1px solid rgba(139, 92, 246, 0.14);
   border-radius: 26px;
 
-  background: linear-gradient(135deg, #ffffff 0%, #faf7ff 100%);
+  background: linear-gradient(135deg, var(--theme-surface, #ffffff) 0%, var(--theme-surface-raised, #faf7ff) 100%);
 
   box-shadow: 0 12px 30px rgba(139, 92, 246, 0.08);
 }
 
 .flashcard-all-practice-card h2 {
   margin: 6px 0 10px;
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 }
 
 .flashcard-all-practice-card p {
   margin: 0;
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
 }
 
 .flashcard-topics {
@@ -45,7 +45,7 @@
   padding: 28px;
   border-radius: 26px;
 
-  background: rgba(255, 255, 255, 0.62);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.62));
   border: 1px solid rgba(139, 92, 246, 0.1);
 }
 
@@ -58,19 +58,19 @@
 
 .flashcard-topic-header h2 {
   margin: 5px 0 8px;
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 }
 
 .flashcard-topic-header p:not(.flashcard-topic-label) {
   margin: 0;
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
 }
 
 .flashcard-topic-label,
 .flashcard-subtopic-label {
   margin: 0;
 
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
 
   font-size: 0.78rem;
   font-weight: 800;
@@ -93,7 +93,7 @@
   padding: 22px;
   border-radius: 20px;
 
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   border: 1px solid rgba(23, 20, 42, 0.07);
 
   box-shadow: 0 7px 18px rgba(0, 0, 0, 0.04);
@@ -101,12 +101,12 @@
 
 .flashcard-subtopic-card h3 {
   margin: 5px 0 8px;
-  color: #17142a;
+  color: var(--theme-text, #17142a);
   font-size: 1.05rem;
 }
 
 .flashcard-subtopic-card span {
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-size: 0.92rem;
   font-weight: 600;
 }
@@ -149,8 +149,8 @@
   padding: 11px 16px;
   border-radius: 13px;
 
-  color: #7c3aed;
-  background: #f4edff;
+  color: var(--theme-accent, #7c3aed);
+  background: var(--theme-soft, #f4edff);
 }
 
 .flashcard-secondary-button:hover {
@@ -170,7 +170,7 @@
   padding: 0;
   margin-bottom: 28px;
 
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
   background: transparent;
 }
 
@@ -190,7 +190,7 @@
 }
 
 .flashcard-practice-progress {
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-weight: 700;
 }
 
@@ -202,7 +202,7 @@
   overflow: hidden;
 
   border-radius: 999px;
-  background: #ebe7f2;
+  background: var(--theme-surface-raised, #ebe7f2);
 }
 
 .flashcard-progress-bar {
@@ -231,8 +231,8 @@
   cursor: pointer;
   text-align: left;
 
-  color: #17142a;
-  background: #ffffff;
+  color: var(--theme-text, #17142a);
+  background: var(--theme-surface, #ffffff);
 
   box-shadow: 0 18px 45px rgba(65, 42, 115, 0.1);
 
@@ -249,13 +249,13 @@
 }
 
 .flashcard-practice-card-flipped {
-  background: linear-gradient(145deg, #ffffff, #faf5ff);
+  background: linear-gradient(145deg, var(--theme-surface, #ffffff), var(--theme-soft, #faf5ff));
 }
 
 .flashcard-label {
   margin: 0 0 24px;
 
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
 
   font-size: 0.88rem;
   font-weight: 800;
@@ -266,7 +266,7 @@
 .flashcard-practice-card h2 {
   margin: auto 0;
 
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 
   font-size: clamp(1.5rem, 3vw, 2.15rem);
   line-height: 1.45;
@@ -278,7 +278,7 @@
 
   margin-top: 34px;
 
-  color: #8b8b99;
+  color: var(--theme-muted, #8b8b99);
   font-size: 0.9rem;
 }
 

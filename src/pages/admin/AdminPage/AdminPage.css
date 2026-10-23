@@ -5,7 +5,7 @@
 
 .page-label {
   margin: 0 0 0.5rem;
-  color: #9b6ee8;
+  color: var(--theme-accent, #9b6ee8);
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -15,7 +15,7 @@
 .page-description {
   margin-top: 0.5rem;
   margin-bottom: 2rem;
-  color: #666;
+  color: var(--theme-muted, #666);
 }
 
 .admin-grid {
@@ -29,7 +29,7 @@
   padding: 1.75rem;
   border: 1px solid rgba(167, 116, 255, 0.15);
   border-radius: 22px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
   cursor: pointer;
   transition:
@@ -51,7 +51,7 @@
 
 .admin-card p {
   margin: 0;
-  color: #666;
+  color: var(--theme-muted, #666);
   line-height: 1.5;
 }
 
