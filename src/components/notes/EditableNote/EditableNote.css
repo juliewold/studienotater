@@ -26,7 +26,7 @@
 }
 
 .editable-note-subject {
-  color: #8a8390;
+  color: var(--theme-muted, #8a8390);
 
   font-size: 0.8rem;
   font-weight: 700;
@@ -71,14 +71,14 @@
 .editable-note-edit-button {
   border: 1px solid rgba(139, 92, 246, 0.18);
 
-  background: rgba(255, 255, 255, 0.55);
-  color: #7c3aed;
+  background: var(--theme-surface, rgba(255, 255, 255, 0.55));
+  color: var(--theme-accent, #7c3aed);
 }
 
 .editable-note-edit-button:hover {
   border-color: rgba(139, 92, 246, 0.35);
 
-  background: #f8f5ff;
+  background: var(--theme-surface-raised, #f8f5ff);
 
   transform: translateY(-1px);
 }
@@ -97,14 +97,14 @@
 }
 
 .editable-note-cancel-button {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--theme-border, #e5e7eb);
 
-  background: #ffffff;
-  color: #4b5563;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-muted, #4b5563);
 }
 
 .editable-note-cancel-button:hover {
-  background: #f9fafb;
+  background: var(--theme-surface-raised, #f9fafb);
 
   transform: translateY(-1px);
 }
@@ -129,7 +129,7 @@
 .editable-note-title {
   margin: 0;
 
-  color: #24202a;
+  color: var(--theme-text, #24202a);
 
   font-size: clamp(2.6rem, 4.5vw, 3.3rem);
   font-weight: 750;
@@ -142,7 +142,7 @@
 
   margin: 1.3rem 0 0;
 
-  color: #5f5964;
+  color: var(--theme-muted, #5f5964);
 
   font-size: 1.08rem;
   line-height: 1.7;
@@ -168,7 +168,7 @@
 }
 
 .editable-note-title-input {
-  color: #24202a;
+  color: var(--theme-text, #24202a);
 
   font-size: clamp(2.6rem, 4.5vw, 3.3rem);
   font-weight: 750;
@@ -188,14 +188,14 @@
   resize: none;
   overflow: hidden;
 
-  color: #5f5964;
+  color: var(--theme-muted, #5f5964);
 
   font-size: 1.08rem;
   line-height: 1.7;
 }
 
 .editable-note-description-input::placeholder {
-  color: #b8b0bc;
+  color: var(--theme-muted, #b8b0bc);
 }
 
 /* Editor */
@@ -212,7 +212,7 @@
   margin: 0 auto;
   padding: 0.75rem 1.5rem 5rem;
 
-  color: #29252f;
+  color: var(--theme-text, #29252f);
 
   font-size: 1.05rem;
   line-height: 1.8;
@@ -229,12 +229,12 @@
 
 .editable-note-success {
   background: #dcfce7;
-  color: #166534;
+  color: var(--theme-success-text, #166534);
 }
 
 .editable-note-error {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--theme-danger-surface, #fee2e2);
+  color: var(--theme-danger-text, #991b1b);
 }
 
 /* Lagrestatus */
@@ -244,7 +244,7 @@
   align-items: center;
   gap: 0.35rem;
 
-  color: #8b8490;
+  color: var(--theme-muted, #8b8490);
 
   font-size: 0.85rem;
   white-space: nowrap;
@@ -279,7 +279,7 @@
 }
 
 .editable-note-classification label {
-  color: #746d79;
+  color: var(--theme-muted, #746d79);
 
   font-size: 0.88rem;
   font-weight: 600;
@@ -291,11 +291,11 @@
 
   padding: 0.6rem 2.1rem 0.6rem 0.8rem;
 
-  border: 1px solid #ded7e5;
+  border: 1px solid var(--theme-border, #ded7e5);
   border-radius: 10px;
 
-  background: #ffffff;
-  color: #332d38;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #332d38);
 
   font: inherit;
 
@@ -312,7 +312,7 @@
 }
 
 .editable-note-classification select:focus {
-  border-color: #9b6ee8;
+  border-color: var(--theme-accent, #9b6ee8);
 
   box-shadow: 0 0 0 3px rgba(155, 110, 232, 0.12);
 }
@@ -334,14 +334,14 @@
   margin-top: 0.5rem;
   padding: 1rem;
 
-  border: 1px solid #e5deeb;
+  border: 1px solid var(--theme-border, #e5deeb);
   border-radius: 12px;
 
-  background: #fbfaff;
+  background: var(--theme-surface-raised, #fbfaff);
 }
 
 .editable-note-multiple-subtopics-title {
-  color: #4b4450;
+  color: var(--theme-text, #4b4450);
 
   font-size: 0.9rem;
   font-weight: 700;
@@ -354,7 +354,7 @@
 }
 
 .editable-note-topic-group-title {
-  color: #746d79;
+  color: var(--theme-muted, #746d79);
 
   font-size: 0.82rem;
   font-weight: 700;
@@ -373,7 +373,7 @@
   border-radius: 8px;
 
   background: transparent;
-  color: #5f5864;
+  color: var(--theme-muted, #5f5864);
 
   font: inherit;
   font-size: 0.84rem;
@@ -384,7 +384,7 @@
 }
 
 .editable-note-topic-toggle:hover {
-  background: #f5f1fb;
+  background: var(--theme-surface-raised, #f5f1fb);
 }
 
 .editable-note-topic-toggle-main {
@@ -424,11 +424,11 @@
 
   padding: 0.45rem 0.65rem;
 
-  border: 1px solid #e1d9e8;
+  border: 1px solid var(--theme-border, #e1d9e8);
   border-radius: 9px;
 
-  background: #ffffff;
-  color: #4f4854;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #4f4854);
 
   font-size: 0.84rem;
   font-weight: 500;
@@ -439,7 +439,7 @@
 .editable-note-subtopic-option:hover {
   border-color: #bca8e8;
 
-  background: #f8f5ff;
+  background: var(--theme-surface-raised, #f8f5ff);
 }
 
 .editable-note-subtopic-option input {
@@ -468,7 +468,7 @@
   border: none;
 
   background: transparent;
-  color: #8a8390;
+  color: var(--theme-muted, #8a8390);
 
   font-size: 0.84rem;
   font-weight: 600;
@@ -477,7 +477,7 @@
 .editable-note-classification-display span + span::before {
   margin-right: 0.7rem;
 
-  color: #b6aeba;
+  color: var(--theme-muted, #b6aeba);
 
   content: "·";
 }
@@ -599,17 +599,17 @@
 }
 .editable-note-reading .editable-note-title { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.15; overflow-wrap: anywhere; }
 .editable-note-reading .editable-note-description { font-size: 1.08rem; line-height: 1.7; margin-top: 16px; }
-.note-reading-tools { padding-bottom: 14px; border-bottom: 1px solid #e5dced; }
+.note-reading-tools { padding-bottom: 14px; border-bottom: 1px solid var(--theme-border, #e5dced); }
 .note-reading-tools .note-ai-tools { max-width: none; margin: 12px 0 0; padding: 0; background: transparent; border: 0; }
 .note-reading-tools .note-ai-tools > h2 { font-size: .8rem; margin-bottom: 8px; }
-.note-reading-tools .note-ai-actions > details { padding: 6px 10px; background: #faf8fd; }
+.note-reading-tools .note-ai-actions > details { padding: 6px 10px; background: var(--theme-surface-raised, #faf8fd); }
 .editable-note-reading .resource-progress--compact {
   display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
   margin: 0; padding: 0; background: transparent; box-shadow: none; border-radius: 0;
 }
 .resource-progress--compact .resource-completed { margin: 0; gap: 6px; font-size: .82rem; }
 .resource-progress--compact .resource-rating { display: flex; align-items: center; gap: 6px; }
-.resource-progress--compact .resource-rating p { margin: 0; font-size: .78rem; color: #746d79; }
+.resource-progress--compact .resource-rating p { margin: 0; font-size: .78rem; color: var(--theme-muted, #746d79); }
 .resource-progress--compact .stars { gap: 0; }
 .resource-progress--compact .stars button { font-size: 1.25rem; width: 26px; min-height: 32px; }
 @media (min-width: 1000px) {
@@ -631,11 +631,11 @@
   margin-top: 12px; resize: vertical; overflow: auto; line-height: 1.7;
 }
 .editable-note-editing .editable-note-save-status { font-size: .8rem; }
-.editable-note-classification-details { margin-top: 12px; font-size: .85rem; color: #5f5964; }
+.editable-note-classification-details { margin-top: 12px; font-size: .85rem; color: var(--theme-muted, #5f5964); }
 .editable-note-classification-details > summary { cursor: pointer; font-weight: 650; line-height: 1.6; }
 .editable-note-classification-details > summary > span { font-weight: 400; margin-left: 8px; overflow-wrap: anywhere; }
 .editable-note-classification-details .editable-note-multiple-subtopics { margin: 10px 0 0; padding: 12px; max-height: 260px; overflow-y: auto; }
-.editable-note-editing :is(summary, input, textarea, button):focus-visible { outline: 2px solid #9b6ee8; outline-offset: 3px; }
+.editable-note-editing :is(summary, input, textarea, button):focus-visible { outline: 2px solid var(--theme-accent, #9b6ee8); outline-offset: 3px; }
 
 /* Both modes share the header/outline/content grid in NoteDocument. */
 .editable-note-editing .editable-note-topbar { max-width: none; margin: 0; padding: 0; }

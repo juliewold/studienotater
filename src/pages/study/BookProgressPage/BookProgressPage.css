@@ -5,7 +5,7 @@
 }
 
 .book-progress-card {
-  background: white;
+  background: var(--theme-surface, white);
   padding: 32px;
   border-radius: 24px;
   margin-top: 32px;
@@ -38,9 +38,9 @@
 }
 
 .book-page-cell {
-  border: 1px solid #e6d8ff;
-  background: #ffffff;
-  color: #17132f;
+  border: 1px solid var(--theme-border, #e6d8ff);
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #17132f);
   border-radius: 10px;
   padding: 10px 0;
   cursor: pointer;
@@ -50,7 +50,7 @@
 }
 
 .book-page-cell:hover {
-  background: #f3ebff;
+  background: var(--theme-soft, #f3ebff);
   transform: translateY(-1px);
 }
 

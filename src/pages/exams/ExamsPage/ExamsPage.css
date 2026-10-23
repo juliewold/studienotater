@@ -12,8 +12,8 @@
   flex-direction: column;
 
   min-width: 0;
-  background: white;
-  border: 1px solid #ece8f7;
+  background: var(--theme-surface, white);
+  border: 1px solid var(--theme-border, #ece8f7);
   border-radius: 20px;
   padding: 1.5rem;
 
@@ -39,7 +39,7 @@
 
 .exam-meta {
   margin: 0.35rem 0 1.25rem;
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-weight: 500;
 }
 
@@ -55,8 +55,8 @@
   text-decoration: none;
   color: inherit;
 
-  background: #faf8ff;
-  border: 1px solid #ece8f7;
+  background: var(--theme-surface-raised, #faf8ff);
+  border: 1px solid var(--theme-border, #ece8f7);
   border-radius: 14px;
 
   transition:
@@ -70,7 +70,7 @@
 }
 
 .exam-row:hover {
-  background: #f5efff;
+  background: var(--theme-soft, #f5efff);
   border-color: #d8c7ff;
   transform: translateX(3px);
 }
@@ -81,7 +81,7 @@
 
 .exam-arrow {
   flex-shrink: 0;
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
   font-size: 1.3rem;
 
   transition: transform 0.2s ease;

@@ -16,7 +16,7 @@
 .flashcard-generator-header h2 {
   margin: 0 0 0.35rem;
 
-  color: #24202a;
+  color: var(--theme-text, #24202a);
 
   font-size: 1.65rem;
   font-weight: 750;
@@ -26,7 +26,7 @@
 .flashcard-generator-header p {
   margin: 0;
 
-  color: #746d79;
+  color: var(--theme-muted, #746d79);
 
   font-size: 0.95rem;
 }
@@ -43,8 +43,8 @@
   border: 1px solid rgba(124, 110, 230, 0.22);
   border-radius: 10px;
 
-  background: #ffffff;
-  color: #6f60db;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-accent, #6f60db);
 
   font: inherit;
   font-size: 0.9rem;
@@ -60,7 +60,7 @@
 
 .flashcard-generate-button:hover:not(:disabled) {
   border-color: rgba(124, 110, 230, 0.45);
-  background: #f8f5ff;
+  background: var(--theme-surface-raised, #f8f5ff);
 
   transform: translateY(-1px);
 }
@@ -86,8 +86,8 @@
 
   border-radius: 10px;
 
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--theme-danger-surface, #fee2e2);
+  color: var(--theme-danger-text, #991b1b);
 
   font-size: 0.9rem;
 }
@@ -100,7 +100,7 @@
 .flashcard-generator-summary {
   margin: 0 0 0.25rem;
 
-  color: #746d79;
+  color: var(--theme-muted, #746d79);
 
   font-size: 0.88rem;
   font-weight: 600;
@@ -114,10 +114,10 @@
 
   padding: 1rem;
 
-  border: 1px solid #e4dfea;
+  border: 1px solid var(--theme-border, #e4dfea);
   border-radius: 14px;
 
-  background: rgba(255, 255, 255, 0.65);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.65));
 
   transition:
     border-color 0.15s ease,
@@ -127,7 +127,7 @@
 
 .flashcard-generator-card.is-selected {
   border-color: rgba(124, 110, 230, 0.3);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.9));
 }
 
 .flashcard-generator-card:not(.is-selected) {
@@ -139,7 +139,7 @@
   flex-direction: column;
   gap: 0.4rem;
 
-  color: #625b68;
+  color: var(--theme-muted, #625b68);
 
   font-size: 0.82rem;
   font-weight: 650;
@@ -169,11 +169,11 @@
 
   padding: 0.7rem 0.8rem;
 
-  border: 1px solid #ded7e5;
+  border: 1px solid var(--theme-border, #ded7e5);
   border-radius: 10px;
 
-  background: #ffffff;
-  color: #332d38;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #332d38);
 
   font: inherit;
   font-size: 0.9rem;
@@ -189,7 +189,7 @@
 }
 
 .flashcard-generator-card textarea:focus {
-  border-color: #9b6ee8;
+  border-color: var(--theme-accent, #9b6ee8);
   box-shadow: 0 0 0 3px rgba(155, 110, 232, 0.1);
 }
 
@@ -238,7 +238,7 @@
 
   border-radius: 10px;
 
-  background: #ecfdf3;
+  background: var(--theme-success-surface, #ecfdf3);
   color: #18794e;
 
   font-size: 0.9rem;

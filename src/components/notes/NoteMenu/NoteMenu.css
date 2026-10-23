@@ -18,7 +18,7 @@
 }
 
 .note-menu-button:hover {
-  background: #f2f2f2;
+  background: var(--theme-surface-raised, #f2f2f2);
 }
 
 .note-menu-dropdown {
@@ -28,7 +28,7 @@
 
   min-width: 190px;
 
-  background: white;
+  background: var(--theme-surface, white);
   border-radius: 12px;
 
   box-shadow: 0 12px 30px rgb(0 0 0 / 12%);
@@ -56,7 +56,7 @@
 }
 
 .note-menu-dropdown button:hover {
-  background: #f7f7f7;
+  background: var(--theme-surface-raised, #f7f7f7);
 }
 
 .note-menu-dropdown .note-menu-delete-option {
@@ -64,7 +64,7 @@
 }
 
 .note-menu-dropdown .note-menu-delete-option:hover {
-  background: #fff1f1;
+  background: var(--theme-surface-raised, #fff1f1);
 }
 
 .note-modal-overlay {
@@ -89,7 +89,7 @@
   padding: 24px;
 
   border-radius: 18px;
-  background: white;
+  background: var(--theme-surface, white);
 
   box-shadow: 0 20px 60px rgb(0 0 0 / 20%);
 }
@@ -124,7 +124,7 @@
 }
 
 .note-modal-close-button:hover {
-  background: #f2f2f2;
+  background: var(--theme-surface-raised, #f2f2f2);
 }
 
 .note-modal-message {
@@ -148,14 +148,14 @@
 
   padding: 12px 14px;
 
-  border: 1px solid #e8e8e8;
+  border: 1px solid var(--theme-border, #e8e8e8);
   border-radius: 12px;
 
   cursor: pointer;
 }
 
 .note-move-option:hover {
-  background: #f8f8f8;
+  background: var(--theme-surface-raised, #f8f8f8);
 }
 
 .note-move-option input {
@@ -176,7 +176,7 @@
   box-sizing: border-box;
   padding: 12px 14px;
 
-  border: 1px solid #d8d8d8;
+  border: 1px solid var(--theme-border, #d8d8d8);
   border-radius: 10px;
 
   font: inherit;
@@ -216,7 +216,7 @@
 }
 
 .note-modal-cancel-button {
-  background: #eeeeee;
+  background: var(--theme-surface-raised, #eeeeee);
 }
 
 .note-modal-submit-button {

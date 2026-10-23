@@ -6,8 +6,8 @@
   width: 260px;
   padding: 8px;
 
-  background: #ffffff;
-  border: 1px solid #ede9fe;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #ede9fe);
   border-radius: 12px;
 
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
@@ -20,7 +20,7 @@
 
   padding: 4px 6px 10px;
 
-  color: #111827;
+  color: var(--theme-text, #111827);
   font-size: 0.9rem;
   font-weight: 700;
 }
@@ -38,14 +38,14 @@
   border: 0;
   border-radius: 8px;
 
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-size: 1.25rem;
   cursor: pointer;
 }
 
 .concept-picker-close:hover {
-  background: #f5f3ff;
-  color: #7c3aed;
+  background: var(--theme-soft, #f5f3ff);
+  color: var(--theme-accent, #7c3aed);
 }
 
 .concept-picker-search {
@@ -55,22 +55,22 @@
   margin-bottom: 8px;
   padding: 8px 10px;
 
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid var(--theme-border, #e5e7eb);
   border-radius: 8px;
   outline: none;
 
-  color: #1f2937;
+  color: var(--theme-text, #1f2937);
   font: inherit;
   font-size: 0.85rem;
 }
 
 .concept-picker-search:focus {
-  border-color: #7c3aed;
+  border-color: var(--theme-accent, #7c3aed);
 }
 
 .concept-picker-search::placeholder {
-  color: #9ca3af;
+  color: var(--theme-muted, #9ca3af);
 }
 
 .concept-picker-list {
@@ -83,7 +83,7 @@
   margin: 0;
   padding: 10px;
 
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-size: 0.82rem;
   text-align: center;
 }
@@ -107,17 +107,17 @@
   cursor: pointer;
 }
 .concept-picker-item:hover {
-  background: #f5f3ff;
+  background: var(--theme-soft, #f5f3ff);
 }
 
 .concept-picker-name {
-  color: #1f2937;
+  color: var(--theme-text, #1f2937);
   font-size: 0.9rem;
   font-weight: 600;
 }
 
 .concept-picker-type {
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;

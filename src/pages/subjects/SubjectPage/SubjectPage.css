@@ -5,7 +5,7 @@
 
 .subject-page-label {
   margin: 0;
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -20,7 +20,7 @@
 
 .subject-page-name {
   margin: 0;
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-size: 1rem;
   line-height: 1.4;
 }
@@ -37,10 +37,10 @@
   margin-top: 24px;
   padding: 18px 20px;
 
-  border: 1px solid #e4d8fb;
+  border: 1px solid var(--theme-border, #e4d8fb);
   border-radius: 16px;
 
-  background: #faf8ff;
+  background: var(--theme-surface-raised, #faf8ff);
 }
 
 .subject-knowledge-base > div {
@@ -51,7 +51,7 @@
 .subject-knowledge-base h2 {
   margin: 0;
 
-  color: #211a32;
+  color: var(--theme-text, #211a32);
   font-size: 1.2rem;
   line-height: 1.25;
 }
@@ -60,7 +60,7 @@
   max-width: 650px;
   margin: 6px 0 0;
 
-  color: #6b6475;
+  color: var(--theme-muted, #6b6475);
   font-size: 0.88rem;
   line-height: 1.5;
 }
@@ -101,7 +101,7 @@
 }
 
 .subject-knowledge-base button:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid var(--theme-accent, #8b5cf6);
   outline-offset: 3px;
 }
 
@@ -111,9 +111,9 @@
   margin: 0;
   padding-top: 12px;
 
-  border-top: 1px solid #e9ddfb;
+  border-top: 1px solid var(--theme-border, #e9ddfb);
 
-  color: #625b6f;
+  color: var(--theme-muted, #625b6f);
   font-size: 0.84rem;
   line-height: 1.5;
 }
@@ -123,9 +123,9 @@
 .subject-progress-card {
   margin-top: 24px;
   padding: 18px 20px;
-  border: 1px solid #ece7f5;
+  border: 1px solid var(--theme-border, #ece7f5);
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   box-shadow: none;
 }
 
@@ -138,7 +138,7 @@
 
 .subject-progress-label {
   margin: 0 0 3px;
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -147,14 +147,14 @@
 
 .subject-progress-header h2 {
   margin: 0;
-  color: #211a32;
+  color: var(--theme-text, #211a32);
   font-size: 1.2rem;
   line-height: 1.25;
 }
 
 .subject-progress-percentage {
   flex-shrink: 0;
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
   font-size: 1.55rem;
   font-weight: 800;
   line-height: 1;
@@ -165,7 +165,7 @@
   margin-top: 14px;
   overflow: hidden;
   border-radius: 999px;
-  background: #eee7fb;
+  background: var(--theme-soft, #eee7fb);
 }
 
 .subject-progress-summary {
@@ -174,7 +174,7 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 9px;
-  color: #625b6f;
+  color: var(--theme-muted, #625b6f);
   font-size: 0.84rem;
 }
 
@@ -192,21 +192,21 @@
   gap: 10px;
   min-width: 0;
   padding: 9px 11px;
-  border: 1px solid #ece7f5;
+  border: 1px solid var(--theme-border, #ece7f5);
   border-radius: 11px;
-  background: #faf8ff;
+  background: var(--theme-surface-raised, #faf8ff);
 }
 
 .subject-progress-category span {
   min-width: 0;
-  color: #625b6f;
+  color: var(--theme-muted, #625b6f);
   font-size: 0.84rem;
   overflow-wrap: anywhere;
 }
 
 .subject-progress-category strong {
   flex-shrink: 0;
-  color: #34284a;
+  color: var(--theme-text, #34284a);
   font-size: 0.9rem;
 }
 
@@ -219,13 +219,13 @@
 }
 
 .subject-progress-status {
-  background: #f7f4fb;
-  color: #6b6475;
+  background: var(--theme-surface-raised, #f7f4fb);
+  color: var(--theme-muted, #6b6475);
 }
 
 .subject-progress-error {
-  background: #fff0f0;
-  color: #b42318;
+  background: var(--theme-danger-surface, #fff0f0);
+  color: var(--theme-danger-text, #b42318);
 }
 
 /* Funksjonskort */
@@ -242,9 +242,9 @@
 .subject-topic-progress {
   margin-top: 28px;
   padding: 18px 20px;
-  border: 1px solid #ece7f5;
+  border: 1px solid var(--theme-border, #ece7f5);
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   box-shadow: none;
 }
 
@@ -258,7 +258,7 @@
 
 .subject-topic-progress-header h2 {
   margin: 0;
-  color: #211a32;
+  color: var(--theme-text, #211a32);
   font-size: 1.2rem;
 }
 
@@ -266,7 +266,7 @@
   margin: 0;
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
-  background: #f5f0ff;
+  background: var(--theme-soft, #f5f0ff);
   color: #7950c6;
   font-size: 0.72rem;
   font-weight: 700;
@@ -280,9 +280,9 @@
 .subject-topic-progress-item {
   min-width: 0;
   padding: 12px 14px;
-  border: 1px solid #ece7f5;
+  border: 1px solid var(--theme-border, #ece7f5);
   border-radius: 11px;
-  background: #faf8ff;
+  background: var(--theme-surface-raised, #faf8ff);
 }
 
 .subject-topic-progress-top {
@@ -294,7 +294,7 @@
 
 .subject-topic-progress-top h3 {
   margin: 0;
-  color: #34284a;
+  color: var(--theme-text, #34284a);
   font-size: 0.95rem;
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -302,13 +302,13 @@
 
 .subject-topic-progress-top p {
   margin: 2px 0 0;
-  color: #756d80;
+  color: var(--theme-muted, #756d80);
   font-size: 0.78rem;
 }
 
 .subject-topic-progress-top > strong {
   flex-shrink: 0;
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
   font-size: 0.9rem;
 }
 
@@ -317,12 +317,12 @@
   margin-top: 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: #e9e2f5;
+  background: var(--theme-surface-raised, #e9e2f5);
 }
 
 .subject-topic-progress-rating {
   margin: 6px 0 0;
-  color: #6f6878;
+  color: var(--theme-muted, #6f6878);
   font-size: 0.76rem;
 }
 
@@ -353,7 +353,7 @@
   border-radius: 10px;
 
   background: transparent;
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
 
   cursor: pointer;
 
@@ -363,7 +363,7 @@
 }
 
 .subject-topic-progress-more-button:hover {
-  background: #f5f0ff;
+  background: var(--theme-soft, #f5f0ff);
 }
 
 .subject-topic-progress-more-button:active {
@@ -371,7 +371,7 @@
 }
 
 .subject-topic-progress-more-button:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid var(--theme-accent, #8b5cf6);
   outline-offset: 2px;
 }
 
@@ -559,7 +559,7 @@
 
 .subject-syllabus-header h2 {
   margin: 0;
-  color: #211a32;
+  color: var(--theme-text, #211a32);
   font-size: 1.2rem;
   line-height: 1.25;
 }
@@ -583,11 +583,11 @@
   min-height: 64px;
   padding: 14px 16px;
 
-  border: 1px solid #ece7f5;
+  border: 1px solid var(--theme-border, #ece7f5);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 
-  color: #34284a;
+  color: var(--theme-text, #34284a);
   text-decoration: none;
 
   transition:
@@ -609,13 +609,13 @@
 
 .subject-syllabus-topic-link svg {
   flex-shrink: 0;
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
 }
 
 .subject-syllabus-topic-link:hover {
   border-color: #d8c8f5;
-  background: #faf8ff;
-  color: #7c3aed;
+  background: var(--theme-surface-raised, #faf8ff);
+  color: var(--theme-accent, #7c3aed);
 }
 
 .subject-syllabus-topic-link:active {
@@ -623,7 +623,7 @@
 }
 
 .subject-syllabus-topic-link:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid var(--theme-accent, #8b5cf6);
   outline-offset: 2px;
 }
 

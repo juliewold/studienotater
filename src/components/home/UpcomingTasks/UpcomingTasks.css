@@ -20,7 +20,7 @@
 
 .upcoming-tasks-header a {
   flex-shrink: 0;
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
   font-size: 0.9rem;
   font-weight: 700;
   text-decoration: none;
@@ -45,10 +45,10 @@
   min-height: 76px;
   padding: 16px 18px;
 
-  border: 1px solid #ece7f5;
+  border: 1px solid var(--theme-border, #ece7f5);
   border-left-width: 4px;
   border-radius: 16px;
-  background: white;
+  background: var(--theme-surface, white);
 }
 
 .upcoming-task-content {
@@ -78,7 +78,7 @@
 
 .upcoming-task p {
   margin: 0;
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -86,19 +86,19 @@
 .upcoming-task time {
   flex-shrink: 0;
 
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
   font-size: 0.82rem;
   font-weight: 600;
   text-align: right;
 }
 
 .upcoming-task-time-today {
-  color: #1f2937 !important;
+  color: var(--theme-text, #1f2937) !important;
   font-weight: 700 !important;
 }
 
 .upcoming-task-time-tomorrow {
-  color: #4b5563 !important;
+  color: var(--theme-muted, #4b5563) !important;
   font-weight: 700 !important;
 }
 
@@ -107,11 +107,11 @@
 /* -------------------------------------------------- */
 
 .upcoming-task-purple {
-  border-left-color: #8b5cf6;
+  border-left-color: var(--theme-accent, #8b5cf6);
 }
 
 .upcoming-task-purple .upcoming-task-code {
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
 }
 
 .upcoming-task-pink {
@@ -171,11 +171,11 @@
 }
 
 .upcoming-task-default {
-  border-left-color: #d1d5db;
+  border-left-color: var(--theme-border, #d1d5db);
 }
 
 .upcoming-task-default .upcoming-task-code {
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
 }
 
 .upcoming-tasks-more {
@@ -193,7 +193,7 @@
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
   cursor: pointer;
   transition:
     background 0.2s ease,
@@ -201,7 +201,7 @@
 }
 
 .upcoming-tasks-more-button:hover {
-  background: #f3e8ff;
+  background: var(--theme-soft, #f3e8ff);
   transform: translateY(1px);
 }
 

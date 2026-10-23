@@ -6,9 +6,9 @@
 
 .admin-books-section {
   padding: 1.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--theme-border, #e5e7eb);
   border-radius: 18px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
 }
 
 .admin-books-section h2 {
@@ -32,18 +32,18 @@
 .admin-books-select {
   width: 100%;
   padding: 0.75rem 0.85rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--theme-border, #d1d5db);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   font: inherit;
 }
 
 .admin-books-form input:focus,
 .admin-books-form select:focus,
 .admin-books-select:focus {
-  outline: 2px solid #c4b5fd;
+  outline: 2px solid var(--theme-control-border, #c4b5fd);
   outline-offset: 1px;
-  border-color: #8b5cf6;
+  border-color: var(--theme-accent, #8b5cf6);
 }
 
 .admin-books-row {
@@ -75,13 +75,13 @@
 }
 
 .admin-books-secondary-button {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--theme-soft, #f3f4f6);
+  color: var(--theme-text, #374151);
 }
 
 .admin-books-delete-button {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: var(--theme-danger-surface, #fee2e2);
+  color: var(--theme-danger-text, #b91c1c);
 }
 
 .admin-books-actions button:disabled,
@@ -104,7 +104,7 @@
   gap: 1rem;
 
   padding: 1rem 1.1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--theme-border, #e5e7eb);
   border-radius: 12px;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .admin-books-item-content span {
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-size: 0.9rem;
 }
 
@@ -134,17 +134,17 @@
 }
 
 .admin-books-error {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--theme-danger-surface, #fef2f2);
+  color: var(--theme-danger-text, #b91c1c);
 }
 
 .admin-books-success {
-  background: #f0fdf4;
-  color: #166534;
+  background: var(--theme-success-surface, #f0fdf4);
+  color: var(--theme-success-text, #166534);
 }
 
 .admin-books-empty {
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
 }
 
 @media (max-width: 700px) {

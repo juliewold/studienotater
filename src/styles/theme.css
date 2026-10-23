@@ -197,3 +197,39 @@
 [data-theme="dark"] .footer :is(h3, p) { color: var(--app-background); }
 [data-theme="dark"] .footer-content p { opacity: 1; }
 [data-theme="dark"] .footer-copy { opacity: 1 !important; }
+
+/* Legacy light palettes opt into these semantic roles with their original color
+   as fallback. Keep these aliases dark-only: light mode remains pixel-identical. */
+:root[data-theme="dark"] {
+  --theme-surface: var(--app-surface);
+  --theme-surface-raised: var(--app-surface-raised);
+  --theme-soft: var(--app-soft);
+  --theme-text: var(--app-text);
+  --theme-muted: var(--app-muted);
+  --theme-accent: var(--app-accent);
+  --theme-border: var(--app-border);
+  --theme-control-border: var(--app-control-border);
+  --theme-danger-surface: #422530;
+  --theme-danger-text: #ffb3ba;
+  --theme-success-surface: #20392f;
+  --theme-success-text: #9fe0b4;
+}
+:root[data-theme="dark"] {
+  --theme-warning-surface: #3c3221;
+  --theme-warning-text: #f5d18c;
+}
+
+/* Nested answer controls need elevation and a visible selected state. */
+[data-theme="dark"] :is(.answer-option,.option-card,.amount-card,.profile-summary) {
+  background: var(--app-surface-raised);
+  color: var(--app-text);
+}
+[data-theme="dark"] :is(.topic-card-selected,.option-card-selected,.amount-card-selected,.answer-option-selected) {
+  background: var(--app-soft);
+  border-color: var(--app-accent);
+}
+[data-theme="dark"] :is(.answer-option,.option-card,.amount-card):hover {
+  background: var(--app-surface-hover);
+}
+/* Today's date keeps white text on its purple circle; event palettes stay intact. */
+[data-theme="dark"] :is(.calendar-day-number-today,.calendar-week-day-number-today) { color: white; }

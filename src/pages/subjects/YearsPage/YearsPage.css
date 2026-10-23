@@ -18,7 +18,7 @@
   padding: 1.5rem;
   border: 1px solid rgba(167, 116, 255, 0.15);
   border-radius: 22px;
-  background: white;
+  background: var(--theme-surface, white);
   box-shadow: 0 10px 30px rgba(52, 38, 84, 0.06);
   color: inherit;
   text-decoration: none;
@@ -42,13 +42,13 @@
 .year-card::after {
   content: "→";
   font-size: 1.4rem;
-  color: #9b6ee8;
+  color: var(--theme-accent, #9b6ee8);
 }
 
 .page-description {
   margin-top: 0.5rem;
   margin-bottom: 2rem;
-  color: #666;
+  color: var(--theme-muted, #666);
   font-size: 1rem;
 }
 

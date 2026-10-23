@@ -11,14 +11,14 @@
 .auth-form input {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid #ddd6ea;
+  border: 1px solid var(--theme-border, #ddd6ea);
   border-radius: 12px;
   font: inherit;
   box-sizing: border-box;
 }
 
 .auth-form input:focus {
-  outline: 2px solid #c7b2e3;
+  outline: 2px solid var(--theme-control-border, #c7b2e3);
   border-color: transparent;
 }
 
@@ -41,11 +41,11 @@
 .auth-switch {
   margin-top: 24px;
   text-align: center;
-  color: #6b6780;
+  color: var(--theme-muted, #6b6780);
 }
 
 .auth-switch a {
-  color: #8b6bb3;
+  color: var(--theme-accent, #8b6bb3);
   font-weight: 600;
   text-decoration: none;
 }
@@ -62,13 +62,13 @@
 }
 
 .auth-message-error {
-  background: #fff0f0;
-  color: #a52a2a;
+  background: var(--theme-danger-surface, #fff0f0);
+  color: var(--theme-danger-text, #a52a2a);
 }
 
 .auth-message-success {
-  background: #eefbf3;
-  color: #267a46;
+  background: var(--theme-success-surface, #eefbf3);
+  color: var(--theme-success-text, #267a46);
 }
 
 .auth-form button:disabled {
@@ -78,7 +78,7 @@
 
 .forgot-password-link {
   align-self: flex-end;
-  color: #8b6bb3;
+  color: var(--theme-accent, #8b6bb3);
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;

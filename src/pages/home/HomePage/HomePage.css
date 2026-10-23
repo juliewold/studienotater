@@ -84,7 +84,7 @@
 .logged-out-hero h1 {
   margin: 0;
 
-  color: #161329;
+  color: var(--theme-text, #161329);
   font-size: clamp(3.4rem, 6vw, 5.7rem);
   line-height: 0.98;
   letter-spacing: -0.055em;
@@ -94,7 +94,7 @@
   max-width: 580px;
   margin: 28px 0 0;
 
-  color: #6b7280;
+  color: var(--theme-muted, #6b7280);
   font-size: 1.2rem;
   line-height: 1.7;
 }
@@ -140,16 +140,16 @@
 }
 
 .logged-out-secondary-button {
-  border: 1px solid #e5dcf3;
+  border: 1px solid var(--theme-border, #e5dcf3);
 
-  background: rgba(255, 255, 255, 0.72);
-  color: #27213e;
+  background: var(--theme-surface, rgba(255, 255, 255, 0.72));
+  color: var(--theme-text, #27213e);
 }
 
 .logged-out-secondary-button:hover {
   transform: translateY(-2px);
 
-  background: white;
+  background: var(--theme-surface, white);
 }
 
 /* Note previews */
@@ -172,10 +172,10 @@
   width: 310px;
   height: auto;
 
-  border: 1px solid #e8e3ed;
+  border: 1px solid var(--theme-border, #e8e3ed);
   border-radius: 12px;
 
-  background: white;
+  background: var(--theme-surface, white);
 
   object-fit: contain;
 }
@@ -197,7 +197,7 @@
 
   padding: 72px 0 48px;
 
-  border-top: 1px solid #e9e3ef;
+  border-top: 1px solid var(--theme-border, #e9e3ef);
 }
 
 .logged-out-feature-number {
@@ -214,14 +214,14 @@
 .logged-out-feature h2 {
   margin: 0 0 12px;
 
-  color: #161329;
+  color: var(--theme-text, #161329);
   font-size: 1.35rem;
 }
 
 .logged-out-feature p {
   margin: 0;
 
-  color: #737080;
+  color: var(--theme-muted, #737080);
   line-height: 1.7;
 }
 
@@ -241,10 +241,10 @@
   max-width: 620px;
   padding: 48px;
 
-  border: 1px solid #e8e1f0;
+  border: 1px solid var(--theme-border, #e8e1f0);
   border-radius: 24px;
 
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.78));
 
   text-align: center;
 }
@@ -260,7 +260,7 @@
 
   border-radius: 18px;
 
-  background: #f0e7ff;
+  background: var(--theme-soft, #f0e7ff);
   color: #9b6df3;
 }
 
@@ -271,7 +271,7 @@
 .home-empty-state h1 {
   margin: 0;
 
-  color: #161329;
+  color: var(--theme-text, #161329);
   font-size: 2rem;
   line-height: 1.2;
 }
@@ -280,7 +280,7 @@
   max-width: 500px;
   margin: 18px auto 0;
 
-  color: #737080;
+  color: var(--theme-muted, #737080);
 
   font-size: 1rem;
   line-height: 1.7;

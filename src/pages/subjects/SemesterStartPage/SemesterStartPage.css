@@ -2,7 +2,7 @@
   margin-top: 32px;
   padding: 28px;
 
-  background: white;
+  background: var(--theme-surface, white);
   border-radius: 24px;
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
@@ -23,7 +23,7 @@
   padding: 12px 20px;
   border-radius: 999px;
 
-  background: #eee7fb;
+  background: var(--theme-soft, #eee7fb);
   cursor: pointer;
   font-weight: 600;
 }
@@ -46,7 +46,7 @@
   padding: 16px 18px;
   border-radius: 18px;
 
-  background: #fbf7ff;
+  background: var(--theme-surface-raised, #fbf7ff);
   cursor: pointer;
 }
 
@@ -72,7 +72,7 @@
 
 .custom-subject-form input {
   padding: 14px 16px;
-  border: 1px solid #e2d8f0;
+  border: 1px solid var(--theme-border, #e2d8f0);
   border-radius: 16px;
   font-size: 1rem;
 }
@@ -105,9 +105,9 @@
 
 .remove-subject-button {
   border: none;
-  background: #f3e8ff;
+  background: var(--theme-soft, #f3e8ff);
 
-  color: #7c3aed;
+  color: var(--theme-accent, #7c3aed);
 
   padding: 8px 14px;
   border-radius: 999px;
@@ -125,7 +125,7 @@
   margin-top: 32px;
   padding: 24px 28px;
 
-  background: white;
+  background: var(--theme-surface, white);
   border-radius: 24px;
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
@@ -134,7 +134,7 @@
 .semester-finish-info {
   margin: 0;
 
-  color: #7c7483;
+  color: var(--theme-muted, #7c7483);
 
   font-size: 0.95rem;
 }

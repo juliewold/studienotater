@@ -1,5 +1,5 @@
 .resource-progress {
-  background: #ffffff;
+  background: var(--theme-surface, #ffffff);
   border-radius: 24px;
 
   padding: 24px;
@@ -99,7 +99,7 @@
   border: 1px solid rgba(139, 92, 246, 0.12);
   border-radius: 16px;
 
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--theme-surface, rgba(255, 255, 255, 0.92));
 
   box-shadow:
     0 10px 30px rgba(31, 24, 40, 0.08),
@@ -124,7 +124,7 @@
 .resource-progress--floating .resource-rating p {
   margin-bottom: 7px;
 
-  color: #746d79;
+  color: var(--theme-muted, #746d79);
 
   font-size: 0.78rem;
   font-weight: 650;

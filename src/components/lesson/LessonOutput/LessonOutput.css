@@ -1,17 +1,17 @@
 .lesson-output {
   margin: 20px 0;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--theme-border, #e5e7eb);
   border-radius: 16px;
   overflow: hidden;
-  background: #f8fafc;
+  background: var(--theme-surface-raised, #f8fafc);
 }
 
 .lesson-output-header {
   padding: 10px 16px;
   font-weight: 700;
-  color: #6b7280;
-  background: #f3f4f6;
-  border-bottom: 1px solid #e5e7eb;
+  color: var(--theme-muted, #6b7280);
+  background: var(--theme-soft, #f3f4f6);
+  border-bottom: 1px solid var(--theme-border, #e5e7eb);
 }
 
 .lesson-output pre {

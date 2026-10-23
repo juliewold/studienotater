@@ -12,7 +12,7 @@
 .video-topic-section > h2 {
   margin: 0;
   font-size: 1.7rem;
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 }
 
 .video-subtopics {
@@ -28,7 +28,7 @@
 .video-subtopic-section > h3 {
   margin: 0;
   font-size: 1.2rem;
-  color: #39344f;
+  color: var(--theme-text, #39344f);
 }
 
 .video-grid {
@@ -38,7 +38,7 @@
 }
 
 .video-card {
-  background: white;
+  background: var(--theme-surface, white);
   border: none;
   border-radius: 24px;
   padding: 0;
@@ -113,7 +113,7 @@
   padding: 18px 20px 12px;
   font-size: 1rem;
   line-height: 1.45;
-  color: #17142a;
+  color: var(--theme-text, #17142a);
 }
 
 .video-card .resource-progress {

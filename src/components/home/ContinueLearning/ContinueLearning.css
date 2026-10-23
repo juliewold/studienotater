@@ -15,7 +15,7 @@
 }
 
 .recent-card {
-  background: white;
+  background: var(--theme-surface, white);
   border-radius: 24px;
   padding: 24px;
 
@@ -36,7 +36,7 @@
 .recent-type {
   margin: 0 0 12px;
 
-  color: #8b5cf6;
+  color: var(--theme-accent, #8b5cf6);
   font-weight: 600;
   font-size: 0.9rem;
 }

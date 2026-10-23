@@ -1,5 +1,5 @@
 .year-card {
-  background: white;
+  background: var(--theme-surface, white);
   border-radius: 24px;
   padding: 24px;
   text-align: center;
@@ -23,5 +23,5 @@
 
 .year-card p {
   margin: 4px 0 0;
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 }

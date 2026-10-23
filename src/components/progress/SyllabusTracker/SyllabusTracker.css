@@ -1,6 +1,6 @@
 .syllabus-tracker {
   margin-top: 40px;
-  background: white;
+  background: var(--theme-surface, white);
   border-radius: 24px;
   padding: 28px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
@@ -22,7 +22,7 @@
 
   padding: 14px 16px;
   border-radius: 16px;
-  background: #fbf7ff;
+  background: var(--theme-surface-raised, #fbf7ff);
 
   cursor: pointer;
   font-weight: 600;
@@ -41,12 +41,12 @@
   margin-bottom: 12px;
 
   font-weight: 600;
-  color: #6b647c;
+  color: var(--theme-muted, #6b647c);
 }
 
 .progress-bar {
   height: 12px;
-  background: #eee7fb;
+  background: var(--theme-soft, #eee7fb);
   border-radius: 999px;
   overflow: hidden;
 
