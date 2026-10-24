@@ -4,7 +4,7 @@ import logging
 import unicodedata
 from difflib import SequenceMatcher
 
-from .concept_extraction_service import NTNU_LLM_MODEL, get_client
+from ai.llm import NTNU_LLM_MODEL, get_client
 from .structure_note_assignment import note_text, read_json_response
 
 logger = logging.getLogger(__name__)

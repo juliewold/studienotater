@@ -2,7 +2,7 @@
 import json
 from html.parser import HTMLParser
 
-from .concept_extraction_service import NTNU_LLM_MODEL
+from ai.llm import NTNU_LLM_MODEL
 
 
 class _NoteText(HTMLParser):
