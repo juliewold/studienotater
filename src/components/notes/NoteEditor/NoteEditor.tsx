@@ -5,7 +5,7 @@ import { Callout, type CalloutType } from "./Callout";
 import { ConceptLink } from "../../concepts/ConceptLink/ConceptLink";
 import { ConceptPicker } from "../../concepts/ConceptPicker/ConceptPicker";
 
-import { useEffect, useRef, useState, useId, type ReactNode, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, useId, useCallback, type ReactNode, type ChangeEvent } from "react";
 import {
   Bold,
   Braces,
@@ -38,7 +38,7 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
 import { TableKit } from "@tiptap/extension-table";
 import { common, createLowlight } from "lowlight";
-import { supabase } from "../../../lib/supabase";
+import { importIntoEditor, readImportFile } from "./noteImport";
 import { MathDialog } from "./MathDialog/MathDialog";
 import { SlashMenu } from "./SlashMenu";
 import { filterSlashCommands, type SlashCommandItem } from "./slashCommands";
@@ -52,7 +52,7 @@ import { createHeadingAnchors } from "../NoteDocument/headingAnchors";
 
 const lowlight = createLowlight(common);
 
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
 
 type NoteEditorProps = {
   value: string;
@@ -86,6 +86,7 @@ type FormulaControlsPosition = {
 
 export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
   const outlineId = useId();
+  const importInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
   const slashMenuRef = useRef<SlashMenuState | null>(null);
@@ -521,80 +522,14 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
     fileInputRef.current?.click();
   };
 
-  const uploadImage = async (file: File) => {
-    if (!editor) {
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      window.alert("Du må velge en bildefil.");
-      return;
-    }
-
-    if (file.size > MAX_IMAGE_SIZE) {
-      window.alert("Bildet kan ikke være større enn 10 MB.");
-      return;
-    }
-
+  const runImport = useCallback(async (load: () => Promise<string>, files: File[] = []) => {
+    if (!editor) return;
     setIsUploadingImage(true);
-
-    try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError) {
-        throw userError;
-      }
-
-      if (!user) {
-        throw new Error("Du må være logget inn for å laste opp bilder.");
-      }
-
-      const mimeExtension = file.type.split("/")[1]?.toLowerCase();
-
-      const fileExtension =
-        file.name.split(".").pop()?.toLowerCase() || mimeExtension || "png";
-
-      const filePath = `${user.id}/${crypto.randomUUID()}.${fileExtension}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("note-images")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          contentType: file.type,
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data: publicUrlData } = supabase.storage
-        .from("note-images")
-        .getPublicUrl(filePath);
-
-      editor
-        .chain()
-        .focus()
-        .setImage({
-          src: publicUrlData.publicUrl,
-          alt: file.name || "Innlimt bilde",
-          title: file.name || "Innlimt bilde",
-        })
-        .run();
-    } catch (error) {
-      console.error("Kunne ikke laste opp bildet:", error);
-
-      const message =
-        error instanceof Error ? error.message : "En ukjent feil oppstod.";
-
-      window.alert(`Kunne ikke laste opp bildet: ${message}`);
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
+    try { await importIntoEditor(editor, load, files); }
+    catch (error) { window.alert(error instanceof Error ? error.message : "Importen mislyktes."); }
+    finally { setIsUploadingImage(false); }
+  }, [editor, setIsUploadingImage]);
+  const uploadImage = (file: File) => runImport(async () => "", [file]);
 
   const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -616,25 +551,26 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
     const editorElement = editor.view.dom;
 
     const handlePasteImage = (event: ClipboardEvent) => {
-      const files = Array.from(event.clipboardData?.files ?? []);
-
-      const image = files.find((file) => file.type.startsWith("image/"));
-
-      if (!image) {
-        return;
+      const data = event.clipboardData;
+      if (!data) return;
+      let html = data.getData("text/html");
+      const plain = data.getData("text/plain");
+      const files = Array.from(data.files).filter(file => file.type.startsWith("image/"));
+      if (!html && !files.length && !/\\[([]|\$\$/.test(plain)) return;
+      if (!html && plain) {
+        const container = document.createElement("div");
+        for (const line of plain.split("\n")) {
+          const paragraph = document.createElement("p"); paragraph.textContent = line; container.append(paragraph);
+        }
+        html = container.innerHTML;
       }
-
       event.preventDefault();
-
-      void uploadImage(image);
+      event.stopImmediatePropagation();
+      void runImport(async () => html, files);
     };
-
-    editorElement.addEventListener("paste", handlePasteImage);
-
-    return () => {
-      editorElement.removeEventListener("paste", handlePasteImage);
-    };
-  }, [editor]);
+    editorElement.addEventListener("paste", handlePasteImage, true);
+    return () => editorElement.removeEventListener("paste", handlePasteImage, true);
+  }, [editor, runImport]);
 
   const handleInsertTable = () => {
     if (!editor) {
@@ -1020,6 +956,12 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
           <span>Formelblokk</span>
         </button>
 
+        <button type="button" disabled={isUploadingImage}
+          onMouseDown={event => event.preventDefault()}
+          onClick={() => importInputRef.current?.click()}
+          title="Importer HTML/DOCX med innebygde bilder. Settes inn ved markøren.">
+          {isUploadingImage ? "Importerer…" : "Importer"}
+        </button>
         <button
           type="button"
           onClick={handleChooseImage}
@@ -1292,6 +1234,11 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
         hidden
       />
 
+      <input ref={importInputRef} type="file" accept=".html,.htm,.docx" hidden
+        onChange={event => {
+          const file = event.target.files?.[0]; event.target.value = "";
+          if (file) void runImport(() => readImportFile(file));
+        }} />
       <NoteDocument editor={editor} outlineId={outlineId} header={header} toolbar={toolbar} />
 
 
