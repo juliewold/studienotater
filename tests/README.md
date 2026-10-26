@@ -496,3 +496,35 @@ Bruk `tests/callout-selection.html?manual` for manuell prøve: marker innhold, �
 
 ### Theme consistency
 See `tests/theme-audit.md`. Run `node tests/theme-light-regression.mjs` to verify all migrated styles preserve original light colors/layout. Open `tests/theme-consistency.html`, click **Kjør kontrasttester**, and switch between the five representative views and themes. Uses isolated data-free previews; no Supabase writes.
+
+## Import av studienotater
+
+Åpne `/studienotater/tests/note-import.html` med Vite. Testene kjører ekte
+TipTap og NoteEditor-innliming/filinput med simulert Storage-opplasting.
+De dekker flere bilder i riktig rekkefølge, DOCX med innebygde bilder,
+HTML → lagring → gjenåpning, dokumentstruktur, LaTeX, undo og avbrudd ved feil.
+Ingen produksjonsdata opprettes. `fixtures/import-note.docx` er et minimalt,
+syntetisk dokument med to én-pikselbilder og tekst mellom bildene.
+
+Manuell test med et disponibelt notat: Sett inn → Importer → velg HTML/DOCX,
+lagre notatet, åpne det igjen og kontroller bilder/formler. Dette krever
+innlogging og skrivetilgang til eksisterende `note-images`-bucket.
+
+HTML må inneholde bildedata som `data:image/...;base64,...` (eller eksisterende
+permanente bilder fra appens egen bucket). DOCX må ha bildene innebygd, ikke
+bare eksterne koblinger. Import settes inn ved markøren. Bilder i HTML beholder
+posisjonen; rene bildefiler fra utklippstavlen settes inn etter eventuell tekst.
+Ved tvetydige/manglende bildedata avbrytes importen uten å endre dokumentet.
+
+LaTeX støttes som editorens `data-latex`, KaTeX/MathML med original
+`annotation encoding="application/x-tex"`, eller tekst med `\\(...\\)`,
+`\\[...\\]` og `$$...$$`. Kodeblokker endres ikke. Rendret matematikk uten
+LaTeX-kilde kan ikke rekonstrueres. DOCX med Word-ligninger/andre elementer som
+konvertereren ikke støtter avvises med melding; bruk HTML med LaTeX-kilde.
+Mammoth bevarer semantisk dokumentstruktur, ikke Words sideoppsett.
+
+Kopiering fra ChatGPT varierer med nettleser og kopieringsmåte: utklippstavlen
+kan inneholde bare tekst eller midlertidige/autentiserte bilde-URL-er, uten
+selve bildene. Disse URL-ene lastes ikke automatisk ned. Selvstendig HTML med
+innebygde bilder og LaTeX-kilde er den mest presise importmetoden; DOCX med
+innebygde bilder og LaTeX som tekst er et alternativ. Ingen ekstern AI brukes.
