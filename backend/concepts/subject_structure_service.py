@@ -2,7 +2,7 @@ import json
 
 from .structure_note_assignment import assign_notes, note_text, read_json_response
 
-from .concept_extraction_service import (
+from ai.llm import (
     NTNU_LLM_MODEL,
     get_client,
 )

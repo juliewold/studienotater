@@ -1,17 +1,12 @@
 import json
 import logging
-import os
 import re
 import unicodedata
 
-from openai import OpenAI
+from ai.llm import NTNU_LLM_MODEL, get_client
 
 
 logger = logging.getLogger(__name__)
-
-NTNU_LLM_BASE_URL = "https://llm.hpc.ntnu.no/v1"
-NTNU_LLM_MODEL = "openai/gpt-oss-120b"
-
 
 def _normalize_source_term(value):
     return " ".join(unicodedata.normalize("NFKC", value).casefold().split())
@@ -20,20 +15,6 @@ def _normalize_source_term(value):
 def _term_in_source(term, text):
     return re.search(r"(?<!\w)" + re.escape(_normalize_source_term(term)) + r"(?!\w)",
                      _normalize_source_term(text)) is not None
-
-
-def get_client():
-    api_key = os.getenv("NTNU_LLM_API_KEY")
-
-    if not api_key:
-        raise RuntimeError("NTNU_LLM_API_KEY is not configured.")
-
-    return OpenAI(
-        api_key=api_key,
-        base_url=NTNU_LLM_BASE_URL,
-        timeout=120.0,
-        max_retries=2,
-    )
 
 
 def _extract_concept_candidates_once(

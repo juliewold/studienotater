@@ -1,6 +1,6 @@
 import json
 import logging
-from .concept_extraction_service import NTNU_LLM_MODEL, get_client
+from ai.llm import NTNU_LLM_MODEL, get_client
 
 logger = logging.getLogger(__name__)
 
