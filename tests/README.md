@@ -596,3 +596,38 @@ created_at=gte og count=exact. Re-rendering uten endrede fag/bruker/rolle/uke sk
 ikke starte ny ressurslasting. Bytt fag eller bruker og kontroller at tidligere
 data ikke gjenbrukes. Innlogget bruker uten valgte fag og utlogget forside skal
 fortsatt vise sine eksisterende tom-/velkomstvisninger.
+
+## Studieplan: notatmetadata
+
+```sh
+node --experimental-strip-types --test tests/study-plan-egress.test.mjs tests/home-egress.test.mjs tests/note-metadata.test.mjs tests/global-search.test.mjs tests/note-navigation.test.mjs
+```
+
+Studieplanen og adminens ressursvelger bruker eksisterende `getNoteMetadataBySubject`,
+uten HTML eller editor-JSON. Samme metadata gjenbrukes i hookens state til titler,
+ressursvalg, fremdrifts-ID-er og navigasjon. En lokal loader deler bare pågående
+notatlesinger for samme fag og bruker-/rollescope. Ferdige svar beholdes ikke;
+nytt besøk/fagvalg leser ferske metadata, og mislykkede lesinger kan forsøkes igjen.
+
+Tester bruker mocket Supabase og en isolert hook-harness med mocket React/tjenester.
+De dekker metadata-projeksjon, filtre/rekkefølge, overlappende kall, tomme fagvalg,
+feil, separate scopes, titler/lenker, manglende ressurser, fremdrift, toggling,
+ressursvalg og adminens oppretting/redigering/avbryt/sletting. Ingen virkelig lagring
+eller nettverk brukes. Eksisterende fullinnholdskontrakter testes fortsatt; lesing
+av selve notatet og AI-/kildebehandling beholder sine fullinnholdsfunksjoner.
+
+Vanlig notatlasting gjør fortsatt ett kall per valgt fag og visning (1→1), men
+uten `content`/`content_json`. To overlappende notatlesinger i samme hook/scope
+deles (2→1); ferdige metadata gjenbrukes ved ressursvalg og redigering av samme fag
+uten nye notatlesinger. PDF-er, videoer, bøker og øvrige studieplankall er uendret.
+
+Den syntetiske før/etter-testen med ett notat (10 000 tegn HTML-tekst og 10 000
+tegn i JSON) gir 20 255→195 byte JSON-responsinnhold, med ett kall før og etter.
+Det er ikke produksjonsmålt egress; HTTP-headere, komprimering og annen trafikk
+er ikke inkludert. Gevinsten avhenger av notatstørrelsene.
+
+Manuell kontroll: Åpne studieplanen, følg notatlenker, kontroller titler/fremdrift
+og merk studieelementer fullført. I admin: velg fag, velg/fjern notatressurser,
+opprett og rediger en studieplan, avbryt og kontroller sletting med egne testdata.
+Nettverket skal ikke hente `content` eller `content_json` for ressurslistene, men
+selve notatsiden skal fortsatt hente og vise innhold.
