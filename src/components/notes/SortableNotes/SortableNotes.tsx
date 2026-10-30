@@ -1,7 +1,7 @@
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import { useContext, useRef, useState, type ReactNode } from "react";
 import { GripVertical } from "lucide-react";
-import { getNotesByFolder, getNotesWithoutFolder, reorderNotes, type DatabaseNote } from "../../../services/notes/notesService";
+import { getNoteMetadataByFolder, getNoteMetadataWithoutFolder, reorderNotes, type NoteMetadata } from "../../../services/notes/notesService";
 import { moveNoteInOrder } from "../../../services/notes/noteOrder";
 import "./SortableNotes.css";
 
@@ -9,10 +9,10 @@ type Props = {
   subjectId: string;
   folderId: string | null;
   className: string;
-  notes: DatabaseNote[];
+  notes: NoteMetadata[];
   enabled: boolean;
-  onReordered: (notes: DatabaseNote[]) => void;
-  children: (note: DatabaseNote) => ReactNode;
+  onReordered: (notes: NoteMetadata[]) => void;
+  children: (note: NoteMetadata) => ReactNode;
 };
 
 export const SortableNotes = ({ subjectId, folderId, className, notes, enabled, onReordered, children }: Props) => {
@@ -35,7 +35,7 @@ export const SortableNotes = ({ subjectId, folderId, className, notes, enabled, 
       setMessage("Notatrekkefølgen er lagret.");
     } catch {
       // An interrupted response may have committed. Re-read instead of claiming rollback.
-      try { onReordered(await (folderId === null ? getNotesWithoutFolder(subjectId) : getNotesByFolder(subjectId, folderId))); } catch { /* Keep last confirmed view. */ }
+      try { onReordered(await (folderId === null ? getNoteMetadataWithoutFolder(subjectId) : getNoteMetadataByFolder(subjectId, folderId))); } catch { /* Keep last confirmed view. */ }
       setMessage("Kunne ikke bekrefte lagring. Last inn siden på nytt før du prøver igjen.");
     } finally {
       pending.current = false;

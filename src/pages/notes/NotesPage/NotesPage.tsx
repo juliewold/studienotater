@@ -13,8 +13,8 @@ import { subjects } from "../../../data/subjects";
 
 import {
   createNote,
-  getNotesBySubject,
-  type DatabaseNote,
+  getNoteMetadataBySubject,
+  type NoteMetadata,
 } from "../../../services/notes/notesService";
 
 import {
@@ -61,7 +61,7 @@ export const NotesPage = () => {
   const [view, setView] = useState<"all" | "topics">("all");
   const [query, setQuery] = useState("");
   const [notesRevision, setNotesRevision] = useState(0);
-  const [notes, setNotes] = useState<DatabaseNote[]>([]);
+  const [notes, setNotes] = useState<NoteMetadata[]>([]);
 
   const [folderNoteCounts, setFolderNoteCounts] = useState<
     Record<string, number>
@@ -118,7 +118,7 @@ export const NotesPage = () => {
       setNotesError("");
 
       try {
-        const allNotes = await getNotesBySubject(subjectId);
+        const allNotes = await getNoteMetadataBySubject(subjectId);
 
         const counts = allNotes.reduce<Record<string, number>>(
           (currentCounts, note) => {
@@ -299,7 +299,7 @@ export const NotesPage = () => {
           getTopicsBySubject(subjectId),
           getAllSubtopicsBySubject(subjectId),
           getNoteFoldersBySubject(subjectId),
-          getNotesBySubject(subjectId),
+          getNoteMetadataBySubject(subjectId),
         ]);
 
       let createdFolderCount = 0;
@@ -440,7 +440,7 @@ export const NotesPage = () => {
   const visibleNotes = sortNotes(notes).filter(note => query.trim()
     ? note.title.normalize("NFC").toLocaleLowerCase("nb").includes(query.trim().normalize("NFC").toLocaleLowerCase("nb"))
     : note.folderId === null);
-  const renderNote = (note: DatabaseNote) => {
+  const renderNote = (note: NoteMetadata) => {
             const favoriteId = `${subject.id}-database-${note.slug}`;
 
             const resourceId = `note-${subject.id}-database-${note.slug}`;

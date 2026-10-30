@@ -7,8 +7,8 @@ import {
 } from "../services/media/pdfsService";
 
 import {
-  getNotesBySubject,
-  type DatabaseNote,
+  getNoteMetadataBySubject,
+  type NoteMetadata,
 } from "../services/notes/notesService";
 
 import {
@@ -25,7 +25,7 @@ export const useHomeProgress = () => {
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
 
   const [databasePdfs, setDatabasePdfs] = useState<DatabasePdf[]>([]);
-  const [databaseNotes, setDatabaseNotes] = useState<DatabaseNote[]>([]);
+  const [databaseNotes, setDatabaseNotes] = useState<NoteMetadata[]>([]);
   const [databaseVideos, setDatabaseVideos] = useState<DatabaseVideo[]>([]);
 
   const [isLoadingResources, setIsLoadingResources] = useState(true);
@@ -59,7 +59,7 @@ export const useHomeProgress = () => {
             ),
             Promise.all(
               selectedSubjectIds.map((subjectId) =>
-                getNotesBySubject(subjectId),
+                getNoteMetadataBySubject(subjectId),
               ),
             ),
             Promise.all(

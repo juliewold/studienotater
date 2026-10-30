@@ -1,13 +1,13 @@
-import type { DatabaseNote } from "./notesService";
+import type { NoteMetadata } from "./notesService";
 import type { NoteFolder } from "./noteFoldersService";
 import { sortNoteFolders } from "./noteFolderOrder";
 
-export const sortNotes = (notes: DatabaseNote[]) => [...notes].sort((a, b) =>
+export const sortNotes = <T extends NoteMetadata>(notes: T[]) => [...notes].sort((a, b) =>
   (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER) || a.id.localeCompare(b.id),
 );
 
 /** Exactly the sidebar sequence: ordered folders, then unfiled notes. */
-export const orderNotesForNavigation = (notes: DatabaseNote[], folders: NoteFolder[]) => {
+export const orderNotesForNavigation = <T extends NoteMetadata>(notes: T[], folders: NoteFolder[]) => {
   const ordered = sortNotes(notes);
   const folderIds = new Set(folders.map(folder => folder.id));
   return [
@@ -16,7 +16,7 @@ export const orderNotesForNavigation = (notes: DatabaseNote[], folders: NoteFold
   ];
 };
 
-export const moveNoteInOrder = (notes: DatabaseNote[], source: string, target: string) => {
+export const moveNoteInOrder = <T extends NoteMetadata>(notes: T[], source: string, target: string) => {
   const ordered = sortNotes(notes);
   const from = ordered.findIndex(note => note.id === source);
   const to = ordered.findIndex(note => note.id === target);

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getPdfsBySubject, type DatabasePdf } from "../services/media/pdfsService";
 
-import { getNotesBySubject, type DatabaseNote } from "../services/notes/notesService";
+import { getNoteMetadataBySubject, type NoteMetadata } from "../services/notes/notesService";
 
 import {
   getVideosBySubject,
@@ -87,7 +87,7 @@ export const useSubjectProgress = (subjectId: string | undefined, refreshKey = 0
   const { getProgress, isLoadingProgress } = useProgress();
 
   const [pdfs, setPdfs] = useState<DatabasePdf[]>([]);
-  const [notes, setNotes] = useState<DatabaseNote[]>([]);
+  const [notes, setNotes] = useState<NoteMetadata[]>([]);
   const [videos, setVideos] = useState<DatabaseVideo[]>([]);
 
   const [isLoadingResources, setIsLoadingResources] = useState(true);
@@ -110,7 +110,7 @@ export const useSubjectProgress = (subjectId: string | undefined, refreshKey = 0
       try {
         const [loadedPdfs, loadedNotes, loadedVideos] = await Promise.all([
           getPdfsBySubject(subjectId),
-          getNotesBySubject(subjectId),
+          getNoteMetadataBySubject(subjectId),
           getVideosBySubject(subjectId),
         ]);
 

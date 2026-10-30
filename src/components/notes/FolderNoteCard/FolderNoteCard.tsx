@@ -2,13 +2,13 @@ import "./FolderNoteCard.css";
 import { Check, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import type { DatabaseNote } from "../../../services/notes/notesService";
+import type { NoteMetadata } from "../../../services/notes/notesService";
 import type { Progress } from "../../../services/progress/progressService";
 import type { NoteChange } from "../NoteCard/NoteCard";
 import { NoteMenu } from "../NoteMenu/NoteMenu";
 
 type FolderNoteCardProps = {
-  note: DatabaseNote;
+  note: NoteMetadata;
   subjectId: string;
   progress: Progress;
   onNoteChanged?: (change: NoteChange) => void;

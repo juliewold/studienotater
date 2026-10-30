@@ -7,8 +7,8 @@ import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
 import {
-  getNotesBySubject,
-  type DatabaseNote,
+  getNoteMetadataBySubject,
+  type NoteMetadata,
 } from "../../../services/notes/notesService";
 
 import {
@@ -26,7 +26,7 @@ type WeeklySubjectData = {
   code: string;
   name: string;
   color: string;
-  notes: DatabaseNote[];
+  notes: NoteMetadata[];
   pdfs: DatabasePdf[];
   flashcards: DatabaseFlashcard[];
 };
@@ -106,7 +106,7 @@ export const WeeklyUpdates = () => {
         const loadedSubjects = await Promise.all(
           displaySubjects.map(async (subject) => {
             const [notes, pdfs, flashcards] = await Promise.all([
-              getNotesBySubject(subject.id),
+              getNoteMetadataBySubject(subject.id),
               getPdfsBySubject(subject.id),
               getFlashcardsBySubject(subject.id),
             ]);

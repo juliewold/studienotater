@@ -2,7 +2,7 @@ import "./NoteCard.css";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
-import type { DatabaseNote } from "../../../services/notes/notesService";
+import type { NoteMetadata } from "../../../services/notes/notesService";
 import { NoteMenu } from "../NoteMenu/NoteMenu";
 
 export type NoteChange =
@@ -11,7 +11,7 @@ export type NoteChange =
   | { type: "deleted" };
 
 type NoteCardProps = {
-  note: DatabaseNote;
+  note: NoteMetadata;
   subjectId: string;
   descriptionFallback?: string;
   progress?: {

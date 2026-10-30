@@ -14,8 +14,8 @@ import {
 
 import {
   createNote,
-  getNotesByFolder,
-  type DatabaseNote,
+  getNoteMetadataByFolder,
+  type NoteMetadata,
 } from "../../../services/notes/notesService";
 
 import {
@@ -37,7 +37,7 @@ export const FolderPage = () => {
 
   const [folder, setFolder] = useState<NoteFolder | null>(null);
 
-  const [notes, setNotes] = useState<DatabaseNote[]>([]);
+  const [notes, setNotes] = useState<NoteMetadata[]>([]);
 
   const [progressByNoteId, setProgressByNoteId] = useState<
     Record<string, Progress>
@@ -80,7 +80,7 @@ export const FolderPage = () => {
           return;
         }
 
-        const loadedNotes = await getNotesByFolder(subjectId, folderId);
+        const loadedNotes = await getNoteMetadataByFolder(subjectId, folderId);
 
         let loadedSubtopics: DatabaseSubtopic[] = [];
 

@@ -1,6 +1,6 @@
 import "./GlobalSearch.css";
 
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -9,11 +9,21 @@ import {
   type GlobalSearchResult,
 } from "../../../services/search/globalSearchService.ts";
 
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
+import { NOTES_CHANGED } from "../../../services/notes/notesNavigationEvents";
+import { createSearchCache } from "../../../services/search/searchCache";
+
 type Props = {
   onNavigate: () => void;
 };
 
-export const GlobalSearch = ({ onNavigate }: Props) => {
+export const GlobalSearch = (props: Props) => {
+  const { user, role } = useContext(AuthContext);
+  // Remount clears results, query and in-flight consumers on account/role changes.
+  return <SessionGlobalSearch key={JSON.stringify([user?.id ?? null, role])} {...props} />;
+};
+
+const SessionGlobalSearch = ({ onNavigate }: Props) => {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
 
@@ -21,21 +31,32 @@ export const GlobalSearch = ({ onNavigate }: Props) => {
 
   const [loading, setLoading] = useState(true);
 
+  const [cache] = useState(() => createSearchCache(getGlobalSearchItems));
+  const [revision, setRevision] = useState(0);
+
   useEffect(() => {
-    const load = async () => {
-      try {
-        const results = await getGlobalSearchItems();
-
-        setItems(results);
-      } catch {
-        setItems([]);
-      } finally {
-        setLoading(false);
-      }
+    const invalidate = () => {
+      cache.invalidate();
+      setItems([]);
+      setLoading(true);
+      setRevision(value => value + 1);
     };
+    window.addEventListener(NOTES_CHANGED, invalidate);
+    return () => window.removeEventListener(NOTES_CHANGED, invalidate);
+  }, [cache]);
 
-    load();
-  }, []);
+  useEffect(() => {
+    if (!focused) return;
+    let active = true;
+    void cache.get().then(results => {
+      if (active) setItems(results);
+    }).catch(() => {
+      if (active) setItems([]);
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => { active = false; };
+  }, [cache, focused, revision]);
 
   const results = useMemo(() => {
     return searchGlobalItems(items, query);

@@ -1,4 +1,4 @@
-import { getAllNotes, type DatabaseNote } from "./../notes/notesService";
+import { getAllSearchNotes, type SearchNote } from "./../notes/notesService";
 import { getAllFlashcards, type DatabaseFlashcard } from "./../study/flashcardsService";
 import { getAllVideos, type DatabaseVideo } from "./../media/videosService";
 import { getAllPdfs, type DatabasePdf } from "./../media/pdfsService";
@@ -72,7 +72,7 @@ const joinSearchableText = (
   return values.filter(Boolean).join(" ");
 };
 
-const mapNoteToSearchResult = (note: DatabaseNote): GlobalSearchResult => {
+const mapNoteToSearchResult = (note: SearchNote): GlobalSearchResult => {
   return {
     id: note.id,
     type: "note",
@@ -150,7 +150,7 @@ const mapPdfToSearchResult = (pdf: DatabasePdf): GlobalSearchResult => {
 
 export async function getGlobalSearchItems(): Promise<GlobalSearchResult[]> {
   const [notes, flashcards, videos, pdfs] = await Promise.all([
-    getAllNotes(),
+    getAllSearchNotes(),
     getAllFlashcards(),
     getAllVideos(),
     getAllPdfs(),

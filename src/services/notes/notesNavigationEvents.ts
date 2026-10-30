@@ -1,6 +1,15 @@
+import type { NoteMetadata } from "./notesService";
+
+export type NotesChange = { navigation?: boolean; note?: NoteMetadata };
+
 // Local invalidation keeps the outline in sync with the existing CRUD services.
 export const NOTES_CHANGED = "studienotater:notes-changed";
-export const notifyNotesChanged = () => window.dispatchEvent(new Event(NOTES_CHANGED));
+// Saved metadata can update navigation locally; HTML-only changes affect search alone.
+export const notifyNotesChanged = (change?: NotesChange) => {
+  const event = new Event(NOTES_CHANGED) as Event & { detail?: NotesChange };
+  event.detail = change;
+  window.dispatchEvent(event);
+};
 
 const navigationGuards = new Set<() => Promise<boolean>>();
 export const registerNotesNavigationGuard = (guard: () => Promise<boolean>) => {

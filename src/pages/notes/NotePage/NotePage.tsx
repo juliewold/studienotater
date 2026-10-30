@@ -1,16 +1,12 @@
-import { NOTES_CHANGED } from "../../../services/notes/notesNavigationEvents";
 import "./NotePage.css";
 import { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useOutletContext, useParams } from "react-router-dom";
 
 import { subjects } from "../../../data/subjects";
 
-import {
-  getNoteBySlug,
-  type DatabaseNote,
-} from "../../../services/notes/notesService";
+import type { DatabaseNote } from "../../../services/notes/notesService";
 
-import { getOrderedNotes } from "../../../services/notes/noteNavigationService";
+import type { NotesNavigationContext } from "../../../services/notes/notesNavigationStore";
 
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 
@@ -24,9 +20,11 @@ export const NotePage = () => {
 
   const [note, setNote] = useState<DatabaseNote | null>(null);
 
-  const [previousNote, setPreviousNote] = useState<DatabaseNote | null>(null);
-
-  const [nextNote, setNextNote] = useState<DatabaseNote | null>(null);
+  const navigation = useOutletContext<NotesNavigationContext>();
+  const { loadNote: readNote } = navigation;
+  const currentIndex = navigation.notes.findIndex(item => item.slug === noteId);
+  const previousNote = !navigation.error && currentIndex > 0 ? navigation.notes[currentIndex - 1] : null;
+  const nextNote = !navigation.error && currentIndex >= 0 ? navigation.notes[currentIndex + 1] ?? null : null;
 
   const [isLoadingNote, setIsLoadingNote] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -40,22 +38,15 @@ export const NotePage = () => {
     const loadNote = async () => {
       if (!subjectId || !noteId) {
         setNote(null);
-        setPreviousNote(null);
-        setNextNote(null);
         setIsLoadingNote(false);
         return;
       }
 
       setIsLoadingNote(true);
       setErrorMessage("");
-      setPreviousNote(null);
-      setNextNote(null);
 
       try {
-        const [loadedNote, orderedNotes] = await Promise.all([
-          getNoteBySlug(subjectId, noteId),
-          getOrderedNotes(subjectId),
-        ]);
+        const loadedNote = await readNote(noteId);
 
         if (cancelled) return;
         if (!loadedNote) {
@@ -65,27 +56,11 @@ export const NotePage = () => {
         }
 
         setNote(loadedNote);
-
-        const currentIndex = orderedNotes.findIndex(
-          (currentNote) => currentNote.id === loadedNote.id,
-        );
-
-        setPreviousNote(
-          currentIndex > 0 ? orderedNotes[currentIndex - 1] : null,
-        );
-
-        setNextNote(
-          currentIndex >= 0 && currentIndex < orderedNotes.length - 1
-            ? orderedNotes[currentIndex + 1]
-            : null,
-        );
       } catch (error) {
         if (cancelled) return;
         console.error("Kunne ikke hente notat:", error);
 
         setNote(null);
-        setPreviousNote(null);
-        setNextNote(null);
 
         setErrorMessage("Kunne ikke hente notatet.");
       } finally {
@@ -95,31 +70,7 @@ export const NotePage = () => {
 
     loadNote();
     return () => { cancelled = true; };
-  }, [noteId, subjectId]);
-
-  // Refresh links when the shared outline changes, without resetting an editor draft.
-  useEffect(() => {
-    if (!subjectId || !note?.id) return;
-    let cancelled = false;
-    let request = 0;
-    const refresh = async () => {
-      const current = ++request;
-      try {
-        const ordered = await getOrderedNotes(subjectId);
-        if (cancelled || current !== request) return;
-        const index = ordered.findIndex(item => item.id === note.id);
-        setPreviousNote(index > 0 ? ordered[index - 1] : null);
-        setNextNote(index >= 0 && index + 1 < ordered.length ? ordered[index + 1] : null);
-      } catch {
-        if (!cancelled && current === request) {
-          setPreviousNote(null);
-          setNextNote(null);
-        }
-      }
-    };
-    window.addEventListener(NOTES_CHANGED, refresh);
-    return () => { cancelled = true; window.removeEventListener(NOTES_CHANGED, refresh); };
-  }, [subjectId, note?.id]);
+  }, [noteId, subjectId, readNote]);
 
   if (isLoadingNote) {
     return (
