@@ -1,3 +1,4 @@
+import { useStudyPlanNoteMetadata } from "../useStudyPlanNoteMetadata";
 import {
   useCallback,
   useEffect,
@@ -20,8 +21,7 @@ import {
   type StudyTopicResourceType,
 } from "../../services/study/studyPlansService";
 import {
-  getNotesBySubject,
-  type DatabaseNote,
+  type NoteMetadata,
 } from "../../services/notes/notesService";
 import {
   getVideosBySubject,
@@ -44,6 +44,7 @@ type ResourceSelection = {
 };
 
 export const useAdminStudyPlans = () => {
+  const loadNoteMetadata = useStudyPlanNoteMetadata();
   const [subjectId, setSubjectId] = useState("");
   const [structureTopicId, setStructureTopicId] = useState("");
   const [topics, setTopics] = useState<DatabaseTopic[]>([]);
@@ -67,7 +68,7 @@ export const useAdminStudyPlans = () => {
   const [studyTopics, setStudyTopics] = useState<DatabaseStudyTopic[]>([]);
 
   const [availablePdfs, setAvailablePdfs] = useState<DatabasePdf[]>([]);
-  const [availableNotes, setAvailableNotes] = useState<DatabaseNote[]>([]);
+  const [availableNotes, setAvailableNotes] = useState<NoteMetadata[]>([]);
   const [availableVideos, setAvailableVideos] = useState<DatabaseVideo[]>([]);
 
   const [isLoadingTopics, setIsLoadingTopics] = useState(true);
@@ -219,7 +220,7 @@ export const useAdminStudyPlans = () => {
       try {
         const [pdfs, notes, videos] = await Promise.all([
           getPdfsBySubject(selectedSubjectId),
-          getNotesBySubject(selectedSubjectId),
+          loadNoteMetadata(selectedSubjectId),
           getVideosBySubject(selectedSubjectId),
         ]);
 
@@ -234,7 +235,7 @@ export const useAdminStudyPlans = () => {
         setIsLoadingResources(false);
       }
     },
-    [],
+    [loadNoteMetadata],
   );
 
   useEffect(() => {

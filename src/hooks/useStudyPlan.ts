@@ -1,3 +1,4 @@
+import { useStudyPlanNoteMetadata } from "./useStudyPlanNoteMetadata";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { AuthContext } from "../context/AuthContext/AuthContext";
@@ -10,8 +11,7 @@ import {
 } from "../services/study/studyPlansService";
 
 import {
-  getNotesBySubject,
-  type DatabaseNote,
+  type NoteMetadata,
 } from "../services/notes/notesService";
 
 import {
@@ -53,6 +53,7 @@ type TopicProgressItem =
 
 export const useStudyPlan = (subjectId?: string) => {
   const { user } = useContext(AuthContext);
+  const loadNoteMetadata = useStudyPlanNoteMetadata();
 
   const { getProgress, isLoadingProgress } = useProgress();
 
@@ -65,7 +66,7 @@ export const useStudyPlan = (subjectId?: string) => {
 
   const [topics, setTopics] = useState<DatabaseStudyTopic[]>([]);
   const [pdfs, setPdfs] = useState<DatabasePdf[]>([]);
-  const [notes, setNotes] = useState<DatabaseNote[]>([]);
+  const [notes, setNotes] = useState<NoteMetadata[]>([]);
   const [videos, setVideos] = useState<DatabaseVideo[]>([]);
 
   const [completedStudyPlanItems, setCompletedStudyPlanItems] = useState<
@@ -95,7 +96,7 @@ export const useStudyPlan = (subjectId?: string) => {
         await Promise.all([
           getStudyTopicsBySubject(subjectId),
           getPdfsBySubject(subjectId),
-          getNotesBySubject(subjectId),
+          loadNoteMetadata(subjectId),
           getVideosBySubject(subjectId),
         ]);
 
@@ -109,7 +110,7 @@ export const useStudyPlan = (subjectId?: string) => {
     } finally {
       setIsLoadingPlan(false);
     }
-  }, [subjectId]);
+  }, [subjectId, loadNoteMetadata]);
 
   const loadBooks = useCallback(async () => {
     if (!subjectId) {
