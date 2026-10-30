@@ -1,56 +1,12 @@
 import "./WeeklyUpdates.css";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
-import {
-  getNoteMetadataBySubject,
-  type NoteMetadata,
-} from "../../../services/notes/notesService";
-
-import {
-  getPdfsBySubject,
-  type DatabasePdf,
-} from "../../../services/media/pdfsService";
-
-import {
-  getFlashcardsBySubject,
-  type DatabaseFlashcard,
-} from "../../../services/study/flashcardsService";
-
-type WeeklySubjectData = {
-  id: string;
-  code: string;
-  name: string;
-  color: string;
-  notes: NoteMetadata[];
-  pdfs: DatabasePdf[];
-  flashcards: DatabaseFlashcard[];
-};
-
-const getStartOfWeek = () => {
-  const now = new Date();
-
-  const day = now.getDay();
-  const diffToMonday = day === 0 ? -6 : 1 - day;
-
-  const monday = new Date(now);
-
-  monday.setDate(now.getDate() + diffToMonday);
-  monday.setHours(0, 0, 0, 0);
-
-  return monday;
-};
-
-const isFromThisWeek = (createdAt: string) => {
-  const createdDate = new Date(createdAt);
-  const startOfWeek = getStartOfWeek();
-
-  return createdDate >= startOfWeek;
-};
+import { getWeeklyResourceCounts, type HomeResourcesSnapshot } from "../../../services/home/homeResourcesService";
 
 const getWeekNumber = () => {
   const date = new Date();
@@ -70,11 +26,8 @@ const getWeekNumber = () => {
   );
 };
 
-export const WeeklyUpdates = () => {
+export const WeeklyUpdates = ({ resources }: { resources: HomeResourcesSnapshot }) => {
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
-
-  const [weeklySubjects, setWeeklySubjects] = useState<WeeklySubjectData[]>([]);
-  const [isLoadingWeeklyUpdates, setIsLoadingWeeklyUpdates] = useState(true);
 
   const displaySubjects = useMemo(() => {
     return semesterSubjects.map((semesterSubject) => {
@@ -94,54 +47,12 @@ export const WeeklyUpdates = () => {
     });
   }, [semesterSubjects]);
 
-  useEffect(() => {
-    if (isLoadingSemesterSubjects) {
-      return;
-    }
+  const weeklySubjects = useMemo(() => resources.weeklyError ? [] : displaySubjects
+    .map(subject => ({ ...subject, ...getWeeklyResourceCounts(resources, subject.id) }))
+    .filter(subject => subject.notes > 0 || subject.pdfs > 0 || subject.flashcards > 0),
+  [displaySubjects, resources]);
 
-    const loadWeeklyUpdates = async () => {
-      setIsLoadingWeeklyUpdates(true);
-
-      try {
-        const loadedSubjects = await Promise.all(
-          displaySubjects.map(async (subject) => {
-            const [notes, pdfs, flashcards] = await Promise.all([
-              getNoteMetadataBySubject(subject.id),
-              getPdfsBySubject(subject.id),
-              getFlashcardsBySubject(subject.id),
-            ]);
-
-            return {
-              ...subject,
-              notes: notes.filter((note) => isFromThisWeek(note.createdAt)),
-              pdfs: pdfs.filter((pdf) => isFromThisWeek(pdf.createdAt)),
-              flashcards: flashcards.filter((flashcard) =>
-                isFromThisWeek(flashcard.createdAt),
-              ),
-            };
-          }),
-        );
-
-        setWeeklySubjects(
-          loadedSubjects.filter(
-            (subject) =>
-              subject.notes.length > 0 ||
-              subject.pdfs.length > 0 ||
-              subject.flashcards.length > 0,
-          ),
-        );
-      } catch (error) {
-        console.error("Kunne ikke hente ukens innhold:", error);
-        setWeeklySubjects([]);
-      } finally {
-        setIsLoadingWeeklyUpdates(false);
-      }
-    };
-
-    loadWeeklyUpdates();
-  }, [displaySubjects, isLoadingSemesterSubjects]);
-
-  if (isLoadingSemesterSubjects || isLoadingWeeklyUpdates) {
+  if (isLoadingSemesterSubjects || resources.loading) {
     return (
       <section className="weekly-updates site-container">
         <p>Laster ukens innhold...</p>
@@ -182,26 +93,26 @@ export const WeeklyUpdates = () => {
               </div>
 
               <div className="weekly-update-details">
-                {subject.notes.length > 0 && (
+                {subject.notes > 0 && (
                   <span>
-                    {subject.notes.length}{" "}
-                    {subject.notes.length === 1 ? "notat" : "notater"}
+                    {subject.notes}{" "}
+                    {subject.notes === 1 ? "notat" : "notater"}
                   </span>
                 )}
 
-                {subject.pdfs.length > 0 && (
+                {subject.pdfs > 0 && (
                   <span>
-                    {subject.pdfs.length}{" "}
-                    {subject.pdfs.length === 1
+                    {subject.pdfs}{" "}
+                    {subject.pdfs === 1
                       ? "forelesning"
                       : "forelesninger"}
                   </span>
                 )}
 
-                {subject.flashcards.length > 0 && (
+                {subject.flashcards > 0 && (
                   <span>
-                    {subject.flashcards.length}{" "}
-                    {subject.flashcards.length === 1
+                    {subject.flashcards}{" "}
+                    {subject.flashcards === 1
                       ? "flashcard"
                       : "flashcards"}
                   </span>

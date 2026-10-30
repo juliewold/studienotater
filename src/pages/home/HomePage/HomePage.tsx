@@ -1,5 +1,6 @@
 import "./HomePage.css";
 import { useContext } from "react";
+import { useHomeResources } from "../../../hooks/useHomeResources";
 import { useHomeProgress } from "../../../hooks/useHomeProgress";
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
@@ -142,7 +143,8 @@ export const HomePage = () => {
 };
 
 const HomeDashboard = () => {
-  const progress = useHomeProgress();
+  const resources = useHomeResources();
+  const progress = useHomeProgress(resources);
   const now = new Date();
   return <>
     <main className="home-dashboard site-container">
@@ -156,7 +158,7 @@ const HomeDashboard = () => {
             <p>Kom raskt tilbake til notater og repetisjon.</p>
             <div className="dashboard-shortcuts"><Link to="/notater">Åpne notater →</Link><Link to="/flashcards">Repeter med flashcards</Link></div>
           </div>
-          <WeeklyUpdates />
+          <WeeklyUpdates resources={resources} />
         </section>
         <UpcomingTasks />
       </div>
