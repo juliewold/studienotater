@@ -8,7 +8,7 @@ const blockSelector = '[data-type="callout"], [data-type="block-math"]';
  * Names must resolve uniquely; explicit IDs/names take precedence over context.
  * A heading's scope ends at the next heading of equal or higher rank.
  */
-export function resolveSourceConcepts(content: string, concepts: Concept[]): string {
+export function resolveSourceConcepts(content: string, concepts: Pick<Concept, "id" | "name">[]): string {
   const doc = new DOMParser().parseFromString(content, "text/html");
   const names = new Map<string, Set<string>>();
   for (const concept of concepts) {

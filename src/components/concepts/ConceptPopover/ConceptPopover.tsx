@@ -1,10 +1,10 @@
+import { useConceptContentSession } from "../../../hooks/useConceptContentSession";
 import "./ConceptPopover.css";
 
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Concept } from "../../../data/concepts/types";
 import {
-  getConceptContent,
   type ConceptContentSource,
 } from "../../../services/concepts/conceptContentService";
 
@@ -21,6 +21,7 @@ export const ConceptPopover = ({
   top,
   onClose,
 }: ConceptPopoverProps) => {
+  const session = useConceptContentSession();
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
   const [conceptContent, setConceptContent] = useState<ConceptContentSource[]>(
     [],
@@ -39,7 +40,7 @@ export const ConceptPopover = ({
       setIsConceptContentLoading(true);
 
       try {
-        const content = await getConceptContent(concept.id);
+        const content = await session.getContent(concept.id);
 
         if (!isCancelled) {
           setConceptContent(content);
@@ -62,7 +63,7 @@ export const ConceptPopover = ({
     return () => {
       isCancelled = true;
     };
-  }, [concept.id]);
+  }, [concept.id, session]);
   return (
     <div
       className="concept-popover"

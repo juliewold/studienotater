@@ -8,23 +8,19 @@ export type ConceptContext = {
   subtopicName: string;
 };
 
+export async function getConceptSubtopicIds(conceptId: string): Promise<string[]> {
+  const { data, error } = await supabase.from("concept_subtopics")
+    .select("subtopic_id").eq("concept_id", conceptId);
+  if (error) throw error;
+  return [...new Set((data ?? []).map(link => link.subtopic_id as string))];
+}
+
 export async function getConceptContexts(
   conceptId: string,
+  knownSubtopicIds?: string[],
 ): Promise<ConceptContext[]> {
-  const { data: links, error: linksError } = await supabase
-    .from("concept_subtopics")
-    .select("subtopic_id")
-    .eq("concept_id", conceptId);
-
-  if (linksError) {
-    throw linksError;
-  }
-
-  const subtopicIds = (links ?? []).map((link) => link.subtopic_id);
-
-  if (subtopicIds.length === 0) {
-    return [];
-  }
+  const subtopicIds = knownSubtopicIds ?? await getConceptSubtopicIds(conceptId);
+  if (subtopicIds.length === 0) return [];
 
   const { data: subtopics, error: subtopicsError } = await supabase
     .from("subtopics")

@@ -1,3 +1,4 @@
+import { notifyConceptsChanged } from "./conceptContentEvents";
 import { supabase } from "../../lib/supabase";
 import type { Concept, ConceptType } from "../../data/concepts/types";
 
@@ -144,6 +145,7 @@ export async function createConcept(
       throw updateError;
     }
 
+    notifyConceptsChanged();
     return mapConceptRow(data as ConceptRow);
   }
 
@@ -166,6 +168,7 @@ export async function createConcept(
     throw insertError;
   }
 
+  notifyConceptsChanged();
   return mapConceptRow(data as ConceptRow);
 }
 

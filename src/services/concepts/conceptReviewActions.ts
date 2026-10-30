@@ -1,3 +1,4 @@
+import { notifyConceptsChanged } from "./conceptContentEvents";
 import { supabase } from "../../lib/supabase";
 import type { Concept } from "../../data/concepts/types";
 export type ConceptEdits = { name: string; shortDefinition: string; explanation: string };
@@ -8,4 +9,5 @@ export async function applyConceptReview(concept: Concept, action: "edit" | "del
     p_values: values ?? null,
   });
   if (error) throw new Error(error.message);
+  notifyConceptsChanged();
 }

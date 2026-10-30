@@ -1,6 +1,9 @@
-import { getConceptsFromDatabase } from "./conceptService";
+import { getConceptBySlugFromDatabase } from "./conceptService";
+import type { Concept } from "../../data/concepts/types";
+import { getConceptContexts, getConceptSubtopicIds } from "./conceptContextService";
+import { getConceptSourceNotes, getSourceConceptIndex, type SourceConcept } from "./conceptSourceNotesService";
 import { resolveSourceConcepts } from "./sourceConceptResolver";
-import { getAllNotes } from "../notes/notesService";
+
 
 export type ConceptContent = {
   type: "definition" | "theorem" | "formula" | "method" | "example";
@@ -48,20 +51,56 @@ export type ConceptContentSource = ConceptContent & {
   noteSlug: string;
 };
 
-export async function getConceptContent(
-  conceptId: string,
-): Promise<ConceptContentSource[]> {
-  const [notes, concepts] = await Promise.all([getAllNotes(), getConceptsFromDatabase()]);
+/** A session shares the name index, contexts and source results across page/popover. */
+export function createConceptContentSession() {
+  let index: Promise<SourceConcept[]> | undefined;
+  const memberships = new Map<string, Promise<string[]>>();
+  const conceptsBySlug = new Map<string, Promise<Concept | undefined>>();
+  const contexts = new Map<string, ReturnType<typeof getConceptContexts>>();
+  const contents = new Map<string, Promise<ConceptContentSource[]>>();
+  const getMembership = (id: string) => {
+    let pending = memberships.get(id);
+    if (!pending) {
+      pending = getConceptSubtopicIds(id).catch(error => { memberships.delete(id); throw error; });
+      memberships.set(id, pending);
+    }
+    return pending;
+  };
+  const getContexts = (id: string) => {
+    let pending = contexts.get(id);
+    if (!pending) {
+      pending = getMembership(id).then(ids => getConceptContexts(id, ids)).catch(error => { contexts.delete(id); throw error; });
+      contexts.set(id, pending);
+    }
+    return pending;
+  };
+  return {
+    getContexts,
+    getConcept(slug: string) {
+      let pending = conceptsBySlug.get(slug);
+      if (!pending) {
+        pending = getConceptBySlugFromDatabase(slug).catch(error => { conceptsBySlug.delete(slug); throw error; });
+        conceptsBySlug.set(slug, pending);
+      }
+      return pending;
+    },
+    getContent(id: string): Promise<ConceptContentSource[]> {
+      const cached = contents.get(id);
+      if (cached) return cached;
+      if (!index) index = getSourceConceptIndex().catch(error => { index = undefined; throw error; });
+      const pending = (async () => {
+        const [concepts, subtopicIds] = await Promise.all([index!, getMembership(id).catch(() => [])]);
+        const notes = await getConceptSourceNotes(id, concepts, subtopicIds);
+        return notes.flatMap(note => getConceptContentFromNote(resolveSourceConcepts(note.content ?? "", concepts), id)
+          .map(item => ({ ...item, noteId: note.id, noteTitle: note.title, subjectId: note.subject_id, noteSlug: note.slug })));
+      })().catch(error => { contents.delete(id); throw error; });
+      contents.set(id, pending);
+      return pending;
+    },
+  };
+}
 
-  return notes.flatMap((note) => {
-    const content = getConceptContentFromNote(resolveSourceConcepts(note.content, concepts), conceptId);
-
-    return content.map((item) => ({
-      ...item,
-      noteId: note.id,
-      noteTitle: note.title,
-      subjectId: note.subjectId,
-      noteSlug: note.slug,
-    }));
-  });
+/** Standalone callers retain the existing API without a process-wide data cache. */
+export function getConceptContent(conceptId: string): Promise<ConceptContentSource[]> {
+  return createConceptContentSession().getContent(conceptId);
 }
