@@ -1,20 +1,22 @@
 import { folderToneClass } from "../../../services/notes/noteFolderOrder";
 import "../FolderCard/folderColors.css";
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useContext, useEffect, useRef, useState, useSyncExternalStore, type MouseEvent } from "react";
 import { Link, Outlet, useLocation, useMatch, useNavigate, useParams } from "react-router-dom";
 import { ChevronDown, FileText, Folder, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
-import { getNoteFoldersBySubject, type NoteFolder } from "../../../services/notes/noteFoldersService";
-import { getNotesBySubject } from "../../../services/notes/notesService";
-import { orderNotesForNavigation } from "../../../services/notes/noteOrder";
-import type { DatabaseNote } from "../../../services/notes/notesService";
-import { NOTES_CHANGED, prepareNotesNavigation } from "../../../services/notes/notesNavigationEvents";
+import { getNoteFoldersBySubject } from "../../../services/notes/noteFoldersService";
+import { getNoteBySlug, getNoteMetadataBySubject } from "../../../services/notes/notesService";
+import { createNotesNavigationStore, createPendingNoteLoader } from "../../../services/notes/notesNavigationStore";
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
+import type { NoteMetadata } from "../../../services/notes/notesService";
+import { NOTES_CHANGED, prepareNotesNavigation, type NotesChange } from "../../../services/notes/notesNavigationEvents";
 import "./NotesLayout.css";
 
 export const NotesLayout = () => {
   const { subjectId = "" } = useParams();
-  return <SubjectNotesLayout key={subjectId} subjectId={subjectId} />;
+  const { user, role } = useContext(AuthContext);
+  return <SubjectNotesLayout key={JSON.stringify([subjectId, user?.id, role])} subjectId={subjectId} />;
 };
 
 const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
@@ -28,10 +30,15 @@ const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
   const code = custom?.customCode ?? subject?.code ?? subjectId.toUpperCase();
   const name = custom?.customName ?? subject?.name ?? "Notater";
   const base = `/fag/${encodeURIComponent(subjectId)}/notater`;
-  const [data, setData] = useState<{ folders: NoteFolder[]; notes: DatabaseNote[] }>({ folders: [], notes: [] });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [retry, setRetry] = useState(0);
+  const [store] = useState(() => createNotesNavigationStore(subjectId, async () => {
+    const [folders, notes] = await Promise.all([
+      getNoteFoldersBySubject(subjectId), getNoteMetadataBySubject(subjectId),
+    ]);
+    return { folders, notes };
+  }));
+  const [loadNote] = useState(() => createPendingNoteLoader(slug => getNoteBySlug(subjectId, slug)));
+  const data = useSyncExternalStore(store.subscribe, store.getSnapshot);
+  const { loading, error } = data;
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [collapsed, setCollapsed] = useState(false);
   const [navigationMessage, setNavigationMessage] = useState("");
@@ -39,27 +46,11 @@ const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
   const drawer = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    let cancelled = false;
-    let request = 0;
-    let timer: ReturnType<typeof setTimeout>;
-    const load = async () => {
-      const current = ++request;
-      try {
-        const [folders, notes] = await Promise.all([getNoteFoldersBySubject(subjectId), getNotesBySubject(subjectId)]);
-        if (cancelled || current !== request) return;
-        setData({ folders, notes: orderNotesForNavigation(notes, folders) });
-        setError("");
-      } catch {
-        if (!cancelled && current === request) setError("Kunne ikke hente notatoversikten.");
-      } finally {
-        if (!cancelled && current === request) setLoading(false);
-      }
-    };
-    const refresh = () => { clearTimeout(timer); timer = setTimeout(() => void load(), 150); };
-    void load();
+    const refresh = (event: Event) => store.applyChange((event as Event & { detail?: NotesChange }).detail);
     window.addEventListener(NOTES_CHANGED, refresh);
-    return () => { cancelled = true; clearTimeout(timer); window.removeEventListener(NOTES_CHANGED, refresh); };
-  }, [subjectId, pathname, retry]);
+    void store.ensureLoaded();
+    return () => window.removeEventListener(NOTES_CHANGED, refresh);
+  }, [store]);
 
   useEffect(() => {
     drawer.current?.close();
@@ -88,13 +79,13 @@ const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
       navigate(to);
     } finally { pendingNavigation.current = false; }
   };
-  const noteLink = (note: DatabaseNote) => <Link key={note.id} to={`${base}/${encodeURIComponent(note.slug)}`} onClick={event => void go(event, `${base}/${encodeURIComponent(note.slug)}`, note.folderId)} className={`notes-outline-note${currentNote?.id === note.id ? " is-current" : ""}`} aria-current={currentNote?.id === note.id ? "page" : undefined}><FileText size={14} /><span>{note.title}</span></Link>;
+  const noteLink = (note: NoteMetadata) => <Link key={note.id} to={`${base}/${encodeURIComponent(note.slug)}`} onClick={event => void go(event, `${base}/${encodeURIComponent(note.slug)}`, note.folderId)} className={`notes-outline-note${currentNote?.id === note.id ? " is-current" : ""}`} aria-current={currentNote?.id === note.id ? "page" : undefined}><FileText size={14} /><span>{note.title}</span></Link>;
   const unfiled = data.notes.filter(note => !note.folderId || !data.folders.some(folder => folder.id === note.folderId));
   const outline = <>
     <header className="notes-outline-header"><div><span>{code}</span><h2>{name}</h2></div></header>
     <Link className="notes-outline-all" to={base} onClick={event => void go(event, base)} aria-current={pathname === base ? "page" : undefined}>Alle notater</Link>
     {loading && <p className="notes-outline-status">Laster mapper og notater…</p>}
-    {error && <div className="notes-outline-status" role="alert">{error} <button onClick={() => setRetry(value => value + 1)}>Prøv igjen</button></div>}
+    {error && <div className="notes-outline-status" role="alert">{error} <button onClick={() => void store.refresh()}>Prøv igjen</button></div>}
     <nav aria-label={`Mapper og notater i ${code}`}>
       {data.folders.map((folder) => {
         const notes = data.notes.filter(note => note.folderId === folder.id);
@@ -113,7 +104,7 @@ const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
 
   return <div className={`notes-workspace${collapsed ? " notes-workspace-collapsed" : ""}`}>
     <aside className="notes-outline-desktop" aria-label="Notatnavigasjon"><button className="notes-outline-toggle" aria-label={collapsed ? "Vis notatsidebar" : "Skjul notatsidebar"} aria-expanded={!collapsed} onClick={() => setCollapsed(value => !value)}>{collapsed ? <PanelLeftOpen size={19} /> : <PanelLeftClose size={19} />}{!collapsed && <span>Notater</span>}</button>{!collapsed && outline}</aside>
-    <div className="notes-workspace-content"><button className="notes-outline-mobile-toggle" onClick={() => drawer.current?.showModal()} aria-haspopup="dialog"><PanelLeftOpen size={18} />Mapper og notater</button><Outlet /></div>
+    <div className="notes-workspace-content"><button className="notes-outline-mobile-toggle" onClick={() => drawer.current?.showModal()} aria-haspopup="dialog"><PanelLeftOpen size={18} />Mapper og notater</button><Outlet context={{ ...data, loadNote }} /></div>
     <dialog ref={drawer} className="notes-outline-drawer" aria-label="Mapper og notater"><button className="notes-outline-toggle" aria-label="Lukk notatsidebar" onClick={() => drawer.current?.close()}><X size={20} />Lukk</button>{outline}</dialog>
   </div>;
 };

@@ -4,7 +4,7 @@ import { supabase } from "../../lib/supabase";
 
 export type NoteContentJson = Record<string, unknown> | null;
 
-export type DatabaseNote = {
+export type NoteMetadata = {
   id: string;
   subjectId: string;
   folderId: string | null;
@@ -17,10 +17,13 @@ export type DatabaseNote = {
   slug: string;
   title: string;
   description: string;
-  content: string;
-  contentJson: NoteContentJson;
   createdAt: string;
   sortOrder?: number;
+};
+
+export type DatabaseNote = NoteMetadata & {
+  content: string;
+  contentJson: NoteContentJson;
 };
 
 type CreateNoteInput = {
@@ -71,7 +74,9 @@ type NoteRow = {
   subtopics: SubtopicRelation | SubtopicRelation[] | null;
 };
 
-const noteSelect = `
+type NoteMetadataRow = Omit<NoteRow, "content" | "content_json">;
+
+const noteMetadataSelect = `
   id,
   subject_id,
   folder_id,
@@ -79,8 +84,6 @@ const noteSelect = `
   slug,
   title,
   description,
-  content,
-  content_json,
   created_at,
   sort_order,
   subtopics!notes_subtopic_id_fkey (
@@ -95,6 +98,8 @@ const noteSelect = `
   )
 `;
 
+const noteSelect = `${noteMetadataSelect}, content, content_json`;
+
 const getFirstRelation = <T>(relation: T | T[] | null): T | null => {
   if (Array.isArray(relation)) {
     return relation[0] ?? null;
@@ -103,7 +108,7 @@ const getFirstRelation = <T>(relation: T | T[] | null): T | null => {
   return relation;
 };
 
-function mapDatabaseNote(note: NoteRow): DatabaseNote {
+function mapNoteMetadata(note: NoteMetadataRow): NoteMetadata {
   const subtopic = getFirstRelation(note.subtopics);
 
   const topic = subtopic ? getFirstRelation(subtopic.topics) : null;
@@ -121,11 +126,37 @@ function mapDatabaseNote(note: NoteRow): DatabaseNote {
     slug: note.slug,
     title: note.title,
     description: note.description,
-    content: note.content ?? "",
-    contentJson: note.content_json ?? null,
     createdAt: note.created_at,
     sortOrder: note.sort_order,
   };
+}
+
+function mapDatabaseNote(note: NoteRow): DatabaseNote {
+  return { ...mapNoteMetadata(note), content: note.content ?? "", contentJson: note.content_json ?? null };
+}
+
+// List consumers must opt into metadata; existing full-content APIs stay unchanged.
+export async function getNoteMetadataBySubject(subjectId: string): Promise<NoteMetadata[]> {
+  const { data, error } = await supabase.from("notes").select(noteMetadataSelect)
+    .eq("subject_id", subjectId).order("sort_order", { ascending: true }).order("id", { ascending: true });
+  if (error) throw error;
+  return sortNotes(((data ?? []) as NoteMetadataRow[]).map(mapNoteMetadata));
+}
+
+export async function getNoteMetadataByFolder(subjectId: string, folderId: string): Promise<NoteMetadata[]> {
+  const { data, error } = await supabase.from("notes").select(noteMetadataSelect)
+    .eq("subject_id", subjectId).eq("folder_id", folderId)
+    .order("sort_order", { ascending: true }).order("id", { ascending: true });
+  if (error) throw error;
+  return sortNotes(((data ?? []) as NoteMetadataRow[]).map(mapNoteMetadata));
+}
+
+export async function getNoteMetadataWithoutFolder(subjectId: string): Promise<NoteMetadata[]> {
+  const { data, error } = await supabase.from("notes").select(noteMetadataSelect)
+    .eq("subject_id", subjectId).is("folder_id", null)
+    .order("sort_order", { ascending: true }).order("id", { ascending: true });
+  if (error) throw error;
+  return sortNotes(((data ?? []) as NoteMetadataRow[]).map(mapNoteMetadata));
 }
 
 export async function getNotesBySubject(
@@ -142,6 +173,19 @@ export async function getNotesBySubject(
   }
 
   return sortNotes(((data ?? []) as NoteRow[]).map(mapDatabaseNote));
+}
+
+/** Search needs HTML for matches/snippets, but never the editor JSON. */
+export type SearchNote = NoteMetadata & { content: string };
+
+export async function getAllSearchNotes(): Promise<SearchNote[]> {
+  const { data, error } = await supabase.from("notes")
+    .select(`${noteMetadataSelect}, content`)
+    .order("sort_order", { ascending: true }).order("id", { ascending: true });
+  if (error) throw error;
+  return sortNotes(((data ?? []) as NoteRow[]).map(note => ({
+    ...mapNoteMetadata(note), content: note.content ?? "",
+  })));
 }
 
 export async function getAllNotes(range?: { from: number; to: number }): Promise<DatabaseNote[]> {
@@ -330,7 +374,7 @@ export async function updateNote(
     throw error;
   }
 
-  notifyNotesChanged();
+  notifyNotesChanged({ note: mapNoteMetadata(data as NoteRow) });
 
   return mapDatabaseNote(data as NoteRow);
 }
@@ -359,6 +403,7 @@ export async function updateNoteConceptLinks(
       "Notatet ble endret eller kunne ikke lagres. Kjør genereringen på nytt.",
     );
   }
+  notifyNotesChanged({ navigation: false });
 }
 
 export async function updateNoteTitle(

@@ -1,11 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
-import type { DatabaseNote } from "../../../services/notes/notesService";
+import type { NoteMetadata } from "../../../services/notes/notesService";
 import { getSubtopicLinksForNotes, type NoteSubtopicLink } from "../../../services/notes/noteSubtopicsService";
 import { getTopicsBySubject, getAllSubtopicsBySubject, type DatabaseTopic, type DatabaseSubtopic } from "../../../services/subjects/subjectStructureService";
 import { groupNotes } from "./groupNotes";
 
 export function StructuredNotes({ subjectId, notes, query, renderNote }: {
-  subjectId: string; notes: DatabaseNote[]; query: string; renderNote: (note: DatabaseNote) => ReactNode;
+  subjectId: string; notes: NoteMetadata[]; query: string; renderNote: (note: NoteMetadata) => ReactNode;
 }) {
   const [structure, setStructure] = useState<{ topics: DatabaseTopic[]; subtopics: DatabaseSubtopic[]; links: NoteSubtopicLink[] } | null>(null);
   const [error, setError] = useState(false);

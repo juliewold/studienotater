@@ -1,8 +1,8 @@
-import type { DatabaseNote } from "../../../services/notes/notesService";
+import type { NoteMetadata } from "../../../services/notes/notesService";
 import type { NoteSubtopicLink } from "../../../services/notes/noteSubtopicsService";
 import type { DatabaseTopic, DatabaseSubtopic } from "../../../services/subjects/subjectStructureService";
 
-export function groupNotes(notes: DatabaseNote[], topics: DatabaseTopic[], subtopics: DatabaseSubtopic[], links: NoteSubtopicLink[], query: string) {
+export function groupNotes(notes: NoteMetadata[], topics: DatabaseTopic[], subtopics: DatabaseSubtopic[], links: NoteSubtopicLink[], query: string) {
   const normalize = (value: string) => value.normalize("NFC").trim().toLocaleLowerCase("nb");
   const filtered = [...new Map(notes.map(note => [note.id, note])).values()]
     .filter(note => normalize(note.title).includes(normalize(query)))

@@ -528,3 +528,36 @@ kan inneholde bare tekst eller midlertidige/autentiserte bilde-URL-er, uten
 selve bildene. Disse URL-ene lastes ikke automatisk ned. Selvstendig HTML med
 innebygde bilder og LaTeX-kilde er den mest presise importmetoden; DOCX med
 innebygde bilder og LaTeX som tekst er et alternativ. Ingen ekstern AI brukes.
+
+### Note metadata regression tests
+
+Run `node --test tests/note-metadata.test.mjs` with Node.js 22.15+ (or a newer version supporting `registerHooks` and TypeScript stripping). These tests mock the Supabase boundary and never contact a database. They check metadata projections, filters, mapping, ordering, empty/error responses, and the existing full-content read/write contracts. No extra test dependencies are required.
+
+## Globalsøk og egress
+
+Kjør `node --experimental-strip-types --test tests/global-search.test.mjs tests/note-metadata.test.mjs`.
+Testene bruker simulerte Supabase-svar uten nettverk. De dekker utsatt cachelasting,
+samtidige kall, gjenbruk, ugyldiggjøring under lasting, feil og nye forsøk, isolerte
+cacheinstanser, søkeprojeksjon uten JSON, innholdssøk, rangering og tekstutdrag.
+
+Manuell nettverkskontroll på port 5174: Åpning av siden skal ikke hente søkegrunnlaget.
+Første fokus i søkefeltet skal hente det; gjentatt fokus skal gjenbruke det.
+Lagre eller slett et notat og åpne søket igjen: data skal hentes på nytt.
+Bytt bruker: tidligere søketekst og resultater skal være tømt.
+
+## Delt notatnavigasjon og autolagring
+
+```sh
+node --experimental-strip-types --test tests/note-navigation.test.mjs tests/note-metadata.test.mjs tests/global-search.test.mjs
+```
+
+Navigasjonstestene kjører uten database og dekker delt datasett, samtidige lesinger,
+gjentatt navigasjon uten nye listekall, metadata fra lagringssvaret, innholdsautolagring,
+AI-endringer, oppretting/sletting/flytting/navneendring/omrekkefølge, mappeendringer,
+endringer under pågående henting, feil og nytt forsøk, samt separate bruker-/faginstanser.
+
+Manuell kontroll på port 5174: Åpne et notat direkte. Sidepanelet og forrige/neste
+skal dele én henting av notatmetadata og én av mapper. Bytt notat innen samme fag:
+ingen av disse listene skal hentes på nytt. Endre bare innhold og vent på autolagring:
+ingen navigasjonslister skal hentes. Endre tittel eller flytt/slett/opprett/sorter notater:
+sidepanel og forrige/neste skal følge samme oppdaterte rekkefølge.
