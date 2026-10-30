@@ -1,88 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
-
+import { useMemo } from "react";
 import { subjects } from "../data/subjects";
-import {
-  getPdfsBySubject,
-  type DatabasePdf,
-} from "../services/media/pdfsService";
+import type { HomeResourcesSnapshot } from "../services/home/homeResourcesService";
+import { useProgress } from "./useProgress";
+import { useSemesterSubjects } from "./useSemesterSubjects";
 
-import {
-  getNoteMetadataBySubject,
-  type NoteMetadata,
-} from "../services/notes/notesService";
-
-import {
-  getVideosBySubject,
-  type DatabaseVideo,
-} from "../services/media/videosService";
-
-import { useProgress } from "../hooks/useProgress";
-import { useSemesterSubjects } from "../hooks/useSemesterSubjects";
-
-export const useHomeProgress = () => {
+export const useHomeProgress = (resources: HomeResourcesSnapshot) => {
   const { getProgress, isLoadingProgress } = useProgress();
-
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
-
-  const [databasePdfs, setDatabasePdfs] = useState<DatabasePdf[]>([]);
-  const [databaseNotes, setDatabaseNotes] = useState<NoteMetadata[]>([]);
-  const [databaseVideos, setDatabaseVideos] = useState<DatabaseVideo[]>([]);
-
-  const [isLoadingResources, setIsLoadingResources] = useState(true);
-  const [resourcesError, setResourcesError] = useState("");
-
-  const selectedSubjectIds = useMemo(
-    () => semesterSubjects.map((semesterSubject) => semesterSubject.subjectId),
-    [semesterSubjects],
-  );
-
-  useEffect(() => {
-    const loadResources = async () => {
-      if (selectedSubjectIds.length === 0) {
-        setDatabasePdfs([]);
-        setDatabaseNotes([]);
-        setDatabaseVideos([]);
-        setIsLoadingResources(false);
-        return;
-      }
-
-      setIsLoadingResources(true);
-      setResourcesError("");
-
-      try {
-        const [pdfsBySubject, notesBySubject, videosBySubject] =
-          await Promise.all([
-            Promise.all(
-              selectedSubjectIds.map((subjectId) =>
-                getPdfsBySubject(subjectId),
-              ),
-            ),
-            Promise.all(
-              selectedSubjectIds.map((subjectId) =>
-                getNoteMetadataBySubject(subjectId),
-              ),
-            ),
-            Promise.all(
-              selectedSubjectIds.map((subjectId) =>
-                getVideosBySubject(subjectId),
-              ),
-            ),
-          ]);
-
-        setDatabasePdfs(pdfsBySubject.flat());
-        setDatabaseNotes(notesBySubject.flat());
-        setDatabaseVideos(videosBySubject.flat());
-      } catch (error) {
-        console.error("Kunne ikke hente ressurser til fremdriften:", error);
-
-        setResourcesError("Kunne ikke hente all fremdrift.");
-      } finally {
-        setIsLoadingResources(false);
-      }
-    };
-
-    loadResources();
-  }, [selectedSubjectIds]);
+  const { notes: databaseNotes, pdfs: databasePdfs, videos: databaseVideos } = resources;
+  const isLoadingResources = resources.loading;
+  const resourcesError = resources.progressError ? "Kunne ikke hente all fremdrift." : "";
 
   const progressSubjects = useMemo(() => {
     return semesterSubjects.map((semesterSubject) => {

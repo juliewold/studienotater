@@ -561,3 +561,38 @@ skal dele én henting av notatmetadata og én av mapper. Bytt notat innen samme 
 ingen av disse listene skal hentes på nytt. Endre bare innhold og vent på autolagring:
 ingen navigasjonslister skal hentes. Endre tittel eller flytt/slett/opprett/sorter notater:
 sidepanel og forrige/neste skal følge samme oppdaterte rekkefølge.
+
+## Forside: delt ressursmetadata og ukentlig flashcard-telling
+
+```sh
+node --experimental-strip-types --test tests/home-egress.test.mjs tests/note-metadata.test.mjs tests/global-search.test.mjs tests/note-navigation.test.mjs
+```
+
+Testene bruker en simulert Supabase-grense uten nettverk eller dataskriving. De dekker
+delte/samtidige kall, gjenbruk, tomme fagvalg, separate datasett, lette projeksjoner,
+HEAD/exact-telling med datofilter, mandagsgrense/søndag/årsskifte/DST i Europe/Oslo,
+ukentlige tellinger, feilavgrensning og uendrede fremdrifts-ID-er, totaler, avrunding,
+vurderinger og egendefinerte fagkoder. Eksisterende tester fra PR #50 kjøres samtidig.
+
+For N unike valgte fag er ressurskallene redusert fra 6N til 4N (33,3 %):
+notater 2→1, PDF-er 2→1, videoer 1→1 og flashcards 1→1 per fag. Flashcard-kallet
+returnerer nå bare antall via response-header, uten spørsmål/svar eller historiske
+rader. Notater trenger kun id/slug/created_at, PDF-er id/created_at; fag-ID-en følger
+fra filteret. Historikken gjenbrukes til fremdrift og ukentlig telling, slik at
+datofiltrering ikke fjerner ressurser fra fremdriftens nevner. Eksisterende sortering
+og video-utvalg beholdes. Fremdrift, semesterfag, eksamener og andre forsidekall er
+ikke inkludert i 6N→4N-sammenligningen og er ikke endret.
+
+Den automatiserte før/etter-testen kjører de tidligere tjenestekallene og den nye
+hentingen mot samme syntetiske datasett: 2 fag og 500 flashcards, hvor 20 er nye
+denne uken. Resultat: 12→8 kall, 366 184→978 byte JSON-responsinnhold. Dette er
+ikke produksjonsmåling: HTTP-headere, transportkomprimering og annen sidetrafikk
+er ikke inkludert, og gevinsten avhenger av reelle data.
+
+Manuell kontroll: Åpne forsiden med valgte fag. Kontroller at fremdrift, vurderinger,
+fagkoder, uketall og entall/flertall vises som før. Se etter én metadatahenting
+for notater og PDF-er per fag, ett videokall og ett HEAD-kall til flashcards med
+created_at=gte og count=exact. Re-rendering uten endrede fag/bruker/rolle/uke skal
+ikke starte ny ressurslasting. Bytt fag eller bruker og kontroller at tidligere
+data ikke gjenbrukes. Innlogget bruker uten valgte fag og utlogget forside skal
+fortsatt vise sine eksisterende tom-/velkomstvisninger.
