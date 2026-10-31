@@ -1,7 +1,8 @@
+import { createNoteEditorData } from "../../../services/notes/noteEditorDataService";
 import { registerNotesNavigationGuard } from "../../../services/notes/notesNavigationEvents";
 import "./EditableNote.css";
 import { ResourceProgress } from "../../progress/ResourceProgress/ResourceProgress";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
   ChevronDown,
@@ -19,14 +20,11 @@ import {
 } from "../../../services/notes/notesService";
 
 import {
-  getTopicsBySubject,
-  getAllSubtopicsBySubject,
   type DatabaseTopic,
   type DatabaseSubtopic,
 } from "../../../services/subjects/subjectStructureService";
 
 import {
-  getSubtopicIdsByNote,
   replaceNoteSubtopics,
 } from "../../../services/notes/noteSubtopicsService";
 
@@ -34,7 +32,6 @@ import { autoLinkConceptsToSubtopic } from "../../../services/concepts/conceptAu
 import { createConceptSuggestionsForNote } from "../../../services/concepts/conceptExtractionService";
 
 import {
-  getConceptSuggestionsByNote,
   type ConceptSuggestion,
 } from "../../../services/concepts/conceptSuggestionsService";
 
@@ -73,6 +70,11 @@ export const EditableNote = ({
   showClassification = true,
   resourceId,
 }: EditableNoteProps) => {
+  const data = useMemo(() => createNoteEditorData(note.id, note.subjectId), [note.id, note.subjectId]);
+  const editorReady = useRef<typeof data | null>(null);
+  const activeData = useRef(data);
+  useEffect(() => { activeData.current = data; }, [data]);
+  const [isLoadingEditor, setIsLoadingEditor] = useState(false);
   const adminAccess = useRef(isAdmin);
   useEffect(() => { adminAccess.current = isAdmin; }, [isAdmin]);
   const [isEditing, setIsEditing] = useState(false);
@@ -130,67 +132,26 @@ export const EditableNote = ({
   }, [isEditing, note, selectedSubtopicIds]);
 
   useEffect(() => {
-    const loadTopics = async () => {
-      try {
-        const loadedTopics = await getTopicsBySubject(note.subjectId);
-        setTopics(loadedTopics);
-      } catch (error) {
-        console.error("Kunne ikke hente temaer:", error);
-      }
-    };
-
-    void loadTopics();
-  }, [note.subjectId]);
-
-  useEffect(() => {
-    const loadMultipleSubtopics = async () => {
-      try {
-        const [loadedSubtopics, linkedSubtopicIds] = await Promise.all([
-          getAllSubtopicsBySubject(note.subjectId),
-          getSubtopicIdsByNote(note.id),
-        ]);
-
-        setAllSubtopics(loadedSubtopics);
-        setSelectedSubtopicIds(linkedSubtopicIds);
-
-        lastSavedDraft.current = {
-          title: note.title,
-          description: note.description,
-          content: note.content,
-          contentJson: note.contentJson,
-          topicId: note.topicId ?? "",
-          subtopicId: note.subtopicId ?? "",
-          subtopicIds: [...linkedSubtopicIds],
-        };
-      } catch (error) {
-        console.error("Kunne ikke hente undertemaer for notatet:", error);
-      }
-    };
-
-    void loadMultipleSubtopics();
-  }, [
-    note.id,
-    note.subjectId,
-    note.title,
-    note.description,
-    note.content,
-    note.contentJson,
-    note.topicId,
-    note.subtopicId,
-  ]);
+    if (!showClassification) return;
+    let active = true;
+    void data.reading().then(loaded => {
+      if (!active || editorReady.current === data) return;
+      setTopics(loaded.topics);
+      setAllSubtopics(loaded.subtopics);
+      setSelectedSubtopicIds(loaded.ids);
+    }).catch(error => console.error("Kunne ikke hente klassifisering:", error));
+    return () => { active = false; };
+  }, [data, showClassification]);
 
   const loadConceptSuggestions = async () => {
+    if (!adminAccess.current) return;
     try {
-      const loadedSuggestions = await getConceptSuggestionsByNote(note.id);
-      setConceptSuggestions(loadedSuggestions);
+      const loaded = await data.suggestions(true);
+      if (activeData.current === data && adminAccess.current) setConceptSuggestions(loaded);
     } catch (error) {
       console.error("Kunne ikke hente konseptforslag:", error);
     }
   };
-
-  useEffect(() => {
-    void loadConceptSuggestions();
-  }, [note.id]);
 
   const primarySubtopicId = selectedSubtopicIds[0] ?? "";
 
@@ -334,8 +295,23 @@ export const EditableNote = ({
     isAdmin,
   ]);
 
-  const handleStartEditing = () => {
-    if (!isAdmin) return;
+  const handleStartEditing = async () => {
+    if (!isAdmin || isLoadingEditor) return;
+    setIsLoadingEditor(true);
+    let loaded: Awaited<ReturnType<typeof data.editing>>;
+    try {
+      loaded = await data.editing();
+      if (editorReady.current === data) loaded = { ...loaded, ids: [...selectedSubtopicIds] };
+      if (activeData.current !== data || !adminAccess.current) return;
+    } catch (error) {
+      console.error("Kunne ikke hente redigeringsdata:", error);
+      setErrorMessage("Kunne ikke hente redigeringsdata. Prøv igjen.");
+      return;
+    } finally { setIsLoadingEditor(false); }
+    editorReady.current = data;
+    setTopics(loaded.topics);
+    setAllSubtopics(loaded.subtopics);
+    setSelectedSubtopicIds(loaded.ids);
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
@@ -346,9 +322,9 @@ export const EditableNote = ({
       description: note.description,
       content: note.content,
       contentJson: note.contentJson,
-      topicId: primarySubtopic?.topicId ?? "",
-      subtopicId: primarySubtopicId,
-      subtopicIds: [...selectedSubtopicIds],
+      topicId: loaded.subtopics.find(item => item.id === loaded.ids[0])?.topicId ?? "",
+      subtopicId: loaded.ids[0] ?? "",
+      subtopicIds: [...loaded.ids],
     };
 
     setErrorMessage("");
@@ -357,8 +333,8 @@ export const EditableNote = ({
 
     const topicIdsWithSelectedSubtopics = [
       ...new Set(
-        allSubtopics
-          .filter((subtopic) => selectedSubtopicIds.includes(subtopic.id))
+        loaded.subtopics
+          .filter((subtopic) => loaded.ids.includes(subtopic.id))
           .map((subtopic) => subtopic.topicId),
       ),
     ];
@@ -613,10 +589,11 @@ export const EditableNote = ({
           <button
             type="button"
             className="editable-note-edit-button"
-            onClick={handleStartEditing}
+            onClick={() => void handleStartEditing()}
+            disabled={isLoadingEditor}
           >
             <Edit3 size={17} />
-            Rediger
+            {isLoadingEditor ? "Henter redigeringsdata…" : "Rediger"}
           </button>
         )}
       </header>
@@ -678,11 +655,18 @@ export const EditableNote = ({
       ) : <>{toolbar}{readingContent}</>}
 
       {isAdmin && (
+        <details onToggle={event => {
+          if (event.currentTarget.open) void data.suggestions().then(loaded => {
+            if (activeData.current === data && adminAccess.current) setConceptSuggestions(loaded);
+          }).catch(error => console.error("Kunne ikke hente konseptforslag:", error));
+        }}>
+        <summary>Begrepsforslag</summary>
         <ConceptSuggestions
           suggestions={conceptSuggestions}
           subtopicId={note.subtopicId}
           onSuggestionUpdated={() => void loadConceptSuggestions()}
         />
+        </details>
       )}
     </article>
   );
