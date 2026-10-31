@@ -153,6 +153,14 @@ class AIAuthenticationTests(SimpleTestCase):
         self.opener.open.assert_not_called()
         self.assert_no_ai()
 
+    def test_role_is_rechecked_when_admin_access_is_removed(self):
+        # Isolated role responses only; no real profile or role is modified.
+        self.replies({"id": USER_ID}, [{"id": USER_ID, "role": "admin"}],
+                     {"id": USER_ID}, [{"id": USER_ID, "role": "user"}])
+        self.assertEqual(self.post("summarize-note/", {"text": "Note"}).status_code, 200)
+        self.assertEqual(self.post("summarize-note/", {"text": "Note"}).status_code, 403)
+        self.ai["summarize_note"].assert_called_once_with("Note")
+
     def test_cors_preflight_allows_authorization_header(self):
         response = self.client.options("/api/concepts/extract/", HTTP_ORIGIN="http://localhost:5173",
             HTTP_ACCESS_CONTROL_REQUEST_METHOD="POST", HTTP_ACCESS_CONTROL_REQUEST_HEADERS="authorization,content-type")

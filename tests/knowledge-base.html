@@ -1,6 +1,7 @@
 <!doctype html><html lang="nb"><meta charset="utf-8"><title>Kunnskapsbase – regresjonstester</title>
 <h1>Kunnskapsbase – regresjonstester</h1><p id="summary">Kjører …</p><pre id="results"></pre>
 <script type="module">
+import './ai-test-session.ts';
 import { generateKnowledgeBaseForSubject } from '../src/services/concepts/knowledgeBaseService.ts';
 const assert=(value,message)=>{if(!value)throw new Error(message)};
 const topic={id:'topic',subject_id:'subject',name:'Tema',sort_order:0};
@@ -27,8 +28,8 @@ async function scenario({failAI=false,failStatus=500,invalidNote=false,allInvali
   if(method==='GET'){
    if(table==='topics')return response([topic]);
    if(table==='subtopics')return response([subtopic]);
-   if(table==='notes')return response((invalidNote?['one','two','three']:['one','two']).map(id=>{
-    const row=note(id);
+   if(table==='notes')return response((invalidNote?['one','two','three']:['one','two']).map((id,index)=>{
+    const row={...note(id),sort_order:index};
     if(emptyNote&&id==='one')row.content='';
     if(namedCallout){
       row.content='<div data-type="callout" data-callout-type="definition" data-concept-name="Begrep"'+(alreadyLinked?' data-concept-id="manual"':'')+'><div class="note-callout-body"><p>En forklaring</p></div></div>';

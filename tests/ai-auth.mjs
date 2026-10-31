@@ -65,6 +65,11 @@ for (const [path, name, args, endpoint] of cases) {
   assert.ok(calls[0].url.endsWith(endpoint));
   assert.equal(calls[0].options.headers.Authorization, 'Bearer test-access-token');
   assert.equal(calls[0].options.headers['Content-Type'], 'application/json');
+  session = { access_token: 'refreshed-test-access-token' };
+  calls = [];
+  await module.namespace[name](...args);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].options.headers.Authorization, 'Bearer refreshed-test-access-token');
   for (const state of ['missing', 'error']) {
     session = state === 'missing' ? null : { access_token: 'test-access-token' };
     sessionError = state === 'error' ? new Error('session unavailable') : null;
@@ -74,5 +79,5 @@ for (const [path, name, args, endpoint] of cases) {
   }
   session = { access_token: 'test-access-token' };
   sessionError = null;
-  console.log(`PASS ${endpoint}: Bearer token sent; missing/failed sessions do not call AI`);
+  console.log(`PASS ${endpoint}: current/refreshed Bearer token sent; missing/failed sessions do not call AI`);
 }

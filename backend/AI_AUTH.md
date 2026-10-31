@@ -43,3 +43,24 @@ Before deployment, use a test Supabase project to confirm: missing/expired token
 give 401; a normal account gives 403 on all five routes; an administrator can use
 each tool; changing a user's own role through the Data API is rejected. Verify
 the frontend and backend point at the same project. Never commit test credentials.
+
+## Local verification, 2026-10-31
+
+- 80 backend tests passed, including rechecking a removed admin role.
+- Five frontend service flows passed with current/refreshed tokens and rejected
+  missing/failed sessions before any AI request. Production build passed.
+- Browser regressions passed: summary 5/5, selected text 7/7, structure 6/6,
+  knowledge base 11/11, and flashcard tests plus generation preview.
+- Running local Django returned 401 on all five routes without a token and with
+  a deliberately invalid token checked by the configured Supabase Auth service.
+- Isolated local HTTP tests returned 403 for simulated ordinary users and 200
+  for simulated administrators on all five routes, with mocked Supabase and AI.
+- No production database changes or NTNU LLM calls were made. Real-account
+  login/role lookup against an isolated Supabase project remains unverified;
+  no such project/accounts were available in the workspace.
+
+Deployment caveat: `.github/workflows/deploy.yml` currently supplies only the
+Supabase frontend variables. AI also requires `VITE_API_URL` at build time,
+pointing at an accessible HTTPS backend with appropriate CORS origins. Local
+loopback configuration is suitable for local tests only. This deployment
+configuration was not changed as part of the authentication patch.
