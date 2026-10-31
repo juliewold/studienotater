@@ -1,3 +1,4 @@
+import { getAIAuthHeaders } from "../../lib/aiAuth";
 export async function explainSelectedText(text: string, signal?: AbortSignal): Promise<string> {
   const selected = text.trim();
   if (!selected) throw new Error("Marker tekst i notatet først.");
@@ -5,7 +6,7 @@ export async function explainSelectedText(text: string, signal?: AbortSignal): P
   const apiUrl = import.meta.env.VITE_API_URL;
   if (!apiUrl) throw new Error("AI-tjenesten er ikke konfigurert.");
   const response = await fetch(`${apiUrl}/api/concepts/explain-selection/`, {
-    method: "POST", headers: { "Content-Type": "application/json" },
+    method: "POST", headers: await getAIAuthHeaders(),
     body: JSON.stringify({ text: selected }), signal,
   });
   const data = await response.json().catch(() => null);

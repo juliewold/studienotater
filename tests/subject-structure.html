@@ -1,6 +1,7 @@
 <!doctype html><html lang="nb"><meta charset="utf-8"><title>Fagstruktur – regresjonstester</title>
 <h1>Fagstruktur – regresjonstester</h1><p id="summary">Kjører …</p><pre id="results"></pre>
 <script type="module">
+import "./ai-test-session.ts";
 import { generateAndSaveSubjectStructure } from '../src/services/concepts/subjectStructureGenerationService.ts';
 const assert=(ok,message)=>{if(!ok)throw new Error(message)};
 const response=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});

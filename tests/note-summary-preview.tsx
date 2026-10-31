@@ -1,3 +1,4 @@
+import './ai-test-session';
 import { createRoot } from 'react-dom/client';
 import { NoteSummary } from '../src/components/notes/NoteSummary/NoteSummary';
 // This isolated UI fixture makes no real AI requests or database writes.

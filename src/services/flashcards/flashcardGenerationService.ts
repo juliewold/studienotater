@@ -1,3 +1,4 @@
+import { getAIAuthHeaders } from "../../lib/aiAuth";
 
 export type AvailableFlashcardSubtopic = {
   id: string;
@@ -34,9 +35,7 @@ export async function generateFlashcards(
 
   const response = await fetch(`${apiUrl}/api/concepts/generate-flashcards/`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: await getAIAuthHeaders(),
     body: JSON.stringify({
       text,
       subtopics,
