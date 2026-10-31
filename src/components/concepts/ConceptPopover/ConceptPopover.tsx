@@ -1,3 +1,4 @@
+import { PrivateNoteHtml } from "../../notes/PrivateNoteHtml";
 import { useConceptContentSession } from "../../../hooks/useConceptContentSession";
 import "./ConceptPopover.css";
 
@@ -106,12 +107,7 @@ export const ConceptPopover = ({
               </span>
 
               {item.type !== "formula" && (
-                <div
-                  className="concept-popover-note-html"
-                  dangerouslySetInnerHTML={{
-                    __html: item.html,
-                  }}
-                />
+                <PrivateNoteHtml className="concept-popover-note-html" html={item.html} />
               )}
 
               <Link

@@ -6,7 +6,6 @@ export type DatabasePdf = {
   title: string;
   category: string;
   filePath: string;
-  fileUrl: string;
   createdAt: string;
 
   subtopicId: string | null;
@@ -75,17 +74,12 @@ const mapPdf = (pdf: PdfRow): DatabasePdf => {
 
   const topic = subtopic ? getFirstRelation(subtopic.topics) : null;
 
-  const { data: publicUrlData } = supabase.storage
-    .from("pdfs")
-    .getPublicUrl(pdf.file_path);
-
   return {
     id: pdf.id,
     subjectId: pdf.subject_id,
     title: pdf.title,
     category: pdf.category,
     filePath: pdf.file_path,
-    fileUrl: publicUrlData.publicUrl,
     createdAt: pdf.created_at,
 
     subtopicId: subtopic?.id ?? null,

@@ -348,16 +348,6 @@ export const useAdminExams = () => {
     }
   };
 
-  const getFileUrl = (filePath: string | null) => {
-    if (!filePath) {
-      return null;
-    }
-
-    const { data } = supabase.storage.from("pdfs").getPublicUrl(filePath);
-
-    return data.publicUrl;
-  };
-
   return {
     examFileInputRef,
     solutionFileInputRef,
@@ -392,7 +382,6 @@ export const useAdminExams = () => {
     errorMessage,
     successMessage,
 
-    getFileUrl,
     handleSubmit,
     handleEdit,
     cancelEdit,

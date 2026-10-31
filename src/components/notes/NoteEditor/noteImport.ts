@@ -1,3 +1,4 @@
+import { getNoteImagePath, noteImageReference } from "../../../services/media/privateStorage";
 import type { Editor } from '@tiptap/core';
 import { closeHistory } from '@tiptap/pm/history';
 import { supabase } from '../../../lib/supabase';
@@ -13,7 +14,7 @@ export async function storeNoteImage(file: File): Promise<{ url: string; path: s
   const bucket = supabase.storage.from('note-images');
   const result = await bucket.upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
   if (result.error) throw result.error;
-  return { path, url: bucket.getPublicUrl(path).data.publicUrl };
+  return { path, url: noteImageReference(path) };
 }
 
 /** Convert only source-backed mathematics; never infer LaTeX from rendered glyphs. */
@@ -64,8 +65,8 @@ export async function prepareNoteImport(html: string, files: File[], upload: (fi
   const pending: Array<{ image: HTMLImageElement; file: File }> = [];
   for (const image of images) {
     const src = image.getAttribute('src') ?? '';
-    const storedPrefix = supabase.storage.from('note-images').getPublicUrl('').data.publicUrl;
-    if (src.startsWith(storedPrefix.endsWith('/') ? storedPrefix : storedPrefix + '/')) continue;
+    const storedPath = getNoteImagePath(src);
+    if (storedPath) { image.setAttribute('src', noteImageReference(storedPath)); continue; }
     if (!src.startsWith('data:image/')) {
       // A clipboard file can identify one image unambiguously, but never guess multiple positions.
       if (images.length === 1 && files.length === 1) pending.push({ image, file: files[0] });

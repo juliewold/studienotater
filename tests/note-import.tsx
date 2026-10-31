@@ -1,3 +1,4 @@
+import { noteImageReference } from "../src/services/media/privateStorage";
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
@@ -36,9 +37,9 @@ const docx = new File([await (await fetch('./fixtures/import-note.docx')).arrayB
 const converted = await readImportFile(docx);
 const imported = await prepareNoteImport(converted, [], async () => (await upload()).url);
 check((imported.match(/<img/g) ?? []).length === 2 && imported.indexOf('Etter bilde 1') < imported.lastIndexOf('<img'), 'Ekte DOCX med to innebygde bilder beholder rekkefølgen');
-const permanent = supabase.storage.from('note-images').getPublicUrl('test/existing.png').data.publicUrl;
+const permanent = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/note-images/test/existing.png`;
 const copied = await prepareNoteImport(`<p>Eksisterende</p><img src="${permanent}">`, [], async () => { throw Error('Skal ikke laste opp på nytt'); });
-check(copied.includes(permanent), 'Kopiering av eksisterende permanent notatbilde bevares');
+check(copied.includes(noteImageReference('test/existing.png')), 'Kopiering av eksisterende permanent notatbilde bevares');
 const safe = await prepareNoteImport('<script>bad()</script><p onclick="bad()">Trygt</p><a href="javascript:bad()">Lenke</a>', [], async () => '');
 check(!safe.includes('script') && !safe.includes('onclick'), 'Aktivt HTML-innhold fjernes');
 editor.destroy(); reopened.destroy();
@@ -46,8 +47,18 @@ editor.destroy(); reopened.destroy();
 // Actual NoteEditor paste handler, with storage boundary mocked: no real user data.
 const originalFetch = window.fetch;
 const originalUser = supabase.auth.getUser;
+const originalSession = supabase.auth.getSession;
+const originalStorageFrom = supabase.storage.from;
+supabase.auth.getSession = async () => ({data:{session:{user:{id:'test-user'},access_token:'isolated'}},error:null}) as Awaited<ReturnType<typeof originalSession>>;
+
 supabase.auth.getUser = async () => ({data:{user:{id:'test-user'}}, error:null}) as Awaited<ReturnType<typeof originalUser>>;
 let uploads = 0;
+supabase.storage.from = (() => ({
+  upload: async () => {uploads++;return {data:{path:'test'},error:null};},
+  remove: async () => ({data:[],error:null}),
+  createSignedUrl: async () => ({data:{signedUrl:png},error:null}),
+})) as typeof originalStorageFrom;
+
 window.fetch = async (url, init) => {
   if (String(url).includes('/storage/v1/object/') && init?.method === 'POST') { uploads++; return Response.json({Key:'test'}); }
   return originalFetch(url, init);
@@ -62,7 +73,7 @@ editable.focus();
 const clipboard = new DataTransfer(); clipboard.setData('text/html',html);
 editable.dispatchEvent(new ClipboardEvent('paste',{clipboardData:clipboard,bubbles:true,cancelable:true}));
 await until(()=>uploads === 2 && latest.includes('data-latex') && editable.getAttribute('contenteditable') === 'true');
-check(editable.querySelectorAll('img[src]').length === 2 && latest.includes('/storage/v1/object/public/note-images/test-user/'), 'Faktisk NoteEditor-innliming laster opp og setter inn begge bilder');
+check(editable.querySelectorAll('img[src]').length === 2 && latest.includes('supabase-storage://note-images/test-user/'), 'Faktisk NoteEditor-innliming laster opp og setter inn begge bilder');
 // The same file input used by the Importer toolbar control.
 const input = document.querySelector<HTMLInputElement>('input[accept=".html,.htm,.docx"]')!;
 const fileTransfer = new DataTransfer(); fileTransfer.items.add(docx); input.files=fileTransfer.files;
@@ -73,5 +84,5 @@ const binary = new DataTransfer(); binary.items.add(new File([await (await origi
 editable.dispatchEvent(new ClipboardEvent('paste',{clipboardData:binary,bubbles:true,cancelable:true}));
 await until(()=>uploads === 5 && editable.getAttribute('contenteditable') === 'true');
 check(editable.querySelectorAll('img[src]').length === 5, 'Binært bilde fra utklippstavlen bruker samme lagring');
-window.fetch=originalFetch; supabase.auth.getUser=originalUser;
+window.fetch=originalFetch; supabase.auth.getUser=originalUser; supabase.auth.getSession=originalSession; supabase.storage.from=originalStorageFrom;
 document.querySelector('#results')!.textContent=`${results.length} tester bestått\n${results.join('\n')}`;

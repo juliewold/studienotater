@@ -1,3 +1,4 @@
+import { PrivateFileLink } from "../../../components/media/PrivateFileLink";
 import "./AdminPdfsPage.css";
 
 import { subjects } from "../../../data/subjects";
@@ -341,13 +342,7 @@ export const AdminPdfsPage = () => {
                           </div>
 
                           <div className="uploaded-pdf-actions">
-                            <a
-                              href={pdf.fileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              Åpne
-                            </a>
+                            <PrivateFileLink path={pdf.filePath}>Åpne</PrivateFileLink>
 
                             <button
                               type="button"
