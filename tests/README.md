@@ -705,3 +705,39 @@ Endrede filer i begreps-Egress-arbeidet:
 - `tests/README.md`
 - `tests/concept-content-egress.html`
 - `tests/concept-content-egress.mjs`
+
+## Notatvisning: utsatt redigeringsdata
+
+Kjør `node --experimental-strip-types --test tests/note-editor-egress.test.mjs tests/study-plan-egress.test.mjs tests/home-egress.test.mjs tests/note-metadata.test.mjs tests/global-search.test.mjs tests/note-navigation.test.mjs`.
+Åtte nye tjenestetester kjører med simulerte Supabase-svar uten nettverk eller lagring.
+De dekker utsatt lasting, målrettet klassifisering, tomme koblinger, gjenbruk av
+koblinger, samtidige kall, forslag/refresh, feil/retry og noteavgrensning.
+
+Lesemodus beholder klassifiseringen: koblings-ID-er hentes én gang og bare de
+koblede undertemaene/temaene lastes. Uten koblinger trengs bare ett kall. Med
+showClassification=false starter ingen av disse kallene før redigering.
+Administratorens første redigeringsåpning venter på hele fagstrukturen og koblingene
+før editor/autolagring aktiveres; feil avbryter åpningen, slik at ukjente koblinger
+ikke lagres som en tom liste. Eksisterende koblinger gjenbrukes. Hele strukturen
+gjenbrukes ved senere åpninger i samme notatvisning, og lokale koblingsvalg beholdes.
+Et sent lesesvar kan ikke overskrive editorens komplette struktur.
+
+Begrepsforslag lastes når administratoren åpner panelet «Begrepsforslag».
+Gjentatt åpning gjenbruker svaret; generering og godkjenning/redigering av forslag
+henter oppdaterte forslag. Eksisterende tilgangskontroll, notatlagring, AI-kall
+og begrepsrendering er beholdt. Notatinnhold og titler er ikke avhengigheter
+for strukturhentingen, så autolagring utløser ingen nye slike lesinger.
+
+Syntetisk admin-lesetest med 100 temaer/undertemaer og ett koblet undertema:
+før 5 kall/14 535 byte, etter 3 kall/139 byte JSON-responsinnhold.
+Dette inkluderer kun klassifisering/forslag, ikke notatet, begrepsrendering,
+fremdrift eller andre AI-verktøy. Headere, komprimering og produksjons-egress
+er ikke målt. Vanlig leser uten admin gikk fra 4 til 3 klassifiseringskall.
+Første redigeringsåpning etter lesing gjør inntil tre ekstra strukturkall;
+fordelen er at disse unngås for rene lesere og ikke gjentas ved hver lagring.
+
+Manuell nettleserverifisering gjenstår: les notatet med og uten klassifisering,
+åpne/lukk forslagspanelet, start redigering, endre undertemavalg, autolagre,
+avslutt og gjenåpne redigering. Kontroller titler, koblinger, navigasjonslagring,
+AI-generering og at ikke-administrator ikke får redigerings-/forslagskall.
+Øvrige kall i ReadOnlyNote/NoteEditor og AI-verktøyene er ikke optimalisert her.
