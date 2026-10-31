@@ -1,4 +1,5 @@
 <!doctype html><html lang="nb"><meta charset="utf-8"><title>Note explanation tests</title><h1>Note explanation tests</h1><pre id="results"></pre><script type="module">
+import "./ai-test-session.ts";
 import { explainSelectedText, getSelectedNoteText } from '../src/services/notes/selectedTextService.ts';
 const original=window.fetch;
 const assert=(v,m)=>{if(!v)throw Error(m)};

@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from .auth import require_ai_admin
 from .concept_extraction_service import extract_concept_candidates
 from .flashcard_generation_service import generate_flashcards
 from .note_summary_service import summarize_note
@@ -15,6 +16,7 @@ from .subject_structure_service import generate_subject_structure
 
 @csrf_exempt
 @require_POST
+@require_ai_admin
 def extract_concepts(request):
     try:
         body = json.loads(request.body)
@@ -108,6 +110,7 @@ def extract_concepts(request):
 
 @csrf_exempt
 @require_POST
+@require_ai_admin
 def generate_structure(request):
     try:
         body = json.loads(request.body)
@@ -202,6 +205,7 @@ def generate_structure(request):
 
 @csrf_exempt
 @require_POST
+@require_ai_admin
 def generate_flashcard_suggestions(request):
     try:
         body = json.loads(request.body)
@@ -279,6 +283,7 @@ def generate_flashcard_suggestions(request):
 
 @csrf_exempt
 @require_POST
+@require_ai_admin
 def generate_note_summary(request):
     try:
         body = json.loads(request.body)
@@ -299,6 +304,7 @@ def generate_note_summary(request):
 
 @csrf_exempt
 @require_POST
+@require_ai_admin
 def explain_note_selection(request):
     try:
         body = json.loads(request.body)

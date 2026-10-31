@@ -1,10 +1,10 @@
 from unittest.mock import Mock, patch
 
-from django.test import SimpleTestCase
+from .auth_test_utils import AuthenticatedAITestCase
 from openai import APIConnectionError, APIStatusError
 
 
-class ConceptExtractionFailureTests(SimpleTestCase):
+class ConceptExtractionFailureTests(AuthenticatedAITestCase):
     def request_with_failure(self, error):
         with patch("concepts.views.extract_concept_candidates", side_effect=error):
             return self.client.post(
@@ -43,7 +43,7 @@ class ConceptExtractionFailureTests(SimpleTestCase):
         self.assertEqual(response.headers["access-control-allow-origin"], "http://127.0.0.1:5173")
 
 
-class AIValidationTests(SimpleTestCase):
+class AIValidationTests(AuthenticatedAITestCase):
     def call_service(self, service, payload, raw=False):
         import json
         from .concept_extraction_service import extract_concept_candidates
@@ -156,7 +156,7 @@ class AIValidationTests(SimpleTestCase):
                     "topics": [{"name": "Topic", "subtopics": [subtopic]}]})
 
 
-class StructureEndpointTests(SimpleTestCase):
+class StructureEndpointTests(AuthenticatedAITestCase):
     payload = {"subjectName": "Algorithms", "notes": [
         {"id": "n1", "title": "A note", "content": "Some source content"}]}
 
@@ -202,7 +202,7 @@ class StructureEndpointTests(SimpleTestCase):
                 ai.assert_not_called()
 
 
-class ConceptRetryTests(SimpleTestCase):
+class ConceptRetryTests(AuthenticatedAITestCase):
     def response(self, content, finish_reason="stop"):
         return Mock(choices=[Mock(message=Mock(content=content), finish_reason=finish_reason)])
 
@@ -276,7 +276,7 @@ class ConceptRetryTests(SimpleTestCase):
         self.assertEqual(client.chat.completions.create.call_count, 2)
 
 
-class ConceptCanonicalContextTests(SimpleTestCase):
+class ConceptCanonicalContextTests(AuthenticatedAITestCase):
     def test_context_and_original_name_survive_retry(self):
         import json
         from .concept_extraction_service import extract_concept_candidates
@@ -320,7 +320,7 @@ class ConceptCanonicalContextTests(SimpleTestCase):
                 helper.call_service("concept_extraction_service", {"candidates": [helper.candidate(sourceName=bad)]})
 
 
-class StructureCompletionTests(SimpleTestCase):
+class StructureCompletionTests(AuthenticatedAITestCase):
     existing = [{"id": "t1", "name": "Original topic", "subtopics": [{"id": "s1", "name": "Original subtopic"}]}]
     notes = [{"id": "n1", "title": "New", "content": "Source", "organize": True},
              {"id": "n2", "title": "Manual", "content": "Source", "organize": False}]
@@ -374,7 +374,7 @@ class StructureCompletionTests(SimpleTestCase):
             ai.assert_called_once_with("Subject", self.notes, self.existing)
 
 
-class ConceptSourceLanguageTests(SimpleTestCase):
+class ConceptSourceLanguageTests(AuthenticatedAITestCase):
     def extract(self, text, name, source_name=None, existing=None):
         import json
         from .concept_extraction_service import extract_concept_candidates

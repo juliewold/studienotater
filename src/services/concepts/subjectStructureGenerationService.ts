@@ -1,3 +1,4 @@
+import { getAIAuthHeaders } from "../../lib/aiAuth";
 import { supabase } from "../../lib/supabase";
 import { getNotesBySubject } from "../notes/notesService";
 import { getSubtopicLinksForNotes } from "../notes/noteSubtopicsService";
@@ -37,7 +38,7 @@ export async function generateAndSaveSubjectStructure(
 
   const response = await fetch(`${apiUrl}/api/concepts/generate-structure/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: await getAIAuthHeaders(),
     body: JSON.stringify({
       subjectName,
       notes: withContent.map(note => ({ id: note.id, title: note.title, content: note.content, organize: eligible.has(note.id) })),

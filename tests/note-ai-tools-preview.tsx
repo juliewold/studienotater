@@ -1,3 +1,4 @@
+import './ai-test-session';
 import { createRoot } from 'react-dom/client';
 import { NoteAITools } from '../src/components/notes/NoteAITools/NoteAITools';
 window.fetch = async (input, options) => {

@@ -1,6 +1,6 @@
 import json
 from unittest.mock import Mock, patch
-from django.test import SimpleTestCase
+from .auth_test_utils import AuthenticatedAITestCase
 from openai import APIConnectionError, APIStatusError
 from .selected_text_service import explain_selected_text
 
@@ -9,7 +9,7 @@ def response(content, finish="stop"):
     return Mock(choices=[Mock(message=Mock(content=content), finish_reason=finish)])
 
 
-class SelectedTextTests(SimpleTestCase):
+class SelectedTextTests(AuthenticatedAITestCase):
     def test_success_uses_only_note_as_source(self):
         client = Mock()
         client.chat.completions.create.return_value = response('{"explanation":"  Kort repetisjon.  "}')

@@ -1,3 +1,4 @@
+import { getAIAuthHeaders } from "../../lib/aiAuth";
 import { getPlainTextFromNote } from "../concepts/conceptExtractionService";
 
 export async function generateNoteSummary(content: string, signal?: AbortSignal): Promise<string> {
@@ -7,7 +8,7 @@ export async function generateNoteSummary(content: string, signal?: AbortSignal)
   if (!apiUrl) throw new Error("AI-tjenesten er ikke konfigurert.");
   const response = await fetch(`${apiUrl}/api/concepts/summarize-note/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: await getAIAuthHeaders(),
     body: JSON.stringify({ text }),
     signal,
   });

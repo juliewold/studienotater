@@ -1,6 +1,6 @@
 import json
 from unittest.mock import Mock, patch
-from django.test import SimpleTestCase
+from .auth_test_utils import AuthenticatedAITestCase
 from .flashcard_generation_service import generate_flashcards
 
 
@@ -12,7 +12,7 @@ def card(question='Hva gjør en stack?', answer='LIFO.', point='stack', evidence
     return dict(question=question, answer=answer, learningPoint=point, evidence=evidence)
 
 
-class FlashcardGenerationTests(SimpleTestCase):
+class FlashcardGenerationTests(AuthenticatedAITestCase):
     def run_generation(self, outputs, text='En stack bruker LIFO.', topics=None):
         client = Mock()
         client.chat.completions.create.side_effect = [response(o) for o in outputs]

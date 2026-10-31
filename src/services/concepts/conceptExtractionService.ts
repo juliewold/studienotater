@@ -1,3 +1,4 @@
+import { getAIAuthHeaders } from "../../lib/aiAuth";
 import type { Concept, ConceptType } from "../../data/concepts/types";
 import { getConceptsFromDatabase } from "./conceptService";
 import { addConceptSuggestion } from "./conceptSuggestionsService";
@@ -42,9 +43,7 @@ export async function extractConceptCandidates(
 
   const response = await fetch(`${apiUrl}/api/concepts/extract/`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: await getAIAuthHeaders(),
     body: JSON.stringify({
       text,
       subtopics,
