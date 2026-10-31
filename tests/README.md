@@ -631,3 +631,77 @@ og merk studieelementer fullført. I admin: velg fag, velg/fjern notatressurser,
 opprett og rediger en studieplan, avbryt og kontroller sletting med egne testdata.
 Nettverket skal ikke hente `content` eller `content_json` for ressurslistene, men
 selve notatsiden skal fortsatt hente og vise innhold.
+
+## Begrepsvisning: filtrert HTML-kildehenting og delte data
+
+Kjør de eksisterende Node-testene med:
+
+```sh
+node --experimental-strip-types --test tests/study-plan-egress.test.mjs tests/home-egress.test.mjs tests/note-metadata.test.mjs tests/global-search.test.mjs tests/note-navigation.test.mjs
+```
+
+Nye tester med ekte DOMParser: start en isolert Vite-testserver med
+`VITE_SUPABASE_URL=https://concept-tests.invalid VITE_SUPABASE_ANON_KEY=mock-key npm run dev -- --port 5177 --strictPort`,
+og åpne `/studienotater/tests/concept-content-egress.html`. Testen erstatter
+Supabase-grensen og avviser skriveroperasjoner og live fetch. Den bruker ikke
+produksjonsdata. Testserverens mock-URL er kun til tester, ikke vanlig bruk av appen.
+
+14 nettlesertester dekker eksplisitte ID-er, primære/sekundære undertemakoblinger,
+ukoblede kilder på tvers av fag, legacy-navn/overskrifter, entity-dekoding, Unicode,
+inline-formatering, formler/kontekst/LaTeX, nesting, kildehenvisninger, tvetydighet,
+paginering av notater/navneindeks, deling av samtidige og ferdige lesinger, feil og
+retry, tomme resultater, filter-escaping og ugyldiggjøring ved lokale endringer
+eller bytte av bruker/rolle. Uttrekkene sammenlignes med den tidligere globale
+HTML-resolveren. Eksisterende `topic-learning.html` (16 tester) og
+`concept-review.html` (40 tester) er også kjørt med mock-data i nettleseren.
+
+Kildeoppslaget bruker `concept_subtopics`, `notes.subtopic_id`, `note_subtopics`
+og de eksisterende begreps-ID-ene/navnene i HTML. Disse koblingene er ikke en
+fullstendig kildeindeks. Derfor brukes de som kandidathint sammen med et
+konservativt globalt HTML-forfilter; de avgrenser ikke eksklusivt eierskap.
+[PostgRESTs dokumenterte pattern-filtre](https://docs.postgrest.org/en/stable/references/api/tables_views.html#pattern-matching)
+brukes før data sendes til nettleseren. Den eksisterende DOM-resolveren avgjør
+fortsatt hvilke bokser som faktisk tilhører begrepet. HTML og kilde-ID/tittel/slug/fag
+hentes, men aldri `content_json`. Den globale navneindeksen trenger bare id/name,
+slik at forklaringer ikke lastes for alle begreper på nytt. Selve begrepet beholder
+sin eksisterende definisjon og forklaring.
+
+Begrepsside og popover deler kildedata, navneindeks, tilhørighet og pågående
+forespørsler innen samme bruker-/rollescope. Noteendringer og vellykkede
+begreps-/koblingsendringer ugyldiggjør cachen også når visningen ikke er montert.
+Feilede forespørsler beholdes ikke. Begrepssidens tilhørighetsvisning gjenbruker
+koblingsoppslaget fra kildehentingen. Ingen nye AI-kall eller lagringer utføres.
+
+Syntetisk test av `getConceptContent` alene (uten separat side-/popoverinnlasting):
+31 testnotater, hvor 9 gir kildeinnhold. Før: 2 kall, 327 042 byte JSON-responsinnhold.
+Første nye lesing: 4 kall, 2 562 byte. Gjentatt lesing i samme scope: 0 kall/0 byte.
+Kalde lesinger kan gjøre flere små koblingsoppslag; antall avhenger av koblinger
+og paginering. Dette er ikke produksjonsmålt egress og inkluderer ikke headere,
+komprimering eller andre sidekall.
+
+Begrensninger: Legacy HTML med entities/Unicode eller svært korte/symbolske navn
+kan gi brede kandidatsett, også på tvers av fag. Dette er nødvendig for å bevare
+eksisterende kilder uten schema-/datamigrering. SQL-forfilteret kan fortsatt kreve
+server-side scanning; det er ingen garanti for lavere database-CPU. Endringer fra
+andre faner/brukere push-varsles ikke; full sidelasting henter en ny sesjon.
+Begrepsgjennomgang, temainnhold, AI-generering og notatredigering beholder egne
+fullinnholdsbehov. Manuell kontroll mot ekte data av side/popover, forklaringer,
+notatlenker og navigasjon gjenstår.
+
+Endrede filer i begreps-Egress-arbeidet:
+
+- `src/components/concepts/ConceptPopover/ConceptPopover.tsx`
+- `src/hooks/useConceptContentSession.ts`
+- `src/pages/concepts/ConceptPage/ConceptPage.tsx`
+- `src/services/concepts/conceptContentCache.ts`
+- `src/services/concepts/conceptContentEvents.ts`
+- `src/services/concepts/conceptContentService.ts`
+- `src/services/concepts/conceptContextService.ts`
+- `src/services/concepts/conceptReviewActions.ts`
+- `src/services/concepts/conceptService.ts`
+- `src/services/concepts/conceptSourceNotesService.ts`
+- `src/services/concepts/conceptSubtopicsService.ts`
+- `src/services/concepts/sourceConceptResolver.ts`
+- `tests/README.md`
+- `tests/concept-content-egress.html`
+- `tests/concept-content-egress.mjs`

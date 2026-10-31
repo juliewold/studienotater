@@ -1,3 +1,4 @@
+import { useConceptContentSession } from "../../../hooks/useConceptContentSession";
 import "./ConceptPage.css";
 import "katex/dist/katex.min.css";
 
@@ -7,16 +8,13 @@ import { MathText } from "../../../components/common/MathText/MathText";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { getConceptBySlugFromDatabase } from "../../../services/concepts/conceptService";
 import type { Concept } from "../../../data/concepts/types";
 
 import {
-  getConceptContent,
   type ConceptContentSource,
 } from "../../../services/concepts/conceptContentService";
 
 import {
-  getConceptContexts,
   type ConceptContext,
 } from "../../../services/concepts/conceptContextService";
 
@@ -27,6 +25,7 @@ export const ConceptPage = () => {
 };
 
 const ConceptDetails = ({ slug }: { slug: string | undefined }) => {
+  const session = useConceptContentSession();
   const [concept, setConcept] = useState<Concept | undefined>();
   const [isConceptLoading, setIsConceptLoading] = useState(true);
   const [conceptContent, setConceptContent] = useState<ConceptContentSource[]>([]);
@@ -42,7 +41,7 @@ const ConceptDetails = ({ slug }: { slug: string | undefined }) => {
     const load = async () => {
       let loadedConcept: Concept | undefined;
       try {
-        loadedConcept = slug ? await getConceptBySlugFromDatabase(slug) : undefined;
+        loadedConcept = slug ? await session.getConcept(slug) : undefined;
       } catch (error) {
         console.error("Kunne ikke hente konsept:", error);
         if (!isCancelled) setConceptError(true);
@@ -56,8 +55,8 @@ const ConceptDetails = ({ slug }: { slug: string | undefined }) => {
       }
 
       const [content, contexts] = await Promise.allSettled([
-        getConceptContent(loadedConcept.id),
-        getConceptContexts(loadedConcept.id),
+        session.getContent(loadedConcept.id),
+        session.getContexts(loadedConcept.id),
       ]);
       if (isCancelled) return;
 
@@ -81,7 +80,7 @@ const ConceptDetails = ({ slug }: { slug: string | undefined }) => {
 
     void load();
     return () => { isCancelled = true; };
-  }, [slug]);
+  }, [slug, session]);
 
   if (isConceptLoading) {
     return (

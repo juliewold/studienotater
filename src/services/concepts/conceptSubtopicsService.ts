@@ -1,3 +1,4 @@
+import { notifyConceptsChanged } from "./conceptContentEvents";
 import { supabase } from "../../lib/supabase";
 
 export type ConceptSubtopicLink = {
@@ -67,6 +68,7 @@ export async function addConceptSubtopic(
   if (insertError) {
     throw insertError;
   }
+  notifyConceptsChanged();
 }
 
 export async function removeConceptSubtopic(
@@ -82,6 +84,7 @@ export async function removeConceptSubtopic(
   if (error) {
     throw error;
   }
+  notifyConceptsChanged();
 }
 
 export async function removeConceptSubtopicsBySubtopicIds(
@@ -99,4 +102,5 @@ export async function removeConceptSubtopicsBySubtopicIds(
   if (error) {
     throw error;
   }
+  notifyConceptsChanged();
 }
