@@ -1,3 +1,4 @@
+import { usePrivateStorageUrl } from "../../../hooks/usePrivateStorageUrl";
 import "./PdfViewerPage.css";
 import { useContext, useEffect, useState } from "react";
 import { ExternalLink, FileText } from "lucide-react";
@@ -38,6 +39,7 @@ export const PdfViewerPage = () => {
   const { isAdmin } = useContext(AuthContext);
 
   const [pdf, setPdf] = useState<DatabasePdf | null>(null);
+  const fileAccess = usePrivateStorageUrl("pdfs", pdf?.filePath);
   const [summaryNote, setSummaryNote] = useState<DatabaseNote | null>(null);
 
   const [isLoadingPdf, setIsLoadingPdf] = useState(true);
@@ -198,10 +200,10 @@ export const PdfViewerPage = () => {
         </div>
       </div>
 
-      {useSeparatePdfView ? (
+      {!fileAccess.url ? <p role="status">{fileAccess.loading ? "Laster filtilgang…" : fileAccess.error}</p> : useSeparatePdfView ? (
         <div className="pdf-mobile-viewer">
           <a
-            href={pdf.fileUrl}
+            href={fileAccess.url ?? undefined}
             target="_blank"
             rel="noreferrer"
             className="pdf-open-button"
@@ -213,7 +215,7 @@ export const PdfViewerPage = () => {
       ) : (
         <object
           className="pdf-viewer"
-          data={pdf.fileUrl}
+          data={fileAccess.url!}
           type="application/pdf"
           aria-label={pdf.title}
         >
@@ -221,7 +223,7 @@ export const PdfViewerPage = () => {
             <p>PDF-en kan ikke vises direkte i nettleseren.</p>
 
             <a
-              href={pdf.fileUrl}
+              href={fileAccess.url ?? undefined}
               target="_blank"
               rel="noreferrer"
               className="pdf-open-button"

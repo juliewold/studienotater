@@ -1,3 +1,4 @@
+import { PrivateFileLink } from "../../../components/media/PrivateFileLink";
 import "./AdminExamsPage.css";
 import { subjects } from "../../../data/subjects";
 import { useAdminExams } from "../../../hooks/admin/useAdminExams";
@@ -44,7 +45,6 @@ export const AdminExamsPage = () => {
     errorMessage: previousExamError,
     successMessage: previousExamSuccess,
 
-    getFileUrl,
     handleSubmit: handlePreviousExamSubmit,
     handleEdit: handlePreviousExamEdit,
     cancelEdit: cancelPreviousExamEdit,
@@ -305,10 +305,6 @@ export const AdminExamsPage = () => {
           ) : (
             <div className="uploaded-exam-list">
               {uploadedExams.map((exam) => {
-                const examFileUrl = getFileUrl(exam.examFilePath);
-                const solutionFileUrl = getFileUrl(exam.solutionFilePath);
-                const mySolutionFileUrl = getFileUrl(exam.mySolutionFilePath);
-
                 return (
                   <article key={exam.id} className="uploaded-exam-item">
                     <div className="uploaded-exam-content">
@@ -341,35 +337,9 @@ export const AdminExamsPage = () => {
                     </div>
 
                     <div className="uploaded-exam-actions">
-                      {examFileUrl && (
-                        <a
-                          href={examFileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Oppgavesett
-                        </a>
-                      )}
-
-                      {solutionFileUrl && (
-                        <a
-                          href={solutionFileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Løsning
-                        </a>
-                      )}
-
-                      {mySolutionFileUrl && (
-                        <a
-                          href={mySolutionFileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Min besvarelse
-                        </a>
-                      )}
+                      <PrivateFileLink path={exam.examFilePath}>Oppgavesett</PrivateFileLink>
+                      <PrivateFileLink path={exam.solutionFilePath}>Løsning</PrivateFileLink>
+                      <PrivateFileLink path={exam.mySolutionFilePath}>Min besvarelse</PrivateFileLink>
 
                       <button
                         type="button"

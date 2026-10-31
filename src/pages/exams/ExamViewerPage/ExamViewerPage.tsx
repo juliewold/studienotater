@@ -5,7 +5,7 @@ import {
   getExamsBySubject,
   type DatabaseExam,
 } from "../../../services/exams/examsService";
-import { supabase } from "../../../lib/supabase";
+import { usePrivateStorageUrl } from "../../../hooks/usePrivateStorageUrl";
 import { ExamTaskTracker } from "../../../components/exams/ExamTaskTracker/ExamTaskTracker";
 
 export const ExamViewerPage = () => {
@@ -50,14 +50,6 @@ export const ExamViewerPage = () => {
     loadExam();
   }, [examId, subjectId]);
 
-  if (isLoadingExam) {
-    return (
-      <main className="page-container">
-        <p>Laster eksamensfil...</p>
-      </main>
-    );
-  }
-
   const filePath =
     fileId === "solution"
       ? exam?.solutionFilePath
@@ -72,17 +64,20 @@ export const ExamViewerPage = () => {
         ? "Min besvarelse"
         : "Oppgavesett";
 
-  let fileUrl = "";
+  const fileAccess = usePrivateStorageUrl("pdfs", filePath);
+  const fileUrl = fileAccess.url;
 
-  if (filePath) {
-    const { data } = supabase.storage.from("pdfs").getPublicUrl(filePath);
-
-    fileUrl = data.publicUrl;
+  if (isLoadingExam) {
+    return (
+      <main className="page-container">
+        <p>Laster eksamensfil...</p>
+      </main>
+    );
   }
 
   const examTitle = exam ? `${exam.title} – ${exam.semester} ${exam.year}` : "";
 
-  if (errorMessage || !exam || !filePath || !fileUrl) {
+  if (errorMessage || !exam || !filePath) {
     return (
       <main className="page-container">
         <Link to={`/fag/${subjectId}/eksamen`} className="back-link">
@@ -110,7 +105,7 @@ export const ExamViewerPage = () => {
         </div>
       </header>
 
-      <div className="exam-workspace">
+      {!fileUrl ? <p role="status">{fileAccess.loading ? "Laster filtilgang…" : fileAccess.error}</p> : <div className="exam-workspace">
         <aside className="exam-workspace-sidebar">
           <ExamTaskTracker examId={exam.id} tasks={exam.relevantTasks} />
         </aside>
@@ -131,7 +126,7 @@ export const ExamViewerPage = () => {
             Åpne PDF i fullskjerm
           </a>
         </div>
-      </div>
+      </div>}
     </main>
   );
 };

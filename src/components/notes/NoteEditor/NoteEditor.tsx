@@ -35,7 +35,7 @@ import { useEditor, useEditorState, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Mathematics } from "@tiptap/extension-mathematics";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import Image from "@tiptap/extension-image";
+import { PrivateImage } from "./PrivateImage";
 import { TableKit } from "@tiptap/extension-table";
 import { common, createLowlight } from "lowlight";
 import { importIntoEditor, readImportFile } from "./noteImport";
@@ -183,7 +183,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
         },
       }),
 
-      Image.configure({
+      PrivateImage.configure({
         inline: false,
         allowBase64: false,
         resize: {

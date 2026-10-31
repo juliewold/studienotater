@@ -14,7 +14,7 @@ import { NoteDocument } from "../NoteDocument/NoteDocument";
 import StarterKit from "@tiptap/starter-kit";
 import { Mathematics } from "@tiptap/extension-mathematics";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import Image from "@tiptap/extension-image";
+import { PrivateImage } from "../NoteEditor/PrivateImage";
 import { common, createLowlight } from "lowlight";
 import { TableKit } from "@tiptap/extension-table";
 import { Callout } from "../NoteEditor/Callout";
@@ -81,7 +81,7 @@ export const ReadOnlyNote = ({ content, header }: ReadOnlyNoteProps) => {
           },
         }),
 
-        Image.configure({
+        PrivateImage.configure({
           inline: false,
           allowBase64: false,
         }),
