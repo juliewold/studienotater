@@ -26,7 +26,6 @@ const input = (id: string, value: string) => {
  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(element, value);
  element.dispatchEvent(new Event("input", { bubbles: true }));
 };
-let deletionMode: "blocked" | "success" = "blocked";
 supabase.auth.getUser = async () => ({ data: { user }, error: null });
 supabase.auth.signInWithPassword = (async () => ({ data: { user, session: { access_token: "isolated-token" } }, error: null })) as typeof supabase.auth.signInWithPassword;
 supabase.auth.signOut = async () => ({ error: { message: "Simulated browser cleanup failure" } }) as Awaited<ReturnType<typeof supabase.auth.signOut>>;
@@ -34,6 +33,7 @@ const render = (role: "admin" | "user", signedIn = true) => {
  flushSync(() => root.render(<AuthContext.Provider value={{ user: signedIn ? user : null, role, isAdmin: role === "admin", isLoading: false, signOut: async () => {} }}><SettingsPage key={`${role}-${signedIn}`} /></AuthContext.Provider>));
 };
 try {
+ check(import.meta.env.VITE_ACCOUNT_DELETION_ENABLED === "true", "UI interaction suite requires the isolated enabled build");
  render("user", false);
  check(!document.querySelector(".delete-account-button"), "Anonymous users are asked to log in");
  for (const role of ["user", "admin"] as const) {
@@ -64,12 +64,11 @@ try {
  check(true, "Storage ownership failure is shown without claiming deletion");
  input("delete-password", "synthetic-password");
  await until(() => !(document.querySelector("button[type=submit]") as HTMLButtonElement).disabled);
- deletionMode = "success";
  form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
  await until(() => calls === 2);
  resolveDeletion!(Response.json({ code: "ACCOUNT_DELETED" }));
  await until(() => document.querySelector("[role=alert]")?.textContent?.includes("Kontoen er slettet"));
- check(deletionMode === "success" && !document.querySelector("button[type=submit]"), "Confirmed deletion is not retried when local cleanup fails");
+ check(!document.querySelector("button[type=submit]"), "Confirmed deletion is not retried when local cleanup fails");
  document.querySelector("#results")!.textContent = checks.map(label => `PASS: ${label}`).join("\n");
 } catch (error) {
  document.querySelector("#results")!.textContent = checks.map(label => `PASS: ${label}`).join("\n") + `\nFAIL: ${String(error)}`;

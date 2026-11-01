@@ -97,7 +97,7 @@ export const SettingsPage = () => {
           </div>
         </section>
 
-        <section className="settings-card account-deletion" aria-labelledby="delete-account-title">
+        {import.meta.env.VITE_ACCOUNT_DELETION_ENABLED === "true" && <section className="settings-card account-deletion" aria-labelledby="delete-account-title">
           <h2 id="delete-account-title">Slett konto</h2>
           <p>Kontoen, profilen, favorittene, fagvalgene og den personlige fremdriften slettes permanent. Felles notater, PDF-er, bilder og eksamensfiler bevares.</p>
           <p>Sikkerhetskopier og sikkerhetslogger kan beholdes i en begrenset periode. Nedlastede filer og data i andre nettlesere slettes ikke automatisk.</p>
@@ -118,7 +118,7 @@ export const SettingsPage = () => {
             </form>
           )}
           {error && <p role="alert">{error}</p>}
-        </section>
+        </section>}
       </div>
     </main>
   );

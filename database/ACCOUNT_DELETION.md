@@ -12,6 +12,46 @@ keys, triggers, log retention and backup settings have **not** been verified for
 this feature. Complete the metadata-only SQL review below before enabling it.
 Do not infer production cascades from TypeScript types or previous Storage tests.
 
+### Production review update (2026-11-01)
+
+The operator confirmed the required personal tables, the validated
+`book_task_progress.user_id` Auth foreign key, and a shared `calendar_events`
+table without `user_id`. `notes.created_by` is absent. `auth.scim_users` is empty;
+do not modify Supabase-managed Auth tables. Future SCIM use requires a separate
+review of retained provisioning data.
+
+The operator inspected all 102 rows in the historical application backup tables:
+
+| Table | Rows | Reviewed content | Account deletion behavior |
+| --- | --- | --- | --- |
+| `study_topics_backup_20260910` | 14 | Shared academic topics | Preserve |
+| `study_topic_items_backup_20260910` | 62 | Shared exercises and syllabus entries | Preserve |
+| `study_topic_resources_backup_20260910` | 26 | Shared PDF and video references | Preserve |
+
+No obvious personal information was found in the reviewed fields. The operator
+also confirmed no registered foreign keys, obvious user ownership fields or
+triggers on these backups. Classify these reviewed copies as shared academic
+content, not personal progress or account-owned records. Keep all rows when an
+account is deleted; do not add these tables to `account_deletion_targets()` or
+the shared-attribution allowlist. This classification is specific to the
+reviewed contents, not permission to retain future account-specific data. These
+application tables are separate from provider database snapshots and their
+retention/restore obligations.
+
+The supplied trigger inventory found no active DELETE triggers on `auth.users`,
+`profiles` or the personal progress tables, and no UPDATE triggers on
+`auth.users`. The repository's profile role protection runs on INSERT/UPDATE,
+not DELETE; shared-note/concept triggers are outside this cleanup's write path.
+Storage triggers are not invoked because cleanup neither deletes nor updates
+Storage. The final production query for active non-internal DELETE triggers
+on Auth child tables returned **No rows returned**, as confirmed by the
+operator. All agreed production database checks are complete without new
+identified blockers; no further trigger-function review is outstanding from
+that inventory. The broader initial
+inventory and local-test caveats below describe the original evidence baseline;
+this update records subsequent operator-supplied production findings, not an
+independent production connection or deployment approval.
+
 | Location | Personal data evidenced by code/provider | Deletion behavior |
 | --- | --- | --- |
 | Supabase Auth | User UUID, email, password hash, username/full name in signup metadata; provider identities, confirmation/recovery data, sessions/refresh tokens, sign-in timestamps, potential phone/MFA records | Supported Auth admin **hard-delete** API; never a frontend admin call |
@@ -195,14 +235,83 @@ does not add FKs or reclassify existing rows.
    without logging passwords/tokens/request bodies. CORS is not authentication.
 7. Verify preflight with a reviewed synthetic account in the isolated stack;
    verify production function configuration with non-destructive missing-token
-   requests only. Set `ACCOUNT_DELETION_ENABLED=true` only after approval, then
-   publish the compatible frontend. No Django deployment is needed.
-8. Before publishing, get a reviewer to run the isolated end-to-end acceptance
-   checklist, including reader/admin deletion, MFA rejection, owned Storage
+   requests only: while disabled, POST must return `503 / NOT_AVAILABLE`
+   (the flag is checked before token validation). Keep the server flag false.
+   No Django deployment is needed.
+8. Before publishing, review the recorded isolated end-to-end acceptance
+   results. Repeat only checks affected by a concrete implementation change.
+   Acceptance coverage includes reader/admin deletion, MFA rejection, owned Storage
    blocking, rollback, unknown SET NULL tables, silent child/profile/Auth trigger
    cancellation (before and after cleanup), deferred COMMIT failure, duplicate
    click, uncertain network/verification outcome and local logout. Confirm the
    deployed Auth admin lookup uses the explicit `user_not_found` error code.
+9. After PR approval, merge the reviewed branch into main. This automatically
+   triggers GitHub Pages deployment; keep `ACCOUNT_DELETION_ENABLED=false`.
+   Verify the deployed commit, Settings rendering, browser console and the
+   disabled-backend response without attempting an actual deletion.
+10. Only after frontend verification, operational prerequisites and explicit
+    activation approval, set `ACCOUNT_DELETION_ENABLED=true`. A missing-token
+    POST should then return 401 without deleting anything. A full production
+    deletion test requires separate approval and a newly created disposable
+    synthetic account, never an existing real user or shared-file owner.
+
+### Frontend availability flag
+
+Settings hides the entire deletion section unless the public build-time flag
+`VITE_ACCOUNT_DELETION_ENABLED` is exactly the string `true`. Missing, false or
+other values keep it hidden. The Pages workflow reads the repository Actions
+variable of that name (`vars`, not secrets), defaulting to `false`. Leave it
+unset or false until activation is approved. Never treat the UI flag as
+authorization; `ACCOUNT_DELETION_ENABLED` on the server remains the security
+control. The client flag cannot enable a disabled backend.
+
+Publish and verify the frontend with the UI flag false and the server flag
+false. After approval, enable the server, perform non-destructive checks, then
+publish a new frontend build with the UI flag true. Changing a GitHub variable
+alone does not rebuild Pages; the workflow now explicitly passes this non-secret
+value to Vite, and a new build/deployment is required. Configure it under
+GitHub Settings > Secrets and variables > Actions > Variables as a repository
+variable. Its initial value must remain false or unset. On an incident disable the
+server flag first; old browser bundles can still contain the button. This
+implementation introduces no status API or privileged frontend credentials.
+
+### Operator decisions required before activation
+
+- Provide the real operator name/contact and a working support/privacy channel
+  for blocked deletion, unsupported reauthentication and uncertain outcomes.
+  Do not invent contact details or promise an unagreed response time.
+- Record actual provider backup/log retention, access restrictions, expiry and
+  the procedure for respecting erasure requests after a restore. Include relevant
+  Supabase/Auth/Edge and other provider logs; retention is not established by
+  these schema checks. Clarify local browser-history limitations in the notice.
+- Assign responsibility and a supported, reviewed procedure for administrator
+  accounts owning shared files. Those accounts remain blocked from self-service
+  deletion until ownership/dependencies are safely resolved. Preserve shared
+  files and access; do not null ownership or delete files to bypass the guard.
+
+### PR completeness review
+
+Before the frontend flag and integration follow-up, the feature diff against
+the locally available `origin/main` contained 17 files: application UI/service, Edge Function/configuration, both SQL
+migrations, rollout/FK documentation and existing deletion/FK regression tests.
+The local `main` ref is older than `origin/main`; do not use its broad historical
+diff as this feature's PR scope. This review did not fetch or verify remote
+freshness.
+
+The updated `database/ACCOUNT_DELETION.md` and these five reviewed integration
+files are included in the local publication changes:
+
+- `tests/account-deletion.integration-schema.sql`
+- `tests/account-deletion.integration.html`
+- `tests/account-deletion.integration.mjs`
+- `tests/account-deletion.integration.tsx`
+- `tests/run-account-deletion-integration.py`
+
+These are reusable synthetic-only fixtures, API/browser verification and an
+isolated native-stack runner referenced by this document, not production data
+or deployment artifacts. No generated credentials, local environment files or
+temporary test-stack data belong in the PR. Local commits do not authorize
+publication, deployment or activation.
 
 Example deployment command after review (do not run during implementation):
 
@@ -245,6 +354,98 @@ old personal rows without evaluating the deletion request.
 
 ## Tests and references
 
+### Real local integration verification — 2026-11-01
+
+Verified with Supabase CLI **2.122.0**, the experimental **native runtime** on
+macOS Apple silicon, real local PostgreSQL 17.11, Auth, Storage, REST and Edge
+Runtime. Docker is not required for this supported native setup. All services
+used a fresh `/tmp/studienotater-account-integration-*` project/data directory,
+locally generated keys and a stripped environment. No production `.env`, keys,
+accounts, schema dump or database connection were used. No remote deployment
+was performed. The minimal application schema is synthetic, not proof of
+compatibility with the deployed production schema.
+
+Passed against real services:
+
+- Hard deletion through the actual Edge Function and Auth admin API for a
+  synthetic reader and administrator; Auth users, identities, sessions, refresh
+  tokens, profiles, all six other required personal tables and owned calendar
+  rows were erased. The tested accounts had no verified MFA factors.
+- Real private Storage bucket and file uploads, including user-owned files.
+  File ownership blocked deletion while preserving the account, personal rows,
+  all uploaded bytes and Storage metadata.
+- Unknown personal `ON DELETE SET NULL` dependency rejected before erasure.
+- Silent personal-table DELETE cancellation, late Auth cancellation/deferred
+  COMMIT failure and a raised database exception all rolled back. Full snapshots
+  of Auth users, identities, sessions, refresh tokens, MFA rows and application
+  data were preserved on failure; the internal pending-check table stayed empty.
+- Early Auth cancellation did not produce a false success response.
+- Another synthetic user's data remained unchanged, shared note content was
+  preserved with classified attribution cleared, and all Storage object rows
+  were unchanged.
+- Missing/invalid bearer tokens and a cross-user target-ID attempt were rejected
+  by the real Edge Function without modifying either account.
+- Actual `SettingsPage`, `LoginPage`, Auth provider and deletion service against
+  local Auth/Edge: incorrect password rejected; real file owner received the
+  ownership-block message; successful deletion returned to the actual app login
+  page with the deletion confirmation. Direct database/Auth checks confirmed
+  both UI outcomes and preservation of another account/shared files. No
+  unexpected browser console errors were observed in the checked completion.
+
+There were no implementation fixes required by these real-service tests. The
+new files are reusable test infrastructure; no production runtime code changed.
+The full local Auth/API suite was also repeated from a clean stack using the
+test starter. The isolated services were stopped after verification.
+
+To repeat (requires the official CLI >=2.122.0, `psql`, Node dependencies, network
+access for verified native service artifacts, and a supported native platform):
+
+```sh
+# Fresh synthetic stack, real API suite, automatic stop afterward.
+python3 tests/run-account-deletion-integration.py --supabase /path/to/supabase
+
+# Keep the fresh stack and dedicated local frontend for browser acceptance.
+python3 tests/run-account-deletion-integration.py --supabase /path/to/supabase --keep-running
+```
+
+The starter prints only PASS messages, the test root and the browser URL, never
+keys. CLI startup/status output remains in the private test directory. The
+frontend's dedicated `envDir` contains only the locally generated publishable
+key; the repository's production `.env` is excluded.
+
+Open the printed integration page and log in with the **synthetic-only**
+`account-delete-ui-owner@example.invalid`, password
+`Synthetic-Account-Delete-2026!`. Verify wrong-password rejection and then the
+file-ownership block with the correct password. Return to that page's login
+route, log in as `account-delete-ui-success@example.invalid` with the same
+synthetic password, and complete `SLETT` confirmation. This account is disposable
+and is supposed to be permanently erased. Do not substitute a real account.
+The same `run` suite cannot be repeated against already erased fixtures; create
+a fresh stack for each run.
+
+Then run these modes in order, replacing the path with the printed test root:
+
+```sh
+node tests/account-deletion.integration.mjs /tmp/studienotater-account-integration-<id> verify-ui
+node tests/account-deletion.integration.mjs /tmp/studienotater-account-integration-<id> verify-auth
+node tests/account-deletion.integration.mjs /tmp/studienotater-account-integration-<id> verify-rollback-auth
+```
+
+`verify-ui` compares against the baseline saved by `run`. `verify-auth` performs
+a legitimate survivor login, so run the UI comparison first. No mode reads
+production credentials; the runner refuses non-loopback API/database URLs or a
+CLI identity that does not belong to the fresh temporary test root. Stop only
+this test stack afterward with `SUPABASE_HOME=<test-root>/home`,
+`SUPABASE_EXPERIMENTAL_STACK=1` and `supabase --workdir <test-root> stop`. Stop the
+test frontend using its recorded `frontend.pid` after checking its command
+points to that root's Vite config. Do not stop unrelated development services.
+
+The agreed production schema review is now complete as recorded above.
+Production activation is still pending the manual rollout and operator
+decisions, not another repetition of passed tests. The integration fixtures
+remain synthetic; rerun affected tests only if implementation changes or a
+concrete schema incompatibility is identified.
+
 - `node --experimental-vm-modules tests/account-deletion.mjs`: offline Edge
   handler and client service security/error tests; no live deletion calls.
 - `tests/account-deletion.sql`: **only** an empty local database named
@@ -263,5 +464,24 @@ Sources: [Supabase user data/deletion](https://supabase.com/docs/guides/auth/man
 [server-only hard deletion](https://supabase.com/docs/reference/javascript/auth-admin-deleteuser),
 [Storage ownership](https://supabase.com/docs/guides/storage/security/ownership),
 [Edge authorization headers](https://supabase.com/docs/guides/functions/auth-headers),
+[native local runtime](https://supabase.com/docs/guides/local-development/docker-and-native-runtimes),
 [signed URL and cache limits](https://supabase.com/kb/troubleshooting/storage-private-bucket-files-still-accessible-after-remove-access-or-logout),
 [GDPR Article 17 in Norwegian law](https://lovdata.no/lov/2018-06-15-38/kapiii).
+
+Local flag checks: `node --experimental-vm-modules tests/account-deletion-flag.mjs`.
+For isolated enabled UI interaction tests only, start Vite with
+`VITE_ACCOUNT_DELETION_ENABLED=true npm run dev` and open
+`/studienotater/tests/account-deletion.html`. The local integration runner sets
+this flag only in its temporary frontend environment. Neither command changes
+GitHub variables or production flags. For a local enabled production build,
+use `VITE_ACCOUNT_DELETION_ENABLED=true npm run build`; this does not deploy it.
+
+The frontend-flag follow-up also includes `.github/workflows/deploy.yml`, the
+Settings visibility condition, the UI test precondition, the integration
+runner's isolated frontend flag, and `tests/account-deletion-flag.mjs`. Include
+that new offline flag test in the eventual PR alongside the five integration
+files listed above.
+
+The adapted mocked browser UI suite passed all ten checks with the frontend
+flag enabled in an isolated temporary environment. Outbound production requests
+were blocked; the temporary test server and its configuration were removed.

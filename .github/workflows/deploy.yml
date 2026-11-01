@@ -34,6 +34,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          VITE_ACCOUNT_DELETION_ENABLED: ${{ vars.VITE_ACCOUNT_DELETION_ENABLED || 'false' }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
