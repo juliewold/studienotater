@@ -30,6 +30,9 @@ INSERT INTO notes VALUES (1,'shared material','00000000-0000-0000-0000-000000000
 INSERT INTO calendar_events VALUES (1,'shared calendar');
 INSERT INTO storage.objects VALUES (1,'00000000-0000-0000-0000-000000000002',NULL,'shared.pdf');
 INSERT INTO storage.buckets VALUES ('pdfs',NULL,false),('note-images',NULL,false);
+-- Reproduce the reported production gap before installing the separate fix.
+ALTER TABLE book_task_progress DROP CONSTRAINT book_task_progress_user_id_fkey;
+\ir ../database/migrations/20261101_book_task_progress_auth_user_fk.sql
 \ir ../database/migrations/20261101_account_deletion.sql
 \ir ../database/migrations/20261101_account_deletion.sql
 
