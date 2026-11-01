@@ -37,6 +37,7 @@ export const LoginPage = () => {
 
   return (
     <AuthLayout label="Velkommen tilbake" title="Logg inn">
+      {new URLSearchParams(location.search).get("accountDeleted") === "1" && <p role="status">Kontoen er slettet. Takk for at du brukte Studienotater.</p>}
       <form className="auth-form" onSubmit={handleSubmit}>
         <label htmlFor="email">E-post</label>
         <input
