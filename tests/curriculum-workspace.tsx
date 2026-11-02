@@ -81,10 +81,10 @@ check(formulas[0].description === "Masterteoremet", "Formel i boks får boksens 
 const symbols = findSymbols([{ latex: "O(n) + \\Omega(n) + \\lg n" }, { latex: "\\Theta(n)" }]).map(entry => entry.definition.id);
 check(symbols.join() === "O,Omega,Theta,lg", "Symboler finnes uten falske treff (Ω er ikke O)");
 // --- Reviewed lesson ---------------------------------------------------------
-check(hasLesson("tdt4120", "01") && hasLesson("tdt4120", "02a") && hasLesson("tdt4120", "02b") && !hasLesson("tdt4120", "03"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
+check(["01", "02a", "02b", "03"].every(id => hasLesson("tdt4120", id)) && !hasLesson("tdt4120", "04"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
 const allBlocks = (blocks: LessonBlock[]): LessonBlock[] => blocks.flatMap(block =>
   block.type === "box" || block.type === "example" ? [block, ...allBlocks(block.blocks)] : [block]);
-for (const unitId of ["01", "02a", "02b"]) {
+for (const unitId of ["01", "02a", "02b", "03"]) {
   const lesson = (await loadLesson("tdt4120", unitId))!;
   const lessonBlocks = lesson.sections.flatMap(section => allBlocks(section.blocks));
   const texts = [lesson.summary, ...lesson.goals, ...lesson.overview, ...lesson.keyFormulas.map(formula => formula.label), ...lessonBlocks.flatMap(block =>
@@ -104,7 +104,7 @@ for (const unitId of ["01", "02a", "02b"]) {
   check(lesson.sources.some(source => source.kind === "drive") && lesson.sources.some(source => source.kind === "note"), `${unitId}: kilder fra Google Drive og de forbedrede notatene`);
 }
 const lesson01 = (await loadLesson("tdt4120", "01"))!;
-const allNamed = (await Promise.all(["01", "02a", "02b"].map(async id => lessonFormulas((await loadLesson("tdt4120", id))!)))).flat();
+const allNamed = (await Promise.all(["01", "02a", "02b", "03"].map(async id => lessonFormulas((await loadLesson("tdt4120", id))!)))).flat();
 check(lesson01.concepts.length > 10 && !lesson01.concepts.some(slug => /heap|huffman|knapsack|ryggsekk|tree|quicksort|merge/.test(slug)), "Bare begreper fra forelesning 1");
 check(lesson01.notes.every(note => !/sikkerhetskopi/i.test(note.label)), "Læringsnotatet lenker til gjeldende notater");
 check(matchesSearch("grad", "Grådighet") && matchesSearch("merge sort", "Merge Sort algoritme") && !matchesSearch("heap", "Merge"), "Søk tåler diakritiske tegn og flere ord");
@@ -115,7 +115,7 @@ const calls: Call[] = [];
 const rows: Record<string, unknown[]> = {
   topics: topics.map(topic => ({ id: topic.id, subject_id: "tdt4120", name: topic.name, sort_order: topic.sortOrder })),
   subtopics: topics.flatMap(topic => topic.subtopics.map(subtopic => ({ id: subtopic.id, topic_id: topic.id, name: subtopic.name, sort_order: subtopic.sortOrder }))),
-  notes: [{ id: "n1", subject_id: "tdt4120", folder_id: null, subtopic_id: "merge", slug: "notat", title: "Notat", description: "", created_at: "", sort_order: 0, subtopics: null, content: html }],
+  notes: [{ id: "n1", subject_id: "tdt4120", folder_id: null, subtopic_id: "bfs", slug: "notat", title: "Notat", description: "", created_at: "", sort_order: 0, subtopics: null, content: html }],
   pdfs: [], note_subtopics: [],
   concept_subtopics: [{ concept_id: "c1", subtopic_id: "merge" }, { concept_id: "c1", subtopic_id: "ins" }, { concept_id: "c2", subtopic_id: "merge" }],
   concepts: [
@@ -206,18 +206,22 @@ check(contentCalls() === contentBefore, "Læringssiden henter ikke notatinnhold 
 check([...document.querySelectorAll("#tema-begreper .curriculum-chip-list a")].some(link => link.textContent === "Trekanttall") === false, "Begreper fra kunnskapsbasen som ikke er valgt for forelesningen, vises ikke");
 
 navigate("/fag/tdt4120/tema/pensum/03");
+await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 7);
+check(text("h1") === "Splitt og hersk" && text(".lesson-overview").includes("Masterteoremet") && document.querySelector("#tema-binaersok .lesson-figure") && document.querySelector("#tema-masterteoremet .lesson-figure"), "Forelesning 03 viser læringsnotatet med figurer ved teorien");
+check(text("#tema-ressurser").includes("Øving 3, del 1") && !/sikkerhetskopi/i.test(text(".curriculum-unit-page")), "Lenker til de forbedrede øvingsnotatene, uten sikkerhetskopier");
+check(document.querySelectorAll(".curriculum-subtopics a").length === 2, "Aktivt tema viser undertemaer i sidemenyen");
+
+navigate("/fag/tdt4120/tema/pensum/04");
 await waitFor(() => text(".curriculum-unit-page").includes("Læringsnotatet for dette temaet er ikke skrevet ennå"));
-check(text("h1") === "Splitt og hersk" && text(".curriculum-label") === "Forelesning 03", "Temaside for forelesning uten læringsnotat");
-check(!document.querySelector(".lesson-part") && !text(".curriculum-unit-page").includes("Masterteoremet"), "Uferdige notater vises ikke som læringsinnhold");
-check(text(".curriculum-unit-page").includes("Rekursiv dekomponering.") && text(".curriculum-unit-page").includes("Øving 3: Splitt og hersk") && text("#tema-ressurser").includes("Notat"), "Introduksjon, øving og lenke til notatet vises");
+check(text("h1") === "Rangering i lineær tid" && text(".curriculum-label") === "Forelesning 04", "Temaside for forelesning uten læringsnotat");
+check(!document.querySelector(".lesson-part") && text(".curriculum-unit-page").includes("Øving 4: Rangering i lineær tid"), "Uten læringsnotat vises øving, men ikke læringsinnhold");
 check(!document.querySelector("#tema-begreper .curriculum-chip-list a[href*='concepts']") && text("#tema-begreper").includes("Begrepene for dette temaet velges ut"), "Uten læringsnotat vises ingen ufiltrert begrepsliste");
 check(contentCalls() === contentBefore, "Heller ikke temaer uten læringsnotat henter notatinnhold");
-check(document.querySelectorAll(".curriculum-subtopics a").length === 2, "Aktivt tema viser undertemaer i sidemenyen");
 const before = calls.length;
 document.querySelector<HTMLButtonElement>(".curriculum-mark")!.click();
 await waitFor(() => calls.length > before);
 const save = calls.at(-1)!;
-check(save.table === "progress" && save.method === "POST" && JSON.stringify(save.body).includes('"item_type":"syllabus"') && JSON.stringify(save.body).includes("tdt4120-03"), "Gjennomgått lagres som eksisterende pensumfremdrift");
+check(save.table === "progress" && save.method === "POST" && JSON.stringify(save.body).includes('"item_type":"syllabus"') && JSON.stringify(save.body).includes("tdt4120-04"), "Gjennomgått lagres som eksisterende pensumfremdrift");
 await waitFor(() => text(".curriculum-progress-count") === "1/16");
 check(document.querySelector(".curriculum-mark")!.getAttribute("aria-pressed") === "true", "Markering vises i siden og sidemenyen");
 
