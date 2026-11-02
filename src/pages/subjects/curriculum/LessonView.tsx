@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, BookOpen, ExternalLink, Lightbulb, ScrollText } from "lucide-react";
 import type { Lesson, LessonBlock } from "../../../data/curriculum/lessons/types";
@@ -13,18 +14,47 @@ const boxes = {
 export function LessonIntro({ lesson }: { lesson: Lesson }) {
   return <div className="lesson-intro">
     <p className="lesson-summary"><RichText>{lesson.summary}</RichText></p>
-    <div className="lesson-goals">
-      <h2>Dette skal du kunne</h2>
+    <section className="lesson-overview" aria-labelledby="lesson-overview-title">
+      <h2 id="lesson-overview-title">Det viktigste</h2>
+      <ul className="lesson-overview-points">{lesson.overview.map(point => <li key={point}><RichText>{point}</RichText></li>)}</ul>
+      {lesson.keyFormulas.length > 0 && <dl className="lesson-key-formulas">{lesson.keyFormulas.map(formula => <div key={formula.latex}>
+        <dt><RichText>{formula.label}</RichText></dt>
+        <dd><Latex latex={formula.latex} /></dd>
+      </div>)}</dl>}
+    </section>
+    <details className="lesson-goals">
+      <summary>Læringsmål fra pensumheftet</summary>
       <ul>{lesson.goals.map(goal => <li key={goal}><RichText>{goal}</RichText></li>)}</ul>
-    </div>
+    </details>
   </div>;
 }
 
+/** Detailed sections, collapsible for revision. Printing expands every one. */
 export function LessonSections({ lesson }: { lesson: Lesson }) {
-  return <>{lesson.sections.map(section => <section key={section.id} className="curriculum-section lesson-section" id={`tema-${section.id}`} aria-labelledby={`tema-${section.id}-title`}>
-    <h2 id={`tema-${section.id}-title`}>{section.title}</h2>
-    <Blocks blocks={section.blocks} />
-  </section>)}</>;
+  const root = useRef<HTMLDivElement>(null);
+  const setAll = (open: boolean) => root.current?.querySelectorAll<HTMLDetailsElement>("details.lesson-part").forEach(section => { section.open = open; });
+  useEffect(() => {
+    let closed: HTMLDetailsElement[] = [];
+    const expand = () => {
+      closed = Array.from(root.current?.querySelectorAll<HTMLDetailsElement>("details:not([open])") ?? []);
+      closed.forEach(element => { element.open = true; });
+    };
+    const restore = () => { closed.forEach(element => { element.open = false; }); closed = []; };
+    window.addEventListener("beforeprint", expand);
+    window.addEventListener("afterprint", restore);
+    return () => { window.removeEventListener("beforeprint", expand); window.removeEventListener("afterprint", restore); };
+  }, []);
+  return <div ref={root} className="lesson-parts">
+    <div className="lesson-toolbar">
+      <h2>Gjennomgang</h2>
+      <button type="button" onClick={() => setAll(true)}>Åpne alle</button>
+      <button type="button" onClick={() => setAll(false)}>Lukk alle</button>
+    </div>
+    {lesson.sections.map(section => <details key={section.id} className="curriculum-section lesson-part" id={`tema-${section.id}`}>
+      <summary><h3>{section.title}</h3></summary>
+      <div className="lesson-part-body"><Blocks blocks={section.blocks} /></div>
+    </details>)}
+  </div>;
 }
 
 export function LessonSources({ lesson }: { lesson: Lesson }) {

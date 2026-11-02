@@ -29,7 +29,15 @@ export type Lesson = {
   /** Date the content was last reviewed against the sources (YYYY-MM-DD). */
   reviewed: string;
   summary: LessonText;
+  /** The essentials for exam revision, shown first. */
+  overview: LessonText[];
+  /** The few formulas to know by heart, shown with the overview. */
+  keyFormulas: { latex: string; label: LessonText }[];
   goals: LessonText[];
+  /** Slugs of existing concept pages that belong to this unit. */
+  concepts: string[];
+  /** Current notes for this unit (slug and title), instead of every linked note. */
+  notes: { slug: string; label: string }[];
   sources: LessonSource[];
   sections: LessonSection[];
 };

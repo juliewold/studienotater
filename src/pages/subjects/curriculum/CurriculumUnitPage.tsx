@@ -5,7 +5,7 @@ import { useCurriculum } from "../../../components/subjects/CurriculumLayout/cur
 import { MathText } from "../../../components/common/MathText/MathText";
 import { hasLesson, loadLesson } from "../../../data/curriculum/lessons";
 import type { Lesson } from "../../../data/curriculum/lessons/types";
-import { conceptsForUnit, exercisesForUnit, lectureNotesForUnit, notesForUnit, type CurriculumUnit } from "../../../services/subjects/curriculumContent";
+import { currentNotesForUnit, exercisesForUnit, lectureNotesForUnit, type CurriculumUnit } from "../../../services/subjects/curriculumContent";
 import { CurriculumPage, CurriculumStatus } from "./curriculumShared";
 import { unitLabel } from "./curriculumHelpers";
 import { LessonIntro, LessonSections, LessonSources } from "./LessonView";
@@ -23,8 +23,7 @@ export function CurriculumUnitPage() {
 function UnitDetails({ unit }: { unit: CurriculumUnit }) {
   const { subjectId, workspace, progress } = useCurriculum();
   const data = workspace!;
-  const notes = useMemo(() => notesForUnit(unit, data.notes, data.noteLinks), [unit, data]);
-  const concepts = useMemo(() => conceptsForUnit(unit, data.concepts), [unit, data]);
+  const linkedNotes = useMemo(() => currentNotesForUnit(unit, data.notes, data.noteLinks), [unit, data]);
   const lectureNotes = lectureNotesForUnit(unit, data.pdfs);
   const exercises = exercisesForUnit(unit, data.pdfs, data.notes);
   const introductions = unit.topics.flatMap(topic => data.introductions[topic.id] ? [{ topic, text: data.introductions[topic.id] }] : []);
@@ -43,10 +42,14 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
     return () => { cancelled = true; };
   }, [expectsLesson, subjectId, unit.id]);
 
+  // A lesson names its own concepts and current notes; the knowledge base links concepts too broadly.
+  const concepts = lesson ? lesson.concepts.flatMap(slug => data.concepts.find(concept => concept.slug === slug) ?? []) : [];
+  const notes = lesson ? lesson.notes.map(note => data.notes.find(item => item.slug === note.slug) ?? { id: note.slug, slug: note.slug, title: note.label, subjectId })
+    : linkedNotes;
   const done = progress.completed.has(unit.id);
   const navigation = [...(lesson?.sections.map(({ id, title }) => ({ id, title })) ?? []),
     ...(!lesson && introductions.length ? [{ id: "introduksjon", title: "Introduksjon" }] : []),
-    ...(concepts.length || unit.subtopicIds.length ? [{ id: "begreper", title: "Begreper og undertemaer" }] : []),
+    { id: "begreper", title: unit.subtopicIds.length ? "Begreper og undertemaer" : "Begreper" },
     { id: "ressurser", title: "Forelesninger og øvinger" }];
 
   return <CurriculumPage label={unitLabel(unit, Boolean(data.config))} title={unit.title} className="curriculum-unit-page">
@@ -70,7 +73,9 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
     {(lesson || !expectsLesson) && <nav className="curriculum-on-page" aria-label="På denne siden"><span>På denne siden</span>
       <ul>{navigation.map(item => <li key={item.id}><a href={`#tema-${item.id}`} onClick={event => {
         event.preventDefault();
-        document.getElementById(`tema-${item.id}`)?.scrollIntoView({ block: "start" });
+        const target = document.getElementById(`tema-${item.id}`);
+        if (target instanceof HTMLDetailsElement) target.open = true;
+        target?.scrollIntoView({ block: "start" });
       }}>{item.title}</a></li>)}</ul>
     </nav>}
 
@@ -79,18 +84,20 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
       {introductions.map(({ topic, text }) => <p key={topic.id} className="curriculum-introduction"><MathText>{text}</MathText></p>)}
     </Section>}
 
-    {(concepts.length > 0 || unit.subtopicIds.length > 0) && <Section id="begreper" title="Begreper og undertemaer">
-      {concepts.length > 0 && <>
-        <p className="curriculum-section-intro">Begrepssider fra kunnskapsbasen. Se alle definisjonene under <Link to={`/fag/${subjectId}/tema/begreper`}>Begreper</Link>.</p>
-        <ul className="curriculum-chip-list">{concepts.map(concept => <li key={concept.id}><Link to={`/concepts/${concept.slug}`}><MathText>{concept.name}</MathText></Link></li>)}</ul>
-      </>}
+    <Section id="begreper" title={unit.subtopicIds.length ? "Begreper og undertemaer" : "Begreper"}>
+      {concepts.length > 0
+        ? <>
+          <p className="curriculum-section-intro">Begrepene i denne forelesningen. Alle begreper finner du under <Link to={`/fag/${subjectId}/tema/begreper`}>Begreper</Link>.</p>
+          <ul className="curriculum-chip-list">{concepts.map(concept => <li key={concept.id}><Link to={`/concepts/${concept.slug}`}><MathText>{concept.name}</MathText></Link></li>)}</ul>
+        </>
+        : <p className="curriculum-section-intro">Begrepene for dette temaet velges ut når læringsnotatet skrives. Til da finner du alle begreper under <Link to={`/fag/${subjectId}/tema/begreper`}>Begreper</Link>.</p>}
       {unit.topics.filter(topic => topic.subtopics.length > 0).map(topic => <div key={topic.id} className="curriculum-subtopic-group">
         <h3><Link to={`/fag/${subjectId}/tema/${topic.id}`}>{topic.name}</Link></h3>
         <ul className="curriculum-chip-list">{topic.subtopics.map(subtopic => <li key={subtopic.id}>
           <Link to={`/fag/${subjectId}/tema/${topic.id}/undertema/${subtopic.id}`}>{subtopic.name}</Link>
         </li>)}</ul>
       </div>)}
-    </Section>}
+    </Section>
 
     <Section id="ressurser" title="Forelesninger og øvinger">
       <p className="curriculum-section-intro">Åpne fullstendige forklaringer, lysark og løsningsforslag.</p>

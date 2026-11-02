@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { BookOpen, Check, ExternalLink, Pi, Sigma } from "lucide-react";
 import { subjects } from "../../../data/subjects";
 import { groupUnitsByPart, useCurriculum } from "../../../components/subjects/CurriculumLayout/curriculumContext";
-import { conceptsForUnit } from "../../../services/subjects/curriculumContent";
+import { hasLesson } from "../../../data/curriculum/lessons";
 import { CurriculumPage, CurriculumStatus } from "./curriculumShared";
 
 export function CurriculumOverviewPage() {
@@ -39,7 +39,7 @@ export function CurriculumOverviewPage() {
       : groupUnitsByPart(units).map((part, index) => <section key={part.name ?? index} className="curriculum-section">
         {part.name && <h2>{part.name}</h2>}
         <ol className="curriculum-unit-grid">{part.units.map(unit => {
-          const concepts = conceptsForUnit(unit, workspace.concepts).length;
+          const lesson = hasLesson(subjectId, unit.id);
           const completed = progress.completed.has(unit.id);
           return <li key={unit.id}>
             <Link className={`curriculum-unit-card${completed ? " is-done" : ""}`} to={`${base}/pensum/${unit.id}`}>
@@ -49,8 +49,9 @@ export function CurriculumOverviewPage() {
               </span>
               <strong>{unit.title}</strong>
               {unit.readings && unit.readings.length > 0 && <span className="curriculum-unit-readings">{unit.readings.join(" · ")}</span>}
-              <span className="curriculum-unit-meta">
-                {unit.subtopicIds.length > 0 ? `${unit.subtopicIds.length} undertemaer · ${concepts} begreper` : "Ingen notater ennå"}
+              <span className={lesson ? "curriculum-unit-meta has-lesson" : "curriculum-unit-meta"}>
+                {lesson ? "Læringsnotat klart" : "Læringsnotat kommer"}
+                {unit.subtopicIds.length > 0 && ` · ${unit.subtopicIds.length} undertemaer`}
                 {unit.supporting && " · Støttelitteratur"}
               </span>
             </Link>

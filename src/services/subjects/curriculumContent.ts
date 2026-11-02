@@ -54,9 +54,22 @@ export function notesForUnit(unit: CurriculumUnit, notes: NoteMetadata[], links:
   return notes.filter(note => (note.subtopicId && ids.has(note.subtopicId)) || linked.has(note.id));
 }
 
-export function conceptsForUnit(unit: CurriculumUnit, concepts: WorkspaceConcept[]) {
-  const ids = new Set(unit.subtopicIds);
-  return concepts.filter(concept => concept.subtopicIds.some(id => ids.has(id)));
+export const isBackupTitle = (title: string) => /sikkerhetskopi/i.test(title);
+
+/** The lecture or exercise number a title declares, e.g. "Øving 2a …", "Forelesning 3 …" or "4. Rangering …". */
+export function declaredNumber(title: string) {
+  const match = title.match(/^\s*(?:forelesning|øving)\s*0*(\d+[ab]?)(?![\p{L}\p{N}])/iu) ?? title.match(/^\s*0*(\d+[ab]?)\.\s/u);
+  return match?.[1].toLowerCase();
+}
+
+/** Linked notes without backups and without notes that declare another lecture's number. */
+export function currentNotesForUnit(unit: CurriculumUnit, notes: NoteMetadata[], links: NoteSubtopicLink[]) {
+  const own = unit.resourceNumber?.toLowerCase();
+  return notesForUnit(unit, notes, links).filter(note => {
+    if (isBackupTitle(note.title)) return false;
+    const declared = declaredNumber(note.title);
+    return !declared || !own || declared === own;
+  });
 }
 
 const numberPattern = (prefix: string, number: string) =>
@@ -74,8 +87,8 @@ export function exercisesForUnit(unit: CurriculumUnit, pdfs: DatabasePdf[], note
   if (!unit.resourceNumber) return [];
   const pattern = numberPattern("øving", unit.resourceNumber);
   return [
-    ...pdfs.filter(pdf => pattern.test(pdf.title)).map(pdf => ({ id: pdf.id, title: pdf.title, kind: "pdf" as const })),
-    ...notes.filter(note => pattern.test(note.title)).map(note => ({ id: note.id, title: note.title, slug: note.slug, kind: "note" as const })),
+    ...pdfs.filter(pdf => pattern.test(pdf.title) && !isBackupTitle(pdf.title)).map(pdf => ({ id: pdf.id, title: pdf.title, kind: "pdf" as const })),
+    ...notes.filter(note => pattern.test(note.title) && !isBackupTitle(note.title)).map(note => ({ id: note.id, title: note.title, slug: note.slug, kind: "note" as const })),
   ];
 }
 

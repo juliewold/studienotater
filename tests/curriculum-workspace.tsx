@@ -11,7 +11,7 @@ import { SymbolsPage } from "../src/pages/subjects/curriculum/SymbolsPage";
 import { ConceptGlossaryPage } from "../src/pages/subjects/curriculum/ConceptGlossaryPage";
 import { tdt4120Curriculum } from "../src/data/curriculum/tdt4120";
 import {
-  buildCurriculumUnits, exercisesForUnit, extractFormulas, findSymbols, lectureNotesForUnit,
+  buildCurriculumUnits, currentNotesForUnit, declaredNumber, exercisesForUnit, extractFormulas, findSymbols, lectureNotesForUnit,
   matchesSearch, notesForUnit, OTHER_UNIT_ID, type CurriculumTopic,
 } from "../src/services/subjects/curriculumContent";
 import { loadCurriculumWorkspace, loadNoteSources } from "../src/services/subjects/curriculumWorkspaceService";
@@ -52,6 +52,10 @@ const meta = (id: string, title: string, subtopicId: string | null): NoteMetadat
   folderId: null, subtopicName: null, topicId: null, topicName: null, description: "", createdAt: "" });
 const notes = [meta("n1", "Insertion sort", "ins"), meta("n2", "Forelesning 3", null), meta("n3", "Øving 3", null), meta("n4", "Annet", "bfs")];
 check(notesForUnit(unit("03"), notes, [{ noteId: "n2", subtopicId: "merge" }]).map(note => note.id).join() === "n2", "Notater via primær- og ekstrakobling");
+const versions = [meta("a", "Forelesning 3 - Splitt og hersk", "merge"), meta("b", "Forelesning 3 - Splitt og hersk (sikkerhetskopi 2026-10-30)", "merge"),
+  meta("c", "Øving 2b - Problemer og reduksjoner (løsningsforslag)", "merge"), meta("d", "3. Splitt og hersk", "merge"), meta("e", "Rekurrenser", "merge")];
+check(currentNotesForUnit(unit("03"), versions, []).map(note => note.id).join() === "a,d,e", "Skjuler sikkerhetskopier og notater fra andre forelesninger");
+check(declaredNumber("Øving 2a - Datastrukturer") === "2a" && declaredNumber("Forelesning 10 - X") === "10" && declaredNumber("4. Rangering") === "4" && !declaredNumber("Rekurrenser"), "Kjenner igjen forelesnings- og øvingsnummer i titler");
 const pdf = (id: string, title: string, subtopicId: string | null = null) => ({ id, title, subtopicId, category: "forelesninger" }) as DatabasePdf;
 const pdfs = [pdf("p1", "forelesn01_kort"), pdf("p10", "Forelesning 10"), pdf("p3", "Øving 1"), pdf("px", "Lysark", "merge")];
 check(lectureNotesForUnit(unit("01"), pdfs).map(item => item.id).join() === "p1", "Forelesning 1 matcher ikke forelesning 10 eller øvinger");
@@ -95,6 +99,9 @@ const figureSections = lesson01.sections.filter(section => allBlocks(section.blo
 check(lessonBlocks.filter(block => block.type === "figure").length === 6 && figureSections.length >= 4, "Figurene står ved teorien de forklarer, fordelt på flere avsnitt");
 const named = lessonFormulas(lesson01);
 check(named.length >= 5 && new Set(named.map(formula => formula.key)).size === named.length, "Navngitte formler går til formelsamlingen uten duplikater");
+check(lesson01.overview.length >= 5 && lesson01.keyFormulas.length >= 3, "Kort eksamensoversikt med de viktigste formlene");
+check(lesson01.concepts.length > 10 && !lesson01.concepts.some(slug => /heap|huffman|knapsack|ryggsekk|tree|quicksort|merge/.test(slug)), "Bare begreper fra forelesning 1");
+check(lesson01.notes.every(note => !/sikkerhetskopi/i.test(note.label)), "Læringsnotatet lenker til gjeldende notater");
 check(lesson01.sources.some(source => source.kind === "drive") && lesson01.sources.some(source => source.kind === "note"), "Kilder fra både Google Drive og de forbedrede notatene");
 check(matchesSearch("grad", "Grådighet") && matchesSearch("merge sort", "Merge Sort algoritme") && !matchesSearch("heap", "Merge"), "Søk tåler diakritiske tegn og flere ord");
 
@@ -178,17 +185,28 @@ const contentBefore = contentCalls();
 navigate("/fag/tdt4120/tema/pensum/01");
 await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 6);
 check(text("h1") === "Algoritmer og kompleksitet" && text(".lesson-summary").includes("Insertion-Sort"), "Forelesning 01 viser det kvalitetssikrede læringsnotatet");
-const order = [...document.querySelectorAll(".lesson-section")].map(section => section.querySelector("h2")!.textContent);
+const order = [...document.querySelectorAll(".lesson-part")].map(section => section.querySelector("summary h3")!.textContent);
+check(text(".lesson-overview").includes("Det viktigste") && document.querySelectorAll(".lesson-key-formulas .katex").length >= 3, "Det viktigste står øverst");
+const firstSection = document.querySelector<HTMLDetailsElement>("details.lesson-part")!;
+check(!firstSection.open, "Detaljerte avsnitt er lukket til de åpnes");
+[...document.querySelectorAll<HTMLButtonElement>(".lesson-toolbar button")].find(button => button.textContent === "Åpne alle")!.click();
+check([...document.querySelectorAll<HTMLDetailsElement>("details.lesson-part")].every(section => section.open), "«Åpne alle» åpner alle avsnitt");
+await new Promise(resolve => setTimeout(resolve, 50)); // let passive effects attach their listeners
+window.dispatchEvent(new Event("beforeprint"));
+check([...document.querySelectorAll<HTMLDetailsElement>(".lesson-parts details")].every(section => section.open), "Utskrift viser alt innhold");
+window.dispatchEvent(new Event("afterprint"));
 check(order[0] === "Problem, instans og algoritme" && document.querySelector("#tema-insertion-sort .lesson-figure") && document.querySelector("#tema-asymptotisk .lesson-figure"), "Figurer vises inne i avsnittene, ikke samlet nederst");
 check(text(".lesson-code").includes("while j > 0 and A[j] > key") && document.querySelectorAll(".lesson-code-line").length === 7, "Pseudokode med linjenumre");
 check(text("#tema-ressurser").includes("Løsningsforslag øving 1") && text("#tema-ressurser").includes("Forelesning 1 (lysark)"), "Lenker til forelesning, øving og løsningsforslag beholdes");
 check(contentCalls() === contentBefore, "Læringssiden henter ikke notatinnhold fra Supabase");
+check([...document.querySelectorAll("#tema-begreper .curriculum-chip-list a")].some(link => link.textContent === "Trekanttall") === false, "Begreper fra kunnskapsbasen som ikke er valgt for forelesningen, vises ikke");
 
 navigate("/fag/tdt4120/tema/pensum/03");
 await waitFor(() => text(".curriculum-unit-page").includes("Læringsnotatet for dette temaet er ikke skrevet ennå"));
 check(text("h1") === "Splitt og hersk" && text(".curriculum-label") === "Forelesning 03", "Temaside for forelesning uten læringsnotat");
-check(!document.querySelector(".lesson-section") && !text(".curriculum-unit-page").includes("Masterteoremet"), "Uferdige notater vises ikke som læringsinnhold");
+check(!document.querySelector(".lesson-part") && !text(".curriculum-unit-page").includes("Masterteoremet"), "Uferdige notater vises ikke som læringsinnhold");
 check(text(".curriculum-unit-page").includes("Rekursiv dekomponering.") && text(".curriculum-unit-page").includes("Øving 3: Splitt og hersk") && text("#tema-ressurser").includes("Notat"), "Introduksjon, øving og lenke til notatet vises");
+check(!document.querySelector("#tema-begreper .curriculum-chip-list a[href*='concepts']") && text("#tema-begreper").includes("Begrepene for dette temaet velges ut"), "Uten læringsnotat vises ingen ufiltrert begrepsliste");
 check(contentCalls() === contentBefore, "Heller ikke temaer uten læringsnotat henter notatinnhold");
 check(document.querySelectorAll(".curriculum-subtopics a").length === 2, "Aktivt tema viser undertemaer i sidemenyen");
 const before = calls.length;
