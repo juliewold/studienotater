@@ -37,25 +37,63 @@ export function CliqueFigure() {
   </Svg>;
 }
 
-export function ReductionTypesFigure() {
-  const panel = (x: number, title: string, calls: number, back: string) => <g key={title}>
-    <text x={x + 90} y="20" textAnchor="middle" className="lf-text lf-strong">{title}</text>
-    <rect x={x + 10} y="34" width="70" height="36" rx="8" className="lf-box" />
-    <text x={x + 45} y="57" textAnchor="middle" className="lf-text lf-strong">x ∈ X</text>
-    <rect x={x + 100} y="34" width="70" height="36" rx="8" className="lf-box-accent" />
-    <text x={x + 135} y="57" textAnchor="middle" className="lf-text lf-strong">Y</text>
-    {Array.from({ length: calls }, (_, index) => <g key={index}>
-      <path d={`M${x + 80},${78 + index * 26} L${x + 100},${78 + index * 26}`} className="lf-line" markerEnd="url(#lf-arrow)" />
-      <path d={`M${x + 100},${88 + index * 26} L${x + 80},${88 + index * 26}`} className="lf-line lf-stroke-warn" markerEnd="url(#lf-arrow)" />
-    </g>)}
-    <text x={x + 90} y="184" textAnchor="middle" className="lf-text lf-small">{calls > 1 ? "mange orakelkall" : "ett orakelkall"}</text>
-    <text x={x + 90} y="202" textAnchor="middle" className="lf-text lf-small lf-muted">{back}</text>
+function Step({ x, y, text, kind = "box" }: { x: number; y: number; text: string; kind?: "box" | "oracle" | "result" }) {
+  return <g>
+    <rect x={x} y={y} width="150" height="34" rx="8" className={kind === "oracle" ? "lf-box-warn" : kind === "result" ? "lf-box-sorted" : "lf-box"} />
+    <text x={x + 75} y={y + 22} textAnchor="middle" className="lf-text lf-small lf-strong">{text}</text>
   </g>;
-  return <Svg label="Cook-, Levin- og Karp-reduksjoner fra X til Y" width={640} height={220}>
-    {panel(10, "Cook", 3, "svarene kan brukes fritt")}
-    {panel(225, "Levin", 1, "f fram, g(x, y) tilbake")}
-    {panel(440, "Karp", 1, "x ∈ X ⇔ f(x) ∈ Y")}
-    <text x="320" y="218" textAnchor="middle" className="lf-text lf-small lf-muted">svart: arbeidet reduksjonen gjør · oransje: svaret fra orakelet for Y</text>
+}
+
+function Down({ x, y, label }: { x: number; y: number; label?: string }) {
+  return <g>
+    <line x1={x} y1={y} x2={x} y2={y + 18} className="lf-line" markerEnd="url(#lf-arrow)" />
+    {label && <text x={x + 8} y={y + 13} className="lf-text lf-small lf-muted">{label}</text>}
+  </g>;
+}
+
+export function ReductionTypesFigure() {
+  const column = (x: number) => x + 75;
+  return <Svg label="Cook-, Levin- og Karp-reduksjoner fra X til Y, med orakelet for Y" width={660} height={330}>
+    <text x={column(10)} y="20" textAnchor="middle" className="lf-text lf-strong">Cook</text>
+    <Step x={10} y={32} text="instans x av X" />
+    <Down x={column(10)} y={66} />
+    <Step x={10} y={86} text="polynomisk arbeid" />
+    {[0, 1, 2].map(index => <g key={index}>
+      <line x1="160" y1={96 + index * 50} x2="186" y2={96 + index * 50} className="lf-line" markerEnd="url(#lf-arrow)" />
+      <line x1="186" y1={108 + index * 50} x2="160" y2={108 + index * 50} className="lf-line lf-stroke-warn" markerEnd="url(#lf-arrow)" />
+    </g>)}
+    <rect x="188" y="86" width="22" height="134" rx="6" className="lf-box-warn" />
+    <text x="199" y="160" textAnchor="middle" className="lf-text lf-small lf-strong" transform="rotate(-90 199 156)">orakel Y</text>
+    <rect x="10" y="120" width="150" height="100" rx="8" className="lf-box lf-dashed" />
+    <text x={column(10)} y="166" textAnchor="middle" className="lf-text lf-small lf-muted">mange kall,</text>
+    <text x={column(10)} y="182" textAnchor="middle" className="lf-text lf-small lf-muted">i løkker om vi vil</text>
+    <Down x={column(10)} y={222} />
+    <Step x={10} y={242} text="svar på x" kind="result" />
+    <text x={column(10)} y="300" textAnchor="middle" className="lf-text lf-small">svarene kan brukes fritt</text>
+
+    <text x={column(250)} y="20" textAnchor="middle" className="lf-text lf-strong">Levin</text>
+    <Step x={250} y={32} text="instans x av X" />
+    <Down x={column(250)} y={66} label="f" />
+    <Step x={250} y={86} text="instans f(x) av Y" />
+    <Down x={column(250)} y={120} />
+    <Step x={250} y={140} text="orakel Y: løsning y" kind="oracle" />
+    <Down x={column(250)} y={174} label="g" />
+    <Step x={250} y={194} text="g(x, y) løser x" kind="result" />
+    <text x={column(250)} y="248" textAnchor="middle" className="lf-text lf-small">nøyaktig ett kall</text>
+    <text x={column(250)} y="266" textAnchor="middle" className="lf-text lf-small lf-muted">hver y må gi en løsning på x</text>
+
+    <text x={column(490)} y="20" textAnchor="middle" className="lf-text lf-strong">Karp</text>
+    <Step x={490} y={32} text="instans x av X" />
+    <Down x={column(490)} y={66} label="f" />
+    <Step x={490} y={86} text="instans f(x) av Y" />
+    <Down x={column(490)} y={120} />
+    <Step x={490} y={140} text="orakel Y: ja / nei" kind="oracle" />
+    <Down x={column(490)} y={174} label="uendret" />
+    <Step x={490} y={194} text="samme svar for x" kind="result" />
+    <text x={column(490)} y="248" textAnchor="middle" className="lf-text lf-small">ett kall, helt til slutt</text>
+    <text x={column(490)} y="266" textAnchor="middle" className="lf-text lf-small lf-muted">{"x ∈ X ⇔ f(x) ∈ Y"}</text>
+
+    <text x="330" y="322" textAnchor="middle" className="lf-text lf-small lf-muted">oransje: orakelet for Y · grønn: svaret på X · alle tre bruker polynomisk tid</text>
   </Svg>;
 }
 
