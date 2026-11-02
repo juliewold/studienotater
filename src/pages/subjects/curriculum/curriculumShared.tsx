@@ -27,3 +27,20 @@ export function Latex({ latex, display = true }: { latex: string; display?: bool
   const html = useMemo(() => katex.renderToString(latex, { displayMode: display, throwOnError: false }), [latex, display]);
   return <span className={display ? "curriculum-latex is-display" : "curriculum-latex"} dangerouslySetInnerHTML={{ __html: html }} />;
 }
+
+/** Inline lesson text: $math$, **bold** and `code`. */
+export function RichText({ children }: { children: string }) {
+  const parts = children.split(/(\$[^$]+\$|\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
+  return <>{parts.map((part, index) => part.startsWith("$") && part.endsWith("$") && part.length > 1
+    ? <Latex key={index} latex={part.slice(1, -1)} display={false} />
+    : part.startsWith("**") && part.endsWith("**") ? <strong key={index}><RichText>{part.slice(2, -2)}</RichText></strong>
+    : part.startsWith("`") && part.endsWith("`") ? <code key={index}>{part.slice(1, -1)}</code>
+    : part)}</>;
+}
+
+export function NoteFormulaToggle({ checked, onChange }: { checked: boolean; onChange: (value: boolean) => void }) {
+  return <label className="curriculum-toggle-notes">
+    <input type="checkbox" checked={checked} onChange={event => onChange(event.target.checked)} />
+    Vis også formler fra notater for temaer uten læringsnotat (ikke kvalitetssikret)
+  </label>;
+}

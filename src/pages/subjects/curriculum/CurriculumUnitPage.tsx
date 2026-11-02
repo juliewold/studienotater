@@ -1,27 +1,14 @@
-import "../../../components/notes/NoteEditor/NoteEditor.css";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Check, ExternalLink, FileText } from "lucide-react";
 import { useCurriculum } from "../../../components/subjects/CurriculumLayout/curriculumContext";
-import { ReadOnlyNote } from "../../../components/notes/ReadOnlyNote/ReadOnlyNote";
 import { MathText } from "../../../components/common/MathText/MathText";
-import { loadNoteSources } from "../../../services/subjects/curriculumWorkspaceService";
-import {
-  conceptsForUnit, exercisesForUnit, extractLearningBlocks, lectureNotesForUnit, notesForUnit,
-  type CurriculumUnit, type LearningBlock, type LearningBlockKind, type NoteSource,
-} from "../../../services/subjects/curriculumContent";
+import { hasLesson, loadLesson } from "../../../data/curriculum/lessons";
+import type { Lesson } from "../../../data/curriculum/lessons/types";
+import { conceptsForUnit, exercisesForUnit, lectureNotesForUnit, notesForUnit, type CurriculumUnit } from "../../../services/subjects/curriculumContent";
 import { CurriculumPage, CurriculumStatus } from "./curriculumShared";
-import { conceptTypeLabels, unitLabel } from "./curriculumHelpers";
-
-const sections: { id: string; title: string; kind: LearningBlockKind }[] = [
-  { id: "teori", title: "Kort teori", kind: "theory" },
-  { id: "algoritmer", title: "Algoritmer og pseudokode", kind: "algorithm" },
-  { id: "formler", title: "Kjøretider og formler", kind: "formula" },
-  { id: "figurer", title: "Figurer", kind: "figure" },
-  { id: "eksempler", title: "Eksempler", kind: "example" },
-];
-
-const escapeHtml = (text: string) => text.replace(/[&<>"']/g, char => `&#${char.charCodeAt(0)};`);
+import { unitLabel } from "./curriculumHelpers";
+import { LessonIntro, LessonSections, LessonSources } from "./LessonView";
 
 export function CurriculumUnitPage() {
   const { unitId = "" } = useParams();
@@ -41,28 +28,25 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
   const lectureNotes = lectureNotesForUnit(unit, data.pdfs);
   const exercises = exercisesForUnit(unit, data.pdfs, data.notes);
   const introductions = unit.topics.flatMap(topic => data.introductions[topic.id] ? [{ topic, text: data.introductions[topic.id] }] : []);
-  const [sources, setSources] = useState<NoteSource[] | null>(notes.length ? null : []);
-  const [loadError, setLoadError] = useState("");
-
+  // Only reviewed lessons are shown as learning content; raw note content is linked, never inlined.
+  const expectsLesson = hasLesson(subjectId, unit.id);
+  const [lesson, setLesson] = useState<Lesson | undefined>();
+  const [lessonError, setLessonError] = useState("");
   useEffect(() => {
-    if (!notes.length) return;
+    if (!expectsLesson) return;
     let cancelled = false;
-    loadNoteSources(notes).then(result => { if (!cancelled) setSources(result); })
+    loadLesson(subjectId, unit.id).then(result => { if (!cancelled) setLesson(result); })
       .catch(error => {
-        console.error("Kunne ikke hente notatinnhold:", error);
-        if (!cancelled) setLoadError("Kunne ikke hente innholdet fra notatene.");
+        console.error("Kunne ikke laste læringsnotatet:", error);
+        if (!cancelled) setLessonError("Kunne ikke laste læringsnotatet. Prøv å laste siden på nytt.");
       });
     return () => { cancelled = true; };
-  }, [notes]);
+  }, [expectsLesson, subjectId, unit.id]);
 
-  const blocks = useMemo(() => sources ? extractLearningBlocks(sources) : [], [sources]);
-  const visibleSections = sections.filter(section => section.kind === "theory"
-    ? introductions.length > 0 || blocks.some(block => block.kind === "theory")
-    : blocks.some(block => block.kind === section.kind));
   const done = progress.completed.has(unit.id);
-  const navigation = [...visibleSections.map(({ id, title }) => ({ id, title })),
-    ...(concepts.length ? [{ id: "begreper", title: "Begreper" }] : []),
-    ...(unit.subtopicIds.length ? [{ id: "undertemaer", title: "Undertemaer" }] : []),
+  const navigation = [...(lesson?.sections.map(({ id, title }) => ({ id, title })) ?? []),
+    ...(!lesson && introductions.length ? [{ id: "introduksjon", title: "Introduksjon" }] : []),
+    ...(concepts.length || unit.subtopicIds.length ? [{ id: "begreper", title: "Begreper og undertemaer" }] : []),
     { id: "ressurser", title: "Forelesninger og øvinger" }];
 
   return <CurriculumPage label={unitLabel(unit, Boolean(data.config))} title={unit.title} className="curriculum-unit-page">
@@ -79,35 +63,29 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
     </div>}
     {unit.supporting && <p className="curriculum-note">Pensumheftet oppgir stoffet til denne forelesningen som støttelitteratur, ikke som eget eksamenspensum.</p>}
 
-    <nav className="curriculum-on-page" aria-label="På denne siden"><span>På denne siden</span>
+    {expectsLesson && !lesson ? <CurriculumStatus alert={Boolean(lessonError)}>{lessonError || "Laster læringsnotat…"}</CurriculumStatus>
+      : lesson ? <LessonIntro lesson={lesson} />
+      : <p className="curriculum-note lesson-missing">Læringsnotatet for dette temaet er ikke skrevet ennå. Bruk forelesningene, øvingene og notatene under for fullstendige forklaringer.</p>}
+
+    {(lesson || !expectsLesson) && <nav className="curriculum-on-page" aria-label="På denne siden"><span>På denne siden</span>
       <ul>{navigation.map(item => <li key={item.id}><a href={`#tema-${item.id}`} onClick={event => {
         event.preventDefault();
         document.getElementById(`tema-${item.id}`)?.scrollIntoView({ block: "start" });
       }}>{item.title}</a></li>)}</ul>
-    </nav>
+    </nav>}
 
-    {loadError ? <CurriculumStatus alert>{loadError}</CurriculumStatus>
-      : !sources ? <CurriculumStatus>Henter innhold fra notatene…</CurriculumStatus>
-      : notes.length === 0 && <p className="curriculum-note">Det finnes ingen notater for dette temaet i Studienotater ennå. Bruk forelesningene og øvingene under.</p>}
-
-    {visibleSections.map(section => <Section key={section.id} id={section.id} title={section.title}>
-      {section.kind === "theory" && introductions.map(({ topic, text }) => <p key={topic.id} className="curriculum-introduction"><MathText>{text}</MathText></p>)}
-      <BlockGroups blocks={blocks.filter(block => block.kind === section.kind)} collapsible={section.kind === "example"} concepts={concepts} />
-    </Section>)}
-
-    {concepts.length > 0 && <Section id="begreper" title="Begreper">
-      <ul className="curriculum-concept-grid">{concepts.map(concept => <li key={concept.id}>
-        <Link className="curriculum-concept-card" to={`/concepts/${concept.slug}`}>
-          <span className="curriculum-concept-type">{conceptTypeLabels[concept.type] ?? concept.type}</span>
-          <strong><MathText>{concept.name}</MathText></strong>
-          {concept.shortDefinition && <span className="curriculum-concept-definition"><MathText>{concept.shortDefinition}</MathText></span>}
-        </Link>
-      </li>)}</ul>
+    {lesson && <LessonSections lesson={lesson} />}
+    {!lesson && !expectsLesson && introductions.length > 0 && <Section id="introduksjon" title="Introduksjon">
+      {introductions.map(({ topic, text }) => <p key={topic.id} className="curriculum-introduction"><MathText>{text}</MathText></p>)}
     </Section>}
 
-    {unit.subtopicIds.length > 0 && <Section id="undertemaer" title="Undertemaer">
-      {unit.topics.map(topic => <div key={topic.id} className="curriculum-subtopic-group">
-        {unit.topics.length > 1 && <h3><Link to={`/fag/${subjectId}/tema/${topic.id}`}>{topic.name}</Link></h3>}
+    {(concepts.length > 0 || unit.subtopicIds.length > 0) && <Section id="begreper" title="Begreper og undertemaer">
+      {concepts.length > 0 && <>
+        <p className="curriculum-section-intro">Begrepssider fra kunnskapsbasen. Se alle definisjonene under <Link to={`/fag/${subjectId}/tema/begreper`}>Begreper</Link>.</p>
+        <ul className="curriculum-chip-list">{concepts.map(concept => <li key={concept.id}><Link to={`/concepts/${concept.slug}`}><MathText>{concept.name}</MathText></Link></li>)}</ul>
+      </>}
+      {unit.topics.filter(topic => topic.subtopics.length > 0).map(topic => <div key={topic.id} className="curriculum-subtopic-group">
+        <h3><Link to={`/fag/${subjectId}/tema/${topic.id}`}>{topic.name}</Link></h3>
         <ul className="curriculum-chip-list">{topic.subtopics.map(subtopic => <li key={subtopic.id}>
           <Link to={`/fag/${subjectId}/tema/${topic.id}/undertema/${subtopic.id}`}>{subtopic.name}</Link>
         </li>)}</ul>
@@ -115,6 +93,7 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
     </Section>}
 
     <Section id="ressurser" title="Forelesninger og øvinger">
+      <p className="curriculum-section-intro">Åpne fullstendige forklaringer, lysark og løsningsforslag.</p>
       <div className="curriculum-resource-grid">
         <ResourceList title="Forelesningsnotater" empty="Ingen forelesningsnotater er koblet til temaet ennå.">
           {lectureNotes.map(pdf => <li key={pdf.id}><Link to={`/fag/${subjectId}/pdfs/${pdf.id}`}><FileText size={16} aria-hidden="true" />{pdf.title}</Link></li>)}
@@ -130,6 +109,7 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
         </ResourceList>
       </div>
       <p className="curriculum-more-links"><Link to={`/fag/${subjectId}/eksamen`}>Øv med tidligere eksamener →</Link></p>
+      {lesson && <LessonSources lesson={lesson} />}
     </Section>
   </CurriculumPage>;
 }
@@ -145,20 +125,4 @@ function ResourceList({ title, empty, children }: { title: string; empty: string
   return <div className="curriculum-resource-card"><h3>{title}</h3>
     {items.length ? <ul>{items}</ul> : <p>{empty}</p>}
   </div>;
-}
-
-/** Complete source blocks, one reader per note, with a link back to the note. */
-function BlockGroups({ blocks, collapsible, concepts }: { blocks: LearningBlock[]; collapsible: boolean; concepts: ReturnType<typeof conceptsForUnit> }) {
-  const groups = new Map<string, LearningBlock[]>();
-  for (const block of blocks) groups.set(block.note.id, [...(groups.get(block.note.id) ?? []), block]);
-  return <>{Array.from(groups.values(), group => {
-    const note = group[0].note;
-    const html = group.map(block => block.kind === "algorithm" && block.title
-      ? `<p><strong>${escapeHtml(block.title)}</strong></p>${block.html}` : block.html).join("");
-    const source = <Link className="curriculum-source-link" to={`/fag/${note.subjectId}/notater/${note.slug}`}>Fra {note.title} →</Link>;
-    return collapsible
-      ? <details key={note.id} className="curriculum-block-group"><summary>{group.length} {group.length === 1 ? "eksempel" : "eksempler"} fra {note.title}</summary>
-        <ReadOnlyNote content={html} concepts={concepts} />{source}</details>
-      : <div key={note.id} className="curriculum-block-group"><ReadOnlyNote content={html} concepts={concepts} />{source}</div>;
-  })}</>;
 }

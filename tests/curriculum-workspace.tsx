@@ -11,12 +11,15 @@ import { SymbolsPage } from "../src/pages/subjects/curriculum/SymbolsPage";
 import { ConceptGlossaryPage } from "../src/pages/subjects/curriculum/ConceptGlossaryPage";
 import { tdt4120Curriculum } from "../src/data/curriculum/tdt4120";
 import {
-  buildCurriculumUnits, exercisesForUnit, extractFormulas, extractLearningBlocks, findSymbols, lectureNotesForUnit,
+  buildCurriculumUnits, exercisesForUnit, extractFormulas, findSymbols, lectureNotesForUnit,
   matchesSearch, notesForUnit, OTHER_UNIT_ID, type CurriculumTopic,
 } from "../src/services/subjects/curriculumContent";
 import { loadCurriculumWorkspace, loadNoteSources } from "../src/services/subjects/curriculumWorkspaceService";
 import type { DatabasePdf } from "../src/services/media/pdfsService";
 import type { NoteMetadata } from "../src/services/notes/notesService";
+import katex from "katex";
+import { hasLesson, lessonFormulas, loadLesson } from "../src/data/curriculum/lessons";
+import type { LessonBlock } from "../src/data/curriculum/lessons/types";
 import "../src/index.css";
 import "../src/styles/global.css";
 import "../src/styles/containers.css";
@@ -41,7 +44,7 @@ const unit = (id: string) => units.find(item => item.id === id)!;
 check(units.length === tdt4120Curriculum.units.length + 1, "Alle 15 forelesninger fra pensumheftet, pluss gruppe for ukjente temaer");
 check(unit("01").subtopicIds.join() === "ins" && unit("03").subtopicIds.join() === `${QUICK},merge`, "Undertema kan flyttes til riktig forelesning uten å endre databasen");
 check(unit(OTHER_UNIT_ID).subtopicIds.join() === "bfs", "Temaer som ikke er i konfigurasjonen skjules ikke");
-check(unit("08").topics.length === 0 && unit("08").exercises?.length === 1, "Forelesning uten notater beholder øving og lysark");
+check(unit("08").topics.length === 0 && unit("08").exercises?.length === 2 && Boolean(unit("08").lectureSlides), "Forelesning uten notater beholder øving, løsningsforslag og lysark");
 const fallback = buildCurriculumUnits(undefined, topics);
 check(fallback.length === 3 && fallback[1].id === DC && fallback[1].number === "02", "Fag uten konfigurasjon bruker Supabase-temaene direkte");
 
@@ -68,18 +71,31 @@ const html = [
   math("\\sum_{k=1}^{n-1} k = \\Theta(n^2)"),
 ].join("");
 const sources = [{ id: "n1", title: "Notat", slug: "notat", subjectId: "tdt4120", content: html }];
-const blocks = extractLearningBlocks(sources);
-const kinds = (kind: string) => blocks.filter(block => block.kind === kind);
-check(kinds("theory").length === 1 && kinds("theory")[0].title === "Algoritme", "Definisjoner blir kort teori");
-check(kinds("formula").length === 2 && kinds("formula")[0].html.includes("T(n)=aT"), "Formel inne i teorem holdes samlet med boksen, duplikat fjernes");
-check(kinds("formula")[1].html.startsWith("<p>Antall flyttinger"), "Løs formel tar med forklaringen foran");
-check(kinds("algorithm")[0]?.title === "Insertion-Sort", "Pseudokode får nærmeste overskrift");
-check(kinds("figure")[0]?.title === "Rekursjonstre" && kinds("example").length === 1 && blocks.length === 6, "Figurer og eksempler, tips utelates");
 const formulas = extractFormulas(sources, [{ id: "c1", name: "Trekanttall" }]);
 check(formulas.length === 2 && formulas[1].title === "Trekanttall" && formulas[1].description === "Antall flyttinger $k$:", "Formelsamling med begrepsnavn og matematikk i forklaringen");
 check(formulas[0].description === "Masterteoremet", "Formel i boks får boksens tekst som forklaring");
 const symbols = findSymbols([{ latex: "O(n) + \\Omega(n) + \\lg n" }, { latex: "\\Theta(n)" }]).map(entry => entry.definition.id);
 check(symbols.join() === "O,Omega,Theta,lg", "Symboler finnes uten falske treff (Ω er ikke O)");
+// --- Reviewed lesson ---------------------------------------------------------
+check(hasLesson("tdt4120", "01") && !hasLesson("tdt4120", "03"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
+const lesson01 = (await loadLesson("tdt4120", "01"))!;
+const allBlocks = (blocks: LessonBlock[]): LessonBlock[] => blocks.flatMap(block =>
+  block.type === "box" || block.type === "example" ? [block, ...allBlocks(block.blocks)] : [block]);
+const lessonBlocks = lesson01.sections.flatMap(section => allBlocks(section.blocks));
+const texts = [lesson01.summary, ...lesson01.goals, ...lessonBlocks.flatMap(block =>
+  block.type === "text" ? [block.text] : block.type === "list" ? block.items : block.type === "table" ? [...block.head, ...block.rows.flat(), block.caption ?? ""]
+  : block.type === "quiz" ? block.items.flatMap(item => [item.question, item.answer]) : block.type === "figure" ? [block.caption]
+  : block.type === "example" || block.type === "box" ? [block.title ?? ""] : block.type === "formula" || block.type === "pseudocode" ? [block.caption ?? ""] : [])];
+const latex = [...texts.flatMap(text => [...text.matchAll(/\$([^$]+)\$/g)].map(match => match[1])),
+  ...lessonBlocks.flatMap(block => block.type === "formula" ? [block.latex] : [])];
+const broken = latex.filter(expression => { try { katex.renderToString(expression, { throwOnError: true }); return false; } catch { return true; } });
+check(latex.length > 100 && broken.length === 0, `All matematikk i læringsnotat 01 er gyldig LaTeX (${latex.length} uttrykk)`);
+check(texts.every(text => (text.match(/\*\*/g)?.length ?? 0) % 2 === 0 && (text.match(/\$/g)?.length ?? 0) % 2 === 0), "Ingen ulukkede markeringer i teksten");
+const figureSections = lesson01.sections.filter(section => allBlocks(section.blocks).some(block => block.type === "figure"));
+check(lessonBlocks.filter(block => block.type === "figure").length === 6 && figureSections.length >= 4, "Figurene står ved teorien de forklarer, fordelt på flere avsnitt");
+const named = lessonFormulas(lesson01);
+check(named.length >= 5 && new Set(named.map(formula => formula.key)).size === named.length, "Navngitte formler går til formelsamlingen uten duplikater");
+check(lesson01.sources.some(source => source.kind === "drive") && lesson01.sources.some(source => source.kind === "note"), "Kilder fra både Google Drive og de forbedrede notatene");
 check(matchesSearch("grad", "Grådighet") && matchesSearch("merge sort", "Merge Sort algoritme") && !matchesSearch("heap", "Merge"), "Søk tåler diakritiske tegn og flere ord");
 
 // --- Data loading and egress ------------------------------------------------
@@ -157,12 +173,23 @@ await waitFor(() => document.querySelectorAll(".curriculum-unit-card").length > 
 check(document.querySelectorAll(".curriculum-unit-card").length === 16 && text(".curriculum-sidebar").includes("Formelsamling"), "Oversikt og sidemeny med verktøy og alle temaer");
 check([...document.querySelectorAll(".curriculum-nav-heading")].map(node => node.textContent).includes("Grafalgoritmer"), "Sidemenyen grupperer i hoveddeler");
 
+const contentCalls = () => calls.filter(call => call.table === "notes" && /content/.test(call.select)).length;
+const contentBefore = contentCalls();
+navigate("/fag/tdt4120/tema/pensum/01");
+await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 6);
+check(text("h1") === "Algoritmer og kompleksitet" && text(".lesson-summary").includes("Insertion-Sort"), "Forelesning 01 viser det kvalitetssikrede læringsnotatet");
+const order = [...document.querySelectorAll(".lesson-section")].map(section => section.querySelector("h2")!.textContent);
+check(order[0] === "Problem, instans og algoritme" && document.querySelector("#tema-insertion-sort .lesson-figure") && document.querySelector("#tema-asymptotisk .lesson-figure"), "Figurer vises inne i avsnittene, ikke samlet nederst");
+check(text(".lesson-code").includes("while j > 0 and A[j] > key") && document.querySelectorAll(".lesson-code-line").length === 7, "Pseudokode med linjenumre");
+check(text("#tema-ressurser").includes("Løsningsforslag øving 1") && text("#tema-ressurser").includes("Forelesning 1 (lysark)"), "Lenker til forelesning, øving og løsningsforslag beholdes");
+check(contentCalls() === contentBefore, "Læringssiden henter ikke notatinnhold fra Supabase");
+
 navigate("/fag/tdt4120/tema/pensum/03");
-await waitFor(() => text(".curriculum-unit-page").includes("Fra Notat"));
-check(text("h1") === "Splitt og hersk" && text(".curriculum-label") === "Forelesning 03", "Læringsside for valgt forelesning");
-const headings = [...document.querySelectorAll(".curriculum-unit-page .curriculum-section > h2")].map(node => node.textContent);
-check(["Kort teori", "Algoritmer og pseudokode", "Kjøretider og formler", "Figurer", "Eksempler", "Begreper", "Undertemaer", "Forelesninger og øvinger"].every(heading => headings.includes(heading)), "Teori, algoritmer, formler, figurer, eksempler, begreper og ressurser");
-check(text(".curriculum-unit-page").includes("Rekursiv dekomponering.") && text(".curriculum-unit-page").includes("Øving 3: Splitt og hersk"), "Temaintroduksjon og øving vises");
+await waitFor(() => text(".curriculum-unit-page").includes("Læringsnotatet for dette temaet er ikke skrevet ennå"));
+check(text("h1") === "Splitt og hersk" && text(".curriculum-label") === "Forelesning 03", "Temaside for forelesning uten læringsnotat");
+check(!document.querySelector(".lesson-section") && !text(".curriculum-unit-page").includes("Masterteoremet"), "Uferdige notater vises ikke som læringsinnhold");
+check(text(".curriculum-unit-page").includes("Rekursiv dekomponering.") && text(".curriculum-unit-page").includes("Øving 3: Splitt og hersk") && text("#tema-ressurser").includes("Notat"), "Introduksjon, øving og lenke til notatet vises");
+check(contentCalls() === contentBefore, "Heller ikke temaer uten læringsnotat henter notatinnhold");
 check(document.querySelectorAll(".curriculum-subtopics a").length === 2, "Aktivt tema viser undertemaer i sidemenyen");
 const before = calls.length;
 document.querySelector<HTMLButtonElement>(".curriculum-mark")!.click();
@@ -173,20 +200,25 @@ await waitFor(() => text(".curriculum-progress-count") === "1/16");
 check(document.querySelector(".curriculum-mark")!.getAttribute("aria-pressed") === "true", "Markering vises i siden og sidemenyen");
 
 navigate("/fag/tdt4120/tema/formler");
-await waitFor(() => document.querySelectorAll(".curriculum-formula-card").length === 2);
+await waitFor(() => document.querySelectorAll(".curriculum-formula-card").length === named.length);
+check(!document.querySelector(".curriculum-formula-card.is-unreviewed") && contentCalls() === contentBefore, "Formelsamlingen viser kvalitetssikrede formler uten å hente notater");
 const search = document.querySelector<HTMLInputElement>(".curriculum-search input")!;
 const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
 setter.call(search, "trekanttall"); search.dispatchEvent(new Event("input", { bubbles: true }));
 await waitFor(() => document.querySelectorAll(".curriculum-formula-card").length === 1);
 check(text(".curriculum-formula-card").includes("Trekanttall"), "Formelsamlingen er søkbar");
+setter.call(search, ""); search.dispatchEvent(new Event("input", { bubbles: true }));
+document.querySelector<HTMLInputElement>(".curriculum-toggle-notes input")!.click();
+await waitFor(() => document.querySelectorAll(".curriculum-formula-card.is-unreviewed").length === 2);
+check(text(".curriculum-formulas").includes("fra notater, ikke kvalitetssikret") && contentCalls() <= contentBefore + 1, "Notatformler er valgfrie og tydelig merket");
 
 navigate("/fag/tdt4120/tema/symboler");
 await waitFor(() => document.querySelectorAll(".curriculum-symbol-card").length > 0);
-check(text(".curriculum-symbols").includes("Stor theta") && text(".curriculum-symbols").includes("Sum"), "Symboloversikt fra formlene");
+check(text(".curriculum-symbols").includes("Stor theta") && text(".curriculum-symbols").includes("Stor omega"), "Symboloversikt fra læringsnotatenes formler");
 
 navigate("/fag/tdt4120/tema/begreper");
 await waitFor(() => document.querySelectorAll(".curriculum-concept-card").length === 2);
 check(text(".curriculum-glossary").includes("Del, løs og kombiner."), "Begrepsoversikt med korte definisjoner");
 check(calls.filter(call => call.method !== "GET").length === 1, "Eneste skriving er brukerens egen markering");
-navigate("/fag/tdt4120/tema/pensum/03");
+navigate("/fag/tdt4120/tema/pensum/01");
 report();

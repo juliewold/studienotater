@@ -81,63 +81,8 @@ export function exercisesForUnit(unit: CurriculumUnit, pdfs: DatabasePdf[], note
 
 // --- Note content ---------------------------------------------------------
 
-export type LearningBlockKind = "theory" | "algorithm" | "formula" | "figure" | "example";
-export type LearningBlock = { key: string; kind: LearningBlockKind; html: string; title?: string; note: NoteReference };
-
 const CALLOUT = '[data-type="callout"]';
-const calloutKinds: Record<string, LearningBlockKind> = {
-  definition: "theory", exam: "theory", theorem: "formula", formula: "formula", method: "algorithm", example: "example",
-};
 const reference = ({ id, title, slug, subjectId }: NoteSource): NoteReference => ({ id, title, slug, subjectId });
-
-function precedingHeading(element: Element) {
-  for (let node = element.previousElementSibling; node; node = node.previousElementSibling) {
-    if (/^H[1-4]$/.test(node.tagName)) return node.textContent?.trim() || undefined;
-  }
-  return undefined;
-}
-
-/** Sort complete source blocks into learning sections. Nested blocks stay
- * inside their callout so explanations and assumptions are never separated. */
-export function extractLearningBlocks(notes: NoteSource[]): LearningBlock[] {
-  const seen = new Set<string>();
-  const formulas = new Set<string>();
-  return notes.flatMap(note => {
-    const doc = new DOMParser().parseFromString(note.content, "text/html");
-    const elements = doc.body.querySelectorAll<HTMLElement>(`${CALLOUT}, [data-type="block-math"], pre, img`);
-    return Array.from(elements).flatMap((element): LearningBlock[] => {
-      if (element.parentElement?.closest(CALLOUT)) return [];
-      let kind: LearningBlockKind | undefined;
-      let html = element.outerHTML;
-      let title: string | undefined;
-      if (element.matches(CALLOUT)) {
-        kind = calloutKinds[element.dataset.calloutType ?? ""];
-        title = element.dataset.conceptName || undefined;
-      } else if (element.dataset.type === "block-math") {
-        kind = "formula";
-        const previous = element.previousElementSibling;
-        const latex = element.dataset.latex?.replace(/\s+/g, "") ?? "";
-        if (previous?.tagName === "P" && !previous.querySelector('[data-type="block-math"]')) html = previous.outerHTML + html;
-        // Equal formulas with their own explanation are kept; a bare repetition is not.
-        else if (formulas.has(latex)) return [];
-        formulas.add(latex);
-      } else if (element.tagName === "PRE") {
-        kind = "algorithm";
-        title = precedingHeading(element);
-      } else if (element.tagName === "IMG") {
-        kind = "figure";
-        title = element.getAttribute("alt") || element.getAttribute("title") || undefined;
-        const block = element.closest("p, figure") ?? element;
-        html = block.outerHTML;
-      }
-      if (!kind) return [];
-      const key = `${kind}:${html}`;
-      if (seen.has(key)) return [];
-      seen.add(key);
-      return [{ key, kind, html, title, note: reference(note) }];
-    });
-  });
-}
 
 /** Text with inline math kept as $…$ for MathText. */
 export function textWithMath(element: Element, maxLength = 280) {

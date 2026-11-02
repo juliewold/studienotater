@@ -26,8 +26,6 @@ const lowlight = createLowlight(common);
 type ReadOnlyNoteProps = {
   content: string;
   header?: ReactNode;
-  /** Concepts for automatic links; when given, the full list is not fetched. */
-  concepts?: Concept[];
 };
 
 type PopoverPosition = {
@@ -35,18 +33,15 @@ type PopoverPosition = {
   top: number;
 };
 
-export const ReadOnlyNote = ({ content, header, concepts: providedConcepts }: ReadOnlyNoteProps) => {
+export const ReadOnlyNote = ({ content, header }: ReadOnlyNoteProps) => {
   const outlineId = useId();
-  const [loadedConceptList, setConcepts] = useState<Concept[]>([]);
-  const concepts = providedConcepts ?? loadedConceptList;
-  const shouldLoadConcepts = !providedConcepts;
+  const [concepts, setConcepts] = useState<Concept[]>([]);
   const [selectedConcept, setSelectedConcept] = useState<Concept | null>(null);
 
   const [popoverPosition, setPopoverPosition] =
     useState<PopoverPosition | null>(null);
 
   useEffect(() => {
-    if (!shouldLoadConcepts) return;
     let isCancelled = false;
 
     const loadConcepts = async () => {
@@ -66,7 +61,7 @@ export const ReadOnlyNote = ({ content, header, concepts: providedConcepts }: Re
     return () => {
       isCancelled = true;
     };
-  }, [shouldLoadConcepts]);
+  }, []);
 
   const editor = useEditor(
     {
