@@ -1,5 +1,12 @@
 # Database
 
+## Account deletion
+
+See [ACCOUNT_DELETION.md](ACCOUNT_DELETION.md) for the personal-data inventory,
+schema preflight, Edge Function configuration, manual migration order and
+retention limitations. `20261101_account_deletion.sql` is not applied
+automatically and must not be installed before reviewing production dependencies.
+
 The application currently uses Supabase for persistent data storage.
 
 Database changes that are required by application features are documented here

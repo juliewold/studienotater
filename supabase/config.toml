@@ -1,0 +1,6 @@
+project_id = "studienotater"
+
+[functions.delete-account]
+# Authentication is verified against /auth/v1/user inside the handler. This also
+# supports publishable API keys and asymmetric Supabase signing keys.
+verify_jwt = false
