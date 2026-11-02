@@ -81,10 +81,10 @@ check(formulas[0].description === "Masterteoremet", "Formel i boks får boksens 
 const symbols = findSymbols([{ latex: "O(n) + \\Omega(n) + \\lg n" }, { latex: "\\Theta(n)" }]).map(entry => entry.definition.id);
 check(symbols.join() === "O,Omega,Theta,lg", "Symboler finnes uten falske treff (Ω er ikke O)");
 // --- Reviewed lesson ---------------------------------------------------------
-check(["01", "02a", "02b", "03"].every(id => hasLesson("tdt4120", id)) && !hasLesson("tdt4120", "04"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
+check(["01", "02a", "02b", "03", "04"].every(id => hasLesson("tdt4120", id)) && !hasLesson("tdt4120", "05"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
 const allBlocks = (blocks: LessonBlock[]): LessonBlock[] => blocks.flatMap(block =>
   block.type === "box" || block.type === "example" ? [block, ...allBlocks(block.blocks)] : [block]);
-for (const unitId of ["01", "02a", "02b", "03"]) {
+for (const unitId of ["01", "02a", "02b", "03", "04"]) {
   const lesson = (await loadLesson("tdt4120", unitId))!;
   const lessonBlocks = lesson.sections.flatMap(section => allBlocks(section.blocks));
   const texts = [lesson.summary, ...lesson.goals, ...lesson.overview, ...lesson.keyFormulas.map(formula => formula.label), ...lessonBlocks.flatMap(block =>
@@ -104,7 +104,7 @@ for (const unitId of ["01", "02a", "02b", "03"]) {
   check(lesson.sources.some(source => source.kind === "drive") && lesson.sources.some(source => source.kind === "note"), `${unitId}: kilder fra Google Drive og de forbedrede notatene`);
 }
 const lesson01 = (await loadLesson("tdt4120", "01"))!;
-const allNamed = (await Promise.all(["01", "02a", "02b", "03"].map(async id => lessonFormulas((await loadLesson("tdt4120", id))!)))).flat();
+const allNamed = (await Promise.all(["01", "02a", "02b", "03", "04"].map(async id => lessonFormulas((await loadLesson("tdt4120", id))!)))).flat();
 check(lesson01.concepts.length > 10 && !lesson01.concepts.some(slug => /heap|huffman|knapsack|ryggsekk|tree|quicksort|merge/.test(slug)), "Bare begreper fra forelesning 1");
 check(lesson01.notes.every(note => !/sikkerhetskopi/i.test(note.label)), "Læringsnotatet lenker til gjeldende notater");
 check(matchesSearch("grad", "Grådighet") && matchesSearch("merge sort", "Merge Sort algoritme") && !matchesSearch("heap", "Merge"), "Søk tåler diakritiske tegn og flere ord");
@@ -212,16 +212,21 @@ check(text("#tema-ressurser").includes("Øving 3, del 1") && !/sikkerhetskopi/i.
 check(document.querySelectorAll(".curriculum-subtopics a").length === 2, "Aktivt tema viser undertemaer i sidemenyen");
 
 navigate("/fag/tdt4120/tema/pensum/04");
+await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 10);
+check(text("h1") === "Rangering i lineær tid" && text(".lesson-overview").includes("Sorteringsgrensen") && document.querySelector("#tema-sorteringsgrensen .lesson-figure") && document.querySelector("#tema-radix-sort .lesson-figure"), "Forelesning 04 viser læringsnotatet med figurer ved teorien");
+check(text("#tema-ressurser").includes("Øving 4, del 1") && !/sikkerhetskopi/i.test(text(".curriculum-unit-page")), "Forelesning 04 lenker til de forbedrede øvingsnotatene");
+
+navigate("/fag/tdt4120/tema/pensum/05");
 await waitFor(() => text(".curriculum-unit-page").includes("Læringsnotatet for dette temaet er ikke skrevet ennå"));
-check(text("h1") === "Rangering i lineær tid" && text(".curriculum-label") === "Forelesning 04", "Temaside for forelesning uten læringsnotat");
-check(!document.querySelector(".lesson-part") && text(".curriculum-unit-page").includes("Øving 4: Rangering i lineær tid"), "Uten læringsnotat vises øving, men ikke læringsinnhold");
+check(text("h1") === "Rotfaste trestrukturer" && text(".curriculum-label") === "Forelesning 05", "Temaside for forelesning uten læringsnotat");
+check(!document.querySelector(".lesson-part") && text(".curriculum-unit-page").includes("Øving 5: Rotfaste trestrukturer"), "Uten læringsnotat vises øving, men ikke læringsinnhold");
 check(!document.querySelector("#tema-begreper .curriculum-chip-list a[href*='concepts']") && text("#tema-begreper").includes("Begrepene for dette temaet velges ut"), "Uten læringsnotat vises ingen ufiltrert begrepsliste");
 check(contentCalls() === contentBefore, "Heller ikke temaer uten læringsnotat henter notatinnhold");
 const before = calls.length;
 document.querySelector<HTMLButtonElement>(".curriculum-mark")!.click();
 await waitFor(() => calls.length > before);
 const save = calls.at(-1)!;
-check(save.table === "progress" && save.method === "POST" && JSON.stringify(save.body).includes('"item_type":"syllabus"') && JSON.stringify(save.body).includes("tdt4120-04"), "Gjennomgått lagres som eksisterende pensumfremdrift");
+check(save.table === "progress" && save.method === "POST" && JSON.stringify(save.body).includes('"item_type":"syllabus"') && JSON.stringify(save.body).includes("tdt4120-05"), "Gjennomgått lagres som eksisterende pensumfremdrift");
 await waitFor(() => text(".curriculum-progress-count") === "1/16");
 check(document.querySelector(".curriculum-mark")!.getAttribute("aria-pressed") === "true", "Markering vises i siden og sidemenyen");
 
