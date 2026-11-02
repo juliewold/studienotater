@@ -81,28 +81,32 @@ check(formulas[0].description === "Masterteoremet", "Formel i boks får boksens 
 const symbols = findSymbols([{ latex: "O(n) + \\Omega(n) + \\lg n" }, { latex: "\\Theta(n)" }]).map(entry => entry.definition.id);
 check(symbols.join() === "O,Omega,Theta,lg", "Symboler finnes uten falske treff (Ω er ikke O)");
 // --- Reviewed lesson ---------------------------------------------------------
-check(hasLesson("tdt4120", "01") && !hasLesson("tdt4120", "03"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
-const lesson01 = (await loadLesson("tdt4120", "01"))!;
+check(hasLesson("tdt4120", "01") && hasLesson("tdt4120", "02a") && hasLesson("tdt4120", "02b") && !hasLesson("tdt4120", "03"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
 const allBlocks = (blocks: LessonBlock[]): LessonBlock[] => blocks.flatMap(block =>
   block.type === "box" || block.type === "example" ? [block, ...allBlocks(block.blocks)] : [block]);
-const lessonBlocks = lesson01.sections.flatMap(section => allBlocks(section.blocks));
-const texts = [lesson01.summary, ...lesson01.goals, ...lessonBlocks.flatMap(block =>
-  block.type === "text" ? [block.text] : block.type === "list" ? block.items : block.type === "table" ? [...block.head, ...block.rows.flat(), block.caption ?? ""]
-  : block.type === "quiz" ? block.items.flatMap(item => [item.question, item.answer]) : block.type === "figure" ? [block.caption]
-  : block.type === "example" || block.type === "box" ? [block.title ?? ""] : block.type === "formula" || block.type === "pseudocode" ? [block.caption ?? ""] : [])];
-const latex = [...texts.flatMap(text => [...text.matchAll(/\$([^$]+)\$/g)].map(match => match[1])),
-  ...lessonBlocks.flatMap(block => block.type === "formula" ? [block.latex] : [])];
-const broken = latex.filter(expression => { try { katex.renderToString(expression, { throwOnError: true }); return false; } catch { return true; } });
-check(latex.length > 100 && broken.length === 0, `All matematikk i læringsnotat 01 er gyldig LaTeX (${latex.length} uttrykk)`);
-check(texts.every(text => (text.match(/\*\*/g)?.length ?? 0) % 2 === 0 && (text.match(/\$/g)?.length ?? 0) % 2 === 0), "Ingen ulukkede markeringer i teksten");
-const figureSections = lesson01.sections.filter(section => allBlocks(section.blocks).some(block => block.type === "figure"));
-check(lessonBlocks.filter(block => block.type === "figure").length === 6 && figureSections.length >= 4, "Figurene står ved teorien de forklarer, fordelt på flere avsnitt");
-const named = lessonFormulas(lesson01);
-check(named.length >= 5 && new Set(named.map(formula => formula.key)).size === named.length, "Navngitte formler går til formelsamlingen uten duplikater");
-check(lesson01.overview.length >= 5 && lesson01.keyFormulas.length >= 3, "Kort eksamensoversikt med de viktigste formlene");
+for (const unitId of ["01", "02a", "02b"]) {
+  const lesson = (await loadLesson("tdt4120", unitId))!;
+  const lessonBlocks = lesson.sections.flatMap(section => allBlocks(section.blocks));
+  const texts = [lesson.summary, ...lesson.goals, ...lesson.overview, ...lesson.keyFormulas.map(formula => formula.label), ...lessonBlocks.flatMap(block =>
+    block.type === "text" ? [block.text] : block.type === "list" ? block.items : block.type === "table" ? [...block.head, ...block.rows.flat(), block.caption ?? ""]
+    : block.type === "quiz" ? block.items.flatMap(item => [item.question, item.answer]) : block.type === "figure" ? [block.caption]
+    : block.type === "example" || block.type === "box" ? [block.title ?? ""] : block.type === "formula" || block.type === "pseudocode" ? [block.caption ?? ""] : [])];
+  const latex = [...texts.flatMap(text => [...text.matchAll(/\$([^$]+)\$/g)].map(match => match[1])),
+    ...lessonBlocks.flatMap(block => block.type === "formula" ? [block.latex] : []), ...lesson.keyFormulas.map(formula => formula.latex)];
+  const broken = latex.filter(expression => { try { katex.renderToString(expression, { throwOnError: true }); return false; } catch { return true; } });
+  check(latex.length > 50 && broken.length === 0, `${unitId}: all matematikk er gyldig LaTeX (${latex.length} uttrykk)`);
+  check(texts.every(text => (text.match(/\*\*/g)?.length ?? 0) % 2 === 0 && (text.match(/\$/g)?.length ?? 0) % 2 === 0 && (text.match(/`/g)?.length ?? 0) % 2 === 0), `${unitId}: ingen ulukkede markeringer`);
+  const figureSections = lesson.sections.filter(section => allBlocks(section.blocks).some(block => block.type === "figure"));
+  check(lessonBlocks.filter(block => block.type === "figure").length >= 5 && figureSections.length >= 4, `${unitId}: figurene står ved teorien, fordelt på ${figureSections.length} avsnitt`);
+  const named = lessonFormulas(lesson);
+  check(named.length >= 3 && new Set(named.map(formula => formula.key)).size === named.length, `${unitId}: navngitte formler uten duplikater`);
+  check(lesson.overview.length >= 5 && lesson.keyFormulas.length >= 3 && lesson.concepts.length >= 10 && lesson.notes.length === 1, `${unitId}: oversikt, nøkkelformler, utvalgte begreper og gjeldende notat`);
+  check(lesson.sources.some(source => source.kind === "drive") && lesson.sources.some(source => source.kind === "note"), `${unitId}: kilder fra Google Drive og de forbedrede notatene`);
+}
+const lesson01 = (await loadLesson("tdt4120", "01"))!;
+const allNamed = (await Promise.all(["01", "02a", "02b"].map(async id => lessonFormulas((await loadLesson("tdt4120", id))!)))).flat();
 check(lesson01.concepts.length > 10 && !lesson01.concepts.some(slug => /heap|huffman|knapsack|ryggsekk|tree|quicksort|merge/.test(slug)), "Bare begreper fra forelesning 1");
 check(lesson01.notes.every(note => !/sikkerhetskopi/i.test(note.label)), "Læringsnotatet lenker til gjeldende notater");
-check(lesson01.sources.some(source => source.kind === "drive") && lesson01.sources.some(source => source.kind === "note"), "Kilder fra både Google Drive og de forbedrede notatene");
 check(matchesSearch("grad", "Grådighet") && matchesSearch("merge sort", "Merge Sort algoritme") && !matchesSearch("heap", "Merge"), "Søk tåler diakritiske tegn og flere ord");
 
 // --- Data loading and egress ------------------------------------------------
@@ -177,7 +181,7 @@ const waitFor = (predicate: () => boolean) => new Promise<void>((resolve, reject
 const text = (selector: string) => document.querySelector(selector)?.textContent ?? "";
 
 await waitFor(() => document.querySelectorAll(".curriculum-unit-card").length > 0);
-check(document.querySelectorAll(".curriculum-unit-card").length === 16 && text(".curriculum-sidebar").includes("Formelsamling"), "Oversikt og sidemeny med verktøy og alle temaer");
+check(document.querySelectorAll(".curriculum-unit-card").length === 16 && text(".curriculum-overview").includes("Læringsnotat klart") && text(".curriculum-sidebar").includes("Formelsamling"), "Oversikt og sidemeny med verktøy og alle temaer");
 check([...document.querySelectorAll(".curriculum-nav-heading")].map(node => node.textContent).includes("Grafalgoritmer"), "Sidemenyen grupperer i hoveddeler");
 
 const contentCalls = () => calls.filter(call => call.table === "notes" && /content/.test(call.select)).length;
@@ -218,13 +222,13 @@ await waitFor(() => text(".curriculum-progress-count") === "1/16");
 check(document.querySelector(".curriculum-mark")!.getAttribute("aria-pressed") === "true", "Markering vises i siden og sidemenyen");
 
 navigate("/fag/tdt4120/tema/formler");
-await waitFor(() => document.querySelectorAll(".curriculum-formula-card").length === named.length);
+await waitFor(() => document.querySelectorAll(".curriculum-formula-card").length === new Set(allNamed.map(formula => formula.key)).size);
 check(!document.querySelector(".curriculum-formula-card.is-unreviewed") && contentCalls() === contentBefore, "Formelsamlingen viser kvalitetssikrede formler uten å hente notater");
 const search = document.querySelector<HTMLInputElement>(".curriculum-search input")!;
 const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
-setter.call(search, "trekanttall"); search.dispatchEvent(new Event("input", { bubbles: true }));
+setter.call(search, "lastfaktor"); search.dispatchEvent(new Event("input", { bubbles: true }));
 await waitFor(() => document.querySelectorAll(".curriculum-formula-card").length === 1);
-check(text(".curriculum-formula-card").includes("Trekanttall"), "Formelsamlingen er søkbar");
+check(text(".curriculum-formula-card").includes("Lastfaktor"), "Formelsamlingen er søkbar");
 setter.call(search, ""); search.dispatchEvent(new Event("input", { bubbles: true }));
 document.querySelector<HTMLInputElement>(".curriculum-toggle-notes input")!.click();
 await waitFor(() => document.querySelectorAll(".curriculum-formula-card.is-unreviewed").length === 2);
