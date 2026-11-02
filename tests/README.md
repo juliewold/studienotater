@@ -741,3 +741,13 @@ Manuell nettleserverifisering gjenstår: les notatet med og uten klassifisering,
 avslutt og gjenåpne redigering. Kontroller titler, koblinger, navigasjonslagring,
 AI-generering og at ikke-administrator ikke får redigerings-/forslagskall.
 Øvrige kall i ReadOnlyNote/NoteEditor og AI-verktøyene er ikke optimalisert her.
+
+## Temaside og pensumverktøy
+
+`/studienotater/tests/curriculum-workspace.html` tester pensuminndelingen fra
+`src/data/curriculum/`, uttrekk av teori, pseudokode, formler, figurer og
+eksempler fra notat-HTML, formelsamling, symboler, begreper og koblinger til
+forelesningsnotater og øvinger. Supabase er simulert. Testene kontrollerer også
+egress (metadata først, notatinnhold uten `content_json`, hurtigbuffer i økten)
+og at eneste skriving er brukerens egen «gjennomgått»-markering, lagret som
+eksisterende `progress`-type `syllabus`.

@@ -1,5 +1,10 @@
 import { ConceptReviewPage } from "./pages/admin/ConceptReviewPage/ConceptReviewPage";
-import { CurriculumLayout, CurriculumIndex } from "./components/subjects/CurriculumLayout/CurriculumLayout";
+import { CurriculumLayout } from "./components/subjects/CurriculumLayout/CurriculumLayout";
+import { CurriculumOverviewPage } from "./pages/subjects/curriculum/CurriculumOverviewPage";
+import { CurriculumUnitPage } from "./pages/subjects/curriculum/CurriculumUnitPage";
+import { FormulaCollectionPage } from "./pages/subjects/curriculum/FormulaCollectionPage";
+import { SymbolsPage } from "./pages/subjects/curriculum/SymbolsPage";
+import { ConceptGlossaryPage } from "./pages/subjects/curriculum/ConceptGlossaryPage";
 import { NotesLayout } from "./components/notes/NotesLayout/NotesLayout";
 import { LoginPage } from "./pages/auth/LoginPage/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage/RegisterPage";
@@ -114,7 +119,11 @@ function App() {
         />
 
         <Route path="/fag/:subjectId/tema" element={<ProtectedRoute><CurriculumLayout /></ProtectedRoute>}>
-          <Route index element={<CurriculumIndex />} />
+          <Route index element={<CurriculumOverviewPage />} />
+          <Route path="pensum/:unitId" element={<CurriculumUnitPage />} />
+          <Route path="formler" element={<FormulaCollectionPage />} />
+          <Route path="symboler" element={<SymbolsPage />} />
+          <Route path="begreper" element={<ConceptGlossaryPage />} />
           <Route path=":topicId" element={<TopicPage />} />
           <Route path=":topicId/undertema/:subtopicId" element={<SubtopicPage />} />
         </Route>
