@@ -741,3 +741,15 @@ Manuell nettleserverifisering gjenstår: les notatet med og uten klassifisering,
 avslutt og gjenåpne redigering. Kontroller titler, koblinger, navigasjonslagring,
 AI-generering og at ikke-administrator ikke får redigerings-/forslagskall.
 Øvrige kall i ReadOnlyNote/NoteEditor og AI-verktøyene er ikke optimalisert her.
+
+## Temaside og pensumverktøy
+
+`/studienotater/tests/curriculum-workspace.html` tester pensuminndelingen fra
+`src/data/curriculum/`, de kvalitetssikrede læringsnotatene i
+`src/data/curriculum/lessons/` (all LaTeX må kunne rendres, figurene står i
+avsnittene, navngitte formler går til formelsamlingen), formelsamling, symboler,
+begreper og koblinger til forelesningsnotater, øvinger og løsningsforslag.
+Supabase er simulert. Testene kontrollerer at temasider aldri viser rått
+notatinnhold, at notatinnhold bare hentes når brukeren velger å vise
+ikke-kvalitetssikrede notatformler, og at eneste skriving er brukerens egen
+«gjennomgått»-markering, lagret som eksisterende `progress`-type `syllabus`.

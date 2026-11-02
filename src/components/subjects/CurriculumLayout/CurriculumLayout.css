@@ -1,23 +1,37 @@
-.curriculum-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); align-items: start; min-height: calc(100dvh - 76px); }
-.curriculum-sidebar { position: sticky; top: 76px; height: calc(100dvh - 76px); box-sizing: border-box; max-height: calc(100dvh - 76px); overflow-y: auto; overscroll-behavior: contain; padding: 20px 12px; background: var(--app-surface, #fff); border-right: 1px solid var(--app-border, #e6dfed); color: var(--app-text, #29252f); }
-.curriculum-sidebar header { padding: 0 10px 16px; }
-.curriculum-sidebar header a { font-size: .8rem; color: var(--app-accent, #7c3aed); text-decoration: none; }
-.curriculum-sidebar h2 { margin: 4px 0 0; font-size: 1rem; }
+.curriculum-layout { display: grid; grid-template-columns: 272px minmax(0, 1fr); align-items: start; min-height: calc(100dvh - 76px); }
+.curriculum-sidebar { position: sticky; top: 76px; height: calc(100dvh - 76px); box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; padding: 22px 14px 32px; background: var(--app-surface, #fff); border-right: 1px solid var(--app-border, #e6dfed); color: var(--app-text, #29252f); }
+.curriculum-sidebar-header { padding: 0 10px 18px; }
+.curriculum-back { display: inline-flex; align-items: center; gap: 2px; font-size: .78rem; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--app-accent, #7c3aed); text-decoration: none; }
+.curriculum-back:hover { text-decoration: underline; }
+.curriculum-sidebar h2 { margin: 6px 0 0; font-size: 1rem; line-height: 1.35; color: inherit; }
+.curriculum-progress { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; margin-top: 14px; font-size: .78rem; color: var(--app-muted, #655c70); }
+.curriculum-progress-bar { height: 6px; border-radius: 999px; background: var(--app-soft, #f3edfa); overflow: hidden; }
+.curriculum-progress-bar span { display: block; height: 100%; border-radius: inherit; background: var(--app-accent, #7c3aed); transition: width .2s ease; }
+.curriculum-progress-count { font-variant-numeric: tabular-nums; font-weight: 650; color: var(--app-text, #29252f); }
 .curriculum-navigation ul { list-style: none; padding: 0; margin: 0; }
-.curriculum-navigation a { display: block; padding: 8px 10px; border-radius: 6px; text-decoration: none; font-size: .9rem; line-height: 1.4; color: inherit; overflow-wrap: anywhere; }
+.curriculum-nav-heading { margin: 20px 10px 6px; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--app-muted, #655c70); }
+.curriculum-nav-message { margin: 16px 10px; font-size: .88rem; color: var(--app-muted, #655c70); }
+.curriculum-navigation a { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 8px; text-decoration: none; font-size: .9rem; line-height: 1.4; color: inherit; overflow-wrap: anywhere; }
 .curriculum-navigation a:hover { background: var(--app-soft, #f3edfa); }
-.curriculum-navigation .is-active, .curriculum-navigation a[aria-current="page"] { background: var(--app-soft, #f3edfa); color: var(--app-accent, #7c3aed); font-weight: 650; }
-.curriculum-navigation .curriculum-subtopics { margin: 4px 0 10px 14px; padding-left: 8px; border-left: 1px solid var(--app-border, #e6dfed); }
-.curriculum-subtopics a { font-size: .84rem; color: var(--app-muted, #655c70); }
-.curriculum-subtopics a[aria-current="page"] { box-shadow: inset 3px 0 var(--app-accent, #7c3aed); }
+.curriculum-navigation a:focus-visible { outline: 2px solid var(--app-accent, #7c3aed); outline-offset: 1px; }
+.curriculum-tool svg { flex: none; margin-top: 1px; color: var(--app-muted, #655c70); }
+.curriculum-navigation a.active, .curriculum-navigation a.is-active { background: var(--app-soft, #f3edfa); color: var(--app-accent, #7c3aed); font-weight: 650; }
+.curriculum-navigation a.active svg { color: inherit; }
+.curriculum-unit-number { flex: none; min-width: 2.2em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; line-height: 1.75; color: var(--app-muted, #655c70); }
+.curriculum-unit-link.is-active .curriculum-unit-number { color: inherit; }
+.curriculum-unit-title { flex: 1; min-width: 0; }
+.curriculum-unit-check { flex: none; margin-top: 2px; color: #16a34a; }
+.curriculum-navigation .curriculum-subtopics { margin: 2px 0 8px 22px; padding-left: 10px; border-left: 1px solid var(--app-border, #e6dfed); }
+.curriculum-subtopics a { padding-block: 5px; font-size: .83rem; color: var(--app-muted, #655c70); }
+.curriculum-subtopics a.active { box-shadow: inset 3px 0 var(--app-accent, #7c3aed); }
 .curriculum-content { min-width: 0; }
-.curriculum-index { padding-block: 32px; }
 .curriculum-toggle { display: none; }
+[data-theme="dark"] .curriculum-unit-check { color: #86dc9c; }
 @media (max-width: 900px) {
   .curriculum-layout { grid-template-columns: minmax(0, 1fr); }
-  .curriculum-sidebar { position: static; height: auto; max-height: none; border-right: 0; border-bottom: 1px solid var(--app-border, #e6dfed); padding: 12px var(--site-gutter); }
-  .curriculum-sidebar header { display: inline-block; padding: 0; }
-  .curriculum-toggle { display: block; margin-top: 10px; font: inherit; font-size: .9rem; border: 1px solid var(--app-border, #e6dfed); border-radius: 6px; padding: 6px 10px; background: var(--app-surface, #fff); color: var(--app-accent, #7c3aed); }
+  .curriculum-sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--app-border, #e6dfed); padding: 14px var(--site-gutter); }
+  .curriculum-sidebar-header { padding: 0; }
+  .curriculum-toggle { display: block; margin-top: 12px; font: inherit; font-size: .9rem; border: 1px solid var(--app-border, #e6dfed); border-radius: 8px; padding: 7px 12px; background: var(--app-surface, #fff); color: var(--app-accent, #7c3aed); cursor: pointer; }
   .curriculum-navigation { display: none; }
-  .curriculum-navigation.is-open { display: block; margin-top: 12px; max-height: 50dvh; overflow-y: auto; }
+  .curriculum-navigation.is-open { display: block; margin-top: 8px; max-height: 60dvh; overflow-y: auto; }
 }
