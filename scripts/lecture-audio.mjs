@@ -5,6 +5,7 @@
 //
 //   node scripts/lecture-audio.mjs --unit 01                        # dry run: characters and estimated cost
 //   node scripts/lecture-audio.mjs --unit 01 --provider macos       # free local test with the macOS voice
+//   node scripts/lecture-audio.mjs --unit 01 --provider piper       # free and local, Norwegian Piper voice
 //   node scripts/lecture-audio.mjs --unit 01 --provider azure --confirm
 //   node scripts/lecture-audio.mjs --all --provider elevenlabs --voice <voice-id> --confirm
 //
@@ -15,7 +16,7 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createServer, loadEnv } from "vite";
 
@@ -28,6 +29,8 @@ const providers = {
   azure: { voice: "nb-NO-PernilleNeural", label: voice => `${voice.replace(/^nb-NO-|Neural$/g, "")} (Azure)`, extension: "mp3", paid: true, usdPerMillion: 16 },
   elevenlabs: { voice: undefined, label: () => "ElevenLabs", extension: "mp3", paid: true, usdPerMillion: 100 },
   macos: { voice: "Nora", label: voice => `${voice} (macOS, test)`, extension: "m4a", paid: false, usdPerMillion: 0 },
+  // The model file is read from PIPER_MODEL_DIR (default ~/.local/share/piper), not from the repo.
+  piper: { voice: "no_NO-talesyntese-medium", label: () => "Talesyntese (Piper)", extension: "m4a", paid: false, usdPerMillion: 0 },
 };
 const providerName = option("provider", "azure");
 const provider = providers[providerName];
@@ -103,6 +106,18 @@ async function synthesize(text, neighbours, phrases) {
     execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "64000", aiff, out]);
     const data = readFileSync(out);
     rmSync(aiff); rmSync(out);
+    return data;
+  }
+  if (providerName === "piper") {
+    const model = join(env.PIPER_MODEL_DIR ?? join(homedir(), ".local", "share", "piper"), `${voice}.onnx`);
+    if (!existsSync(model)) throw new Error(`Fant ikke Piper-modellen ${model}. Sett PIPER_MODEL_DIR.`);
+    const wav = join(tmpdir(), `lecture-${process.pid}.wav`);
+    const out = join(tmpdir(), `lecture-${process.pid}.m4a`);
+    // Same phrases and pauses as the browser narrator; the Python helper joins them into one WAV.
+    execFileSync(env.PIPER_PYTHON ?? "python3", [join(root, "scripts", "piper-speak.py"), model, wav], { input: JSON.stringify(phrases(text)) });
+    execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "64000", wav, out]);
+    const data = readFileSync(out);
+    rmSync(wav); rmSync(out);
     return data;
   }
   if (providerName === "azure") {
