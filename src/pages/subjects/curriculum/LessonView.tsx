@@ -74,7 +74,8 @@ function Blocks({ blocks }: { blocks: LessonBlock[] }) {
   return <>{blocks.map((block, index) => <Block key={index} block={block} />)}</>;
 }
 
-function Block({ block }: { block: LessonBlock }) {
+/** One lesson block, as shown on the topic page. Also used by the lecture player. */
+export function Block({ block }: { block: LessonBlock }) {
   switch (block.type) {
     case "text":
       return <p className="lesson-text"><RichText>{block.text}</RichText></p>;
