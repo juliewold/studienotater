@@ -209,7 +209,7 @@ navigate("/fag/tdt4120/tema/pensum/03");
 await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 7);
 check(text("h1") === "Splitt og hersk" && text(".lesson-overview").includes("Masterteoremet") && document.querySelector("#tema-binaersok .lesson-figure") && document.querySelector("#tema-masterteoremet .lesson-figure"), "Forelesning 03 viser læringsnotatet med figurer ved teorien");
 check(text("#tema-ressurser").includes("Øving 3, del 1") && !/sikkerhetskopi/i.test(text(".curriculum-unit-page")), "Lenker til de forbedrede øvingsnotatene, uten sikkerhetskopier");
-check(document.querySelectorAll(".curriculum-subtopics a").length === 2, "Aktivt tema viser undertemaer i sidemenyen");
+check(!document.querySelector(".curriculum-navigation a[href*='/undertema/']") && !document.querySelector(".curriculum-unit-page a[href*='/undertema/']"), "Gamle undertemaer vises verken i sidemenyen eller i læringsnotatet");
 
 navigate("/fag/tdt4120/tema/pensum/04");
 await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 10);

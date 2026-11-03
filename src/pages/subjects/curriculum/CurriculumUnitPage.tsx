@@ -49,7 +49,7 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
   const done = progress.completed.has(unit.id);
   const navigation = [...(lesson?.sections.map(({ id, title }) => ({ id, title })) ?? []),
     ...(!lesson && introductions.length ? [{ id: "introduksjon", title: "Introduksjon" }] : []),
-    { id: "begreper", title: unit.subtopicIds.length ? "Begreper og undertemaer" : "Begreper" },
+    { id: "begreper", title: "Begreper" },
     { id: "ressurser", title: "Forelesninger og øvinger" }];
 
   return <CurriculumPage label={unitLabel(unit, Boolean(data.config))} title={unit.title} className="curriculum-unit-page">
@@ -84,19 +84,13 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
       {introductions.map(({ topic, text }) => <p key={topic.id} className="curriculum-introduction"><MathText>{text}</MathText></p>)}
     </Section>}
 
-    <Section id="begreper" title={unit.subtopicIds.length ? "Begreper og undertemaer" : "Begreper"}>
+    <Section id="begreper" title={"Begreper"}>
       {concepts.length > 0
         ? <>
           <p className="curriculum-section-intro">Begrepene i denne forelesningen. Alle begreper finner du under <Link to={`/fag/${subjectId}/tema/begreper`}>Begreper</Link>.</p>
           <ul className="curriculum-chip-list">{concepts.map(concept => <li key={concept.id}><Link to={`/concepts/${concept.slug}`}><MathText>{concept.name}</MathText></Link></li>)}</ul>
         </>
         : <p className="curriculum-section-intro">Begrepene for dette temaet velges ut når læringsnotatet skrives. Til da finner du alle begreper under <Link to={`/fag/${subjectId}/tema/begreper`}>Begreper</Link>.</p>}
-      {unit.topics.filter(topic => topic.subtopics.length > 0).map(topic => <div key={topic.id} className="curriculum-subtopic-group">
-        <h3><Link to={`/fag/${subjectId}/tema/${topic.id}`}>{topic.name}</Link></h3>
-        <ul className="curriculum-chip-list">{topic.subtopics.map(subtopic => <li key={subtopic.id}>
-          <Link to={`/fag/${subjectId}/tema/${topic.id}/undertema/${subtopic.id}`}>{subtopic.name}</Link>
-        </li>)}</ul>
-      </div>)}
     </Section>
 
     <Section id="ressurser" title="Forelesninger og øvinger">
