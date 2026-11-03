@@ -52,10 +52,13 @@
 
 /* Unit page */
 .curriculum-unit-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
-.curriculum-mark { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: .9rem; font-weight: 600; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--app-border, #e6dfed); background: var(--app-surface, #fff); color: var(--app-text, #29252f); cursor: pointer; }
+.curriculum-mark, .curriculum-play { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: .9rem; font-weight: 600; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--app-border, #e6dfed); background: var(--app-surface, #fff); color: var(--app-text, #29252f); cursor: pointer; }
 .curriculum-mark:hover { border-color: var(--app-accent, #7c3aed); color: var(--app-accent, #7c3aed); }
 .curriculum-mark.is-done { border-color: #16a34a; background: #16a34a; color: #fff; }
 .curriculum-mark:disabled { opacity: .7; cursor: wait; }
+.curriculum-play { border-color: var(--app-accent, #7c3aed); background: var(--app-accent, #7c3aed); color: #fff; }
+.curriculum-play:hover { border-color: var(--app-accent, #7c3aed); color: #fff; filter: brightness(1.08); }
+[data-theme="dark"] .curriculum-play, [data-theme="dark"] .curriculum-play:hover { color: #1b1426; }
 [data-theme="dark"] .curriculum-mark.is-done { border-color: #86dc9c; background: transparent; color: #86dc9c; }
 .curriculum-badge { padding: 3px 10px; border-radius: 999px; background: var(--app-soft, #f3edfa); color: var(--app-accent, #7c3aed); font-size: .78rem; font-weight: 650; }
 .curriculum-readings { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; margin-top: 16px; font-size: .88rem; }

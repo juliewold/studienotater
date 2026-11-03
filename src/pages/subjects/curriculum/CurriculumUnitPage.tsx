@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Check, ExternalLink, FileText } from "lucide-react";
+import { Check, ExternalLink, FileText, PlayCircle } from "lucide-react";
 import { useCurriculum } from "../../../components/subjects/CurriculumLayout/curriculumContext";
 import { MathText } from "../../../components/common/MathText/MathText";
 import { hasLesson, loadLesson } from "../../../data/curriculum/lessons";
@@ -9,6 +9,9 @@ import { currentNotesForUnit, exercisesForUnit, lectureNotesForUnit, type Curric
 import { CurriculumPage, CurriculumStatus } from "./curriculumShared";
 import { unitLabel } from "./curriculumHelpers";
 import { LessonIntro, LessonSections, LessonSources } from "./LessonView";
+
+// The player is its own chunk, loaded the first time someone starts a lecture.
+const LecturePlayer = lazy(() => import("./lecture/LecturePlayer"));
 
 export function CurriculumUnitPage() {
   const { unitId = "" } = useParams();
@@ -31,6 +34,8 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
   const expectsLesson = hasLesson(subjectId, unit.id);
   const [lesson, setLesson] = useState<Lesson | undefined>();
   const [lessonError, setLessonError] = useState("");
+  const [lectureOpen, setLectureOpen] = useState(false);
+  const playButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!expectsLesson) return;
     let cancelled = false;
@@ -58,8 +63,14 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
         disabled={progress.pending.has(unit.id)} onClick={() => void progress.toggle(unit.id)}>
         <Check size={16} aria-hidden="true" />{done ? "Gjennomgått" : "Marker som gjennomgått"}
       </button>}
+      {lesson && <button ref={playButton} type="button" className="curriculum-play" onClick={() => setLectureOpen(true)}>
+        <PlayCircle size={16} aria-hidden="true" />Spill av forelesning
+      </button>}
       {unit.supporting && <span className="curriculum-badge">Støttelitteratur</span>}
     </div>
+    {lesson && lectureOpen && <Suspense fallback={null}>
+      <LecturePlayer lesson={lesson} title={unit.title} label={unitLabel(unit, Boolean(data.config))} onClose={() => { setLectureOpen(false); playButton.current?.focus(); }} />
+    </Suspense>}
     {progress.errorMessage && <CurriculumStatus alert>{progress.errorMessage}</CurriculumStatus>}
     {unit.readings && unit.readings.length > 0 && <div className="curriculum-readings">
       <span>Pensum</span><ul>{unit.readings.map(reading => <li key={reading}>{reading}</li>)}</ul>

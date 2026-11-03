@@ -204,6 +204,13 @@ check(text(".lesson-code").includes("while j > 0 and A[j] > key") && document.qu
 check(text("#tema-ressurser").includes("Løsningsforslag øving 1") && text("#tema-ressurser").includes("Forelesning 1 (lysark)"), "Lenker til forelesning, øving og løsningsforslag beholdes");
 check(contentCalls() === contentBefore, "Læringssiden henter ikke notatinnhold fra Supabase");
 check([...document.querySelectorAll("#tema-begreper .curriculum-chip-list a")].some(link => link.textContent === "Trekanttall") === false, "Begreper fra kunnskapsbasen som ikke er valgt for forelesningen, vises ikke");
+const callsBeforeLecture = calls.length;
+document.querySelector<HTMLButtonElement>(".curriculum-play")!.click();
+await waitFor(() => Boolean(document.querySelector(".lp-dialog .lp-scene-title")));
+check(text(".lp-dialog h2") === "Algoritmer og kompleksitet" && calls.length === callsBeforeLecture, "«Spill av forelesning» åpner avspilleren uten nye Supabase-kall");
+window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+await waitFor(() => !document.querySelector(".lp-dialog"));
+check(document.activeElement?.classList.contains("curriculum-play"), "Lukking gir fokus tilbake til knappen på temasiden");
 
 navigate("/fag/tdt4120/tema/pensum/03");
 await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 7);
