@@ -23,6 +23,7 @@ Lydfilene ligger i `public/lecture-audio/` og publiseres med GitHub Pages. De he
 ```sh
 node scripts/lecture-audio.mjs --all                           # tørrkjøring: antall tegn og anslått pris, ingen API-kall
 node scripts/lecture-audio.mjs --unit 01 --provider macos      # gratis lokal test av hele kjeden
+node scripts/lecture-audio.mjs --unit 01 --provider piper      # gratis, lokal norsk stemme (Piper)
 node scripts/lecture-audio.mjs --unit 01 --provider azure --confirm
 ```
 
@@ -32,6 +33,15 @@ Nøklene leses fra miljøet eller `.env.local`. Bruk aldri `VITE_`-prefiks på d
 - `ELEVENLABS_API_KEY` sammen med `--voice <voice-id>`. Modellen er `eleven_multilingual_v2`; endre den med `--model`.
 
 Betalte leverandører kalles bare med `--confirm`. `--prune` sletter lydfiler som ikke lenger brukes.
+
+## Piper (gratis, lokal)
+
+`--provider piper` bruker stemmen `no_NO-talesyntese-medium` fra [Piper-stemmene på Hugging Face](https://huggingface.co/rhasspy/piper-voices/tree/main/no/no_NO/talesyntese/medium). Modellen er under MIT-lisens, og treningsdataene er CC0. Ingen nøkkel og ingen API-kall.
+
+- Modellfilen `no_NO-talesyntese-medium.onnx` (og `.onnx.json`) må ligge i `PIPER_MODEL_DIR`, som er `~/.local/share/piper` som standard. Den ligger ikke i repoet.
+- Piper må være installert for Python. Sett `PIPER_PYTHON` hvis det er en egen venv, for eksempel `PIPER_PYTHON=~/piper-venv/bin/python`. `pip install piper-tts` på Python 3.11 eller 3.12 er nok.
+- `scripts/piper-speak.py` leser fraser med samme pauser som nettleserfortellingen og skriver én WAV-fil. Den konverteres deretter til m4a med `afconvert`, så kjøringen må skje på macOS.
+- Kjent problem: Piper kan klage på at den ikke finner `phontab`. Det skyldes at espeak-ng-dataene ikke ligger der biblioteket leter. Lenking av `espeak-ng-data` til stedet der feilmeldingen peker, løser det lokalt.
 
 ## Uttale for nettleserstemmer
 
