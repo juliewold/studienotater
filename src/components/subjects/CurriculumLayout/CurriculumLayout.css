@@ -21,9 +21,6 @@
 .curriculum-unit-link.is-active .curriculum-unit-number { color: inherit; }
 .curriculum-unit-title { flex: 1; min-width: 0; }
 .curriculum-unit-check { flex: none; margin-top: 2px; color: #16a34a; }
-.curriculum-navigation .curriculum-subtopics { margin: 2px 0 8px 22px; padding-left: 10px; border-left: 1px solid var(--app-border, #e6dfed); }
-.curriculum-subtopics a { padding-block: 5px; font-size: .83rem; color: var(--app-muted, #655c70); }
-.curriculum-subtopics a.active { box-shadow: inset 3px 0 var(--app-accent, #7c3aed); }
 .curriculum-content { min-width: 0; }
 .curriculum-toggle { display: none; }
 [data-theme="dark"] .curriculum-unit-check { color: #86dc9c; }

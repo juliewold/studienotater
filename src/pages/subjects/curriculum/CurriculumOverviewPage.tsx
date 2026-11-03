@@ -51,7 +51,6 @@ export function CurriculumOverviewPage() {
               {unit.readings && unit.readings.length > 0 && <span className="curriculum-unit-readings">{unit.readings.join(" · ")}</span>}
               <span className={lesson ? "curriculum-unit-meta has-lesson" : "curriculum-unit-meta"}>
                 {lesson ? "Læringsnotat klart" : "Læringsnotat kommer"}
-                {unit.subtopicIds.length > 0 && ` · ${unit.subtopicIds.length} undertemaer`}
                 {unit.supporting && " · Støttelitteratur"}
               </span>
             </Link>

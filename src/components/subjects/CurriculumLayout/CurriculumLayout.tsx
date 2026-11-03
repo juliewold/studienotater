@@ -77,11 +77,6 @@ function SubjectCurriculum({ subjectId }: { subjectId: string }) {
                   <span className="curriculum-unit-title">{unit.title}</span>
                   {done && <Check className="curriculum-unit-check" size={15} aria-label="Gjennomgått" />}
                 </NavLink>
-                {active && unit.subtopicIds.length > 0 && <ul className="curriculum-subtopics">
-                  {unit.topics.flatMap(topic => topic.subtopics.map(subtopic => <li key={subtopic.id}>
-                    <NavLink to={`${base}/${topic.id}/undertema/${subtopic.id}`} onClick={close}>{subtopic.name}</NavLink>
-                  </li>))}
-                </ul>}
               </li>;
             })}</ul>
           </div>)}
