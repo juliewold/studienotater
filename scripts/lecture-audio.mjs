@@ -115,7 +115,8 @@ async function synthesize(text, neighbours, phrases) {
     const out = join(tmpdir(), `lecture-${process.pid}.m4a`);
     // Same phrases and pauses as the browser narrator; the Python helper joins them into one WAV.
     execFileSync(env.PIPER_PYTHON ?? "python3", [join(root, "scripts", "piper-speak.py"), model, wav], { input: JSON.stringify(phrases(text)) });
-    execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "64000", wav, out]);
+    // 32 kbps mono is clear for speech and halves the size compared with 64 kbps.
+    execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "32000", wav, out]);
     const data = readFileSync(out);
     rmSync(wav); rmSync(out);
     return data;
