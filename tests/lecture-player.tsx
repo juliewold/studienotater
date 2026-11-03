@@ -3,7 +3,9 @@ import { act, useState } from "react";
 import { loadLesson, loadSubjectLessons } from "../src/data/curriculum/lessons";
 import type { Lesson, LessonBlock } from "../src/data/curriculum/lessons/types";
 import { buildLectureScript, countSteps } from "../src/pages/subjects/curriculum/lecture/lectureScript";
-import { chunkText, latexToSpeech, splitSentences, toSpeech } from "../src/pages/subjects/curriculum/lecture/speechText";
+import { browserPronunciation, chunkText, codeToSpeech, latexToSpeech, narrationKey, phrases, splitSentences, toSpeech } from "../src/pages/subjects/curriculum/lecture/speechText";
+import { narrate } from "../src/pages/subjects/curriculum/lecture/narrator";
+import { recordingUrl } from "../src/pages/subjects/curriculum/lecture/recordings";
 import { traceInsertionSort } from "../src/pages/subjects/curriculum/lecture/animations/insertionSort";
 import LecturePlayer from "../src/pages/subjects/curriculum/lecture/LecturePlayer";
 import "../src/index.css";
@@ -27,10 +29,19 @@ try {
   check(latexToSpeech("\\Theta(n^2)") === "theta av n i andre", "Θ(n²) leses «theta av n i andre»");
   check(latexToSpeech("O(g(n))") === "stor O av g av n" && latexToSpeech("f = o(g)") === "f er lik lille o av g", "Stor og lille O skilles");
   check(latexToSpeech("\\frac{n(n-1)}{2}") === "n av n minus 1 delt på 2", "Brøker leses som «delt på»");
-  check(latexToSpeech("A[1:i-1]") === "A 1 til i minus 1", "Tabellintervaller leses «fra … til»");
+  check(latexToSpeech("A[1:i-1]") === "A fra 1 til i minus 1" && latexToSpeech("A[j] > key") === "A på plass j er større enn key", "Tabellintervaller og indekser leses «fra … til» og «på plass»");
   check(latexToSpeech("\\sum_{i=1}^{n} i") === "summen fra i er lik 1 til n av i", "Summer med grenser");
   check(latexToSpeech("T_{\\text{worst}}(n) = \\max_{|I| = n} T(I)") === "T worst av n er lik maksimum over størrelsen av I er lik n av T av I", "Indekser, tekst og maksimum");
-  check(toSpeech("**Insertion-Sort** er $\\Theta(n^2)$ **(A8)**.") === "Insertion-Sort er theta av n i andre.", "Fet skrift og læringsmålkoder fjernes fra opplesningen");
+  check(toSpeech("**Insertion-Sort** er $\\Theta(n^2)$ **(A8)**.") === "Insertion Sort er theta av n i andre.", "Fet skrift og læringsmålkoder fjernes, algoritmenavn sies som ord");
+  check(codeToSpeech("while j > 0 and A[j] > key") === "så lenge j er større enn 0 og A på plass j er større enn key"
+    && codeToSpeech("for i = 2 to n") === "for i fra 2 til n" && codeToSpeech("A[j + 1] = A[j]") === "A på plass j pluss 1 settes til A på plass j", "Pseudokode leses som en foreleser sier den");
+  check(toSpeech("Ca. 5, f.eks. dvs. ingen.") === "Cirka 5, for eksempel det vil si ingen.", "Forkortelser skrives ut");
+  const spokenPhrases = phrases("Først dette. Så en lang setning med mange ledd: første del av forklaringen, andre del av forklaringen, tredje del av forklaringen; og en avslutning som er lang nok til å telle med her.");
+  check(spokenPhrases.length >= 3 && spokenPhrases[0].pause > spokenPhrases[1].pause && spokenPhrases.at(-1)!.text.endsWith("her."), "Naturlige pauser: lengre etter punktum, kortere ved kolon og komma");
+  check(browserPronunciation("key og Heapsort") === "ki og hipsort" && toSpeech("$key$") === "key", "Uttaleleksikon gjelder bare nettleserstemmer");
+  check(narrationKey("Hei") === narrationKey("Hei") && narrationKey("Hei") !== narrationKey("Hei.") && /^[0-9a-z]+$/.test(narrationKey("Hei")), "Stabil lydnøkkel per replikk");
+  const manifest = { provider: "azure", voice: "nb-NO-PernilleNeural", label: "Pernille", generated: "2026-11-03", files: { [narrationKey("Hei.")]: "a.mp3" } };
+  check(recordingUrl(manifest, "tdt4120", "01", "Hei.")?.endsWith("/lecture-audio/tdt4120/01/a.mp3") && recordingUrl(manifest, "tdt4120", "01", "Endret.") === undefined, "Bare uendret tekst bruker ferdiginnlest lyd");
   check(splitSentences("Velg $c = 1.5$. Da er f.eks. $n = 2$ nok. Slutt.").length === 3, "Setninger deles ikke inne i matematikk eller forkortelser");
   check(chunkText("En. To. Tre.", 8).length === 2 && chunkText("Kort.").length === 1, "Lange avsnitt deles i korte biter");
 
@@ -68,20 +79,55 @@ try {
   check(script.scenes.filter(scene => scene.kind === "figure").length === 6, "Alle seks figurene i forelesning 01 får egen scene");
 
   // --- Player with stubbed speech ------------------------------------------------
-  const spokenLog: { text: string; lang: string; rate: number }[] = [];
+  const spokenLog: { text: string; lang: string; rate: number; voice?: string }[] = [];
   let cancels = 0;
   let pending: { onend?: () => void }[] = [];
-  class FakeUtterance { text: string; lang = ""; rate = 1; voice: unknown = null; onend?: () => void; onerror?: () => void; constructor(text: string) { this.text = text; } }
+  class FakeUtterance { text: string; lang = ""; rate = 1; voice: { name: string } | null = null; onend?: () => void; onerror?: () => void; constructor(text: string) { this.text = text; } }
   const fakeSynth = {
-    speak(utterance: FakeUtterance) { spokenLog.push({ text: utterance.text, lang: utterance.lang, rate: utterance.rate }); pending.push(utterance); },
+    speak(utterance: FakeUtterance) { spokenLog.push({ text: utterance.text, lang: utterance.lang, rate: utterance.rate, voice: utterance.voice?.name }); pending.push(utterance); },
     cancel() { cancels++; pending = []; },
-    getVoices: () => [{ lang: "nb-NO", name: "Nora", localService: true }],
+    getVoices: () => [{ lang: "nb-NO", name: "Nora", voiceURI: "nora", localService: true }, { lang: "nb-NO", name: "Nora (forbedret)", voiceURI: "nora-enhanced", localService: true }, { lang: "en-US", name: "Samantha", voiceURI: "samantha", localService: true }],
     addEventListener() {}, removeEventListener() {},
   };
   Object.defineProperty(window, "speechSynthesis", { value: fakeSynth, configurable: true });
   Object.defineProperty(window, "SpeechSynthesisUtterance", { value: FakeUtterance, configurable: true });
   const finishSpeech = () => { const queue = pending; pending = []; queue.forEach(utterance => utterance.onend?.()); };
+  // Ends every phrase of the current part; the narrator waits a short pause between phrases.
+  // In manual mode the step does not change, so stop once nothing is queued for a while.
+  const finishPart = async () => {
+    const start = document.querySelector(".lp-counter")?.textContent;
+    let idle = 0;
+    for (let round = 0; round < 200 && idle < 8; round++) {
+      if (document.querySelector(".lp-counter")?.textContent !== start) return;
+      if (pending.length) { idle = 0; await act(async () => finishSpeech()); }
+      else { idle++; await sleep(100); }
+    }
+  };
   localStorage.removeItem("lecture-player-settings");
+
+  // Pre-generated audio plays when it exists and falls back to the browser voice if the file fails.
+  const audios: { src: string; playbackRate: number; onended: (() => void) | null; onerror: (() => void) | null }[] = [];
+  class FakeAudio {
+    src: string; playbackRate = 1; preservesPitch = true; duration = NaN;
+    onended: (() => void) | null = null; onerror: (() => void) | null = null; onloadedmetadata: (() => void) | null = null;
+    constructor(src: string) { this.src = src; audios.push(this); }
+    play() { return Promise.resolve(); }
+    pause() {} removeAttribute() {} load() {}
+  }
+  const realAudio = window.Audio;
+  Object.defineProperty(window, "Audio", { value: FakeAudio, configurable: true, writable: true });
+  let audioDone = false;
+  narrate("Hei.", { rate: 1.15, muted: false, voice: null, audioUrl: "a.mp3", onDone: () => { audioDone = true; } });
+  audios[0].onended?.();
+  check(audioDone && audios[0].src === "a.mp3" && audios[0].playbackRate === 1.15 && !spokenLog.length, "Ferdiginnlest lyd spilles i valgt tempo og styrer når neste steg starter");
+  narrate("Hei igjen.", { rate: 1, muted: false, voice: null, audioUrl: "mangler.mp3", onDone: () => {} })();
+  const stopFallback = narrate("Hei igjen.", { rate: 1, muted: false, voice: null, audioUrl: "mangler.mp3", onDone: () => {} });
+  audios.at(-1)!.onerror?.();
+  check(spokenLog.at(-1)?.text === "Hei igjen.", "Mangler lydfilen, leser nettleserstemmen i stedet");
+  stopFallback();
+  Object.defineProperty(window, "Audio", { value: realAudio, configurable: true, writable: true });
+  spokenLog.length = 0;
+  pending = [];
 
   const container = document.getElementById("root")!;
   const root = createRoot(container);
@@ -102,11 +148,11 @@ try {
   await waitFor(() => spokenLog.length > 0);
   check(dialog()?.getAttribute("aria-modal") === "true" && document.body.style.overflow === "hidden", "Avspilleren åpnes som modal og låser siden bak");
   check(document.querySelector(".lp-scene-title h3")?.textContent === "Algoritmer og kompleksitet", "Første scene er tittelen");
-  check(spokenLog[0].lang === "nb-NO" && !/[$\\]/.test(spokenLog[0].text), "Opplesningen starter automatisk på norsk");
+  check(spokenLog[0].lang === "nb-NO" && !/[$\\]/.test(spokenLog[0].text) && spokenLog[0].voice === "Nora (forbedret)", "Opplesningen starter automatisk med den beste norske stemmen");
   const total = Number(counter().split("/")[1]);
   check(total === countSteps(script) && counter().startsWith("1 /"), "Telleren viser steg av totalt");
 
-  await act(async () => finishSpeech());
+  await finishPart();
   await waitFor(() => counter().startsWith("2 /"), 2000);
   check(true, "Når en replikk er ferdig, går avspilleren automatisk videre");
 
@@ -122,9 +168,25 @@ try {
   await act(async () => [...document.querySelectorAll<HTMLButtonElement>(".lp-segmented button")].find(item => item.textContent === "Manuell")!.click());
   await act(async () => button("Neste").click());
   await waitFor(() => spokenLog.length > spokenBefore);
-  await act(async () => finishSpeech());
+  await finishPart();
   await sleep(700);
   check(counter().startsWith("3 /") && button("Spill av"), "Manuell modus leser steget og venter på brukeren");
+
+  await act(async () => button("Velg stemme").click());
+  const voiceSelect = document.querySelector<HTMLSelectElement>(".lp-voice-select select")!;
+  const voiceOptions = [...voiceSelect.options].map(option => option.textContent);
+  check(voiceOptions.length === 2 && voiceOptions[0]?.startsWith("Nora (forbedret)") && !voiceOptions.some(option => option?.includes("Samantha")), "Stemmevalget viser norske stemmer, best først");
+  await act(async () => { voiceSelect.value = "nora"; voiceSelect.dispatchEvent(new Event("change", { bubbles: true })); });
+  const previewFrom = spokenLog.length;
+  await act(async () => document.querySelector<HTMLButtonElement>(".lp-voice-preview")!.click());
+  check(spokenLog.slice(previewFrom).some(item => item.voice === "Nora" && item.text.includes("velkommen")), "Forhåndslytting leser en prøve med valgt stemme");
+  await act(async () => window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
+  check(!document.querySelector(".lp-voice-panel") && dialog(), "Escape lukker stemmevalget først, ikke avspilleren");
+  check(JSON.parse(localStorage.getItem("lecture-player-settings")!).voice === "nora", "Valgt stemme huskes");
+  await act(async () => button("Neste").click());
+  await waitFor(() => spokenLog.at(-1)?.voice === "Nora");
+  await finishPart();
+  check(true, "Neste replikk leses med den valgte stemmen");
 
   const select = document.querySelector<HTMLSelectElement>(".lp-chapter select")!;
   await act(async () => { select.value = "3"; select.dispatchEvent(new Event("change", { bubbles: true })); });

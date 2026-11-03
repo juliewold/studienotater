@@ -133,3 +133,15 @@
   .lp-backdrop, .lp-dialog, .lp-scene, .lp-part { animation: none; }
   .lp-cell, .lp-progress-fill, .lp-part { transition: none; }
 }
+
+/* Voice picker, opened from the footer */
+.lp-footer { position: relative; }
+.lp-voice-panel { position: absolute; right: 18px; bottom: calc(100% + 10px); z-index: 2; display: grid; gap: 10px; width: min(360px, calc(100% - 36px)); padding: 14px 16px 16px; border: 1px solid var(--app-border, #e6dfed); border-radius: 16px; background: var(--app-surface, #fff); box-shadow: 0 18px 40px rgba(40, 20, 70, .18); animation: lp-part-in .2s ease-out; }
+.lp-voice-head { display: flex; align-items: center; justify-content: space-between; }
+.lp-voice-head .lp-icon-button { width: 30px; height: 30px; border-radius: 9px; }
+.lp-voice-select select { width: 100%; }
+.lp-voice-preview { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: inherit; font-size: .88rem; font-weight: 600; padding: 8px 14px; border: 1px solid var(--app-accent, #7c3aed); border-radius: 999px; background: var(--app-soft, #f3edfa); color: var(--app-accent, #7c3aed); cursor: pointer; }
+.lp-voice-preview[aria-pressed="true"] { background: var(--app-accent, #7c3aed); color: #fff; }
+[data-theme="dark"] .lp-voice-preview[aria-pressed="true"] { color: #1b1426; }
+.lp-voice-tip { margin: 0; font-size: .8rem; line-height: 1.5; color: var(--app-muted, #716879); }
+@media (max-width: 600px) { .lp-voice-panel { right: 12px; left: 12px; width: auto; } }
