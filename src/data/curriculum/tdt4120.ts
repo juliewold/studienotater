@@ -82,6 +82,7 @@ export const tdt4120Curriculum: CurriculumConfig = {
       id: "09", number: "09", resourceNumber: "9", title: "Minimale spenntrær", part: "Grafalgoritmer",
       readings: ["Kap. 19: innledning, 19.1 og 19.3", "Kap. 21"], topicIds: [],
       lectureSlides: drive("Forelesning 9 (lysark)", "1eNDqTQ8ERWHBvQtuNGV1J1sjc7DhhVah"),
+      exercises: [drive("Øving 9: Minimale spenntrær", "1VWjZwHR8sM0aZHTgCDOKNqRl6Nwa-ZZw"), drive("Løsningsforslag øving 9", "1TsPVhXVyVgxk96o-pzMJTev4DuEpKlIv")],
     },
     {
       id: "10", number: "10", resourceNumber: "10", title: "Korteste vei fra én til alle", part: "Grafalgoritmer",
