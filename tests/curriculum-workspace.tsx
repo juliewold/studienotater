@@ -81,10 +81,10 @@ check(formulas[0].description === "Masterteoremet", "Formel i boks får boksens 
 const symbols = findSymbols([{ latex: "O(n) + \\Omega(n) + \\lg n" }, { latex: "\\Theta(n)" }]).map(entry => entry.definition.id);
 check(symbols.join() === "O,Omega,Theta,lg", "Symboler finnes uten falske treff (Ω er ikke O)");
 // --- Reviewed lesson ---------------------------------------------------------
-check(["01", "02a", "02b", "03", "04", "05", "06", "07", "08", "09"].every(id => hasLesson("tdt4120", id)) && !hasLesson("tdt4120", "10"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
+check(["01", "02a", "02b", "03", "04", "05", "06", "07", "08", "09", "10"].every(id => hasLesson("tdt4120", id)) && !hasLesson("tdt4120", "11"), "Bare temaer med kvalitetssikret læringsnotat får læringsinnhold");
 const allBlocks = (blocks: LessonBlock[]): LessonBlock[] => blocks.flatMap(block =>
   block.type === "box" || block.type === "example" ? [block, ...allBlocks(block.blocks)] : [block]);
-for (const unitId of ["01", "02a", "02b", "03", "04", "05", "06", "07", "08", "09"]) {
+for (const unitId of ["01", "02a", "02b", "03", "04", "05", "06", "07", "08", "09", "10"]) {
   const lesson = (await loadLesson("tdt4120", unitId))!;
   const lessonBlocks = lesson.sections.flatMap(section => allBlocks(section.blocks));
   const texts = [lesson.summary, ...lesson.goals, ...lesson.overview, ...lesson.keyFormulas.map(formula => formula.label), ...lessonBlocks.flatMap(block =>
@@ -104,7 +104,7 @@ for (const unitId of ["01", "02a", "02b", "03", "04", "05", "06", "07", "08", "0
   check(lesson.sources.some(source => source.kind === "drive") && lesson.sources.some(source => source.kind === "note"), `${unitId}: kilder fra Google Drive og de forbedrede notatene`);
 }
 const lesson01 = (await loadLesson("tdt4120", "01"))!;
-const allNamed = (await Promise.all(["01", "02a", "02b", "03", "04", "05", "06", "07", "08", "09"].map(async id => lessonFormulas((await loadLesson("tdt4120", id))!)))).flat();
+const allNamed = (await Promise.all(["01", "02a", "02b", "03", "04", "05", "06", "07", "08", "09", "10"].map(async id => lessonFormulas((await loadLesson("tdt4120", id))!)))).flat();
 check(lesson01.concepts.length > 10 && !lesson01.concepts.some(slug => /heap|huffman|knapsack|ryggsekk|tree|quicksort|merge/.test(slug)), "Bare begreper fra forelesning 1");
 check(lesson01.notes.every(note => !/sikkerhetskopi/i.test(note.label)), "Læringsnotatet lenker til gjeldende notater");
 check(matchesSearch("grad", "Grådighet") && matchesSearch("merge sort", "Merge Sort algoritme") && !matchesSearch("heap", "Merge"), "Søk tåler diakritiske tegn og flere ord");
@@ -244,21 +244,26 @@ check(text("h1") === "Traversering av grafer" && text(".lesson-overview").includ
 check(text("#tema-ressurser").includes("Eksamen desember 2025") && text("#tema-ressurser").includes("Løsningsforslag øving 8"), "Forelesning 08 lenker til øving, løsningsforslag og eksamener");
 
 navigate("/fag/tdt4120/tema/pensum/09");
-await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 4);
+await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 5);
 check(text("h1") === "Minimale spenntrær" && text(".lesson-overview").includes("Kruskal") && document.querySelector("#tema-disjunkte .lesson-figure") && document.querySelector("#tema-kruskal .lesson-figure"), "Forelesning 09 viser læringsnotatet med figurer ved teorien");
 check(text("#tema-ressurser").includes("Eksamen desember 2025") && text("#tema-ressurser").includes("Løsningsforslag øving 9"), "Forelesning 09 lenker til øving, løsningsforslag og eksamener");
 
 navigate("/fag/tdt4120/tema/pensum/10");
+await waitFor(() => document.querySelectorAll(".lesson-figure svg").length === 6);
+check(text("h1") === "Korteste vei fra én til alle" && text(".lesson-overview").includes("Relax") && document.querySelector("#tema-relax .lesson-figure") && document.querySelector("#tema-dijkstra .lesson-figure"), "Forelesning 10 viser læringsnotatet med figurer ved teorien");
+check(text("#tema-ressurser").includes("Eksamen desember 2025") && text("#tema-ressurser").includes("Øving 10: Korteste vei"), "Forelesning 10 lenker til øving og eksamener");
+
+navigate("/fag/tdt4120/tema/pensum/11");
 await waitFor(() => text(".curriculum-unit-page").includes("Læringsnotatet for dette temaet er ikke skrevet ennå"));
-check(text("h1") === "Korteste vei fra én til alle" && text(".curriculum-label") === "Forelesning 10", "Temaside for forelesning uten læringsnotat");
-check(!document.querySelector(".lesson-part") && text(".curriculum-unit-page").includes("Forelesning 10 (lysark)"), "Uten læringsnotat vises lysark, men ikke læringsinnhold");
+check(text("h1") === "Korteste vei fra alle til alle" && text(".curriculum-label") === "Forelesning 11", "Temaside for forelesning uten læringsnotat");
+check(!document.querySelector(".lesson-part"), "Uten læringsnotat vises ikke læringsinnhold");
 check(!document.querySelector("#tema-begreper .curriculum-chip-list a[href*='concepts']") && text("#tema-begreper").includes("Begrepene for dette temaet velges ut"), "Uten læringsnotat vises ingen ufiltrert begrepsliste");
 check(contentCalls() === contentBefore, "Heller ikke temaer uten læringsnotat henter notatinnhold");
 const before = calls.length;
 document.querySelector<HTMLButtonElement>(".curriculum-mark")!.click();
 await waitFor(() => calls.length > before);
 const save = calls.at(-1)!;
-check(save.table === "progress" && save.method === "POST" && JSON.stringify(save.body).includes('"item_type":"syllabus"') && JSON.stringify(save.body).includes("tdt4120-10"), "Gjennomgått lagres som eksisterende pensumfremdrift");
+check(save.table === "progress" && save.method === "POST" && JSON.stringify(save.body).includes('"item_type":"syllabus"') && JSON.stringify(save.body).includes("tdt4120-11"), "Gjennomgått lagres som eksisterende pensumfremdrift");
 await waitFor(() => text(".curriculum-progress-count") === "1/16");
 check(document.querySelector(".curriculum-mark")!.getAttribute("aria-pressed") === "true", "Markering vises i siden og sidemenyen");
 
