@@ -88,6 +88,7 @@ export const tdt4120Curriculum: CurriculumConfig = {
       id: "10", number: "10", resourceNumber: "10", title: "Korteste vei fra én til alle", part: "Grafalgoritmer",
       readings: ["Kap. 22: innledning og 22.1–22.3"], topicIds: [],
       lectureSlides: drive("Forelesning 10 (lysark)", "1I4VJv0qRWJ7XUBHw9o5ApMIj5EY98QIY"),
+      exercises: [drive("Øving 10: Korteste vei fra én til alle", "1lJYnbikTj6sFBy3Cp34S8BiEVWQE8z4L")],
     },
     { id: "11", number: "11", resourceNumber: "11", title: "Korteste vei fra alle til alle", part: "Grafalgoritmer", readings: ["Kap. 23: innledning og 23.2"], topicIds: [] },
     { id: "12", number: "12", resourceNumber: "12", title: "Maksimal flyt", part: "Grafalgoritmer", readings: ["Kap. 24"], topicIds: [] },
