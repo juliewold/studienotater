@@ -34,6 +34,9 @@ import { traceHeapInsert, traceIncreaseKey } from "../src/pages/subjects/curricu
 import { traceFractional } from "../src/pages/subjects/curriculum/lecture/animations/fractional";
 import { traceScc } from "../src/pages/subjects/curriculum/lecture/animations/scc";
 import { traceDag } from "../src/pages/subjects/curriculum/lecture/animations/dag";
+import { traceQuicksort } from "../src/pages/subjects/curriculum/lecture/animations/quicksort";
+import { traceExtractMax } from "../src/pages/subjects/curriculum/lecture/animations/heapExtract";
+import { traceDecode } from "../src/pages/subjects/curriculum/lecture/animations/decode";
 import LecturePlayer from "../src/pages/subjects/curriculum/lecture/LecturePlayer";
 import "../src/index.css";
 import "../src/styles/global.css";
@@ -355,6 +358,25 @@ try {
     const chainScene = scenes.findIndex(scene => scene.animation?.id === "hash-chaining");
     check(chainScene > 0 && scenes[chainScene].parts.length === chain.length && scenes[chainScene].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
       "Hashtabell med kjeding: animasjonen står etter figuren, med ett lest steg per hendelse");
+  }
+
+  // --- Quicksort, extract-max and decoding ----------------------------------------
+  const quick = traceQuicksort();
+  check(quick.at(-1)!.array.join() === "1,2,3,4,5,6,7,8", "Quicksort sorterer ⟨2, 8, 7, 1, 3, 5, 6, 4⟩ til ⟨1, …, 8⟩");
+  const extract = traceExtractMax();
+  const heapLeft = extract.at(-1)!.array as number[];
+  check(heapLeft.join() === "14,8,10,4,7,9,3,2,1" && heapLeft.every((_, k) => k === 0 || heapLeft[Math.floor((k + 1) / 2) - 1] >= heapLeft[k]),
+    "Max-Heap-Extract-Max gir haugen fra figuren, og den er fortsatt en gyldig maks-haug");
+  const decoded = traceDecode();
+  check(decoded.at(-1)!.output === "abcedf", "Decode leser ut meldingen abcedf fra bitstrengen");
+  for (const [lessonId, title, animation, count] of [
+    ["03", "Quicksort(A, p, r)", "quicksort", quick.length], ["05", "Max-Heap-Extract-Max(A)", "max-heap-extract-max", extract.length],
+    ["07", "Decode(T, C, n)", "decode", decoded.length],
+  ] as const) {
+    const scenes = buildLectureScript(await loadLesson("tdt4120", lessonId).then(lesson => lesson!), "Ny").scenes;
+    const at = scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === title));
+    check(scenes[at + 1]?.animation?.id === animation && scenes[at + 1].parts.length === count && scenes[at + 1].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
+      `${title}: animasjonen følger pseudokoden, med ett lest steg per hendelse`);
   }
 
   // --- Insertion-Sort animation --------------------------------------------------

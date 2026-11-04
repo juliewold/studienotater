@@ -6,6 +6,10 @@ import { traceBfs } from "./bfs";
 import { traceDfs } from "./dfs";
 import { traceDijkstra } from "./dijkstra";
 import { BfsView, DfsView, DijkstraView, TopoView } from "./GraphViews";
+import { DecodeView, ExtractMaxView, QuicksortView } from "./DataViews";
+import { traceQuicksort } from "./quicksort";
+import { traceExtractMax } from "./heapExtract";
+import { traceDecode } from "./decode";
 import { traceBellmanFord } from "./bellmanFord";
 import { traceKruskal } from "./kruskal";
 import { tracePrim } from "./prim";
@@ -90,6 +94,9 @@ export const lectureAnimations: LectureAnimation[] = [
   { id: "fractional-knapsack", title: "Fractional Knapsack steg for steg", matches: pseudocodeTitled(/^Fractional-Knapsack\(/), steps: () => traceFractional().map(({ caption }) => ({ caption })), View: FractionalView },
   { id: "scc", title: "Sterke komponenter steg for steg", matches: pseudocodeTitled(/^Strongly-Connected-Components\(/), steps: () => traceScc().map(({ caption }) => ({ caption })), View: SccView },
   { id: "dag-shortest-paths", title: "DAG-Shortest-Paths steg for steg", matches: pseudocodeTitled(/^DAG-Shortest-Paths\(/), steps: () => traceDag().map(({ caption }) => ({ caption })), View: DagView },
+  { id: "quicksort", title: "Quicksort steg for steg", matches: pseudocodeTitled(/^Quicksort\(/), steps: () => traceQuicksort().map(({ caption }) => ({ caption })), View: QuicksortView },
+  { id: "max-heap-extract-max", title: "Max-Heap-Extract-Max steg for steg", matches: pseudocodeTitled(/^Max-Heap-Extract-Max\(/), steps: () => traceExtractMax().map(({ caption }) => ({ caption })), View: ExtractMaxView },
+  { id: "decode", title: "Dekoding av Huffman-kode steg for steg", matches: pseudocodeTitled(/^Decode\(/), steps: () => traceDecode().map(({ caption }) => ({ caption })), View: DecodeView },
   // The DFS steps of the ordering, with the list growing each time a vertex is finished.
   { id: "topological-sort", title: "Topologisk sortering steg for steg", matches: pseudocodeTitled(/^Topological-Sort\(/), steps: () => traceTopo().map(({ caption }) => ({ caption })), View: TopoView },
 ];

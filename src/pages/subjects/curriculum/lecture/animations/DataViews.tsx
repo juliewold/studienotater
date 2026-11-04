@@ -7,6 +7,9 @@ import { heapPositions, traceHeapInsert, traceIncreaseKey, type HeapFrame } from
 import { traceRadix, traceBucket } from "./radixBucket";
 import { traceRandomizedSelect, traceSelect, type SelectFrame } from "./select";
 import { traceFractional } from "./fractional";
+import { treeLayout, huffmanRoot, traceDecode, type DecodeFrame } from "./decode";
+import { traceQuicksort } from "./quicksort";
+import { traceExtractMax } from "./heapExtract";
 
 // Views for the data-structure algorithms: hash tables, heaps, the radix and bucket sorts, selection, and the
 // fractional knapsack. Each draws the structure in the state of the frame being explained.
@@ -50,7 +53,7 @@ export function DoublingView({ block, step }: AnimationViewProps) {
 }
 
 /** A heap as its array and as the tree it stands for, with the element being moved and its parent marked. */
-function HeapFrameView({ block, frame }: { block: AnimationViewProps["block"]; frame: HeapFrame }) {
+export function HeapFrameView({ block, frame }: { block: AnimationViewProps["block"]; frame: HeapFrame }) {
   const n = frame.array.length;
   const at = useMemo(() => heapPositions(n), [n]);
   const heap = Array.from({ length: n }, (_, index) => String(index + 1));
@@ -136,7 +139,7 @@ export function BucketView({ block, step }: AnimationViewProps) {
   </AlgorithmLayout>;
 }
 
-function SelectFramesView({ block, frame }: { block: AnimationViewProps["block"]; frame: SelectFrame }) {
+export function SelectFramesView({ block, frame }: { block: AnimationViewProps["block"]; frame: SelectFrame }) {
   const tones = frame.array.map((_, index) => {
     if (frame.found === index) return "current";
     if (frame.pivot === index) return "pivot";
@@ -193,4 +196,53 @@ export function FractionalView({ block, step }: AnimationViewProps) {
       <span className="is-key">verdi: {money(frame.total)}</span>
     </div>
   </AlgorithmLayout>;
+}
+
+export function DecodeView({ block, step }: AnimationViewProps) {
+  const frames = useMemo(() => traceDecode(), []);
+  const frame: DecodeFrame = frames[Math.min(step, frames.length - 1)];
+  const root = useMemo(() => huffmanRoot(), []);
+  const placed = useMemo(() => treeLayout(root, 500, 56, 30), [root]);
+  const edges: [string, string][] = [];
+  const walk = (node: typeof root) => {
+    if (node.left) { edges.push([node.id, node.left.id]); walk(node.left); }
+    if (node.right) { edges.push([node.id, node.right.id]); walk(node.right); }
+  };
+  walk(root);
+  const onPath = new Set<string>();
+  let cursor = root;
+  for (const bit of frame.path) { onPath.add(cursor.id); cursor = (bit === "0" ? cursor.left : cursor.right) ?? cursor; }
+  return <AlgorithmLayout block={block} line={frame.line} caption={frame.caption}>
+    <svg className="lp-graph" viewBox="0 0 500 262" role="img" aria-label="Huffman-treet, med stien som er lest">
+      <title>Huffman-treet, med stien som er lest</title>
+      {edges.map(([from, to]) => {
+        const a = placed.get(from)!, b = placed.get(to)!;
+        const active = onPath.has(from) && frame.path.length > 0 && (frame.node.id === to || onPath.has(to));
+        return <line key={`${from}-${to}`} x1={a.x} y1={a.y + 12} x2={b.x} y2={b.y - 12} className={`lp-graph-edge ${active ? "is-active" : "is-plain"}`} />;
+      })}
+      {[...placed.entries()].map(([id, { x, y }]) => {
+        const node = (function find(n: typeof root): typeof root | undefined { if (n.id === id) return n; return (n.left && find(n.left)) || (n.right && find(n.right)) || undefined; })(root)!;
+        const text = node.label ? `${node.label}` : `${node.freq}`;
+        const w = Math.max(30, text.length * 8 + 14);
+        return <g key={id}>
+          <rect x={x - w / 2} y={y - 12} width={w} height={24} rx={8} className={`lp-graph-node ${frame.node.id === id ? "is-current" : node.label ? "is-white" : "is-black"}`} />
+          <text x={x} y={y + 4.5} textAnchor="middle" className="lp-graph-text is-strong">{text}</text>
+        </g>;
+      })}
+    </svg>
+    <div className="lp-anim-vars" aria-live="off">
+      <span className="is-key">Tekst: {frame.output || "–"}</span>
+      <span>Bit: {[...frame.bits].map((bit, index) => (index === frame.bit ? `[${bit}]` : bit)).join("")}</span>
+    </div>
+  </AlgorithmLayout>;
+}
+
+export function QuicksortView({ block, step }: AnimationViewProps) {
+  const frames = useMemo(() => traceQuicksort(), []);
+  return <SelectFramesView block={block} frame={frames[Math.min(step, frames.length - 1)]} />;
+}
+
+export function ExtractMaxView({ block, step }: AnimationViewProps) {
+  const frames = useMemo(() => traceExtractMax(), []);
+  return <HeapFrameView block={block} frame={frames[Math.min(step, frames.length - 1)]} />;
 }
