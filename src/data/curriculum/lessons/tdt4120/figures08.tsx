@@ -1,7 +1,7 @@
 // Figures for lecture 8, drawn from the examples in the lecture slides, CLRS chapter 20 and exercise 8.
 // Every traversal order, time stamp, tree, edge type and component is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
-import { traversalGraph as graph, traversalPositions as at } from "../exampleGraphs";
+import { clothesGraph as clothes, clothesPositions as clothesAt, traversalGraph as graph, traversalPositions as at } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
 type Adj = Record<string, string[]>;
@@ -236,9 +236,6 @@ export function EdgeClassFigure() {
   </Svg>;
 }
 
-const clothes: Adj = { skjorte: ["slips", "belte"], slips: ["jakke"], jakke: [], belte: ["jakke"], klokke: [], truse: ["bukse", "sko"], bukse: ["sko", "belte"], sko: [], sokker: ["sko"] };
-const clothesAt: Record<string, Point> = { truse: { x: 60, y: 34 }, sokker: { x: 200, y: 34 }, skjorte: { x: 370, y: 34 }, klokke: { x: 500, y: 34 },
-  bukse: { x: 60, y: 104 }, sko: { x: 200, y: 104 }, slips: { x: 350, y: 104 }, belte: { x: 130, y: 172 }, jakke: { x: 280, y: 172 } };
 
 function Item({ x, y, label, sub, below = true, tone = "lf-box" }: Point & { label: string; sub?: string; below?: boolean; tone?: string }) {
   return <g>

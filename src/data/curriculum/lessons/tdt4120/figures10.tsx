@@ -1,6 +1,7 @@
 // Figures for lecture 10, drawn from the examples in the lecture slides, CLRS chapter 22 and exercise 10.
 // Every estimate, pass, extraction order and tree is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
+import { bellmanFordEdges, bellmanFordNodes } from "../exampleGraphs";
 import { shortestPathEdges, shortestPathNodes, shortestPathPositions } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
@@ -135,9 +136,9 @@ export function DagFigure() {
 }
 
 export function BellmanFordPassFigure() {
-  const nodes = ["s", "a", "b", "c"];
-  // The list order of the edges decides how fast the estimates settle.
-  const edges: Edge[] = [["s", "a", 4], ["a", "c", 2], ["s", "b", 5], ["b", "a", -3], ["b", "c", 6]];
+  const nodes = bellmanFordNodes;
+  const edges = bellmanFordEdges;
+
   const snapshots = bellmanFordPasses(nodes, edges, "s", 3);
   const cell = 100, left = 150, top = 52, row = 32;
   return <Svg label="Bellman-Ford på fire noder: estimatene for a, b og c når riktige verdier etter to gjennomganger" width={700} height={262}>

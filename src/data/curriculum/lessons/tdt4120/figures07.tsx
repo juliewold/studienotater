@@ -1,6 +1,7 @@
 // Figures for lecture 7, drawn from the examples in the lecture slides, CLRS chapter 15 (and 25.2 for
 // Gale-Shapley) and exercise 7. Selections, Huffman trees and matchings are computed by the algorithms.
 import { Svg } from "../figureKit";
+import { huffmanFrequencies } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
 
@@ -173,7 +174,7 @@ function huffman(chars: [string, number][]) {
   return { root: queue[0], steps };
 }
 
-const clrsChars: [string, number][] = [["a", 45], ["b", 13], ["c", 12], ["d", 16], ["e", 9], ["f", 5]];
+const clrsChars = huffmanFrequencies;
 const name = (node: HuffNode) => node.label ? `${node.label}:${node.freq}` : `${node.freq}`;
 
 export function HuffmanStepsFigure() {

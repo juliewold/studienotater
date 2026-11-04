@@ -1,6 +1,7 @@
 // Figures for lecture 9, drawn from the examples in the lecture slides, CLRS chapters 19 and 21 and exercise 9.
 // Every forest, cut, sorted edge list, decision and key value is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
+import { mstEdges as edges, mstPositions as at } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
 
@@ -94,11 +95,7 @@ export function DisjointSetFigure() {
   </Svg>;
 }
 
-// Graph from CLRS figure 21.1, with the weights on the edges.
-const edges: [string, string, number][] = [["a", "b", 4], ["a", "h", 8], ["b", "c", 8], ["b", "h", 11], ["c", "d", 7], ["c", "f", 4], ["c", "i", 2],
-  ["d", "e", 9], ["d", "f", 14], ["e", "f", 10], ["f", "g", 2], ["g", "h", 1], ["g", "i", 6], ["h", "i", 7]];
-const at: Record<string, Point> = { a: { x: 50, y: 70 }, b: { x: 150, y: 50 }, c: { x: 270, y: 60 }, d: { x: 400, y: 50 }, e: { x: 530, y: 50 },
-  f: { x: 400, y: 170 }, g: { x: 270, y: 200 }, h: { x: 120, y: 190 }, i: { x: 270, y: 120 } };
+
 const pairKey = (u: string, v: string) => [u, v].sort().join("");
 
 /** Draws the weighted graph; `classOf` picks the style of each edge and `labelOf` what is written on it. */

@@ -11,6 +11,14 @@ import { traceInsertionSort } from "../src/pages/subjects/curriculum/lecture/ani
 import { traceBfs } from "../src/pages/subjects/curriculum/lecture/animations/bfs";
 import { traceDfs } from "../src/pages/subjects/curriculum/lecture/animations/dfs";
 import { traceDijkstra } from "../src/pages/subjects/curriculum/lecture/animations/dijkstra";
+import { traceKruskal } from "../src/pages/subjects/curriculum/lecture/animations/kruskal";
+import { tracePrim } from "../src/pages/subjects/curriculum/lecture/animations/prim";
+import { traceBellmanFord } from "../src/pages/subjects/curriculum/lecture/animations/bellmanFord";
+import { traceHuffman } from "../src/pages/subjects/curriculum/lecture/animations/huffman";
+import { traceTopo } from "../src/pages/subjects/curriculum/lecture/animations/topo";
+import { traceMergeSort } from "../src/pages/subjects/curriculum/lecture/animations/mergeSort";
+import { tracePartition } from "../src/pages/subjects/curriculum/lecture/animations/partition";
+import { traceHeapsort } from "../src/pages/subjects/curriculum/lecture/animations/heapsort";
 import LecturePlayer from "../src/pages/subjects/curriculum/lecture/LecturePlayer";
 import "../src/index.css";
 import "../src/styles/global.css";
@@ -138,6 +146,80 @@ try {
   const dijkstraCode = scriptTen.scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === "Dijkstra(G, w, s)"));
   check(scriptTen.scenes[dijkstraCode + 1]?.animation?.id === "dijkstra" && scriptTen.scenes[dijkstraCode + 1].parts.length === dijkstra.length,
     "Dijkstra-animasjonen følger rett etter pseudokoden, med ett steg per hendelse");
+
+  // --- Minimum spanning trees, shortest paths, Huffman and ordering -------------
+  const kruskal = traceKruskal();
+  const kruskalEnd = kruskal.at(-1)!;
+  const accepted = kruskalEnd.sorted.filter(edge => edge.state === "accepted");
+  check(accepted.length === 8 && kruskalEnd.total === 37 && new Set(Object.values(kruskalEnd.set)).size === 1,
+    "Kruskal velger 8 kanter med total vekt 37 og ender med ett spenntre");
+  check(kruskal.every(frame => frame.sorted.filter(edge => edge.state === "accepted").length <= 8), "Kruskal legger aldri til en kant som lager en sykel");
+
+  const prim = tracePrim("a");
+  const primEnd = prim.at(-1)!;
+  const primTotal = Object.keys(primEnd.key).filter(v => primEnd.parent[v]).reduce((sum, v) => sum + primEnd.key[v], 0);
+  check(primEnd.done.join("") === "abcifghde" && primTotal === 37, "Prim fra a tar ut nodene i rekkefølgen a, b, c, i, f, g, h, d, e, med total vekt 37");
+
+  const bellman = traceBellmanFord();
+  const bellmanEnd = bellman.at(-1)!;
+  check(bellmanEnd.d.s === 0 && bellmanEnd.d.a === 2 && bellmanEnd.d.b === 5 && bellmanEnd.d.c === 4
+    && bellman.every(frame => ["a", "b", "c"].every(v => frame.d[v] >= bellmanEnd.d[v])),
+  "Bellman-Ford gir a 2, b 5 og c 4, og estimatene synker aldri");
+  check(bellman.filter(frame => frame.line === 1).length === 3 && bellman.at(-1)!.line === 7 && bellmanEnd.rows.length === 4,
+    "Bellman-Ford gjør |V| − 1 = 3 pass med en oppsummering etter hvert, og kontrollrunden returnerer true");
+
+  const huffman = traceHuffman();
+  const codes = huffman.at(-1)!.codes!;
+  const cost = [["a", 45], ["b", 13], ["c", 12], ["d", 16], ["e", 9], ["f", 5]].reduce((sum, [label, freq]) => sum + (freq as number) * codes[label as string].length, 0);
+  const words = Object.values(codes);
+  check(cost === 224 && codes.a === "0" && words.every(word => words.every(other => word === other || !other.startsWith(word))),
+    "Huffman gir en prefiksfri kode med kostnad 224, som i CLRS-eksemplet");
+  check(huffman.every(frame => frame.queue.every((node, index, all) => index === 0 || node.freq >= all[index - 1].freq)), "Huffman-køen er sortert etter frekvens i hvert steg");
+
+  const topo = traceTopo();
+  const list = topo.at(-1)!.list;
+  const clothesEdges = [["skjorte", "slips"], ["skjorte", "belte"], ["slips", "jakke"], ["belte", "jakke"], ["truse", "bukse"], ["truse", "sko"], ["bukse", "sko"], ["bukse", "belte"], ["sokker", "sko"]];
+  check(list.length === 9 && clothesEdges.every(([u, v]) => list.indexOf(u) < list.indexOf(v)) && topo.every(frame => frame.kind !== "tilbake"),
+    "Topologisk sortering gir en liste der alle kanter peker fremover, og grafen har ingen sykler");
+
+  const lessonIds: Record<string, Lesson> = {
+    "07": (await loadLesson("tdt4120", "07"))!, "08": (await loadLesson("tdt4120", "08"))!,
+    "09": (await loadLesson("tdt4120", "09"))!, "10": (await loadLesson("tdt4120", "10"))!,
+  };
+  const checkPlacement = (lessonId: string, pseudoTitle: string, animationId: string, count: number, name: string) => {
+    const scenes = buildLectureScript(lessonIds[lessonId], name).scenes;
+    const at = scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === pseudoTitle));
+    const next = scenes[at + 1];
+    return next?.kind === "animation" && next.animation?.id === animationId && next.parts.length === count
+      && next.parts.every(part => part.kind === "frame" && part.say.trim().length > 0);
+  };
+  check(checkPlacement("09", "MST-Kruskal(G, w)", "kruskal", kruskal.length, "MST"), "Kruskal-animasjonen følger pseudokoden, med ett lest steg per hendelse");
+  check(checkPlacement("09", "MST-Prim(G, w, r)", "prim", prim.length, "MST"), "Prim-animasjonen følger pseudokoden, med ett lest steg per hendelse");
+  check(checkPlacement("10", "Bellman-Ford(G, w, s)", "bellman-ford", bellman.length, "Korteste vei"), "Bellman-Ford-animasjonen følger pseudokoden, med ett lest steg per hendelse");
+  check(checkPlacement("07", "Huffman(C)", "huffman", huffman.length, "Grådige algoritmer"), "Huffman-animasjonen følger pseudokoden, med ett lest steg per hendelse");
+  check(checkPlacement("08", "Topological-Sort(G)", "topological-sort", topo.length, "Grafer"), "Den topologiske sorteringen følger pseudokoden, med ett lest steg per hendelse");
+
+  // --- Sorting on arrays -----------------------------------------------------------
+  const mergeFrames = traceMergeSort();
+  check(mergeFrames.at(-1)!.array.join() === "1,2,2,3,4,5,6,7", "Merge-Sort gir ⟨1, 2, 2, 3, 4, 5, 6, 7⟩ på CLRS-eksemplet");
+  const partitionFrames = tracePartition();
+  check(partitionFrames.at(-1)!.array.join() === "2,1,3,4,7,5,6,8", "Partition gir ⟨2, 1, 3, 4, 7, 5, 6, 8⟩, som i CLRS");
+  check(partitionFrames.every(frame => frame.j === null || (frame.array.slice(0, frame.i + 1).every(v => v <= frame.array[frame.pivot]) && frame.array.slice(frame.i + 1, frame.j).every(v => v > frame.array[frame.pivot]))),
+    "Partition holder invarianten i hvert steg: alt til venstre for i er ≤ x, og alt mellom i og j er > x");
+  const heapFrames = traceHeapsort();
+  const built = heapFrames.find(frame => frame.phase === "sort")!;
+  const heapOk = (values: number[], size: number) => values.slice(0, size).every((v, k) => (2 * (k + 1) > size) || v >= values[2 * (k + 1) - 1] && (2 * (k + 1) + 1 > size || v >= values[2 * (k + 1)]));
+  check(heapOk(built.array, built.heapSize) && heapFrames.at(-1)!.array.join() === "1,3,4,5,8,10", "Heapsort bygger en maks-haug, og sorterer til ⟨1, 3, 4, 5, 8, 10⟩");
+  check(heapFrames.filter(frame => frame.phase === "sort" && frame.line === 1).length === 5 && heapFrames.every(frame => frame.heapSize >= 1),
+    "Heapsort tar ut hver av de fem største verdiene én gang, og haugen krymper med én for hvert uttak");
+  for (const [lessonId, title, animation, count] of [
+    ["03", "Merge-Sort(A, p, r)", "merge-sort", mergeFrames.length], ["03", "Partition(A, p, r)", "partition", partitionFrames.length], ["05", "Heapsort(A, n)", "heapsort", heapFrames.length],
+  ] as const) {
+    const scenes = buildLectureScript(await loadLesson("tdt4120", lessonId).then(lesson => lesson!), "Sortering").scenes;
+    const at = scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === title));
+    check(scenes[at + 1]?.animation?.id === animation && scenes[at + 1].parts.length === count && scenes[at + 1].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
+      `${title}: animasjonen følger pseudokoden, med ett lest steg per hendelse`);
+  }
 
   // --- Insertion-Sort animation --------------------------------------------------
   const frames = traceInsertionSort();
