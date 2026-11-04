@@ -2,11 +2,15 @@ import { createRoot } from "react-dom/client";
 import { act, useState } from "react";
 import { loadLesson, loadSubjectLessons } from "../src/data/curriculum/lessons";
 import type { Lesson, LessonBlock } from "../src/data/curriculum/lessons/types";
-import { buildLectureScript, countSteps } from "../src/pages/subjects/curriculum/lecture/lectureScript";
+import { buildLectureScript, countSteps, type LecturePart } from "../src/pages/subjects/curriculum/lecture/lectureScript";
+import { figureParts } from "../src/data/curriculum/lessons/reveal";
 import { browserPronunciation, chunkText, codeToSpeech, latexToSpeech, narrationKey, phrases, splitSentences, toSpeech } from "../src/pages/subjects/curriculum/lecture/speechText";
 import { narrate } from "../src/pages/subjects/curriculum/lecture/narrator";
 import { recordingUrl } from "../src/pages/subjects/curriculum/lecture/recordings";
 import { traceInsertionSort } from "../src/pages/subjects/curriculum/lecture/animations/insertionSort";
+import { traceBfs } from "../src/pages/subjects/curriculum/lecture/animations/bfs";
+import { traceDfs } from "../src/pages/subjects/curriculum/lecture/animations/dfs";
+import { traceDijkstra } from "../src/pages/subjects/curriculum/lecture/animations/dijkstra";
 import LecturePlayer from "../src/pages/subjects/curriculum/lecture/LecturePlayer";
 import "../src/index.css";
 import "../src/styles/global.css";
@@ -51,7 +55,8 @@ try {
   for (const lesson of lessons) {
     const script = buildLectureScript(lesson, lesson.unitId);
     const parts = script.scenes.flatMap(scene => scene.parts);
-    const spoken = parts.map(part => part.say);
+    // Silent steps (figure and formula steps without a sentence) are the only parts without speech.
+    const spoken = parts.filter(part => part.kind !== "visual" || part.say.trim()).map(part => part.say);
     const raw = spoken.filter(text => /[\\$]|[_^]\{|[{}]/.test(text) || !text.trim());
     check(!raw.length, `Forelesning ${lesson.unitId}: ingen rå LaTeX eller tomme replikker${raw.length ? `\n  ${raw.join("\n  ")}` : ""}`);
     const shown = JSON.stringify(script.scenes);
@@ -60,6 +65,79 @@ try {
     const long = script.scenes.filter(scene => scene.kind !== "animation" && !scene.table && scene.parts.length > 8);
     check(!long.length && script.chapters.length === lesson.sections.length + 2, `Forelesning ${lesson.unitId}: korte scener og én del per avsnitt${long.map(scene => ` (${scene.heading}: ${scene.parts.length} deler)`).join("")}`);
   }
+
+  // --- Figures, code and derivations built up step by step -----------------------
+  for (const lesson of lessons) {
+    const scenes = buildLectureScript(lesson, lesson.unitId).scenes;
+    const builds = new Map<LessonBlock, LecturePart[]>();
+    scenes.flatMap(scene => scene.parts).forEach(part => {
+      if (part.kind === "visual") builds.set(part.source, [...(builds.get(part.source) ?? []), part]);
+    });
+    const bad = [...builds].filter(([source, steps]) => {
+      const reveals = steps.map(step => step.kind === "visual" ? step.reveal : 0);
+      const total = source.type === "figure" ? figureParts(source.component) : source.type === "pseudocode" ? source.lines.length : Infinity;
+      const ordered = reveals.every((reveal, index) => index === 0 || reveal >= reveals[index - 1]);
+      return !ordered || steps.length < 2 || reveals.at(-1) !== total;
+    });
+    check(!bad.length, `Forelesning ${lesson.unitId}: figurer og kode bygges opp i stigende steg til alt er synlig`);
+    const spokenSteps = [...builds.values()].map(steps => steps.map(step => step.say).filter(Boolean).join(" "));
+    const captions = lesson.sections.flatMap(section => section.blocks.filter(block => block.type === "figure")).map(block => block.type === "figure" ? block.caption : "");
+    check(captions.every(caption => splitSentences(toSpeech(caption)).every(sentence => spokenSteps.some(text => text.includes(sentence)))),
+      `Forelesning ${lesson.unitId}: hver setning i figurteksten leses én gang, mens figuren bygges opp`);
+  }
+  const unit03 = (await loadLesson("tdt4120", "03"))!;
+  const derivation = unit03.sections.flatMap(section => section.blocks).find(block => block.type === "formula" && block.latex.includes("aligned"));
+  const derivationSteps = derivation ? buildLectureScript(unit03, "03").scenes.flatMap(scene => scene.parts).filter(part => part.kind === "visual" && part.source === derivation) : [];
+  const finalStep = derivationSteps.at(-1);
+  check(derivationSteps.length >= 2 && finalStep?.kind === "visual" && finalStep.block.type === "formula" && finalStep.block.latex === (derivation as { latex: string }).latex,
+    "Utregninger vises linje for linje, og siste steg er hele formelen");
+
+  // --- Graph algorithms step by step --------------------------------------------
+  const bfs = traceBfs();
+  const bfsEnd = bfs.at(-1)!;
+  const expectedD = { 1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3, 9: Infinity } as Record<string, number>;
+  check(Object.entries(expectedD).every(([u, value]) => bfsEnd.d[u] === value) && bfsEnd.pi["8"] === "6" && bfsEnd.pi["9"] === undefined,
+    "BFS fra node 1 gir de samme avstandene og forgjengerne som figuren, og node 9 nås ikke");
+  check(bfs.every(frame => {
+    const distances = frame.queue.map(u => frame.d[u]);
+    return distances.every((value, index) => index === 0 || value >= distances[index - 1]) && new Set(distances).size <= 2;
+  }), "BFS-køen er alltid sortert etter avstand, og inneholder høyst to ulike avstander");
+  check(bfs.filter(frame => frame.line === 10).length === 8 && bfs.filter(frame => frame.line === 17).length === 8,
+    "BFS tar ut hver av de åtte nåbare nodene nøyaktig én gang");
+
+  const dfs = traceDfs();
+  const dfsEnd = dfs.at(-1)!;
+  const intervals = Object.keys(dfsEnd.d).map(u => [dfsEnd.d[u], dfsEnd.f[u]] as const);
+  check(intervals.length === 9 && intervals.every(([d, f]) => d < f) && new Set(intervals.flat()).size === 18
+    && intervals.every(([d1, f1]) => intervals.every(([d2, f2]) => (d1 > d2 && f1 < f2) || (d2 > d1 && f2 < f1) || f1 < d2 || f2 < d1 || (d1 === d2 && f1 === f2))),
+  "DFS gir et sammenhengende parentesuttrykk: intervallene er nøstet eller disjunkte");
+  check(dfs.every(frame => frame.stack.every(u => frame.color[u] === "gray")) && dfsEnd.stack.length === 0 && dfs.some(frame => frame.kind === "tilbake"),
+    "DFS-kallstakken inneholder bare grå noder, er tom til slutt, og finner minst én tilbakekant");
+  check(dfs.filter(frame => frame.line === 2).length === 9 && dfs.filter(frame => frame.line === 9).length === 9,
+    "DFS besøker og fullfører hver av de ni nodene nøyaktig én gang");
+
+  const dijkstra = traceDijkstra();
+  const dijkstraEnd = dijkstra.at(-1)!;
+  check(dijkstraEnd.d.s === 0 && dijkstraEnd.d.b === 5 && dijkstraEnd.d.c === 7 && dijkstraEnd.d.a === 8 && dijkstraEnd.d.d === 11,
+    "Dijkstra gir s 0, b 5, c 7, a 8 og d 11, som i figuren");
+  const order = dijkstra.filter(frame => frame.line === 6).map(frame => frame.current);
+  check(order.join() === "s,b,c,a,d" && dijkstra.filter(frame => frame.lowered).every(frame => frame.edge !== null),
+    "Dijkstra tar ut noder i stigende estimat: s, b, c, a, d");
+
+  const lessonEight = (await loadLesson("tdt4120", "08"))!;
+  const scriptEight = buildLectureScript(lessonEight, "Grafer");
+  const bfsCode = scriptEight.scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === "BFS(G, s)"));
+  check(scriptEight.scenes[bfsCode + 1]?.kind === "animation" && scriptEight.scenes[bfsCode + 1].animation?.id === "bfs"
+    && scriptEight.scenes[bfsCode + 1].parts.length === bfs.length,
+  "BFS-animasjonen følger rett etter pseudokoden, med ett steg per hendelse");
+  const dfsCode = scriptEight.scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === "DFS-Visit(G, u)"));
+  check(scriptEight.scenes[dfsCode + 1]?.animation?.id === "dfs" && scriptEight.scenes[dfsCode + 1].parts.length === dfs.length,
+    "DFS-animasjonen følger rett etter DFS-Visit, med ett steg per hendelse");
+  const lessonTen = (await loadLesson("tdt4120", "10"))!;
+  const scriptTen = buildLectureScript(lessonTen, "Korteste veier");
+  const dijkstraCode = scriptTen.scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === "Dijkstra(G, w, s)"));
+  check(scriptTen.scenes[dijkstraCode + 1]?.animation?.id === "dijkstra" && scriptTen.scenes[dijkstraCode + 1].parts.length === dijkstra.length,
+    "Dijkstra-animasjonen følger rett etter pseudokoden, med ett steg per hendelse");
 
   // --- Insertion-Sort animation --------------------------------------------------
   const frames = traceInsertionSort();
@@ -74,8 +152,11 @@ try {
 
   const lesson = (await loadLesson("tdt4120", "01"))!;
   const script = buildLectureScript(lesson, "Algoritmer og kompleksitet");
-  const code = script.scenes.findIndex(scene => scene.parts.some(part => part.kind === "block" && part.block.type === "pseudocode"));
+  const code = script.scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode"));
   check(script.scenes[code + 1]?.kind === "animation" && script.scenes[code + 1].parts.length === frames.length, "Animasjonen følger rett etter pseudokoden for Insertion-Sort");
+  const codeSteps = script.scenes[code].parts.filter(part => part.kind === "visual");
+  check(codeSteps.every((part, index) => part.kind === "visual" && part.reveal >= (index ? (codeSteps[index - 1] as { reveal: number }).reveal : 0)) && codeSteps.length > 1,
+    "Pseudokoden for Insertion-Sort vises linje for linje før animasjonen");
   check(script.scenes.filter(scene => scene.kind === "figure").length === 6, "Alle seks figurene i forelesning 01 får egen scene");
 
   // --- Player with stubbed speech ------------------------------------------------
@@ -103,7 +184,8 @@ try {
       else { idle++; await sleep(100); }
     }
   };
-  localStorage.removeItem("lecture-player-settings");
+  // Browser voices are tested here, so the recorded audio of the unit is not used.
+  localStorage.setItem("lecture-player-settings", JSON.stringify({ auto: true, muted: false, rate: 1, voice: "nora-enhanced" }));
 
   // Pre-generated audio plays when it exists and falls back to the browser voice if the file fails.
   const audios: { src: string; playbackRate: number; onended: (() => void) | null; onerror: (() => void) | null }[] = [];
@@ -174,7 +256,7 @@ try {
 
   await act(async () => button("Velg stemme").click());
   const voiceSelect = document.querySelector<HTMLSelectElement>(".lp-voice-select select")!;
-  const voiceOptions = [...voiceSelect.options].map(option => option.textContent);
+  const voiceOptions = [...voiceSelect.options].filter(option => option.value !== "recorded").map(option => option.textContent);
   check(voiceOptions.length === 2 && voiceOptions[0]?.startsWith("Nora (forbedret)") && !voiceOptions.some(option => option?.includes("Samantha")), "Stemmevalget viser norske stemmer, best først");
   await act(async () => { voiceSelect.value = "nora"; voiceSelect.dispatchEvent(new Event("change", { bubbles: true })); });
   const previewFrom = spokenLog.length;
@@ -191,7 +273,7 @@ try {
   const select = document.querySelector<HTMLSelectElement>(".lp-chapter select")!;
   await act(async () => { select.value = "3"; select.dispatchEvent(new Event("change", { bubbles: true })); });
   check(document.querySelector(".lp-scene-chapter h3")?.textContent === "Insertion-Sort", "Hopp til en del via innholdsvelgeren");
-  for (let index = 0; index < 4 && !document.querySelector(".lp-anim"); index++) await act(async () => button("Neste").click());
+  for (let index = 0; index < 12 && !document.querySelector(".lp-anim"); index++) await act(async () => button("Neste").click());
   check(document.querySelector(".lp-anim .lp-cell") && document.querySelectorAll(".lp-anim .lp-cell").length === 6, "Insertion-Sort-animasjonen vises med seks celler");
   const before = document.querySelector(".lp-anim-caption")?.textContent;
   await act(async () => button("Neste").click());
@@ -224,7 +306,8 @@ try {
   const hadSpeech = "speechSynthesis" in window;
   if (!hadSpeech) {
     await act(async () => setOpen(true));
-    check(document.querySelector(".lp-notice")?.textContent?.includes("støtter ikke opplesning") && button("Slå av lyd").disabled, "Uten tekst-til-tale vises en melding, og lydknappen er deaktivert");
+    // Unit 01 has recorded audio, which plays without speech synthesis, so the player stays usable.
+    check(!document.querySelector(".lp-notice")?.textContent?.includes("støtter ikke opplesning") && !button("Slå av lyd").disabled, "Uten tekst-til-tale spiller innspilt lyd, og lydknappen er aktiv");
     await act(async () => button("Neste").click());
     check(counter().startsWith("2 /"), "Navigasjon fungerer uten lyd");
     await act(async () => button("Lukk forelesningen").click());

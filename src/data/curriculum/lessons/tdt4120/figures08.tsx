@@ -1,6 +1,7 @@
 // Figures for lecture 8, drawn from the examples in the lecture slides, CLRS chapter 20 and exercise 8.
 // Every traversal order, time stamp, tree, edge type and component is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
+import { traversalGraph as graph, traversalPositions as at } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
 type Adj = Record<string, string[]>;
@@ -80,9 +81,6 @@ function dfs(adj: Adj, order = Object.keys(adj)) {
 }
 
 // The running example: a directed graph where 9 cannot be reached from 1, and 3 → 6 → 8 → 3 is a cycle.
-const graph: Adj = { 1: ["2", "3"], 2: ["4", "5"], 3: ["5", "6"], 4: ["7"], 5: ["7"], 6: ["8"], 7: ["8"], 8: ["3"], 9: ["6"] };
-const at: Record<string, Point> = { 1: { x: 45, y: 130 }, 2: { x: 150, y: 65 }, 3: { x: 150, y: 195 }, 4: { x: 260, y: 35 }, 5: { x: 260, y: 130 },
-  6: { x: 260, y: 230 }, 7: { x: 370, y: 80 }, 8: { x: 370, y: 190 }, 9: { x: 470, y: 230 } };
 const list = (items: string[]) => `⟨${items.join(", ")}⟩`;
 
 export function AdjacencyFigure() {

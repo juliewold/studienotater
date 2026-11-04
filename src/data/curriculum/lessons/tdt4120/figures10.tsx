@@ -1,6 +1,7 @@
 // Figures for lecture 10, drawn from the examples in the lecture slides, CLRS chapter 22 and exercise 10.
 // Every estimate, pass, extraction order and tree is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
+import { shortestPathEdges, shortestPathNodes, shortestPathPositions } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
 type Edge = [string, string, number];
@@ -190,9 +191,9 @@ export function NegativeCycleFigure() {
 }
 
 export function DijkstraTraceFigure() {
-  const nodes = ["s", "a", "b", "c", "d"];
-  const edges: Edge[] = [["s", "a", 10], ["s", "b", 5], ["b", "a", 3], ["b", "c", 2], ["a", "c", 1], ["c", "d", 4], ["b", "d", 9]];
-  const at: Record<string, Point> = { s: { x: 40, y: 120 }, b: { x: 130, y: 50 }, a: { x: 130, y: 190 }, c: { x: 220, y: 120 }, d: { x: 220, y: 240 } };
+  const nodes = shortestPathNodes;
+  const edges = shortestPathEdges;
+  const at = shortestPathPositions;
   const { steps } = dijkstra(nodes, edges, "s");
   const start = initial(nodes, "s");
   const rows = [{ label: "Start", u: "", d: start }, ...steps.map((step, k) => ({ label: `${k + 1}.`, u: step.u, d: step.d }))];

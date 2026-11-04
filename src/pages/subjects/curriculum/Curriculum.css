@@ -141,6 +141,7 @@
 .lesson-goals ul { margin: 8px 0 0; padding-left: 20px; }
 .lesson-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 32px; }
 .lesson-toolbar h2 { flex: 1; margin: 0; font-size: 1.3rem; }
+.curriculum-retry { font: inherit; font-size: .85rem; margin: 0 0 16px; padding: 5px 14px; border-radius: 999px; border: 1px solid var(--app-accent, #7c3aed); background: var(--app-soft, #f3edfa); color: var(--app-accent, #7c3aed); cursor: pointer; }
 .lesson-toolbar button { font: inherit; font-size: .85rem; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--app-border, #e6dfed); background: var(--app-surface, #fff); color: var(--app-text, #29252f); cursor: pointer; }
 .lesson-toolbar button:hover { border-color: var(--app-accent, #7c3aed); color: var(--app-accent, #7c3aed); }
 details.lesson-part { margin-top: 12px; border: 1px solid var(--app-border, #e6dfed); border-radius: 12px; background: var(--app-surface, #fff); }
@@ -216,6 +217,11 @@ details.lesson-part > summary h3 { margin: 0; font-size: 1.12rem; }
 .lesson-figure-svg .lf-stroke-warn { stroke: #d97706; }
 .lesson-figure-svg .lf-muted-stroke { stroke: var(--app-muted, #716879); }
 .lesson-figure-svg .lf-region { fill: var(--app-soft, #f3edfa); }
+/* Parts of a figure or code block that the lecture player has not revealed yet keep their place, so nothing moves. */
+.lesson-figure-svg > .lf-step { transition: opacity .45s ease; }
+.lesson-figure-svg > .lf-step.is-hidden { opacity: 0; }
+.lesson-code-line { transition: opacity .35s ease; }
+.lesson-code-line.is-hidden { opacity: 0; }
 [data-theme="dark"] .lesson-figure-svg .lf-fill-warn { fill: #fbbf24; }
 [data-theme="dark"] .lesson-figure-svg .lf-stroke-warn { stroke: #fbbf24; }
 

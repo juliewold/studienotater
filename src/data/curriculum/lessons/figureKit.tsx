@@ -1,9 +1,12 @@
-import type { ReactNode } from "react";
+import { Children, useContext, type ReactNode } from "react";
+import { RevealContext } from "./reveal";
 
 // Shared drawing helpers for lesson figures. Colours come from CSS classes (lf-*)
 // in Curriculum.css, so every figure follows the light and dark themes.
 
+/** Each child of the figure is one part; the lecture player reveals them in order. */
 export function Svg({ label, width, height, children }: { label: string; width: number; height: number; children: ReactNode }) {
+  const reveal = useContext(RevealContext);
   return <svg className="lesson-figure-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
     <title>{label}</title>
     <defs>
@@ -11,7 +14,7 @@ export function Svg({ label, width, height, children }: { label: string; width: 
         <path d="M0,0 L10,5 L0,10 z" className="lf-fill-ink" />
       </marker>
     </defs>
-    {children}
+    {Children.toArray(children).map((child, index) => <g key={index} className={index < reveal ? "lf-step" : "lf-step is-hidden"}>{child}</g>)}
   </svg>;
 }
 
