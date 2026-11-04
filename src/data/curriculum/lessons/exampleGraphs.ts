@@ -47,3 +47,15 @@ export const clothesPositions: Record<string, Point> = {
   truse: { x: 60, y: 34 }, sokker: { x: 200, y: 34 }, skjorte: { x: 370, y: 34 }, klokke: { x: 500, y: 34 },
   bukse: { x: 60, y: 104 }, sko: { x: 200, y: 104 }, slips: { x: 350, y: 104 }, belte: { x: 130, y: 172 }, jakke: { x: 280, y: 172 },
 };
+
+/** The strongly connected components example of lecture 8 (CLRS 20.5). */
+export const sccGraph: Record<string, string[]> = { a: ["b"], b: ["c", "e", "f"], c: ["d", "g"], d: ["c", "h"], e: ["a", "f"], f: ["g"], g: ["f", "h"], h: ["h"] };
+export const sccPositions: Record<string, Point> = {
+  a: { x: 40, y: 52 }, b: { x: 140, y: 52 }, c: { x: 240, y: 52 }, d: { x: 340, y: 52 },
+  e: { x: 40, y: 150 }, f: { x: 140, y: 150 }, g: { x: 240, y: 150 }, h: { x: 340, y: 150 },
+};
+
+/** The DAG of lecture 10: the order is topological, and the edges are listed in the order they are relaxed. */
+export const dagOrder = ["a", "b", "c", "d", "e"];
+export const dagEdges: [string, string, number][] = [["a", "b", 3], ["a", "c", 6], ["b", "c", -2], ["b", "d", 1], ["c", "d", 4], ["c", "e", 2], ["d", "e", -3]];
+export const dagPositions: Record<string, Point> = { a: { x: 60, y: 130 }, b: { x: 190, y: 60 }, c: { x: 190, y: 200 }, d: { x: 330, y: 60 }, e: { x: 330, y: 200 } };

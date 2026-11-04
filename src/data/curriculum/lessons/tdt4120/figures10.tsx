@@ -1,7 +1,7 @@
 // Figures for lecture 10, drawn from the examples in the lecture slides, CLRS chapter 22 and exercise 10.
 // Every estimate, pass, extraction order and tree is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
-import { bellmanFordEdges, bellmanFordNodes } from "../exampleGraphs";
+import { bellmanFordEdges, bellmanFordNodes, dagEdges, dagOrder, dagPositions as dagPos } from "../exampleGraphs";
 import { shortestPathEdges, shortestPathNodes, shortestPathPositions } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
@@ -83,9 +83,6 @@ function dagShortestPaths(order: string[], edges: Edge[], s: string) {
 }
 
 // Own example of a DAG with a negative edge. The topological order is a, b, c, d, e.
-const dagOrder = ["a", "b", "c", "d", "e"];
-const dagEdges: Edge[] = [["a", "b", 3], ["a", "c", 6], ["b", "c", -2], ["b", "d", 1], ["c", "d", 4], ["c", "e", 2], ["d", "e", -3]];
-const dagPos: Record<string, Point> = { a: { x: 60, y: 130 }, b: { x: 190, y: 60 }, c: { x: 190, y: 200 }, d: { x: 330, y: 60 }, e: { x: 330, y: 200 } };
 
 export function RelaxFigure() {
   const u = { x: 70, y: 110 }, v = { x: 230, y: 110 };

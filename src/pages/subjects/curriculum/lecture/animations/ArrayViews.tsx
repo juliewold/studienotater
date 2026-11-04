@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import type { AnimationViewProps } from ".";
-import type { Point } from "../../../../../data/curriculum/lessons/exampleGraphs";
 import { AlgorithmLayout, GraphCanvas, type GraphEdge, type GraphNode } from "./graphCanvas";
 import { traceHeapsort } from "./heapsort";
+import { heapPositions } from "./heapInsert";
 import { traceMergeSort } from "./mergeSort";
 import { tracePartition } from "./partition";
 
@@ -65,17 +65,6 @@ export function PartitionView({ block, step }: AnimationViewProps) {
       <span>j = {frame.j === null ? "–" : frame.j + 1}</span>
     </div>
   </AlgorithmLayout>;
-}
-
-// Node k has children 2k and 2k + 1. Each level is spread out evenly, so the tree fits the canvas.
-function heapPositions(n: number): Record<string, Point> {
-  const at: Record<string, Point> = {};
-  for (let k = 1; k <= n; k++) {
-    const level = Math.floor(Math.log2(k));
-    const count = 2 ** level;
-    at[String(k)] = { x: ((k - count) + 0.5) * (500 / count), y: 34 + level * 72 };
-  }
-  return at;
 }
 
 export function HeapsortView({ block, step }: AnimationViewProps) {

@@ -27,8 +27,8 @@ export const kindName: Record<DfsEdgeKind, string> = {
   tre: "trekant", tilbake: "tilbakekant", fremover: "fremoverkant", kryss: "kryssende kant",
 };
 
-export function traceDfs(adj: Record<string, string[]> = traversalGraph): DfsFrame[] {
-  const order = Object.keys(adj);
+/** DFS with the start vertices of the outer loop in the given order (default: the order of the keys). */
+export function traceDfs(adj: Record<string, string[]> = traversalGraph, order: string[] = Object.keys(adj)): DfsFrame[] {
   const color: Record<string, DfsColor> = {};
   const d: Record<string, number> = {};
   const f: Record<string, number> = {};

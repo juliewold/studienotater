@@ -27,6 +27,13 @@ import { traceGaleShapley, galeMen, galeWomen } from "../src/pages/subjects/curr
 import { traceActivities } from "../src/pages/subjects/curriculum/lecture/animations/activitySelection";
 import { traceRodCutting, rodPrices } from "../src/pages/subjects/curriculum/lecture/animations/rodCutting";
 import { traceTreeInsert } from "../src/pages/subjects/curriculum/lecture/animations/bst";
+import { traceChaining, traceDoubling } from "../src/pages/subjects/curriculum/lecture/animations/hashing";
+import { traceRadix, traceBucket } from "../src/pages/subjects/curriculum/lecture/animations/radixBucket";
+import { traceRandomizedSelect, traceSelect } from "../src/pages/subjects/curriculum/lecture/animations/select";
+import { traceHeapInsert, traceIncreaseKey } from "../src/pages/subjects/curriculum/lecture/animations/heapInsert";
+import { traceFractional } from "../src/pages/subjects/curriculum/lecture/animations/fractional";
+import { traceScc } from "../src/pages/subjects/curriculum/lecture/animations/scc";
+import { traceDag } from "../src/pages/subjects/curriculum/lecture/animations/dag";
 import LecturePlayer from "../src/pages/subjects/curriculum/lecture/LecturePlayer";
 import "../src/index.css";
 import "../src/styles/global.css";
@@ -298,6 +305,56 @@ try {
     const at = scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === title));
     check(scenes[at + 1]?.animation?.id === animation && scenes[at + 1].parts.length === count && scenes[at + 1].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
       `${title}: animasjonen følger pseudokoden, med ett lest steg per hendelse`);
+  }
+
+  // --- Hashing, sorting, heaps, greedy and graphs, the last algorithms ------------
+  const chain = traceChaining();
+  check(JSON.stringify(chain.at(-1)!.slots) === "[[],[10,19,28],[20],[12],[],[5],[33,15],[],[17]]", "Hashtabellen med kjeding gir samme kjeder som figuren");
+  const doubling = traceDoubling();
+  const copyingSteps = doubling.filter(frame => frame.copied > 0).map(frame => frame.copied);
+  check(doubling.at(-1)!.copies === 31 && doubling.at(-1)!.size === 32 && copyingSteps.join() === "1,2,4,8,16",
+    "Tabelldobling kopierer 1, 2, 4, 8 og 16 elementer, til sammen 31, som i figuren");
+  const radix = traceRadix();
+  check(radix.at(-1)!.output.join() === "0529,0531,1223,1736,1938,2007,2016", "Radix-Sort gir de sorterte firesiffrede tallene");
+  const bucket = traceBucket();
+  const bucketInput = [0.78, 0.17, 0.39, 0.26, 0.72, 0.94, 0.21, 0.12, 0.23, 0.68];
+  check(bucket.at(-1)!.output!.join() === [...bucketInput].sort((a, b) => a - b).join(), "Bucket-Sort gir de samme tallene i stigende rekkefølge");
+  const randomized = traceRandomizedSelect();
+  check(randomized.at(-1)!.array[randomized.at(-1)!.found!] === 4, "Randomized-Select finner rang 4, som er 4");
+  const selectFrames = traceSelect();
+  check(selectFrames.at(-1)!.array[selectFrames.at(-1)!.found!] === 7, "Select finner rang 7 i ⟨1, …, 15⟩, som er 7");
+  const increase = traceIncreaseKey();
+  check(increase.at(-1)!.array.join() === "16,15,10,14,7,9,3,2,8,1", "Max-Heap-Increase-Key gir haugen fra figuren");
+  const insertFrames = traceHeapInsert();
+  const heapEnd = insertFrames.at(-1)!.array as number[];
+  check(heapEnd.join() === "16,15,10,8,14,9,3,2,4,1,7" && heapEnd.every((_, k) => k === 0 || heapEnd[Math.floor((k + 1) / 2) - 1] >= heapEnd[k]),
+    "Max-Heap-Insert legger 15 inn og gir en gyldig maks-haug");
+  const fractional = traceFractional();
+  const taken = fractional.at(-1)!.items;
+  check(fractional.at(-1)!.total === 240 && taken.reduce((sum, item) => sum + item.taken, 0) === 50, "Fractional Knapsack gir verdi 240 med sekken full");
+  const sccFrames = traceScc();
+  const comps = sccFrames.at(-1)!.components.map(c => c.slice().sort().join("")).sort().join(" ");
+  check(comps === "abe cd fg h", "SCC finner de fire sterke komponentene {a, b, e}, {c, d}, {f, g} og {h}");
+  const dag = traceDag();
+  const dist = dag.at(-1)!.d;
+  check(dist.a === 0 && dist.b === 3 && dist.c === 1 && dist.d === 4 && dist.e === 1, "DAG-Shortest-Paths gir avstandene 0, 3, 1, 4 og 1");
+  for (const [lessonId, title, animation, count] of [
+    ["02a", "Table-Insert(T, x)", "table-doubling", doubling.length], ["04", "Radix-Sort(A, n, d)", "radix-sort", radix.length],
+    ["04", "Bucket-Sort(A, n)", "bucket-sort", bucket.length], ["04", "Randomized-Select(A, p, r, i)", "randomized-select", randomized.length],
+    ["04", "Select(A, p, r, i)", "select", selectFrames.length], ["05", "Max-Heap-Increase-Key(A, x, k)", "max-heap-increase-key", increase.length],
+    ["05", "Max-Heap-Insert(A, x, n)", "max-heap-insert", insertFrames.length], ["07", "Fractional-Knapsack(v, w, n, W)", "fractional-knapsack", fractional.length],
+    ["08", "Strongly-Connected-Components(G)", "scc", sccFrames.length], ["10", "DAG-Shortest-Paths(G, w, s)", "dag-shortest-paths", dag.length],
+  ] as const) {
+    const scenes = buildLectureScript(await loadLesson("tdt4120", lessonId).then(lesson => lesson!), "Ny").scenes;
+    const at = scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === title));
+    check(scenes[at + 1]?.animation?.id === animation && scenes[at + 1].parts.length === count && scenes[at + 1].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
+      `${title}: animasjonen følger pseudokoden, med ett lest steg per hendelse`);
+  }
+  {
+    const scenes = buildLectureScript(await loadLesson("tdt4120", "02a").then(lesson => lesson!), "Hashing").scenes;
+    const chainScene = scenes.findIndex(scene => scene.animation?.id === "hash-chaining");
+    check(chainScene > 0 && scenes[chainScene].parts.length === chain.length && scenes[chainScene].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
+      "Hashtabell med kjeding: animasjonen står etter figuren, med ett lest steg per hendelse");
   }
 
   // --- Insertion-Sort animation --------------------------------------------------

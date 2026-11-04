@@ -141,6 +141,33 @@
 [data-theme="dark"] .lp-timeline-bar.is-chosen { color: #1b1426; }
 .lp-timeline-bar.is-rejected { opacity: .45; background: transparent; border-style: dashed; }
 .lp-timeline-cut { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--app-accent, #7c3aed); }
+/* Hash table with chaining: one row per slot, the chain runs from the head to the right */
+.lp-chain { display: grid; gap: 6px; }
+.lp-chain-row { display: grid; grid-template-columns: 4.5rem 1fr; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 10px; }
+.lp-chain-row.is-current { background: var(--app-soft, #f3edfa); }
+.lp-chain-slot { font-size: .85rem; color: var(--app-muted, #716879); font-variant-numeric: tabular-nums; }
+.lp-chain-keys { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-height: 2rem; }
+.lp-chain-key { min-width: 2.2rem; padding: 3px 8px; border: 1.5px solid var(--app-border, #d8cfe4); border-radius: 8px; background: var(--app-surface, #fff); font-weight: 700; text-align: center; transition: background .3s, border-color .3s; }
+.lp-chain-key.is-new { border-color: var(--app-accent, #7c3aed); background: var(--app-soft, #f3edfa); }
+.lp-chain-key.is-visiting { border-color: #d97706; background: color-mix(in srgb, #f59e0b 22%, var(--app-surface, #fff)); }
+.lp-chain-key.is-found { border-color: #16a34a; background: color-mix(in srgb, #16a34a 18%, var(--app-surface, #fff)); }
+.lp-chain-arrow { color: var(--app-muted, #716879); font-size: .85rem; }
+/* Radix sort: the digit being sorted on is marked in each number */
+.lp-radix-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.lp-radix-num { padding: 4px 10px; border: 1.5px solid var(--app-border, #d8cfe4); border-radius: 10px; background: var(--app-surface, #fff); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1rem; font-weight: 600; transition: background .3s, border-color .3s; }
+.lp-radix-num.is-placed { border-color: var(--app-accent, #7c3aed); background: var(--app-soft, #f3edfa); }
+.lp-radix-digit { color: var(--app-accent, #7c3aed); font-weight: 800; text-decoration: underline; }
+/* Bucket sort: one column per bucket */
+.lp-buckets { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; }
+.lp-bucket { display: grid; gap: 4px; align-content: start; min-height: 6.5rem; padding: 6px 4px; border: 1.5px solid var(--app-border, #d8cfe4); border-radius: 10px; background: var(--app-surface, #fff); transition: border-color .3s, background .3s; }
+.lp-bucket.is-sorting { border-color: #d97706; background: color-mix(in srgb, #f59e0b 14%, var(--app-surface, #fff)); }
+.lp-bucket-index { font-size: .72rem; text-align: center; color: var(--app-muted, #716879); }
+.lp-bucket-value { font-size: .78rem; text-align: center; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; padding: 2px 0; border-radius: 6px; }
+.lp-bucket-value.is-placed { background: var(--app-soft, #f3edfa); color: var(--app-accent, #7c3aed); font-weight: 800; }
+@media (max-width: 600px) { .lp-buckets { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+/* Fractional knapsack: capacity bar */
+.lp-capacity { position: relative; height: 16px; border-radius: 8px; background: var(--app-background, #faf8fc); border: 1px solid var(--app-border, #e6dfed); overflow: hidden; }
+.lp-capacity-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--app-accent, #7c3aed), #c026d3); transition: width .4s ease; }
 .lp-anim-table { width: 100%; margin-top: 12px; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; text-align: center; }
 .lp-anim-table th, .lp-anim-table td { padding: 4px 6px; border-bottom: 1px solid var(--app-border, #e6dfed); }
 .lp-anim-vars .is-rejected { opacity: .5; text-decoration: line-through; }

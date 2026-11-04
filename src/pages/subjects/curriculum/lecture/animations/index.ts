@@ -5,7 +5,7 @@ import { insertionSortSteps } from "./insertionSort";
 import { traceBfs } from "./bfs";
 import { traceDfs } from "./dfs";
 import { traceDijkstra } from "./dijkstra";
-import { BellmanFordView, BfsView, DfsView, DijkstraView, TopoView } from "./GraphViews";
+import { BfsView, DfsView, DijkstraView, TopoView } from "./GraphViews";
 import { traceBellmanFord } from "./bellmanFord";
 import { traceKruskal } from "./kruskal";
 import { tracePrim } from "./prim";
@@ -18,6 +18,16 @@ import { CountingSortView, KnapsackView, LcsView } from "./TableViews";
 import { ActivityView, DisjointSetsView, GaleShapleyView } from "./StructureViews";
 import { RodView } from "./TableViews";
 import { TreeInsertView } from "./TreeViews";
+import { ChainingView, DoublingView, FractionalView, HeapInsertView, IncreaseKeyView, RadixView, BucketView, RandomizedSelectView, SelectView } from "./DataViews";
+import { traceChaining, traceDoubling } from "./hashing";
+import { traceRadix, traceBucket } from "./radixBucket";
+import { traceRandomizedSelect, traceSelect } from "./select";
+import { traceHeapInsert, traceIncreaseKey } from "./heapInsert";
+import { traceFractional } from "./fractional";
+import { traceScc } from "./scc";
+import { traceDag } from "./dag";
+import { BellmanFordView, DagView, SccView } from "./GraphViews";
+import { HashChainingFigure } from "../../../../../data/curriculum/lessons/tdt4120/figures02a";
 import { traceRodCutting } from "./rodCutting";
 import { traceTreeInsert } from "./bst";
 import { traceLcs } from "./lcs";
@@ -68,6 +78,18 @@ export const lectureAnimations: LectureAnimation[] = [
   { id: "activity-selection", title: "Aktivitetsutvalg steg for steg", matches: pseudocodeTitled(/^Greedy-Activity-Selector\(/), steps: () => traceActivities().map(({ caption }) => ({ caption })), View: ActivityView },
   { id: "rod-cutting", title: "Stangkutting steg for steg", matches: pseudocodeTitled(/^Extended-Bottom-Up-Cut-Rod\(/), steps: () => traceRodCutting().map(({ caption }) => ({ caption })), View: RodView },
   { id: "tree-insert", title: "Innsetting i binært søketre steg for steg", matches: pseudocodeTitled(/^Tree-Insert\(/), steps: () => traceTreeInsert().map(({ caption }) => ({ caption })), View: TreeInsertView },
+  // Chaining has no pseudocode in the lesson, so its animation follows the figure of the hash table.
+  { id: "hash-chaining", title: "Hashtabell med kjeding steg for steg", matches: block => block.type === "figure" && block.component === HashChainingFigure, steps: () => traceChaining().map(({ caption }) => ({ caption })), View: ChainingView },
+  { id: "table-doubling", title: "Tabelldobling steg for steg", matches: pseudocodeTitled(/^Table-Insert\(/), steps: () => traceDoubling().map(({ caption }) => ({ caption })), View: DoublingView },
+  { id: "radix-sort", title: "Radix-Sort steg for steg", matches: pseudocodeTitled(/^Radix-Sort\(/), steps: () => traceRadix().map(({ caption }) => ({ caption })), View: RadixView },
+  { id: "bucket-sort", title: "Bucket-Sort steg for steg", matches: pseudocodeTitled(/^Bucket-Sort\(/), steps: () => traceBucket().map(({ caption }) => ({ caption })), View: BucketView },
+  { id: "randomized-select", title: "Randomized-Select steg for steg", matches: pseudocodeTitled(/^Randomized-Select\(/), steps: () => traceRandomizedSelect().map(({ caption }) => ({ caption })), View: RandomizedSelectView },
+  { id: "select", title: "Select steg for steg", matches: pseudocodeTitled(/^Select\(/), steps: () => traceSelect().map(({ caption }) => ({ caption })), View: SelectView },
+  { id: "max-heap-increase-key", title: "Max-Heap-Increase-Key steg for steg", matches: pseudocodeTitled(/^Max-Heap-Increase-Key\(/), steps: () => traceIncreaseKey().map(({ caption }) => ({ caption })), View: IncreaseKeyView },
+  { id: "max-heap-insert", title: "Max-Heap-Insert steg for steg", matches: pseudocodeTitled(/^Max-Heap-Insert\(/), steps: () => traceHeapInsert().map(({ caption }) => ({ caption })), View: HeapInsertView },
+  { id: "fractional-knapsack", title: "Fractional Knapsack steg for steg", matches: pseudocodeTitled(/^Fractional-Knapsack\(/), steps: () => traceFractional().map(({ caption }) => ({ caption })), View: FractionalView },
+  { id: "scc", title: "Sterke komponenter steg for steg", matches: pseudocodeTitled(/^Strongly-Connected-Components\(/), steps: () => traceScc().map(({ caption }) => ({ caption })), View: SccView },
+  { id: "dag-shortest-paths", title: "DAG-Shortest-Paths steg for steg", matches: pseudocodeTitled(/^DAG-Shortest-Paths\(/), steps: () => traceDag().map(({ caption }) => ({ caption })), View: DagView },
   // The DFS steps of the ordering, with the list growing each time a vertex is finished.
   { id: "topological-sort", title: "Topologisk sortering steg for steg", matches: pseudocodeTitled(/^Topological-Sort\(/), steps: () => traceTopo().map(({ caption }) => ({ caption })), View: TopoView },
 ];

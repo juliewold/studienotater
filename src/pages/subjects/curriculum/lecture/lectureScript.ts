@@ -156,6 +156,16 @@ export function buildLectureScript(lesson: Lesson, title: string): LectureScript
 
 type Add = (scene: Omit<LectureScene, "id" | "chapter">) => void;
 
+/** Adds the animation that matches a block, if there is one, with one narrated part per step. */
+function addAnimation(block: LessonBlock, add: Add) {
+  const animation = findAnimation(block);
+  if (!animation) return;
+  add({
+    kind: "animation", heading: animation.title, animation: { id: animation.id, block },
+    parts: animation.steps(block).map((step, stepIndex) => ({ kind: "frame", step: stepIndex, say: toSpeech(step.caption) })),
+  });
+}
+
 /** Emits the blocks of a section or of a box/example frame as scenes. */
 function emitBlocks(blocks: LessonBlock[], heading: string, frame: LectureScene["frame"], add: Add) {
   let parts: LecturePart[] = [];
@@ -205,16 +215,14 @@ function emitBlocks(blocks: LessonBlock[], heading: string, frame: LectureScene[
         flush();
         add({ kind: "figure", heading, frame, parts: buildSteps(block, figureParts(block.component), `${announce ? `${announce} ` : ""}${narrate(block)}`, 1200) });
         announce = "";
+        // A figure can also have an animation of its own, for a process that has no pseudocode in the lesson.
+        addAnimation(block, add);
         break;
       case "pseudocode": {
         flush();
         add({ kind: "content", heading, frame, parts: buildSteps(block, block.lines.length, `${announce ? `${announce} ` : ""}${narrate(block)}`, 800) });
         announce = "";
-        const animation = findAnimation(block);
-        if (animation) add({
-          kind: "animation", heading: animation.title, animation: { id: animation.id, block },
-          parts: animation.steps(block).map((step, stepIndex) => ({ kind: "frame", step: stepIndex, say: toSpeech(step.caption) })),
-        });
+        addAnimation(block, add);
         break;
       }
       case "table":

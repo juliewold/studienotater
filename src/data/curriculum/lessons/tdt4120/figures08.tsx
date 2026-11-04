@@ -1,7 +1,7 @@
 // Figures for lecture 8, drawn from the examples in the lecture slides, CLRS chapter 20 and exercise 8.
 // Every traversal order, time stamp, tree, edge type and component is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
-import { clothesGraph as clothes, clothesPositions as clothesAt, traversalGraph as graph, traversalPositions as at } from "../exampleGraphs";
+import { sccGraph as scc, sccPositions as sccAt, clothesGraph as clothes, clothesPositions as clothesAt, traversalGraph as graph, traversalPositions as at } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
 type Adj = Record<string, string[]>;
@@ -270,10 +270,6 @@ export function TopoSortFigure() {
     {sorted.map((u, k) => <Item key={u} x={rowX(k)} y={rowY} label={u} sub={`f = ${f[u]}`} tone="lf-box-sorted" />)}
   </Svg>;
 }
-
-const scc: Adj = { a: ["b"], b: ["c", "e", "f"], c: ["d", "g"], d: ["c", "h"], e: ["a", "f"], f: ["g"], g: ["f", "h"], h: ["h"] };
-const sccAt: Record<string, Point> = { a: { x: 40, y: 52 }, b: { x: 140, y: 52 }, c: { x: 240, y: 52 }, d: { x: 340, y: 52 },
-  e: { x: 40, y: 150 }, f: { x: 140, y: 150 }, g: { x: 240, y: 150 }, h: { x: 340, y: 150 } };
 
 function transpose(adj: Adj): Adj {
   const result: Adj = Object.fromEntries(Object.keys(adj).map(u => [u, []]));
