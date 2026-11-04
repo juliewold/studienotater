@@ -32,20 +32,24 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
   const introductions = unit.topics.flatMap(topic => data.introductions[topic.id] ? [{ topic, text: data.introductions[topic.id] }] : []);
   // Only reviewed lessons are shown as learning content; raw note content is linked, never inlined.
   const expectsLesson = hasLesson(subjectId, unit.id);
-  const [lesson, setLesson] = useState<Lesson | undefined>();
-  const [lessonError, setLessonError] = useState("");
+  // The result is kept with the unit it was loaded for, so a lesson or an error from another unit never shows.
+  const [loaded, setLoaded] = useState<{ key: string; lesson?: Lesson; error?: string }>();
+  const lessonKey = `${subjectId}/${unit.id}`;
+  const lesson = loaded?.key === lessonKey ? loaded.lesson : undefined;
+  const lessonError = loaded?.key === lessonKey ? loaded.error ?? "" : "";
   const [lectureOpen, setLectureOpen] = useState(false);
   const playButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!expectsLesson) return;
     let cancelled = false;
-    loadLesson(subjectId, unit.id).then(result => { if (!cancelled) setLesson(result); })
+    loadLesson(subjectId, unit.id).then(result => { if (!cancelled) setLoaded({ key: lessonKey, lesson: result }); })
       .catch(error => {
         console.error("Kunne ikke laste læringsnotatet:", error);
-        if (!cancelled) setLessonError("Kunne ikke laste læringsnotatet. Prøv å laste siden på nytt.");
+        // A failed lesson import is remembered by the browser until the page reloads, so a reload is the retry.
+        if (!cancelled) setLoaded({ key: lessonKey, error: "Kunne ikke laste læringsnotatet. Prøv igjen for å laste siden på nytt." });
       });
     return () => { cancelled = true; };
-  }, [expectsLesson, subjectId, unit.id]);
+  }, [expectsLesson, subjectId, unit.id, lessonKey]);
 
   // A lesson names its own concepts and current notes; the knowledge base links concepts too broadly.
   const concepts = lesson ? lesson.concepts.flatMap(slug => data.concepts.find(concept => concept.slug === slug) ?? []) : [];
@@ -77,7 +81,10 @@ function UnitDetails({ unit }: { unit: CurriculumUnit }) {
     </div>}
     {unit.supporting && <p className="curriculum-note">Pensumheftet oppgir stoffet til denne forelesningen som støttelitteratur, ikke som eget eksamenspensum.</p>}
 
-    {expectsLesson && !lesson ? <CurriculumStatus alert={Boolean(lessonError)}>{lessonError || "Laster læringsnotat…"}</CurriculumStatus>
+    {expectsLesson && !lesson ? <>
+      <CurriculumStatus alert={Boolean(lessonError)}>{lessonError || "Laster læringsnotat…"}</CurriculumStatus>
+      {lessonError && <button type="button" className="curriculum-retry" onClick={() => window.location.reload()}>Prøv igjen</button>}
+    </>
       : lesson ? <LessonIntro lesson={lesson} />
       : <p className="curriculum-note lesson-missing">Læringsnotatet for dette temaet er ikke skrevet ennå. Bruk forelesningene, øvingene og notatene under for fullstendige forklaringer.</p>}
 

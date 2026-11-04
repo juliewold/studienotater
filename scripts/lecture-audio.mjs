@@ -53,8 +53,8 @@ try {
   for (const unitId of units) {
     const lesson = await loadLesson(subjectId, unitId);
     if (!lesson) throw new Error(`Fant ikke læringsnotatet ${subjectId}/${unitId}.`);
-    // The title only appears in the first scene's heading, not in what is said.
-    const texts = [...new Set(buildLectureScript(lesson, "").scenes.flatMap(scene => scene.parts.map(part => part.say)))];
+    // The title only appears in the first scene's heading, not in what is said. Silent steps have no text.
+    const texts = [...new Set(buildLectureScript(lesson, "").scenes.flatMap(scene => scene.parts.map(part => part.say)))].filter(text => text.trim());
     const audioDir = join(root, "public", "lecture-audio", subjectId, unitId);
     const manifestPath = join(root, "src", "data", "curriculum", "lectureAudio", subjectId, `${unitId}.json`);
     const previous = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, "utf8")) : undefined;

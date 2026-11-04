@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { AlertTriangle, AudioLines, BookOpen, ChevronLeft, ChevronRight, HelpCircle, Lightbulb, Pause, Play, RotateCcw, ScrollText, Shapes, Volume2, VolumeX, X } from "lucide-react";
 import type { Lesson } from "../../../../data/curriculum/lessons/types";
 import { Block } from "../LessonView";
+import { RevealContext } from "../../../../data/curriculum/lessons/reveal";
 import { RichText } from "../curriculumShared";
 import { animationById } from "./animations";
 import { buildLectureScript, type LecturePart, type LectureScene } from "./lectureScript";
@@ -20,6 +21,8 @@ const RATES = [0.75, 0.9, 1, 1.15, 1.3, 1.5];
 // Pause between parts, and a little longer between scenes, so each step can sink in.
 const PART_GAP = 450;
 const SCENE_GAP = 900;
+// A figure or formula step without a sentence to read gets this long to be seen.
+const SILENT_STEP = 1100;
 
 function loadSettings(): Settings {
   const defaults = { auto: true, muted: false, rate: 1, voice: "auto" };
@@ -92,17 +95,22 @@ export default function LecturePlayer({ lesson, title, label, onClose }: { lesso
     const part = script.scenes[position.scene].parts[position.part];
     const lastInScene = position.part === script.scenes[position.scene].parts.length - 1;
     let timer = 0;
+    const onDone = () => {
+      if (!auto) { setPlaying(false); return; }
+      timer = window.setTimeout(() => {
+        if (step >= total - 1) setPlaying(false);
+        else goTo(step + 1);
+      }, (part.pause ?? 0) + (lastInScene ? SCENE_GAP : PART_GAP));
+    };
+    if (!part.say.trim()) {
+      timer = window.setTimeout(onDone, SILENT_STEP);
+      return () => window.clearTimeout(timer);
+    }
     const stop = narrate(part.say, {
       rate, muted, voice: voiceRef.current,
       audioUrl: useRecorded ? recordingUrl(recording, lesson.subjectId, lesson.unitId, part.say) : undefined,
       onBlocked: () => { setBlocked(true); setPlaying(false); },
-      onDone: () => {
-        if (!auto) { setPlaying(false); return; }
-        timer = window.setTimeout(() => {
-          if (step >= total - 1) setPlaying(false);
-          else goTo(step + 1);
-        }, (part.pause ?? 0) + (lastInScene ? SCENE_GAP : PART_GAP));
-      },
+      onDone,
     });
     return () => { stop(); window.clearTimeout(timer); };
   }, [playing, position, script, rate, muted, auto, step, total, goTo, useRecorded, recording, lesson.subjectId, lesson.unitId, voiceId, voicesReady]);
@@ -331,7 +339,13 @@ function Frame({ variant, title, children }: { variant: keyof typeof frames; tit
 /** Revealed parts in order; consecutive list items share one list. */
 function Parts({ parts, current }: { parts: LecturePart[]; current: number }) {
   const groups: { items: { part: LecturePart; index: number }[]; list?: boolean; ordered?: boolean }[] = [];
+  // A figure, code block or formula being built up shows only its latest step.
+  const superseded = (index: number) => {
+    const part = parts[index];
+    return part.kind === "visual" && parts.slice(index + 1).some(later => later.kind === "visual" && later.source === part.source);
+  };
   parts.forEach((part, index) => {
+    if (superseded(index)) return;
     const last = groups.at(-1);
     if (part.kind === "item" && last?.list && last.ordered === part.ordered) last.items.push({ part, index });
     else groups.push({ items: [{ part, index }], list: part.kind === "item", ordered: part.kind === "item" && part.ordered });
@@ -344,6 +358,13 @@ function Parts({ parts, current }: { parts: LecturePart[]; current: number }) {
       return group.ordered ? <ol key={group.items[0].index} start={start} className="lp-list">{items}</ol> : <ul key={group.items[0].index} className="lp-list">{items}</ul>;
     }
     const { part, index } = group.items[0];
+    if (part.kind === "visual") {
+      // Keyed by the block, so the figure stays on screen and its new parts fade in.
+      const key = `visual-${parts.findIndex(item => item.kind === "visual" && item.source === part.source)}`;
+      return <div key={key} className="lp-part is-current">
+        <RevealContext.Provider value={part.reveal}><Block block={part.block} /></RevealContext.Provider>
+      </div>;
+    }
     return <div key={index} className={`lp-part ${state(index)}`}>
       {part.kind === "text" && <p className="lp-text"><RichText>{part.text}</RichText></p>}
       {part.kind === "block" && <Block block={part.block} />}

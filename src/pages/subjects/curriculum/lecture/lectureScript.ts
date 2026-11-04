@@ -1,6 +1,7 @@
 import type { Lesson, LessonBlock, LessonText } from "../../../../data/curriculum/lessons/types";
+import { figureParts } from "../../../../data/curriculum/lessons/reveal";
 import { findAnimation } from "./animations";
-import { chunkText, latexToSpeech, toSpeech } from "./speechText";
+import { chunkText, latexToSpeech, splitSentences, toSpeech } from "./speechText";
 
 // Builds a lecture from a reviewed lesson: one concept per scene, revealed one part at a
 // time, so the narration always matches what is on screen. Nothing is fetched; the
@@ -11,7 +12,13 @@ export type LecturePart =
   | { kind: "text"; text: LessonText; say: string; pause?: number }
   | { kind: "item"; text: LessonText; ordered: boolean; number: number; say: string; pause?: number }
   | { kind: "row"; cells: LessonText[]; say: string; pause?: number }
-  | { kind: "frame"; step: number; say: string; pause?: number };
+  | { kind: "frame"; step: number; say: string; pause?: number }
+  /**
+   * One step of a figure, code block or formula that is built up. `source` is the whole
+   * block, which ties its steps together; `block` is what is drawn at this step, and
+   * `reveal` how many of the figure's parts or code lines are visible. Empty `say` means silent.
+   */
+  | { kind: "visual"; source: LessonBlock; block: LessonBlock; reveal: number; say: string; pause?: number };
 
 export type FrameVariant = "definition" | "theorem" | "tip" | "pitfall" | "example" | "quiz";
 
@@ -65,6 +72,54 @@ const listParts = (block: Extract<LessonBlock, { type: "list" }>): LecturePart[]
 const isLarge = (block: LessonBlock) => block.type === "figure" || block.type === "table" || block.type === "pseudocode" || block.type === "quiz";
 const leadsIn = (block: LessonBlock) => block.type === "text" && /:\s*$/.test(block.text);
 const MAX_PARTS = 6;
+// A figure or code block is built up in at most this many steps.
+const MAX_BUILD_STEPS = 5;
+
+/**
+ * Builds a figure or code block step by step. Each step reveals the next share of it while the
+ * matching sentences of the explanation are read, so what appears is what is being explained.
+ * Steps without a sentence are silent.
+ */
+function buildSteps(source: LessonBlock, total: number, narration: string, pause: number): LecturePart[] {
+  const sentences = splitSentences(narration);
+  const steps = Math.max(1, Math.min(total, MAX_BUILD_STEPS, Math.max(2, sentences.length)));
+  const perStep = Math.ceil(sentences.length / steps);
+  // The caption under the figure is written out as it is explained, and in full at the last step.
+  const caption = source.type === "figure" || source.type === "pseudocode" ? source.caption : undefined;
+  const captionSentences = caption ? splitSentences(caption) : [];
+  const withCaption = (text: string): LessonBlock => source.type === "figure" || source.type === "pseudocode" ? { ...source, caption: text } : source;
+  return Array.from({ length: steps }, (_, step) => {
+    const last = step === steps - 1;
+    return {
+      kind: "visual" as const,
+      source,
+      block: caption === undefined ? source : withCaption(last ? caption : captionSentences.slice(0, (step + 1) * perStep).join(" ")),
+      reveal: Math.ceil(((step + 1) * total) / steps),
+      say: sentences.slice(step * perStep, (step + 1) * perStep).join(" "),
+      pause: last ? pause : undefined,
+    };
+  });
+}
+
+/**
+ * A formula with an aligned derivation appears one line at a time, and each line is read as it
+ * comes. Other formulas stay whole. `lead` is the frame announcement, spoken with the first line.
+ */
+function formulaParts(block: Extract<LessonBlock, { type: "formula" }>, lead: string): LecturePart[] {
+  const body = block.latex.trim().match(/^\\begin\{aligned\}([\s\S]*)\\end\{aligned\}$/)?.[1];
+  const lines = body?.split("\\\\").map(line => line.trim()).filter(Boolean) ?? [];
+  if (lines.length < 2) return [{ kind: "block", block, say: say(lead, narrate(block)) }];
+  return lines.map((line, index) => {
+    const last = index === lines.length - 1;
+    return {
+      kind: "visual" as const,
+      source: block,
+      block: last ? block : { ...block, latex: `\\begin{aligned} ${lines.slice(0, index + 1).join(" \\\\ ")} \\end{aligned}`, caption: undefined },
+      reveal: Infinity,
+      say: say(index === 0 ? lead : undefined, index === 0 && block.name ? toSpeech(block.name) : undefined, latexToSpeech(line.replace(/&/g, " ")), last && block.caption ? toSpeech(block.caption) : undefined),
+    };
+  });
+}
 
 export function buildLectureScript(lesson: Lesson, title: string): LectureScript {
   const chapters = ["Introduksjon", ...lesson.sections.map(section => section.title), "Oppsummering"];
@@ -101,6 +156,16 @@ export function buildLectureScript(lesson: Lesson, title: string): LectureScript
 
 type Add = (scene: Omit<LectureScene, "id" | "chapter">) => void;
 
+/** Adds the animation that matches a block, if there is one, with one narrated part per step. */
+function addAnimation(block: LessonBlock, add: Add) {
+  const animation = findAnimation(block);
+  if (!animation) return;
+  add({
+    kind: "animation", heading: animation.title, animation: { id: animation.id, block },
+    parts: animation.steps(block).map((step, stepIndex) => ({ kind: "frame", step: stepIndex, say: toSpeech(step.caption) })),
+  });
+}
+
 /** Emits the blocks of a section or of a box/example frame as scenes. */
 function emitBlocks(blocks: LessonBlock[], heading: string, frame: LectureScene["frame"], add: Add) {
   let parts: LecturePart[] = [];
@@ -128,7 +193,14 @@ function emitBlocks(blocks: LessonBlock[], heading: string, frame: LectureScene[
     switch (block.type) {
       case "text": textParts(block.text).forEach(push); break;
       case "list": listParts(block).forEach(push); break;
-      case "formula": push({ kind: "block", block, say: narrate(block) }); break;
+      case "formula": {
+        const steps = formulaParts(block, announce);
+        // The lines of one derivation stay in one scene.
+        if (parts.length + steps.length > MAX_PARTS) flush();
+        parts.push(...steps);
+        announce = "";
+        break;
+      }
       case "box":
       case "example": {
         flush();
@@ -141,18 +213,16 @@ function emitBlocks(blocks: LessonBlock[], heading: string, frame: LectureScene[
       }
       case "figure":
         flush();
-        add({ kind: "figure", heading, frame, parts: [{ kind: "block", block, say: `${announce ? `${announce} ` : ""}${narrate(block)}`, pause: 1200 }] });
+        add({ kind: "figure", heading, frame, parts: buildSteps(block, figureParts(block.component), `${announce ? `${announce} ` : ""}${narrate(block)}`, 1200) });
         announce = "";
+        // A figure can also have an animation of its own, for a process that has no pseudocode in the lesson.
+        addAnimation(block, add);
         break;
       case "pseudocode": {
         flush();
-        add({ kind: "content", heading, frame, parts: [{ kind: "block", block, say: `${announce ? `${announce} ` : ""}${narrate(block)}`, pause: 800 }] });
+        add({ kind: "content", heading, frame, parts: buildSteps(block, block.lines.length, `${announce ? `${announce} ` : ""}${narrate(block)}`, 800) });
         announce = "";
-        const animation = findAnimation(block);
-        if (animation) add({
-          kind: "animation", heading: animation.title, animation: { id: animation.id, block },
-          parts: animation.steps(block).map((step, stepIndex) => ({ kind: "frame", step: stepIndex, say: toSpeech(step.caption) })),
-        });
+        addAnimation(block, add);
         break;
       }
       case "table":

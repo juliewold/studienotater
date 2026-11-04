@@ -1,6 +1,8 @@
 // Figures for lecture 10, drawn from the examples in the lecture slides, CLRS chapter 22 and exercise 10.
 // Every estimate, pass, extraction order and tree is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
+import { bellmanFordEdges, bellmanFordNodes, dagEdges, dagOrder, dagPositions as dagPos } from "../exampleGraphs";
+import { shortestPathEdges, shortestPathNodes, shortestPathPositions } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
 type Edge = [string, string, number];
@@ -81,9 +83,6 @@ function dagShortestPaths(order: string[], edges: Edge[], s: string) {
 }
 
 // Own example of a DAG with a negative edge. The topological order is a, b, c, d, e.
-const dagOrder = ["a", "b", "c", "d", "e"];
-const dagEdges: Edge[] = [["a", "b", 3], ["a", "c", 6], ["b", "c", -2], ["b", "d", 1], ["c", "d", 4], ["c", "e", 2], ["d", "e", -3]];
-const dagPos: Record<string, Point> = { a: { x: 60, y: 130 }, b: { x: 190, y: 60 }, c: { x: 190, y: 200 }, d: { x: 330, y: 60 }, e: { x: 330, y: 200 } };
 
 export function RelaxFigure() {
   const u = { x: 70, y: 110 }, v = { x: 230, y: 110 };
@@ -134,9 +133,9 @@ export function DagFigure() {
 }
 
 export function BellmanFordPassFigure() {
-  const nodes = ["s", "a", "b", "c"];
-  // The list order of the edges decides how fast the estimates settle.
-  const edges: Edge[] = [["s", "a", 4], ["a", "c", 2], ["s", "b", 5], ["b", "a", -3], ["b", "c", 6]];
+  const nodes = bellmanFordNodes;
+  const edges = bellmanFordEdges;
+
   const snapshots = bellmanFordPasses(nodes, edges, "s", 3);
   const cell = 100, left = 150, top = 52, row = 32;
   return <Svg label="Bellman-Ford på fire noder: estimatene for a, b og c når riktige verdier etter to gjennomganger" width={700} height={262}>
@@ -190,9 +189,9 @@ export function NegativeCycleFigure() {
 }
 
 export function DijkstraTraceFigure() {
-  const nodes = ["s", "a", "b", "c", "d"];
-  const edges: Edge[] = [["s", "a", 10], ["s", "b", 5], ["b", "a", 3], ["b", "c", 2], ["a", "c", 1], ["c", "d", 4], ["b", "d", 9]];
-  const at: Record<string, Point> = { s: { x: 40, y: 120 }, b: { x: 130, y: 50 }, a: { x: 130, y: 190 }, c: { x: 220, y: 120 }, d: { x: 220, y: 240 } };
+  const nodes = shortestPathNodes;
+  const edges = shortestPathEdges;
+  const at = shortestPathPositions;
   const { steps } = dijkstra(nodes, edges, "s");
   const start = initial(nodes, "s");
   const rows = [{ label: "Start", u: "", d: start }, ...steps.map((step, k) => ({ label: `${k + 1}.`, u: step.u, d: step.d }))];

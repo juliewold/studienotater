@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, BookOpen, ExternalLink, Lightbulb, ScrollText } from "lucide-react";
 import type { Lesson, LessonBlock } from "../../../data/curriculum/lessons/types";
+import { RevealContext } from "../../../data/curriculum/lessons/reveal";
 import { Latex, RichText } from "./curriculumShared";
 
 const boxes = {
@@ -76,6 +77,7 @@ function Blocks({ blocks }: { blocks: LessonBlock[] }) {
 
 /** One lesson block, as shown on the topic page. Also used by the lecture player. */
 export function Block({ block }: { block: LessonBlock }) {
+  const reveal = useContext(RevealContext);
   switch (block.type) {
     case "text":
       return <p className="lesson-text"><RichText>{block.text}</RichText></p>;
@@ -98,7 +100,7 @@ export function Block({ block }: { block: LessonBlock }) {
     case "pseudocode":
       return <figure className="lesson-code">
         <figcaption className="lesson-code-title">{block.title}</figcaption>
-        <pre><code>{block.lines.map((line, index) => <span key={index} className="lesson-code-line"><span className="lesson-code-number" aria-hidden="true">{index + 1}</span>{line}{"\n"}</span>)}</code></pre>
+        <pre><code>{block.lines.map((line, index) => <span key={index} className={index < reveal ? "lesson-code-line" : "lesson-code-line is-hidden"}><span className="lesson-code-number" aria-hidden="true">{index + 1}</span>{line}{"\n"}</span>)}</code></pre>
         {block.caption && <p className="lesson-caption"><RichText>{block.caption}</RichText></p>}
       </figure>;
     case "table":

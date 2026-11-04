@@ -1,6 +1,7 @@
 // Figures for lecture 8, drawn from the examples in the lecture slides, CLRS chapter 20 and exercise 8.
 // Every traversal order, time stamp, tree, edge type and component is computed by the algorithm it illustrates.
 import { Svg } from "../figureKit";
+import { sccGraph as scc, sccPositions as sccAt, clothesGraph as clothes, clothesPositions as clothesAt, traversalGraph as graph, traversalPositions as at } from "../exampleGraphs";
 
 type Point = { x: number; y: number };
 type Adj = Record<string, string[]>;
@@ -80,9 +81,6 @@ function dfs(adj: Adj, order = Object.keys(adj)) {
 }
 
 // The running example: a directed graph where 9 cannot be reached from 1, and 3 → 6 → 8 → 3 is a cycle.
-const graph: Adj = { 1: ["2", "3"], 2: ["4", "5"], 3: ["5", "6"], 4: ["7"], 5: ["7"], 6: ["8"], 7: ["8"], 8: ["3"], 9: ["6"] };
-const at: Record<string, Point> = { 1: { x: 45, y: 130 }, 2: { x: 150, y: 65 }, 3: { x: 150, y: 195 }, 4: { x: 260, y: 35 }, 5: { x: 260, y: 130 },
-  6: { x: 260, y: 230 }, 7: { x: 370, y: 80 }, 8: { x: 370, y: 190 }, 9: { x: 470, y: 230 } };
 const list = (items: string[]) => `⟨${items.join(", ")}⟩`;
 
 export function AdjacencyFigure() {
@@ -238,9 +236,6 @@ export function EdgeClassFigure() {
   </Svg>;
 }
 
-const clothes: Adj = { skjorte: ["slips", "belte"], slips: ["jakke"], jakke: [], belte: ["jakke"], klokke: [], truse: ["bukse", "sko"], bukse: ["sko", "belte"], sko: [], sokker: ["sko"] };
-const clothesAt: Record<string, Point> = { truse: { x: 60, y: 34 }, sokker: { x: 200, y: 34 }, skjorte: { x: 370, y: 34 }, klokke: { x: 500, y: 34 },
-  bukse: { x: 60, y: 104 }, sko: { x: 200, y: 104 }, slips: { x: 350, y: 104 }, belte: { x: 130, y: 172 }, jakke: { x: 280, y: 172 } };
 
 function Item({ x, y, label, sub, below = true, tone = "lf-box" }: Point & { label: string; sub?: string; below?: boolean; tone?: string }) {
   return <g>
@@ -275,10 +270,6 @@ export function TopoSortFigure() {
     {sorted.map((u, k) => <Item key={u} x={rowX(k)} y={rowY} label={u} sub={`f = ${f[u]}`} tone="lf-box-sorted" />)}
   </Svg>;
 }
-
-const scc: Adj = { a: ["b"], b: ["c", "e", "f"], c: ["d", "g"], d: ["c", "h"], e: ["a", "f"], f: ["g"], g: ["f", "h"], h: ["h"] };
-const sccAt: Record<string, Point> = { a: { x: 40, y: 52 }, b: { x: 140, y: 52 }, c: { x: 240, y: 52 }, d: { x: 340, y: 52 },
-  e: { x: 40, y: 150 }, f: { x: 140, y: 150 }, g: { x: 240, y: 150 }, h: { x: 340, y: 150 } };
 
 function transpose(adj: Adj): Adj {
   const result: Adj = Object.fromEntries(Object.keys(adj).map(u => [u, []]));
