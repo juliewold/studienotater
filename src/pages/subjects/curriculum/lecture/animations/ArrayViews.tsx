@@ -11,11 +11,11 @@ import { tracePartition } from "./partition";
 
 type Tone = "plain" | "range" | "low" | "high" | "current" | "pivot" | "sorted" | "compare";
 
-function Cells({ values, tones, marks }: { values: number[]; tones: Tone[]; marks?: (string | undefined)[] }) {
+export function Cells({ values, tones, marks }: { values: (number | null)[]; tones: Tone[]; marks?: (string | undefined)[] }) {
   return <div className="lp-cells" role="img" aria-label={`Tabellen: ${values.join(", ")}`}>
     {values.map((value, index) => <div key={index} className="lp-cell-column">
       <span className="lp-cell-mark" aria-hidden="true">{marks?.[index] ?? ""}</span>
-      <div className={`lp-cell-box is-${tones[index]}`}>{value}</div>
+      <div className={`lp-cell-box is-${tones[index]}`}>{value ?? ""}</div>
       <span className="lp-cell-index" aria-hidden="true">{index + 1}</span>
     </div>)}
   </div>;

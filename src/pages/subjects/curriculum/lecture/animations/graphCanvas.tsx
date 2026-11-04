@@ -35,7 +35,8 @@ export function GraphCanvas({ at, edges, nodes, label, directed = true, width = 
         <path d="M0,0 L10,5 L0,10 z" className="lp-graph-arrow" />
       </marker>
     </defs>
-    {edges.map(edge => <Edge key={`${edge.from}${edge.to}`} from={at[edge.from]} to={at[edge.to]} fromR={nodeRadius(edge.from)} toR={nodeRadius(edge.to)}
+    {/* The index is part of the key: one pair can appear twice, as a tree edge and as the active proposal. */}
+    {edges.map((edge, index) => <Edge key={`${index}-${edge.from}-${edge.to}`} from={at[edge.from]} to={at[edge.to]} fromR={nodeRadius(edge.from)} toR={nodeRadius(edge.to)}
       tone={edge.tone} weight={edge.weight} directed={directed} />)}
     {nodes.map(node => <g key={node.id}>
       <circle cx={at[node.id].x} cy={at[node.id].y} r={nodeRadius(node.id)} className={`lp-graph-node is-${node.tone}`} />

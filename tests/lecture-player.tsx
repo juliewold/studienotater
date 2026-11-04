@@ -19,6 +19,14 @@ import { traceTopo } from "../src/pages/subjects/curriculum/lecture/animations/t
 import { traceMergeSort } from "../src/pages/subjects/curriculum/lecture/animations/mergeSort";
 import { tracePartition } from "../src/pages/subjects/curriculum/lecture/animations/partition";
 import { traceHeapsort } from "../src/pages/subjects/curriculum/lecture/animations/heapsort";
+import { traceLcs } from "../src/pages/subjects/curriculum/lecture/animations/lcs";
+import { traceKnapsack } from "../src/pages/subjects/curriculum/lecture/animations/knapsack";
+import { traceCountingSort } from "../src/pages/subjects/curriculum/lecture/animations/countingSort";
+import { traceDisjointSets } from "../src/pages/subjects/curriculum/lecture/animations/disjointSets";
+import { traceGaleShapley, galeMen, galeWomen } from "../src/pages/subjects/curriculum/lecture/animations/galeShapley";
+import { traceActivities } from "../src/pages/subjects/curriculum/lecture/animations/activitySelection";
+import { traceRodCutting, rodPrices } from "../src/pages/subjects/curriculum/lecture/animations/rodCutting";
+import { traceTreeInsert } from "../src/pages/subjects/curriculum/lecture/animations/bst";
 import LecturePlayer from "../src/pages/subjects/curriculum/lecture/LecturePlayer";
 import "../src/index.css";
 import "../src/styles/global.css";
@@ -216,6 +224,77 @@ try {
     ["03", "Merge-Sort(A, p, r)", "merge-sort", mergeFrames.length], ["03", "Partition(A, p, r)", "partition", partitionFrames.length], ["05", "Heapsort(A, n)", "heapsort", heapFrames.length],
   ] as const) {
     const scenes = buildLectureScript(await loadLesson("tdt4120", lessonId).then(lesson => lesson!), "Sortering").scenes;
+    const at = scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === title));
+    check(scenes[at + 1]?.animation?.id === animation && scenes[at + 1].parts.length === count && scenes[at + 1].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
+      `${title}: animasjonen følger pseudokoden, med ett lest steg per hendelse`);
+  }
+
+  // --- Dynamic programming, counting, sets, matching and selection -------------
+  const lcs = traceLcs("ABCBDAB", "BDCABA");
+  const lcsTable = lcs.find(frame => frame.line === 15)!.c;
+  const X = "ABCBDAB", Y = "BDCABA";
+  check(lcs.at(-1)!.output === "BCBA" && lcsTable.at(-1)!.at(-1) === 4
+    && X.split("").every((_, i) => Y.split("").every((__, j) => {
+      const c = lcsTable[i + 1][j + 1]!, diag = lcsTable[i][j]!, up = lcsTable[i][j + 1]!, left = lcsTable[i + 1][j]!;
+      return c === (X[i] === Y[j] ? diag + 1 : Math.max(up, left));
+    })),
+  "LCS fyller tabellen etter rekurrensen, og gir delsekvensen BCBA med lengde 4");
+  check(lcs.filter(frame => [8, 11, 14].includes(frame.line ?? -1)).length === X.length * Y.length, "LCS har ett steg per celle i tabellen");
+
+  const knapsack = traceKnapsack();
+  const K = knapsack.find(frame => frame.line === 10)!.K;
+  check(K.at(-1)!.at(-1) === 220 && knapsack.at(-1)!.taken.join() === "2,3" && K.every(row => row.every((value, j) => j === 0 || value! >= row[j - 1]!)),
+    "Ryggsekken gir verdi 220 med gjenstandene 2 og 3, og verdiene vokser med kapasiteten");
+
+  const counting = traceCountingSort();
+  const sortedInput = [2, 5, 3, 0, 2, 3, 0, 3].sort((a, b) => a - b);
+  check(counting.at(-1)!.B.join() === sortedInput.join() && counting.filter(frame => frame.phase === "place" && frame.line === 8).length === 8,
+    "Counting-Sort gir ⟨0, 0, 2, 2, 3, 3, 3, 5⟩, og plasserer hvert av de åtte elementene én gang");
+
+  const disjoint = traceDisjointSets();
+  const end = disjoint.at(-1)!;
+  const roots = [1, 2, 3, 4].filter(v => end.parent[v] === v);
+  check(roots.length === 1 && roots[0] === 4 && end.rank[4] === 2 && [1, 2, 3, 4].every(v => end.parent[v] === 4),
+    "Disjunkte mengder: etter Union(1, 2), Union(3, 4), Union(1, 3) og Find-Set(1) er alle nodene under roten 4, med rang 2");
+  check(disjoint.every(frame => [1, 2, 3, 4].every(v => { let y = v, steps = 0; while (frame.parent[y] !== y && steps < 10) { y = frame.parent[y]; steps++; } return steps < 10; })),
+    "Pekerne danner aldri en sykel, og hver node når en rot");
+
+  const gale = traceGaleShapley();
+  const engaged = gale.at(-1)!.engaged;
+  const womanOf = Object.fromEntries(Object.entries(engaged).map(([w, m]) => [m, w]));
+  const blocking = Object.entries(galeWomen).flatMap(([w, list]) => list.filter(m => list.indexOf(m) < list.indexOf(engaged[w]) && galeMen[m].indexOf(w) < galeMen[m].indexOf(womanOf[m])));
+  check(Object.keys(engaged).length === 3 && blocking.length === 0 && gale.some(frame => frame.event === "swap") && gale.some(frame => frame.event === "reject"),
+    "Gale-Shapley gir en stabil matching uten blokkerende par, og viser både bytte og avslag");
+
+  const activity = traceActivities();
+  const picked = activity.at(-1)!.chosen;
+  check(picked.join() === "1,4,8,11" && activity.filter(frame => frame.decision === "rejected").length === 7,
+    "Aktivitetsutvalget velger a1, a4, a8 og a11, og forkaster de sju andre");
+
+  for (const [lessonId, title, animation, count] of [
+    ["06", "LCS-Length(X, Y, m, n)", "lcs", lcs.length], ["06", "Knapsack′(n, W)", "knapsack", knapsack.length],
+    ["04", "Counting-Sort(A, n, k)", "counting-sort", counting.length], ["09", "Skog-implementasjonen (CLRS 19.3)", "disjoint-sets", disjoint.length],
+    ["07", "Gale-Shapley(men, women, rankings)", "gale-shapley", gale.length], ["07", "Greedy-Activity-Selector(s, f, n)", "activity-selection", activity.length],
+  ] as const) {
+    const scenes = buildLectureScript(await loadLesson("tdt4120", lessonId).then(lesson => lesson!), "Ny").scenes;
+    const at = scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === title));
+    check(scenes[at + 1]?.animation?.id === animation && scenes[at + 1].parts.length === count && scenes[at + 1].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
+      `${title}: animasjonen følger pseudokoden, med ett lest steg per hendelse`);
+  }
+
+  // --- Rod cutting and binary search trees ----------------------------------------
+  const rod = traceRodCutting(rodPrices, 7);
+  const rodPieces = rod.at(-1)!.pieces;
+  check(rod.find(frame => frame.line === 9 && frame.j === 7)!.r[7] === 18 && rodPieces.reduce((sum, piece) => sum + rodPrices[piece - 1], 0) === 18,
+    "Stangkutting gir inntekt 18 for en stang på 7, og stykkene i rekonstruksjonen gir samme inntekt");
+  const tree = traceTreeInsert([15, 6, 18, 3, 7, 13, 17]);
+  const finalTree = tree.at(-1)!;
+  check(finalTree.caption.includes("3, 6, 7, 13, 15, 17, 18") && tree.every(frame => frame.nodes && (frame.root === null || frame.nodes[frame.root])),
+    "Innsetting i binært søketre gir en inorder-gjennomgang i sortert rekkefølge");
+  for (const [lessonId, title, animation, count] of [
+    ["06", "Extended-Bottom-Up-Cut-Rod(p, n)", "rod-cutting", rod.length], ["05", "Tree-Insert(T, z)", "tree-insert", tree.length],
+  ] as const) {
+    const scenes = buildLectureScript(await loadLesson("tdt4120", lessonId).then(lesson => lesson!), "Ny").scenes;
     const at = scenes.findIndex(scene => scene.parts.some(part => part.kind === "visual" && part.source.type === "pseudocode" && part.source.title === title));
     check(scenes[at + 1]?.animation?.id === animation && scenes[at + 1].parts.length === count && scenes[at + 1].parts.every(part => part.kind === "frame" && part.say.trim().length > 0),
       `${title}: animasjonen følger pseudokoden, med ett lest steg per hendelse`);
