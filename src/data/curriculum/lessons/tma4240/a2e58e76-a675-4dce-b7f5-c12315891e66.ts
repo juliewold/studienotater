@@ -121,5 +121,20 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Transformasjon av tetthet", "Des 2025, oppg. 5d", "$f_Y(y) = f_X(w(y))\\,|w'(y)|$. Her er $Y = 2e^{-X+\\mu}$, og tettheten blir $\\tfrac{1}{2}e^{-y/2}$, altså $\\chi^2_2$."],
+          ["Pivotal størrelse fra transformasjon", "Des 2025, oppg. 5d", "$\\sum 2e^{-X_i+\\mu} \\sim \\chi^2_{2n}$ uavhengig av $\\mu$, så den er pivotal."],
+          ["Normal tilnærming til differanse", "Aug 2026, oppg. 4d", "$X - Y$ er tilnærmet normal. Bruk kontinuitetskorreksjon $\\pm 0{,}5$ når variablene er heltall."],
+        ] },
+        { type: "example", title: "Aug 2026, oppg. 4d: $P(X - Y > 0{,}5)$", blocks: [
+          { type: "text", text: "$E(X - Y) = 0{,}8$ og $\\text{Var}(X - Y) = 1{,}6$. Seier for lag A er $X - Y \\ge 1$, og kontinuitetskorreksjonen gir grensen $0{,}5$." },
+          { type: "text", text: "$P(X - Y > 0{,}5) \\approx 1 - \\Phi\\left(\\frac{0{,}5 - 0{,}8}{\\sqrt{1{,}6}}\\right) = 1 - \\Phi(-0{,}237) \\approx 0{,}594$." },
+        ] },
+      ],
+    },
   ],
 };

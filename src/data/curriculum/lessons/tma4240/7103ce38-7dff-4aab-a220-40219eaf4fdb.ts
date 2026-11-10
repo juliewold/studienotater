@@ -87,5 +87,21 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Konstant i tetthet", "Des 2025, oppg. 3", "Integrer $f$ over støtten og løs for konstanten."],
+          ["Sannsynlighet og median fra tetthet", "Des 2025, oppg. 3d–e", "$P(X \\le a) = \\int_0^a f(x)\\,dx$. Medianen $m$ løser $F(m) = 1/2$."],
+          ["Forventning og varians fra tetthet", "Des 2025, oppg. 3a–c", "$E(X) = \\int x f(x)\\,dx$, $E(X^2) = \\int x^2 f(x)\\,dx$ og $\\text{Var}(X) = E(X^2) - \\mu^2$."],
+        ] },
+        { type: "example", title: "Des 2025, oppg. 3: $f(x) = 3x^2$ på $(0, 1)$", blocks: [
+          { type: "text", text: "$E(X) = \\int_0^1 3x^3\\,dx = \\frac{3}{4}$ og $E(X^2) = \\int_0^1 3x^4\\,dx = \\frac{3}{5}$." },
+          { type: "text", text: "$\\text{Var}(X) = \\frac{3}{5} - \\left(\\frac{3}{4}\\right)^2 = 0{,}0375$, og $P(X \\le \\tfrac{1}{2}) = \\left(\\tfrac{1}{2}\\right)^3 = 0{,}125$." },
+          { type: "text", text: "$F(x) = x^3$, så $F(m) = \\tfrac{1}{2}$ gir $m = (1/2)^{1/3} \\approx 0{,}794$." },
+        ] },
+      ],
+    },
   ],
 };

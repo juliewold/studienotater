@@ -82,5 +82,20 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Simulering ved inversjon", "Des 2025, oppg. 5b", "Løs $F(x) = u$ for $x$. Gumbel-fordelingen står ikke i formelboka, så $F$ må gis i oppgaven."],
+          ["Monte Carlo-estimat for $P(X > Y)$", "Aug 2026, oppg. 4c", "Simuler mange par, tell hvor ofte hendelsen inntreffer, og del på antall simuleringer."],
+        ] },
+        { type: "example", title: "Aug 2026, oppg. 4c: estimat fra 1000 simuleringer", blocks: [
+          { type: "text", text: "Tabellen har 1000 realisasjoner. Summen av cellene der $x > y$ er $233 + (132 + 67) + (61 + 17 + 4) + (23 + 6 + 1) + (3 + 2) = 549$." },
+          { type: "text", text: "Estimatet er $\\hat{p} = 549/1000 = 0{,}549$, med standardfeil $\\sqrt{0{,}549 \\cdot 0{,}451/1000} \\approx 0{,}016$." },
+          { type: "text", text: "Kontroll: alle celler summerer til 1000." },
+        ] },
+      ],
+    },
   ],
 };

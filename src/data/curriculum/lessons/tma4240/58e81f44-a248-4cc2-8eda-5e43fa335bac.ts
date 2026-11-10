@@ -104,5 +104,19 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Normal: sannsynlighet mellom to grenser", "Des 2025, oppg. 4a–c", "Standardiser begge grensene og bruk $\\Phi$. Hent $\\sigma$ fra tetthetsformelen."],
+          ["Kontinuerlig: punktsannsynlighet", "Des 2025, oppg. 4d", "$P(Y = y) = 0$. Bare intervaller har positiv sannsynlighet."],
+        ] },
+        { type: "example", title: "Des 2025, oppg. 4c: normal med $\\mu = 2$ og $\\sigma = 5$", blocks: [
+          { type: "text", text: "$P(2 \\le Y \\le 4) = \\Phi\\left(\\frac{4 - 2}{5}\\right) - \\Phi(0) = \\Phi(0{,}40) - 0{,}5 = 0{,}6554 - 0{,}5 = 0{,}1554$." },
+          { type: "text", text: "$\\Phi(0{,}40) = 0{,}6554$ finner du på side 2." },
+        ] },
+      ],
+    },
   ],
 };
