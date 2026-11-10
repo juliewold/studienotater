@@ -43,7 +43,7 @@ export const lesson: Lesson = {
       title: "Modellen",
       blocks: [
         { type: "text", text: "$x$ er forklaringsvariabelen, og er kjent eller satt av deg. $Y$ er responsen. Modellen sier at forventet respons ligger på en rett linje, og at avviket er normalt med konstant varians." },
-        { type: "formula", latex: "Y_i = \\alpha + \\beta x_i + \\varepsilon_i, \\qquad \\varepsilon_i \\sim N(0, \\sigma^2) \\text{ uavhengige}", name: "Enkel lineær regresjon", caption: `Formelboka ${formelbok("s. 36")} gir $E(Y_i) = \\alpha + \\beta x_i$.` },
+        { type: "formula", latex: "Y_i = \\alpha + \\beta x_i + \\varepsilon_i, \\qquad \\varepsilon_i \\sim N(0, \\sigma^2) \\text{ uavhengige}", name: "Enkel lineær regresjon", book: { status: "partial", pages: "36", missing: "Forutsetningene om uavhengige og normale feilledd må læres" }, caption: `Formelboka ${formelbok("s. 36")} gir $E(Y_i) = \\alpha + \\beta x_i$.` },
         { type: "figure", component: RegressionFigure, caption: "Datapunktene, den fitted linjen og residualene (stiplede linjer) for eksempelet under." },
       ],
     },
@@ -51,7 +51,7 @@ export const lesson: Lesson = {
       id: "mk",
       title: "Minste kvadraters metode",
       blocks: [
-        { type: "formula", latex: "\\hat{\\beta} = \\dfrac{S_{xy}}{S_{xx}}, \\qquad \\hat{\\alpha} = \\bar{y} - \\hat{\\beta}\\bar{x}, \\qquad S_{xx} = \\sum (x_i - \\bar{x})^2, \\quad S_{xy} = \\sum (x_i - \\bar{x})(y_i - \\bar{y})", name: "Minste kvadraters estimater", caption: `Formelboka ${formelbok("s. 36")} med samme definisjoner. $S_{xx}$ og $S_{xy}$ er ikke navngitt i boka.` },
+        { type: "formula", latex: "\\hat{\\beta} = \\dfrac{S_{xy}}{S_{xx}}, \\qquad \\hat{\\alpha} = \\bar{y} - \\hat{\\beta}\\bar{x}, \\qquad S_{xx} = \\sum (x_i - \\bar{x})^2, \\quad S_{xy} = \\sum (x_i - \\bar{x})(y_i - \\bar{y})", name: "Minste kvadraters estimater", book: { status: "book", pages: "36" }, caption: `Formelboka ${formelbok("s. 36")} med samme definisjoner. $S_{xx}$ og $S_{xy}$ er ikke navngitt i boka.` },
         { type: "example", title: "Fem punkter", blocks: [
           { type: "text", text: "$x = (1, 2, 3, 4, 5)$ og $y = (2, 4, 5, 4, 5)$. $\\bar{x} = 3$, $\\bar{y} = 4$. $S_{xx} = 10$ og $S_{xy} = (-2)(-2) + (-1)(0) + 0 \\cdot 1 + 1 \\cdot 0 + 2 \\cdot 1 = 6$." },
           { type: "text", text: "$\\hat{\\beta} = 6/10 = 0{,}6$ og $\\hat{\\alpha} = 4 - 0{,}6 \\cdot 3 = 2{,}2$. Fitted linje: $\\hat{y} = 2{,}2 + 0{,}6x$." },
@@ -66,7 +66,7 @@ export const lesson: Lesson = {
       id: "inferens",
       title: "Inferens om β",
       blocks: [
-        { type: "formula", latex: "\\hat{\\beta} \\sim N\\!\\left(\\beta, \\dfrac{\\sigma^2}{S_{xx}}\\right), \\qquad \\dfrac{\\hat{\\beta} - \\beta}{S/\\sqrt{S_{xx}}} \\sim t_{n-2}", name: "Fordelingen av β̂", caption: `Den normale fordelingen følger av lineærkombinasjon ${formelbok("s. 35")}. $t$-fordelingen og $(n-2)S^2/\\sigma^2 \\sim \\chi^2_{n-2}$ står på side 36 og 27.` },
+        { type: "formula", latex: "\\hat{\\beta} \\sim N\\!\\left(\\beta, \\dfrac{\\sigma^2}{S_{xx}}\\right), \\qquad \\dfrac{\\hat{\\beta} - \\beta}{S/\\sqrt{S_{xx}}} \\sim t_{n-2}", name: "Fordelingen av β̂", book: { status: "partial", pages: "35", missing: "Var(β̂) = σ²/S_xx og t-størrelsen for β må læres" }, caption: `Den normale fordelingen følger av lineærkombinasjon ${formelbok("s. 35")}. $t$-fordelingen og $(n-2)S^2/\\sigma^2 \\sim \\chi^2_{n-2}$ står på side 36 og 27.` },
         { type: "example", title: "KI og test for β i eksempelet", blocks: [
           { type: "text", text: "Standardfeil: $S/\\sqrt{S_{xx}} = 0{,}894/3{,}162 = 0{,}283$. Med $t_{0{,}025, 3} = 3{,}182$ (side 4) er 95 % KI for β: $0{,}6 \\pm 3{,}182 \\cdot 0{,}283 = (-0{,}30;\\ 1{,}50)$." },
           { type: "text", text: "Test $H_0: \\beta = 0$: $t = 0{,}6/0{,}283 = 2{,}12$ med 3 frihetsgrader. Tosidig $p$-verdi er mellom 0,10 og 0,20. Intervallet inneholder 0, så $H_0$ forkastes ikke på 5 %-nivå." },
@@ -80,8 +80,8 @@ export const lesson: Lesson = {
       id: "prediksjon",
       title: "Forventet verdi og prediksjon",
       blocks: [
-        { type: "formula", latex: "\\hat{\\alpha} + \\hat{\\beta}x_0 \\pm t_{\\alpha/2,\\,n-2}\\,S\\sqrt{\\dfrac{1}{n} + \\dfrac{(x_0-\\bar{x})^2}{S_{xx}}}", name: "KI for forventet verdi", caption: "Ikke i formelboka. Usikkerheten i linjen ved $x_0$." },
-        { type: "formula", latex: "\\hat{\\alpha} + \\hat{\\beta}x_0 \\pm t_{\\alpha/2,\\,n-2}\\,S\\sqrt{1 + \\dfrac{1}{n} + \\dfrac{(x_0-\\bar{x})^2}{S_{xx}}}", name: "Prediksjonsintervall", caption: "Ikke i formelboka. Leddet $1$ er støyen i den nye observasjonen. Det gjør intervallet bredere." },
+        { type: "formula", latex: "\\hat{\\alpha} + \\hat{\\beta}x_0 \\pm t_{\\alpha/2,\\,n-2}\\,S\\sqrt{\\dfrac{1}{n} + \\dfrac{(x_0-\\bar{x})^2}{S_{xx}}}", name: "KI for forventet verdi", book: { status: "missing" }, caption: "Ikke i formelboka. Usikkerheten i linjen ved $x_0$." },
+        { type: "formula", latex: "\\hat{\\alpha} + \\hat{\\beta}x_0 \\pm t_{\\alpha/2,\\,n-2}\\,S\\sqrt{1 + \\dfrac{1}{n} + \\dfrac{(x_0-\\bar{x})^2}{S_{xx}}}", name: "Prediksjonsintervall", book: { status: "missing" }, caption: "Ikke i formelboka. Leddet $1$ er støyen i den nye observasjonen. Det gjør intervallet bredere." },
         { type: "example", title: "Ved $x_0 = 3$", blocks: [
           { type: "text", text: "$\\hat{y} = 2{,}2 + 0{,}6 \\cdot 3 = 4{,}0$. Ved $x_0 = \\bar{x}$ er $(x_0 - \\bar{x})^2 = 0$." },
           { type: "text", text: "KI for forventet verdi: $4{,}0 \\pm 3{,}182 \\cdot 0{,}894 \\cdot \\sqrt{1/5} = 4{,}0 \\pm 1{,}27$, altså $(2{,}73;\\ 5{,}27)$." },
@@ -145,7 +145,7 @@ export const lesson: Lesson = {
       title: "Egenskaper til estimatorene og SME",
       blocks: [
         { type: "text", text: "Minste kvadraters estimatorer er også maksimum-likelihood-estimatorer når feilleddene er normale. Da er $\\hat\\alpha$ og $\\hat\\beta$ de samme som i MK, og $\\hat\\sigma^2 = \\frac{1}{n}\\sum(Y_i - \\hat\\alpha - \\hat\\beta x_i)^2$ er SME for $\\sigma^2$. Den deler på $n$, og er derfor ikke forventningsrett (bruk $S^2$ med $n - 2$)." },
-        { type: "formula", latex: "E(\\hat\\beta) = \\beta, \\quad \\text{Var}(\\hat\\beta) = \\dfrac{\\sigma^2}{S_{xx}}, \\quad \\text{Var}(\\hat\\alpha) = \\sigma^2\\left(\\dfrac{1}{n} + \\dfrac{\\bar{x}^2}{S_{xx}}\\right)", name: "Forventning og varians til α̂ og β̂", caption: `Lineærkombinasjoner av $Y_i$ ${formelbok("s. 34")}. Pensum 11.4.` },
+        { type: "formula", latex: "E(\\hat\\beta) = \\beta, \\quad \\text{Var}(\\hat\\beta) = \\dfrac{\\sigma^2}{S_{xx}}, \\quad \\text{Var}(\\hat\\alpha) = \\sigma^2\\left(\\dfrac{1}{n} + \\dfrac{\\bar{x}^2}{S_{xx}}\\right)", name: "Forventning og varians til α̂ og β̂", book: { status: "partial", pages: "34", missing: "Uttrykkene med S_xx må læres" }, caption: `Lineærkombinasjoner av $Y_i$ ${formelbok("s. 34")}. Pensum 11.4.` },
       ],
     },
   ],

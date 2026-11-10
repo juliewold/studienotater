@@ -41,7 +41,7 @@ export const lesson: Lesson = {
       id: "uniform",
       title: "Kontinuerlig uniform fordeling",
       blocks: [
-        { type: "formula", latex: "f(x) = \\dfrac{1}{b-a}, \\quad a \\le x \\le b; \\qquad E(X) = \\dfrac{a+b}{2}, \\quad \\text{Var}(X) = \\dfrac{(b-a)^2}{12}", name: "Kontinuerlig uniform", caption: `Formelboka ${formelbok("s. 28")}. Sannsynlighet er lengde delt på $b - a$.` },
+        { type: "formula", latex: "f(x) = \\dfrac{1}{b-a}, \\quad a \\le x \\le b; \\qquad E(X) = \\dfrac{a+b}{2}, \\quad \\text{Var}(X) = \\dfrac{(b-a)^2}{12}", name: "Kontinuerlig uniform", book: { status: "book", pages: "28" }, caption: `Formelboka ${formelbok("s. 28")}. Sannsynlighet er lengde delt på $b - a$.` },
         { type: "example", title: "$X \\sim U(2, 8)$", blocks: [
           { type: "text", text: "$P(3 < X < 5) = \\dfrac{5-3}{8-2} = \\dfrac{1}{3}$. $E(X) = 5$ og $\\text{Var}(X) = 36/12 = 3$." },
         ] },
@@ -51,8 +51,8 @@ export const lesson: Lesson = {
       id: "normal",
       title: "Normalfordelingen",
       blocks: [
-        { type: "formula", latex: "f(x) = \\dfrac{1}{\\sqrt{2\\pi}\\,\\sigma} \\exp\\!\\left(-\\dfrac{(x-\\mu)^2}{2\\sigma^2}\\right), \\qquad E(X) = \\mu, \\quad \\text{Var}(X) = \\sigma^2", name: "Normalfordeling", caption: `Formelboka ${formelbok("s. 26")}. Sannsynligheter slås opp i $\\Phi$-tabellen på side 1–2.` },
-        { type: "formula", latex: "P(X \\le x) = \\Phi\\!\\left(\\dfrac{x - \\mu}{\\sigma}\\right)", name: "Sannsynlighet i normalfordelingen", caption: `Formelboka ${formelbok("s. 1–2, 26")}. Tabellen gir $\\Phi(z)$ for $z$ fra $-3{,}7$ til $3{,}7$.` },
+        { type: "formula", latex: "f(x) = \\dfrac{1}{\\sqrt{2\\pi}\\,\\sigma} \\exp\\!\\left(-\\dfrac{(x-\\mu)^2}{2\\sigma^2}\\right), \\qquad E(X) = \\mu, \\quad \\text{Var}(X) = \\sigma^2", name: "Normalfordeling", book: { status: "book", pages: "26" }, caption: `Formelboka ${formelbok("s. 26")}. Sannsynligheter slås opp i $\\Phi$-tabellen på side 1–2.` },
+        { type: "formula", latex: "P(X \\le x) = \\Phi\\!\\left(\\dfrac{x - \\mu}{\\sigma}\\right)", name: "Sannsynlighet i normalfordelingen", book: { status: "book", pages: "26" }, caption: `Formelboka ${formelbok("s. 1–2, 26")}. Tabellen gir $\\Phi(z)$ for $z$ fra $-3{,}7$ til $3{,}7$.` },
         { type: "figure", component: () => NormalRegionFigure({ label: "Standard normal med areal over z = 1", shaded: [[1, 4]], marks: [{ z: 1, text: "z = 1" }] }), caption: "Arealet til høyre for $z = 1$ er $1 - \\Phi(1) = 0{,}1587$." },
         { type: "example", title: "$X \\sim N(10, 4)$", blocks: [
           { type: "text", text: "$P(X > 12) = 1 - \\Phi\\!\\left(\\dfrac{12 - 10}{2}\\right) = 1 - \\Phi(1) = 1 - 0{,}8413 = 0{,}1587$." },
@@ -71,7 +71,7 @@ export const lesson: Lesson = {
       title: "Eksponensialfordelingen",
       blocks: [
         { type: "text", text: "Eksponensialfordelingen beskriver tiden til neste hendelse i en Poisson-prosess. Formelboka bruker gjennomsnittet $\\beta$. Hvis oppgaven gir intensiteten $\\lambda$, er $\\beta = 1/\\lambda$." },
-        { type: "formula", latex: "f(x) = \\dfrac{1}{\\beta} e^{-x/\\beta}, \\quad x \\ge 0; \\qquad P(X > x) = e^{-x/\\beta}", name: "Eksponensialfordeling", caption: `Formelboka ${formelbok("s. 26")}. Sannsynligheten for å overskride $x$ er $e^{-x/\\beta}$, som ikke står i boka.` },
+        { type: "formula", latex: "f(x) = \\dfrac{1}{\\beta} e^{-x/\\beta}, \\quad x \\ge 0; \\qquad P(X > x) = e^{-x/\\beta}", name: "Eksponensialfordeling", book: { status: "partial", pages: "26", missing: "P(X > x) = e^(−x/β) må læres" }, caption: `Formelboka ${formelbok("s. 26")}. Sannsynligheten for å overskride $x$ er $e^{-x/\\beta}$, som ikke står i boka.` },
         { type: "example", title: "$\\beta = 5$", blocks: [
           { type: "text", text: "$P(X > 3) = e^{-3/5} = e^{-0{,}6} \\approx 0{,}5488$. Forventningen er 5, og variansen er 25." },
         ] },
@@ -81,9 +81,9 @@ export const lesson: Lesson = {
       id: "gamma-chi",
       title: "Gamma- og χ²-fordelingen",
       blocks: [
-        { type: "formula", latex: "E(X) = \\alpha\\beta, \\qquad \\text{Var}(X) = \\alpha\\beta^2", name: "Gamma-fordelingen", caption: `Formelboka ${formelbok("s. 28")}. Eksponensial er $\\alpha = 1$, og $\\chi^2_\\nu$ er $\\alpha = \\nu/2$, $\\beta = 2$.` },
-        { type: "formula", latex: "E(X) = \\nu, \\qquad \\text{Var}(X) = 2\\nu", name: "χ²-fordelingen", caption: `Formelboka ${formelbok("s. 27")}. Hvis $X_1, \\ldots, X_n$ er uavhengige og standard normale, er $\\sum X_i^2 \\sim \\chi^2_n$.` },
-        { type: "formula", latex: "\\dfrac{(n-1)S^2}{\\sigma^2} \\sim \\chi^2_{n-1}", name: "Variansen i et normalt utvalg", caption: `Formelboka ${formelbok("s. 27")}. $\\bar{X}$ og $\\sum(X_i - \\bar{X})^2$ er uavhengige.` },
+        { type: "formula", latex: "E(X) = \\alpha\\beta, \\qquad \\text{Var}(X) = \\alpha\\beta^2", name: "Gamma-fordelingen", book: { status: "book", pages: "28" }, caption: `Formelboka ${formelbok("s. 28")}. Eksponensial er $\\alpha = 1$, og $\\chi^2_\\nu$ er $\\alpha = \\nu/2$, $\\beta = 2$.` },
+        { type: "formula", latex: "E(X) = \\nu, \\qquad \\text{Var}(X) = 2\\nu", name: "χ²-fordelingen", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. Hvis $X_1, \\ldots, X_n$ er uavhengige og standard normale, er $\\sum X_i^2 \\sim \\chi^2_n$.` },
+        { type: "formula", latex: "\\dfrac{(n-1)S^2}{\\sigma^2} \\sim \\chi^2_{n-1}", name: "Variansen i et normalt utvalg", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. $\\bar{X}$ og $\\sum(X_i - \\bar{X})^2$ er uavhengige.` },
         { type: "example", title: "Øvre 5 % for $\\chi^2_{10}$", blocks: [
           { type: "text", text: "Side 5: $P(\\chi^2_{10} > 18{,}307) = 0{,}05$. Kolonnen er $\\alpha = 0{,}050$, og raden er $\\nu = 10$." },
         ] },
@@ -94,8 +94,8 @@ export const lesson: Lesson = {
       title: "Student t-fordelingen",
       blocks: [
         { type: "text", text: "Hvis $Z \\sim N(0,1)$ og $V \\sim \\chi^2_\\nu$ er uavhengige, er $Z/\\sqrt{V/\\nu}$ t-fordelt med $\\nu$ frihetsgrader. Det er dette som gir t-test og t-intervall for et normalt utvalg med ukjent $\\sigma$." },
-        { type: "formula", latex: "\\dfrac{\\bar{X} - \\mu}{S/\\sqrt{n}} \\sim t_{n-1}", name: "t-størrelsen", caption: `Formelboka ${formelbok("s. 27")}. Gjelder for normale $X_i$. Tabellen på side 4.` },
-        { type: "formula", latex: "E(T) = 0 \\ (\\nu \\ge 2), \\qquad \\text{Var}(T) = \\dfrac{\\nu}{\\nu - 2} \\ (\\nu \\ge 3)", name: "Forventning og varians i t", caption: `Formelboka ${formelbok("s. 27")}. $t_1$ er Cauchy, og $t_\\nu \\to N(0, 1)$ når $\\nu \\to \\infty$.` },
+        { type: "formula", latex: "\\dfrac{\\bar{X} - \\mu}{S/\\sqrt{n}} \\sim t_{n-1}", name: "t-størrelsen", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. Gjelder for normale $X_i$. Tabellen på side 4.` },
+        { type: "formula", latex: "E(T) = 0 \\ (\\nu \\ge 2), \\qquad \\text{Var}(T) = \\dfrac{\\nu}{\\nu - 2} \\ (\\nu \\ge 3)", name: "Forventning og varians i t", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. $t_1$ er Cauchy, og $t_\\nu \\to N(0, 1)$ når $\\nu \\to \\infty$.` },
         { type: "example", title: "$\\nu = 15$, tosidig 95 %", blocks: [
           { type: "text", text: "Side 4: $t_{0{,}025, 15} = 2{,}131$. Sammenlign med $z_{0{,}025} = 1{,}960$. t-verdien er større fordi $\\nu$ er liten." },
         ] },
@@ -123,11 +123,11 @@ export const lesson: Lesson = {
       title: "Seriekobling og Weibull (fra øvingene)",
       blocks: [
         { type: "text", text: "To fordelinger som ikke står i kapittel 6-pensumlisten, men som brukes i STACK 6 og 13. Øvingene er pensum, så kjenn dem." },
-        { type: "formula", latex: "P(\\min(X_1, \\ldots, X_n) > t) = \\prod_{i=1}^{n} P(X_i > t)", name: "Seriekobling: minimum av uavhengige", caption: "Et system med $n$ uavhengige komponenter virker bare så lenge alle virker. Ikke i formelboka." },
+        { type: "formula", latex: "P(\\min(X_1, \\ldots, X_n) > t) = \\prod_{i=1}^{n} P(X_i > t)", name: "Seriekobling: minimum av uavhengige", book: { status: "missing" }, caption: "Et system med $n$ uavhengige komponenter virker bare så lenge alle virker. Ikke i formelboka." },
         { type: "example", title: "Solcellepanel i serie", blocks: [
           { type: "text", text: "Hver celle har eksponensiell levetid med forventning $\\beta$. For $n$ celler gir det $P(\\text{panel virker} > t) = e^{-nt/\\beta}$, altså eksponensial med forventning $\\beta/n$." },
         ] },
-        { type: "formula", latex: "f(x) = \\alpha\\beta\\,x^{\\beta-1} e^{-\\alpha x^{\\beta}}, \\qquad x \\ge 0", name: "Weibull-fordelingen", caption: `Parametrisering som i formelboka ${formelbok("s. 28")}. Eksponensial er tilfellet $\\beta = 1$.` },
+        { type: "formula", latex: "f(x) = \\alpha\\beta\\,x^{\\beta-1} e^{-\\alpha x^{\\beta}}, \\qquad x \\ge 0", name: "Weibull-fordelingen", book: { status: "book", pages: "28" }, caption: `Parametrisering som i formelboka ${formelbok("s. 28")}. Eksponensial er tilfellet $\\beta = 1$.` },
       ],
     },
   ],

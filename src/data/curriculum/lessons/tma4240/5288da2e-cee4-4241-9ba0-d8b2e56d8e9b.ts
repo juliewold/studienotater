@@ -41,7 +41,7 @@ export const lesson: Lesson = {
       title: "Beskrivende statistikk og plott",
       blocks: [
         { type: "text", text: "Før du estimerer, se på dataene. Histogram og boksplott viser form og utliggere. Et **boksplott** har boks fra $Q_1$ til $Q_3$ og en utligger hvis den ligger utenfor $Q_1 - 1{,}5\\,\\text{IQR}$ eller $Q_3 + 1{,}5\\,\\text{IQR}$, der $\\text{IQR} = Q_3 - Q_1$." },
-        { type: "formula", latex: "\\bar{x} = \\dfrac{1}{n}\\sum x_i, \\qquad s = \\sqrt{\\dfrac{1}{n-1}\\sum (x_i - \\bar{x})^2}", name: "Gjennomsnitt og standardavvik", caption: `Formelboka ${formelbok("s. 27")} for $S^2$. Den samme formelen er kvadratroten av varians.` },
+        { type: "formula", latex: "\\bar{x} = \\dfrac{1}{n}\\sum x_i, \\qquad s = \\sqrt{\\dfrac{1}{n-1}\\sum (x_i - \\bar{x})^2}", name: "Gjennomsnitt og standardavvik", book: { status: "partial", pages: "27", missing: "Gjennomsnittet x̄ og s = √S² må læres; S² står i boka" }, caption: `Formelboka ${formelbok("s. 27")} for $S^2$. Den samme formelen er kvadratroten av varians.` },
         { type: "text", text: "Et **QQ-plott** setter utvalgskvantiler mot de teoretiske normalkvantilene. Punktene ligger nær en rett linje hvis dataene er normale. Kraftig avvik i halene tyder på tunge haler, og en buet linje tyder på skjevhet." },
         { type: "box", variant: "pitfall", title: "Vanlig feil", blocks: [
           { type: "text", text: "Å tolke et QQ-plott som et histogram. Det som betyr noe, er hvor punktene ligger i forhold til linjen, ikke hvor høyt de ligger." },
@@ -53,20 +53,20 @@ export const lesson: Lesson = {
       title: "Estimatorer: forventningsrett og varians",
       blocks: [
         { type: "text", text: "Observatoren er en funksjon av de stokastiske $X_i$. Estimatet er verdien for dine observasjoner. Forventningsrett betyr at du i gjennomsnitt treffer riktig verdi. Varians forteller hvor mye estimatet varierer fra utvalg til utvalg." },
-        { type: "formula", latex: "\\text{Bias}(\\hat{\\theta}) = E(\\hat{\\theta}) - \\theta", name: "Bias", caption: "Ikke i formelboka. $\\hat{\\theta}$ er forventningsrett når bias er 0." },
-        { type: "formula", latex: "E(\\bar{X}) = \\mu, \\qquad \\text{Var}(\\bar{X}) = \\dfrac{\\sigma^2}{n}", name: "Gjennomsnittet som estimator", caption: `Formelboka ${formelbok("s. 34")}: lineærkombinasjon med $a_i = 1/n$.` },
-        { type: "formula", latex: "E(S^2) = \\sigma^2", name: "Utvalgsvariansen er forventningsrett", caption: `Formelboka ${formelbok("s. 27")} gir $(n-1)S^2/\\sigma^2 \\sim \\chi^2_{n-1}$, og forventningen til $\\chi^2_{n-1}$ er $n - 1$.` },
+        { type: "formula", latex: "\\text{Bias}(\\hat{\\theta}) = E(\\hat{\\theta}) - \\theta", name: "Bias", book: { status: "missing" }, caption: "Ikke i formelboka. $\\hat{\\theta}$ er forventningsrett når bias er 0." },
+        { type: "formula", latex: "E(\\bar{X}) = \\mu, \\qquad \\text{Var}(\\bar{X}) = \\dfrac{\\sigma^2}{n}", name: "Gjennomsnittet som estimator", book: { status: "partial", pages: "34", missing: "Særtilfellet Var(X̄) = σ²/n må læres; boka har den generelle formelen" }, caption: `Formelboka ${formelbok("s. 34")}: lineærkombinasjon med $a_i = 1/n$.` },
+        { type: "formula", latex: "E(S^2) = \\sigma^2", name: "Utvalgsvariansen er forventningsrett", book: { status: "partial", pages: "27", missing: "E(S²) = σ² må utledes av forventningen til χ²" }, caption: `Formelboka ${formelbok("s. 27")} gir $(n-1)S^2/\\sigma^2 \\sim \\chi^2_{n-1}$, og forventningen til $\\chi^2_{n-1}$ er $n - 1$.` },
         { type: "example", title: "Hvorfor $n - 1$?", blocks: [
           { type: "text", text: "Med $\\sum (x_i - \\bar{x})^2$ er summen alltid mindre enn $\\sum (x_i - \\mu)^2$, fordi $\\bar{x}$ er valgt til å minimere den. Å dele på $n$ gir en systematisk underestimering av $\\sigma^2$. Å dele på $n - 1$ kompenserer for at en frihetsgrad er brukt på $\\bar{x}$." },
         ] },
-        { type: "formula", latex: "\\text{MSE}(\\hat{\\theta}) = \\text{Var}(\\hat{\\theta}) + \\text{Bias}(\\hat{\\theta})^2", name: "Middelkvadratfeil", caption: "Ikke i formelboka. Brukes til å sammenligne estimatorer med forskjellig bias og varians." },
+        { type: "formula", latex: "\\text{MSE}(\\hat{\\theta}) = \\text{Var}(\\hat{\\theta}) + \\text{Bias}(\\hat{\\theta})^2", name: "Middelkvadratfeil", book: { status: "missing" }, caption: "Ikke i formelboka. Brukes til å sammenligne estimatorer med forskjellig bias og varians." },
       ],
     },
     {
       id: "konsistens",
       title: "Konsistens",
       blocks: [
-        { type: "formula", latex: "E(\\hat{\\theta}_n) \\to \\theta \\quad \\text{og} \\quad \\text{Var}(\\hat{\\theta}_n) \\to 0 \\quad \\Rightarrow \\quad \\hat{\\theta}_n \\xrightarrow{p} \\theta", name: "Konsistens", caption: `Formelboka ${formelbok("s. 38")}. Konvergens i sannsynlighet er definert der.` },
+        { type: "formula", latex: "E(\\hat{\\theta}_n) \\to \\theta \\quad \\text{og} \\quad \\text{Var}(\\hat{\\theta}_n) \\to 0 \\quad \\Rightarrow \\quad \\hat{\\theta}_n \\xrightarrow{p} \\theta", name: "Konsistens", book: { status: "book", pages: "38" }, caption: `Formelboka ${formelbok("s. 38")}. Konvergens i sannsynlighet er definert der.` },
         { type: "text", text: "Konsistens er en egenskap ved hele følgen av estimatorer når $n$ vokser. Den sier ikke noe om små utvalg." },
       ],
     },
@@ -75,7 +75,7 @@ export const lesson: Lesson = {
       title: "Maksimum-likelihood",
       blocks: [
         { type: "text", text: "Likelihood er sannsynligheten for de observerte dataene, uttrykt som funksjon av parameteren. Maksimer $L(\\theta)$, eller $\\ell(\\theta) = \\ln L(\\theta)$, som er lettere å derivere." },
-        { type: "formula", latex: "L(\\theta) = \\prod_{i=1}^{n} f(x_i; \\theta), \\qquad \\ell(\\theta) = \\sum_{i=1}^{n} \\ln f(x_i; \\theta)", name: "Likelihood og log-likelihood", caption: "Ikke i formelboka. Sett $\\partial \\ell/\\partial\\theta = 0$ og sjekk at det er et maksimum." },
+        { type: "formula", latex: "L(\\theta) = \\prod_{i=1}^{n} f(x_i; \\theta), \\qquad \\ell(\\theta) = \\sum_{i=1}^{n} \\ln f(x_i; \\theta)", name: "Likelihood og log-likelihood", book: { status: "missing" }, caption: "Ikke i formelboka. Sett $\\partial \\ell/\\partial\\theta = 0$ og sjekk at det er et maksimum." },
         { type: "example", title: "Eksponensial med $\\beta$", blocks: [
           { type: "text", text: "$f(x; \\beta) = \\frac{1}{\\beta}e^{-x/\\beta}$, så $\\ell(\\beta) = -n\\ln\\beta - \\frac{1}{\\beta}\\sum x_i$." },
           { type: "text", text: "$\\dfrac{d\\ell}{d\\beta} = -\\dfrac{n}{\\beta} + \\dfrac{\\sum x_i}{\\beta^2} = 0$ gir $\\hat{\\beta} = \\bar{x}$." },

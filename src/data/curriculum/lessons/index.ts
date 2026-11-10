@@ -1,4 +1,4 @@
-import type { Lesson, LessonBlock } from "./types";
+import type { FormulaBookStatus, Lesson, LessonBlock } from "./types";
 
 // Lessons are separate chunks, loaded only when a topic page or the formula collection needs them.
 const modules = import.meta.glob<{ lesson: Lesson }>("./*/*.ts");
@@ -16,7 +16,7 @@ export async function loadSubjectLessons(subjectId: string): Promise<Lesson[]> {
   return Promise.all(loaders.map(async ([, load]) => (await load()).lesson));
 }
 
-export type LessonFormula = { key: string; latex: string; name: string; caption?: string; sectionId: string; sectionTitle: string };
+export type LessonFormula = { key: string; latex: string; name: string; caption?: string; book?: FormulaBookStatus; sectionId: string; sectionTitle: string };
 
 /** Named formulas in reading order, including those inside boxes and examples. */
 export function lessonFormulas(lesson: Lesson): LessonFormula[] {
@@ -24,7 +24,7 @@ export function lessonFormulas(lesson: Lesson): LessonFormula[] {
   const visit = (blocks: LessonBlock[], sectionId: string, sectionTitle: string) => {
     for (const block of blocks) {
       if (block.type === "formula" && block.name) result.push({
-        key: block.latex.replace(/\s+/g, ""), latex: block.latex, name: block.name, caption: block.caption, sectionId, sectionTitle,
+        key: block.latex.replace(/\s+/g, ""), latex: block.latex, name: block.name, caption: block.caption, book: block.book, sectionId, sectionTitle,
       });
       if (block.type === "box" || block.type === "example") visit(block.blocks, sectionId, sectionTitle);
     }

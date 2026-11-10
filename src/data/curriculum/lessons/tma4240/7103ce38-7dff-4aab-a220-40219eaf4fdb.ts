@@ -40,7 +40,7 @@ export const lesson: Lesson = {
       title: "Diskrete variabler",
       blocks: [
         { type: "text", text: "En diskret variabel tar endelig eller tellbart mange verdier. Punktsannsynligheten $f(x) = P(X = x)$ må være ikke-negativ og summere til 1. Fordelingsfunksjonen summerer opp: $F(x) = \\sum_{t \\le x} f(t)$." },
-        { type: "formula", latex: "\\sum_{x} f(x) = 1, \\qquad F(x) = \\sum_{t \\le x} f(t)", name: "Diskret fordeling", caption: "Ikke i formelboka i generell form. Spesifikke fordelinger står side 25–26." },
+        { type: "formula", latex: "\\sum_{x} f(x) = 1, \\qquad F(x) = \\sum_{t \\le x} f(t)", name: "Diskret fordeling", book: { status: "missing" }, caption: "Ikke i formelboka i generell form. Spesifikke fordelinger står side 25–26." },
         { type: "example", title: "Finn konstanten og en sannsynlighet", blocks: [
           { type: "text", text: "$f(x) = c\\,x$ for $x \\in \\{1, 2, 3\\}$. Normering gir $c(1 + 2 + 3) = 1$, altså $c = 1/6$." },
           { type: "text", text: "$F(2) = P(X \\le 2) = \\frac{1}{6} + \\frac{2}{6} = \\frac{1}{2}$. Da er $P(X \\ge 2) = 1 - F(1) = 1 - \\frac{1}{6} = \\frac{5}{6}$." },
@@ -58,8 +58,8 @@ export const lesson: Lesson = {
       title: "Kontinuerlige variabler",
       blocks: [
         { type: "text", text: "Tettheten $f(x)$ kan være større enn 1. Det som må være riktig, er at arealet under kurven er 1. Sannsynligheter er areal: $P(a < X < b) = \\int_a^b f(x)\\,dx$." },
-        { type: "formula", latex: "F(x) = \\int_{-\\infty}^{x} f(t)\\,dt, \\qquad f(x) = F'(x)", name: "Kontinuerlig fordeling", caption: "Definisjonen av $F$ og $f$. Ikke i formelboka i generell form." },
-        { type: "formula", latex: "P(X = x) = 0", name: "Punktsannsynlighet er null", caption: "Derfor gjelder $P(a < X < b) = P(a \\le X \\le b)$ for kontinuerlige variabler." },
+        { type: "formula", latex: "F(x) = \\int_{-\\infty}^{x} f(t)\\,dt, \\qquad f(x) = F'(x)", name: "Kontinuerlig fordeling", book: { status: "missing" }, caption: "Definisjonen av $F$ og $f$. Ikke i formelboka i generell form." },
+        { type: "formula", latex: "P(X = x) = 0", name: "Punktsannsynlighet er null", book: { status: "missing" }, caption: "Derfor gjelder $P(a < X < b) = P(a \\le X \\le b)$ for kontinuerlige variabler." },
         { type: "example", title: "Tetthet og kvantil", blocks: [
           { type: "text", text: "$f(x) = 2x$ på $[0, 1]$. Da er $F(x) = x^2$ for $0 \\le x \\le 1$." },
           { type: "text", text: "$P(0{,}2 < X < 0{,}5) = F(0{,}5) - F(0{,}2) = 0{,}25 - 0{,}04 = 0{,}21$." },
@@ -75,8 +75,8 @@ export const lesson: Lesson = {
       title: "Simultanfordeling, marginal og betinget fordeling",
       blocks: [
         { type: "text", text: "Når to variabler $X$ og $Y$ inngår samtidig, beskriver $f(x, y)$ den felles fordelingen. Marginalfordelingene får du ved å summere (eller integrere) ut den andre variabelen." },
-        { type: "formula", latex: "f_X(x) = \\sum_y f(x, y), \\qquad f(x \\mid y) = \\dfrac{f(x, y)}{f_Y(y)}", name: "Marginal og betinget fordeling", caption: "Ikke i formelboka. Samme form for kontinuerlige variabler, med integraler." },
-        { type: "formula", latex: "f(x, y) = f_X(x)\\,f_Y(y)", name: "Uavhengighet", caption: "Gjelder for alle $(x, y)$, ikke bare noen. Kontroller alle punkter." },
+        { type: "formula", latex: "f_X(x) = \\sum_y f(x, y), \\qquad f(x \\mid y) = \\dfrac{f(x, y)}{f_Y(y)}", name: "Marginal og betinget fordeling", book: { status: "missing" }, caption: "Ikke i formelboka. Samme form for kontinuerlige variabler, med integraler." },
+        { type: "formula", latex: "f(x, y) = f_X(x)\\,f_Y(y)", name: "Uavhengighet", book: { status: "missing" }, caption: "Gjelder for alle $(x, y)$, ikke bare noen. Kontroller alle punkter." },
         { type: "example", title: "Er $X$ og $Y$ uavhengige?", blocks: [
           { type: "text", text: "$f(x, y) = c\\,x\\,y$ for $x, y \\in \\{1, 2\\}$. Normering: $c(1 + 2 + 2 + 4) = 9c = 1$, altså $c = 1/9$." },
           { type: "text", text: "Marginalen er $f_X(x) = \\sum_y \\frac{xy}{9} = \\frac{x}{9}(1 + 2) = \\frac{x}{3}$, og tilsvarende $f_Y(y) = \\frac{y}{3}$." },

@@ -40,7 +40,7 @@ export const lesson: Lesson = {
       title: "Forventningsverdi",
       blocks: [
         { type: "text", text: "Forventningen er vektet gjennomsnitt av verdiene. For en funksjon $g$ av $X$ veier du $g(x)$ med sannsynligheten. Dette er grunnlaget for både variansen og senere resultater." },
-        { type: "formula", latex: "E[g(X)] = \\sum_x g(x)\\,f(x) \\qquad \\text{eller} \\qquad \\int g(x)\\,f(x)\\,dx", name: "Forventning av en funksjon", caption: `Formelboka ${formelbok(35)}. Brukes med $g(x) = x$ og $g(x) = x^2$.` },
+        { type: "formula", latex: "E[g(X)] = \\sum_x g(x)\\,f(x) \\qquad \\text{eller} \\qquad \\int g(x)\\,f(x)\\,dx", name: "Forventning av en funksjon", book: { status: "book", pages: "35" }, caption: `Formelboka ${formelbok(35)}. Brukes med $g(x) = x$ og $g(x) = x^2$.` },
         { type: "example", title: "Diskret forventning", blocks: [
           { type: "text", text: "$P(X = 0) = 0{,}2$, $P(X = 1) = 0{,}5$ og $P(X = 2) = 0{,}3$. Da er $E(X) = 0 \\cdot 0{,}2 + 1 \\cdot 0{,}5 + 2 \\cdot 0{,}3 = 1{,}1$." },
         ] },
@@ -50,8 +50,8 @@ export const lesson: Lesson = {
       id: "varians",
       title: "Varians og standardavvik",
       blocks: [
-        { type: "formula", latex: "\\text{Var}(X) = E(X^2) - \\mu^2, \\qquad \\text{sd}(X) = \\sqrt{\\text{Var}(X)}", name: "Varians og standardavvik", caption: "Ikke i formelboka i denne formen. Må kunnes. Forventningsverdi og varians for spesifikke fordelinger står side 25–28." },
-        { type: "formula", latex: "\\text{Var}(aX + b) = a^2\\,\\text{Var}(X)", name: "Lineær transformasjon av varians", caption: "Konstanten $b$ påvirker ikke variansen. Konstanten $a$ kvadreres." },
+        { type: "formula", latex: "\\text{Var}(X) = E(X^2) - \\mu^2, \\qquad \\text{sd}(X) = \\sqrt{\\text{Var}(X)}", name: "Varians og standardavvik", book: { status: "missing" }, caption: "Ikke i formelboka i denne formen. Må kunnes. Forventningsverdi og varians for spesifikke fordelinger står side 25–28." },
+        { type: "formula", latex: "\\text{Var}(aX + b) = a^2\\,\\text{Var}(X)", name: "Lineær transformasjon av varians", book: { status: "partial", pages: "34", missing: "Særtilfellet Var(aX + b) = a²Var(X) må læres; boka har den generelle formelen" }, caption: "Konstanten $b$ påvirker ikke variansen. Konstanten $a$ kvadreres." },
         { type: "example", title: "Fortsettelse av eksempelet", blocks: [
           { type: "text", text: "$E(X^2) = 0^2 \\cdot 0{,}2 + 1^2 \\cdot 0{,}5 + 2^2 \\cdot 0{,}3 = 1{,}7$." },
           { type: "text", text: "$\\text{Var}(X) = 1{,}7 - 1{,}1^2 = 1{,}7 - 1{,}21 = 0{,}49$, og $\\text{sd}(X) = 0{,}7$." },
@@ -65,8 +65,8 @@ export const lesson: Lesson = {
       id: "kovarians",
       title: "Kovarians og korrelasjon",
       blocks: [
-        { type: "formula", latex: "\\text{Cov}(X, Y) = E(XY) - E(X)E(Y)", name: "Kovarians", caption: `Formelboka ${formelbok(33)}.` },
-        { type: "formula", latex: "\\rho(X, Y) = \\dfrac{\\text{Cov}(X, Y)}{\\sqrt{\\text{Var}(X)\\,\\text{Var}(Y)}}", name: "Korrelasjonskoeffisient", caption: `Formelboka ${formelbok(33)}. Korrelasjonen måler bare lineær sammenheng.` },
+        { type: "formula", latex: "\\text{Cov}(X, Y) = E(XY) - E(X)E(Y)", name: "Kovarians", book: { status: "book", pages: "33" }, caption: `Formelboka ${formelbok(33)}.` },
+        { type: "formula", latex: "\\rho(X, Y) = \\dfrac{\\text{Cov}(X, Y)}{\\sqrt{\\text{Var}(X)\\,\\text{Var}(Y)}}", name: "Korrelasjonskoeffisient", book: { status: "book", pages: "33" }, caption: `Formelboka ${formelbok(33)}. Korrelasjonen måler bare lineær sammenheng.` },
         { type: "box", variant: "pitfall", title: "Kovarians 0 betyr ikke uavhengig", blocks: [
           { type: "text", text: "Uavhengige variabler har $\\text{Cov} = 0$, men det motsatte gjelder ikke generelt. Det er bare for normale variabler at $\\text{Cov} = 0$ impliserer uavhengighet." },
         ] },
@@ -76,7 +76,7 @@ export const lesson: Lesson = {
       id: "lineaere",
       title: "Lineære kombinasjoner",
       blocks: [
-        { type: "formula", latex: "E(Y) = \\sum_{i=1}^{n} a_i E(X_i) + b, \\qquad \\text{Var}(Y) = \\sum_{i=1}^{n} \\sum_{j=1}^{n} a_i a_j \\text{Cov}(X_i, X_j)", name: "Lineær kombinasjon", caption: `Formelboka ${formelbok(34)}. For to variabler er det samme som nøkkelformelen for $\\text{Var}(aX + bY)$.` },
+        { type: "formula", latex: "E(Y) = \\sum_{i=1}^{n} a_i E(X_i) + b, \\qquad \\text{Var}(Y) = \\sum_{i=1}^{n} \\sum_{j=1}^{n} a_i a_j \\text{Cov}(X_i, X_j)", name: "Lineær kombinasjon", book: { status: "book", pages: "34" }, caption: `Formelboka ${formelbok(34)}. For to variabler er det samme som nøkkelformelen for $\\text{Var}(aX + bY)$.` },
         { type: "text", text: "Hvis variablene er uavhengige, faller alle kovarianstermene bort, og $\\text{Var}(Y) = \\sum a_i^2 \\text{Var}(X_i)$." },
         { type: "example", title: "Avhengige variabler: differanse", blocks: [
           { type: "text", text: "$\\text{Var}(X) = 4$, $\\text{Var}(Y) = 9$ og $\\text{Cov}(X, Y) = 1$. For $2X - Y$ er $a = 2$ og $b = -1$." },

@@ -41,9 +41,9 @@ export const lesson: Lesson = {
       title: "Binomisk fordeling",
       blocks: [
         { type: "text", text: "Bruk den binomiske fordelingen når du har $n$ **uavhengige** forsøk med samme suksessannsynlighet $p$, og teller antall suksesser $X$. Hvis $p$ eller $n$ endrer seg underveis, er ikke modellen riktig." },
-        { type: "formula", latex: "P(X = x) = \\binom{n}{x} p^x (1-p)^{n-x}, \\quad x = 0, 1, \\ldots, n", name: "Binomisk fordeling", caption: `Formelboka ${formelbok("s. 25")}. Forventning $np$ og varians $np(1-p)$ står på samme side.` },
+        { type: "formula", latex: "P(X = x) = \\binom{n}{x} p^x (1-p)^{n-x}, \\quad x = 0, 1, \\ldots, n", name: "Binomisk fordeling", book: { status: "book", pages: "25" }, caption: `Formelboka ${formelbok("s. 25")}. Forventning $np$ og varians $np(1-p)$ står på samme side.` },
         { type: "text", text: "Tabellen på side 12–17 gir $P(X \\le x)$ for $p \\in \\{0{,}05, \\ldots, 0{,}90\\}$. Da trekker du fra forrige rad for å få $P(X = x)$." },
-        { type: "formula", latex: "P(X = x) = P(X \\le x) - P(X \\le x-1), \\qquad P(X \\ge x) = 1 - P(X \\le x-1)", name: "Bruk av tabell (binomisk)", caption: `Formelboka ${formelbok("s. 12–17")}. Tabellen gir kumulative verdier.` },
+        { type: "formula", latex: "P(X = x) = P(X \\le x) - P(X \\le x-1), \\qquad P(X \\ge x) = 1 - P(X \\le x-1)", name: "Bruk av tabell (binomisk)", book: { status: "partial", pages: "12–17", missing: "P(X = x) = P(X ≤ x) − P(X ≤ x−1) og P(X ≥ x) må læres" }, caption: `Formelboka ${formelbok("s. 12–17")}. Tabellen gir kumulative verdier.` },
         { type: "example", title: "$X \\sim \\text{Bin}(10, 0{,}3)$", blocks: [
           { type: "text", text: "$P(X = 2) = \\binom{10}{2} \\cdot 0{,}3^2 \\cdot 0{,}7^8 = 45 \\cdot 0{,}09 \\cdot 0{,}05765 \\approx 0{,}2335$." },
           { type: "text", text: "Tabell: $P(X \\le 2) = 0{,}383$ og $P(X \\le 1) = 0{,}149$. Differansen er $0{,}234$, som stemmer med $0{,}2335$ når du avrunder." },
@@ -63,8 +63,8 @@ export const lesson: Lesson = {
       title: "Poisson-fordelingen og Poisson-prosesser",
       blocks: [
         { type: "text", text: "Poisson telle hendelser i et tidsrom eller område når de skjer tilfeldig, uavhengig og med konstant rate. Hvis rate er $\\lambda$ per enhet og intervallet har lengde $t$, er $\\mu = \\lambda t$." },
-        { type: "formula", latex: "P(X = x) = \\dfrac{\\mu^x e^{-\\mu}}{x!}, \\quad x = 0, 1, \\ldots; \\qquad E(X) = \\text{Var}(X) = \\mu", name: "Poissonfordeling", caption: `Formelboka ${formelbok("s. 25")}. Tabell for $P(X \\le x)$ på side 18–20.` },
-        { type: "formula", latex: "\\mu = \\lambda t", name: "Poisson-prosess", caption: "Ikke i formelboka i denne formen. Formelboka har bare $\\mu$. Rate per enhet og lengde på intervallet må du sette selv." },
+        { type: "formula", latex: "P(X = x) = \\dfrac{\\mu^x e^{-\\mu}}{x!}, \\quad x = 0, 1, \\ldots; \\qquad E(X) = \\text{Var}(X) = \\mu", name: "Poissonfordeling", book: { status: "book", pages: "25" }, caption: `Formelboka ${formelbok("s. 25")}. Tabell for $P(X \\le x)$ på side 18–20.` },
+        { type: "formula", latex: "\\mu = \\lambda t", name: "Poisson-prosess", book: { status: "missing" }, caption: "Ikke i formelboka i denne formen. Formelboka har bare $\\mu$. Rate per enhet og lengde på intervallet må du sette selv." },
         { type: "example", title: "Hendelser per time", blocks: [
           { type: "text", text: "$\\lambda = 3$ per time. For 20 minutter er $\\mu = 3 \\cdot \\tfrac{1}{3} = 1$, og $P(X = 0) = e^{-1} \\approx 0{,}368$." },
           { type: "text", text: "For $\\mu = 2$: $P(X \\le 1) = e^{-2}(1 + 2) = 0{,}406$ (side 18), og $P(X = 3) = \\frac{2^3 e^{-2}}{3!} \\approx 0{,}180$." },
@@ -76,7 +76,7 @@ export const lesson: Lesson = {
       title: "Poisson som tilnærming til binomisk",
       blocks: [
         { type: "text", text: "Når $n$ er stor og $p$ er liten, kan du sette $\\mu = np$ og bruke Poisson. Tommelfingerregelen er $n \\ge 20$ og $p \\le 0{,}05$. Den står ikke i formelboka." },
-        { type: "formula", latex: "\\text{Bin}(n, p) \\approx \\text{Po}(np) \\quad \\text{for } n \\text{ stor og } p \\text{ liten}", name: "Poisson-tilnærming", caption: `Grensen er vist i formelboka ${formelbok("s. 31")} som $\\mu = np$ når $n \\to \\infty$.` },
+        { type: "formula", latex: "\\text{Bin}(n, p) \\approx \\text{Po}(np) \\quad \\text{for } n \\text{ stor og } p \\text{ liten}", name: "Poisson-tilnærming", book: { status: "partial", pages: "31", missing: "Tommelfingerregelen n ≥ 20 og p ≤ 0,05 må læres" }, caption: `Grensen er vist i formelboka ${formelbok("s. 31")} som $\\mu = np$ når $n \\to \\infty$.` },
         { type: "example", title: "$X \\sim \\text{Bin}(200, 0{,}01)$", blocks: [
           { type: "text", text: "Tilnærmingen er $\\mu = 200 \\cdot 0{,}01 = 2$. Da er $P(X \\le 1) \\approx 0{,}406$ fra Poisson-tabellen." },
           { type: "text", text: "Den eksakte binomiske verdien er $0{,}9900^{200} + 200 \\cdot 0{,}01 \\cdot 0{,}9900^{199} \\approx 0{,}405$. Tilnærmingen er god." },
@@ -91,8 +91,8 @@ export const lesson: Lesson = {
       title: "Geometrisk og negativ binomisk",
       blocks: [
         { type: "text", text: "Den **geometriske** fordelingen teller forsøk til første suksess. Den **negative binomiske** teller forsøk til $k$-te suksess. Sjekk alltid om $X$ er antall forsøk eller antall feil før du setter inn formelen." },
-        { type: "formula", latex: "g(x) = p(1-p)^{x-1}, \\quad x = 1, 2, \\ldots; \\qquad E(X) = \\dfrac{1}{p}, \\quad \\text{Var}(X) = \\dfrac{1-p}{p^2}", name: "Geometrisk fordeling", caption: `Formelboka ${formelbok("s. 25")}. $X$ teller forsøk, ikke feil.` },
-        { type: "formula", latex: "b^*(x; k, p) = \\binom{x-1}{k-1} p^k (1-p)^{x-k}, \\quad x = k, k+1, \\ldots; \\qquad E(X) = \\dfrac{k}{p}", name: "Negativ binomisk fordeling", caption: `Formelboka ${formelbok("s. 25")}. For $k = 1$ får du den geometriske.` },
+        { type: "formula", latex: "g(x) = p(1-p)^{x-1}, \\quad x = 1, 2, \\ldots; \\qquad E(X) = \\dfrac{1}{p}, \\quad \\text{Var}(X) = \\dfrac{1-p}{p^2}", name: "Geometrisk fordeling", book: { status: "book", pages: "25" }, caption: `Formelboka ${formelbok("s. 25")}. $X$ teller forsøk, ikke feil.` },
+        { type: "formula", latex: "b^*(x; k, p) = \\binom{x-1}{k-1} p^k (1-p)^{x-k}, \\quad x = k, k+1, \\ldots; \\qquad E(X) = \\dfrac{k}{p}", name: "Negativ binomisk fordeling", book: { status: "book", pages: "25" }, caption: `Formelboka ${formelbok("s. 25")}. For $k = 1$ får du den geometriske.` },
         { type: "example", title: "Geometrisk og negativ", blocks: [
           { type: "text", text: "$p = 0{,}2$: $P(X = 3) = 0{,}2 \\cdot 0{,}8^2 = 0{,}128$, og $E(X) = 5$." },
           { type: "text", text: "$k = 3$, $p = 0{,}5$: $P(X = 5) = \\binom{4}{2} \\cdot 0{,}5^3 \\cdot 0{,}5^2 = 6 \\cdot 0{,}5^5 = 0{,}1875$." },
@@ -103,8 +103,8 @@ export const lesson: Lesson = {
       id: "multinomisk-uniform",
       title: "Diskret uniform og multinomisk",
       blocks: [
-        { type: "formula", latex: "f(x) = \\dfrac{1}{k}, \\quad E(X) = \\dfrac{1}{k}\\sum_{i=1}^{k} x_i", name: "Diskret uniform", caption: `Formelboka ${formelbok("s. 26")}. Et terningkast har $E(X) = 3{,}5$.` },
-        { type: "formula", latex: "E(X_i) = np_i, \\quad \\text{Var}(X_i) = np_i(1-p_i), \\quad \\text{Cov}(X_i, X_j) = -np_ip_j", name: "Multinomisk fordeling", caption: `Formelboka ${formelbok("s. 26")}. Med $k = 2$ er $X_1$ binomisk.` },
+        { type: "formula", latex: "f(x) = \\dfrac{1}{k}, \\quad E(X) = \\dfrac{1}{k}\\sum_{i=1}^{k} x_i", name: "Diskret uniform", book: { status: "book", pages: "26" }, caption: `Formelboka ${formelbok("s. 26")}. Et terningkast har $E(X) = 3{,}5$.` },
+        { type: "formula", latex: "E(X_i) = np_i, \\quad \\text{Var}(X_i) = np_i(1-p_i), \\quad \\text{Cov}(X_i, X_j) = -np_ip_j", name: "Multinomisk fordeling", book: { status: "book", pages: "26" }, caption: `Formelboka ${formelbok("s. 26")}. Med $k = 2$ er $X_1$ binomisk.` },
         { type: "text", text: "Kovariansen i den multinomiske er negativ: flere i én kategori betyr færre i de andre." },
       ],
     },
