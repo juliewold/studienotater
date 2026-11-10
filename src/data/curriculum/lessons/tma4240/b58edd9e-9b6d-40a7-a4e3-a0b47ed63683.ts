@@ -123,5 +123,23 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Stigningstall i log-lineær modell", "Des 2025, oppg. 6a", "$\\hat\\beta_1 = \\sum(t_i - \\bar t)\\ln k_i \\,/\\, \\sum(t_i - \\bar t)^2$. Standardfeil: $s/\\sqrt{\\sum(t_i - \\bar t)^2}$ (formelbok s. 36)."],
+          ["Halveringstid", "Des 2025, oppg. 6b", "Forventet verdi går som $e^{\\beta_1 t}$. Løs $e^{\\beta_1 t_{1/2}} = 1/2$. Feilforplantning gir standardfeilen (formelbok s. 35)."],
+        ] },
+        { type: "example", title: "Des 2025, oppg. 6a: stigning og standardfeil", blocks: [
+          { type: "text", text: "$\\sum(t_i - \\bar t)\\ln k_i = -143{,}6$ og $\\sum(t_i - \\bar t)^2 = 825$. Da er $\\hat\\beta_1 = -143{,}6/825 = -0{,}174$." },
+          { type: "text", text: "Med $\\text{SSE} = 3{,}19$ og $n - 2 = 98$ er $s^2 = 3{,}19/98 = 0{,}03255$, og $\\text{SE}(\\hat\\beta_1) = \\sqrt{0{,}03255/825} = 0{,}00628$." },
+        ] },
+        { type: "example", title: "Des 2025, oppg. 6b: halveringstid", blocks: [
+          { type: "text", text: "$t_{1/2} = -\\ln 2/\\hat\\beta_1 = 0{,}693/0{,}174 \\approx 3{,}98$ timer." },
+          { type: "text", text: "Feilforplantning gir $\\text{SE}(\\hat t_{1/2}) \\approx \\frac{\\ln 2}{\\hat\\beta_1^2}\\,\\text{SE}(\\hat\\beta_1) = \\frac{0{,}693}{0{,}0303} \\cdot 0{,}00628 \\approx 0{,}144$ timer." },
+        ] },
+      ],
+    },
   ],
 };

@@ -132,5 +132,26 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Binomisk test, H0: p = 1/2", "Aug 2026, oppg. 5a", "Forkast for store $X$. Velg minste $c$ med $P(X > c \\mid H_0) \\le \\alpha$. Bruk binomisk tabell (side 12–17) med $p = 0{,}50$."],
+          ["Teststyrke for binomisk test", "Aug 2026, oppg. 5b", "Styrken er $1 - P(X \\le c \\mid p)$. Finn den $p$ der styrken er omtrent 0,8."],
+          ["Poisson-test med eksakt og normal p-verdi", "Des 2025, oppg. 7b–c", "Bruk eksakt p-verdi fra Poisson-tabellen når den finnes. Normaltilnærmingen er grovere for små $\\mu$."],
+        ] },
+        { type: "example", title: "Aug 2026, oppg. 5a: kritisk verdi for $n = 16$", blocks: [
+          { type: "text", text: "$H_0: p = \\tfrac{1}{2}$ mot $H_1: p > \\tfrac{1}{2}$. Forkast for $X > c$." },
+          { type: "text", text: "$P(X > 10 \\mid H_0) = P(X \\ge 11) \\approx 0{,}105 > 0{,}05$, men $P(X > 11 \\mid H_0) = P(X \\ge 12) \\approx 0{,}038 \\le 0{,}05$. Minste $c$ er $c = 11$." },
+          { type: "text", text: "Observert $x = 11$ forkaster ikke $H_0$. Dataene gir ikke støtte for at det er en fordel å ta første straffe." },
+        ] },
+        { type: "example", title: "Des 2025, oppg. 7b–c: Poisson-test", blocks: [
+          { type: "text", text: "$H_0: \\lambda = 9$ mot $H_1: \\lambda < 9$, altså $\\mu = 18$ for 2 år. Observert $x = 12$." },
+          { type: "text", text: "Eksakt: forkast for $X \\le 10$. P-verdi $= P(X \\le 12 \\mid H_0) = 0{,}0917$. Normalt: $z = (12 - 18)/\\sqrt{18} = -1{,}41$, og $p \\approx \\Phi(-1{,}41) = 0{,}0787$. Vi beholder $H_0$ på 5 %-nivå." },
+          { type: "text", text: "Styrke ved $\\lambda = 5$, altså $\\mu = 10$: eksakt $P(X \\le 10 \\mid \\mu = 10) = 0{,}5830$. Normaltilnærmingen gir $0{,}6255$." },
+        ] },
+      ],
+    },
   ],
 };

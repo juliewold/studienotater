@@ -123,5 +123,27 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["KI for μ med kjent σ", "Aug 2026, oppg. 6b", "$\\bar{x} \\pm z_{0{,}025}\\,\\sigma/\\sqrt{n}$. Her er $\\sigma = 2$ gitt i oppgaven."],
+          ["KI for en funksjon av parameteren", "Aug 2026, oppg. 6d", "Transformer grensene med en monoton funksjon. Her avtar $p$ i $\\mu$, så grensene bytter plass."],
+          ["KI med pivotal fordeling", "Des 2025, oppg. 5d", "Bruk en størrelse med kjent fordeling som ikke avhenger av parameteren. Her: $\\chi^2_{2n}$."],
+        ] },
+        { type: "example", title: "Aug 2026, oppg. 6b: KI for μ", blocks: [
+          { type: "text", text: "Gjennomsnitt $5{,}265$, $\\sigma = 2$ og $n = 10$: $5{,}265 \\pm 1{,}96 \\cdot 2/\\sqrt{10} = 5{,}265 \\pm 1{,}239$, altså $(4{,}03;\\ 6{,}50)$." },
+        ] },
+        { type: "example", title: "Aug 2026, oppg. 6d: KI for p = P(sertifisering)", blocks: [
+          { type: "text", text: "Sannsynligheten for at tre baller består er $p(\\mu) = \\Phi\\left(\\frac{10 - \\mu}{2}\\right)^3$, som avtar i $\\mu$." },
+          { type: "text", text: "Grensene blir $\\Phi\\left(\\frac{10 - 6{,}50}{2}\\right)^3 \\approx 0{,}884$ og $\\Phi\\left(\\frac{10 - 4{,}03}{2}\\right)^3 \\approx 0{,}996$." },
+        ] },
+        { type: "example", title: "Des 2025, oppg. 5d: KI for μ med χ²-pivot", blocks: [
+          { type: "text", text: "$2e^{\\mu}\\sum e^{-X_i} \\sim \\chi^2_{2n} = \\chi^2_{100}$. Med $\\chi^2_{0{,}975,100} = 74{,}222$ og $\\chi^2_{0{,}025,100} = 129{,}561$ (side 5)." },
+          { type: "text", text: "KI for μ: $\\left(\\ln \\frac{74{,}222}{2 \\cdot 253{,}4},\\ \\ln \\frac{129{,}561}{2 \\cdot 253{,}4}\\right) = (-1{,}92;\\ -1{,}36)$." },
+        ] },
+      ],
+    },
   ],
 };

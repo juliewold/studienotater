@@ -94,5 +94,21 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Maks. sannsynlighet, normal med kjent σ", "Aug 2026, oppg. 6a", "$L(\\mu) = \\prod f(x_i;\\mu)$, log og deriver. Løsningen er $\\hat\\mu = \\bar{X}$."],
+          ["Maks. sannsynlighet med transformert log-sannsynlighet", "Des 2025, oppg. 5c", "Vis tettheten først. Deriver log-likelihood med hensyn på $\\mu$, og løs $\\ell'(\\mu) = 0$."],
+        ] },
+        { type: "example", title: "Aug 2026, oppg. 6a: estimat for forventet vektøkning", blocks: [
+          { type: "text", text: "$\\hat\\mu = \\frac{1}{10}\\sum x_i = \\frac{52{,}65}{10} = 5{,}265$." },
+        ] },
+        { type: "example", title: "Des 2025, oppg. 5c: estimat for μ i flomhøyde-modellen", blocks: [
+          { type: "text", text: "$\\hat\\mu = \\ln n - \\ln \\sum e^{-X_i}$. Med $n = 50$ og $\\sum e^{-x_i} = 253{,}4$ blir $\\hat\\mu = \\ln 50 - \\ln 253{,}4 \\approx -1{,}62$." },
+        ] },
+      ],
+    },
   ],
 };

@@ -121,5 +121,23 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Betinget sannsynlighet fra tabell", "Aug 2026, oppg. 3a–d", "Les tabellen som sannsynligheter per 1. juli. Bruk $P(B|A) = P(A \\cap B)/P(A)$. Hvis $B \\subset A$, er $P(A \\cap B) = P(B)$ og $P(A|B) = 1$."],
+          ["Bayes med sensitivitet og spesifisitet", "Des 2025, oppg. 1a–d", "Del opp etter $C$ og $C'$. Total sannsynlighet gir $P(T)$, og Bayes gir $P(C|T)$. Komplementregelen gir $P(C'|T)$."],
+          ["Kortkombinatorikk i uniform modell", "Des 2025, oppg. 2a–c", "Tell utfall med kombinasjoner. Hus: $13 \\cdot 12 \\cdot \\binom{4}{3}\\binom{4}{2}$ av $\\binom{52}{5}$ mulige."],
+          ["Lagoppsett med kombinasjoner", "Aug 2026, oppg. 1a–c", "Velg per posisjon med kombinasjoner og multipliser. Sannsynlighet = gunstige / mulige."],
+        ] },
+        { type: "example", title: "Des 2025, oppg. 1: Bayes med test", blocks: [
+          { type: "text", text: "Sensitivitet $P(T|C) = 0{,}7$, $P(C) = 0{,}03$ og $P(T|C') = 0{,}01$." },
+          { type: "text", text: "**Steg 1: total sannsynlighet.** $P(T) = 0{,}7 \\cdot 0{,}03 + 0{,}01 \\cdot 0{,}97 = 0{,}0307$." },
+          { type: "text", text: "**Steg 2: Bayes.** $P(C|T) = \\frac{0{,}7 \\cdot 0{,}03}{0{,}0307} \\approx 0{,}684$, og $P(C'|T) = 1 - 0{,}684 = 0{,}316$." },
+          { type: "text", text: "Formelboka side 32 gir total sannsynlighet og Bayes. Komplementregelen står ikke der." },
+        ] },
+      ],
+    },
   ],
 };

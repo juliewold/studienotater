@@ -117,5 +117,21 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Binomisk: minst én", "Aug 2026, oppg. 2a–b", "$P(X \\ge 1) = 1 - P(X = 0) = 1 - 0{,}99^{200}$. Forventningen er $np$."],
+          ["Poisson-tilnærming til binomisk", "Aug 2026, oppg. 2c", "$\\mu = np = 2$. Slå opp $P(X \\le x)$ i Poisson-tabellen (side 18)."],
+          ["Poisson-prosess over et tidsrom", "Des 2025, oppg. 7a", "Antall i et intervall av lengde $t$ er $\\text{Po}(\\lambda t)$. Forutsetningen er uavhengige delintervall."],
+          ["To uavhengige Poisson-variabler", "Aug 2026, oppg. 4a", "$P(X = 2, Y = 1) = P(X = 2)\\,P(Y = 1)$. Her er $\\mu_X = \\lambda_X \\cdot 90$ minutter."],
+        ] },
+        { type: "example", title: "Des 2025, oppg. 7a: viltpåkjørsler", blocks: [
+          { type: "text", text: "$\\lambda = 9$ per år og 2 år gir $\\mu = 18$. Da er $E(X) = 18$ og $\\text{SD}(X) = \\sqrt{18} \\approx 4{,}24$." },
+          { type: "text", text: "$P(X \\ge 18) = 1 - P(X \\le 17) = 1 - 0{,}4686 = 0{,}5314$ (side 20, $\\mu = 18$)." },
+        ] },
+      ],
+    },
   ],
 };

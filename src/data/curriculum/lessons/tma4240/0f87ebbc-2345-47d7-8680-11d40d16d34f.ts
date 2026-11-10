@@ -99,5 +99,19 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "eksamen",
+      title: "Eksamensoppgaver og metodevalg",
+      blocks: [
+        { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
+          ["Varians av differanse, uavhengige", "Aug 2026, oppg. 4d", "$\\text{Var}(X - Y) = \\text{Var}(X) + \\text{Var}(Y)$ når de er uavhengige. Minustegnet forsvinner i kvadratet."],
+          ["Forventning og varians av funksjon", "Des 2025, oppg. 3a–c", "Regn ut $E(X^2)$ først, deretter $\\text{Var}(X) = E(X^2) - \\mu^2$."],
+        ] },
+        { type: "example", title: "Aug 2026, oppg. 4d: differanse av to Poisson", blocks: [
+          { type: "text", text: "$X \\sim \\text{Po}(1{,}2)$ og $Y \\sim \\text{Po}(0{,}4)$ er uavhengige." },
+          { type: "text", text: "$E(X - Y) = 1{,}2 - 0{,}4 = 0{,}8$ og $\\text{Var}(X - Y) = 1{,}2 + 0{,}4 = 1{,}6$. For Poisson er varians lik forventning (side 25)." },
+        ] },
+      ],
+    },
   ],
 };
