@@ -197,3 +197,38 @@ search so a filtered list cannot overwrite a full group's order.
 
 The migration is tested in a disposable local database and has **not** been run
 on the live Supabase database. Apply it before deploying these frontend changes.
+
+## Nested note folders (undermapper)
+
+Apply `migrations/20261110_note_subfolders.sql` in Supabase **before** deploying the
+updated frontend. It requires `20261013_note_folder_order.sql` and
+`20261013_note_folder_admin.sql` to be applied already.
+
+What it does:
+
+- Adds `note_folders.parent_id` (nullable, FK to `note_folders.id`, `ON DELETE RESTRICT`).
+  Existing folders get `NULL`, so they stay top-level with the same notes and order.
+- Adds the trigger `validate_note_folder_parent`: a folder cannot be its own parent,
+  cannot be moved into one of its own subfolders, and must have a parent in the same
+  subject. The trigger applies to every writer, so the rules hold even outside the UI.
+- Adds the RPC `delete_note_folder(p_folder_id)`: in one transaction it moves direct
+  subfolders and notes up one level (to the parent folder, or to the top level), then
+  deletes the folder. No content is deleted. Admin only, through the existing RLS.
+- Replaces `reorder_note_folders(text, uuid[])` with the same signature. Drag sorting
+  now covers top-level folders only, which matches the top-level list it sends.
+
+It does not change existing rows beyond the new `parent_id` column, and it does not
+change RLS policies or grants other than the new function grants.
+
+Verify on a disposable database only (never on Supabase with existing data):
+
+```sh
+psql -v ON_ERROR_STOP=1 -d <empty-test-db> -f tests/note-subfolders.sql
+```
+
+The script creates the Supabase roles `anon` and `authenticated` when they are missing,
+then runs the migration twice. It checks cycle and cross-subject rejection, reader RLS,
+content moving up on delete, and root-only reordering. It prints `note subfolder tests passed`.
+
+Manual check after applying: as an admin, open a top-level folder, create a subfolder
+from the card menu, move it, and delete it. The confirmation shows what will move.

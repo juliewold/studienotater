@@ -21,6 +21,20 @@
   font-size: 0.92rem;
 }
 
+.folder-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.folder-subfolders {
+  margin-bottom: 28px;
+}
+
+.folder-subfolders .notes-folders {
+  margin-top: 0;
+}
+
 .folder-notes-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

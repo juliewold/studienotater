@@ -1,0 +1,45 @@
+.folder-breadcrumbs {
+  margin: 0 0 6px;
+  font-size: 0.92rem;
+}
+
+.folder-breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.folder-breadcrumbs li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #817687;
+}
+
+.folder-breadcrumbs li + li::before {
+  content: "›";
+  color: #b8a9c9;
+}
+
+.folder-breadcrumbs a {
+  color: #8564a8;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.folder-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.folder-breadcrumbs [aria-current="page"] {
+  overflow: hidden;
+  color: var(--theme-text, #28232d);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

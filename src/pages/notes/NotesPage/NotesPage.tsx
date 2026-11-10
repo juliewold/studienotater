@@ -103,7 +103,10 @@ export const NotesPage = () => {
 
   const { getProgress, isLoadingProgress } = useProgress();
 
-  const sortedFolders = sortNoteFolders(folders);
+  // Only top-level folders are shown as cards here. Subfolders appear inside their parent folder.
+  const sortedFolders = sortNoteFolders(
+    folders.filter((folder) => folder.parentId === null),
+  );
 
   useEffect(() => {
     const loadNotes = async () => {
@@ -312,13 +315,15 @@ export const NotesPage = () => {
         const normalizeName = (value: string) =>
           value.trim().toLocaleLowerCase("nb");
 
+        // Topic folders are top-level; a subfolder must never be linked to a topic.
         let folder = updatedFolders.find(
-          (currentFolder) => currentFolder.topicId === topic.id,
+          (currentFolder) => currentFolder.parentId === null && currentFolder.topicId === topic.id,
         );
 
         if (!folder) {
           folder = updatedFolders.find(
             (currentFolder) =>
+              currentFolder.parentId === null &&
               normalizeName(currentFolder.name) === normalizeName(topic.name),
           );
 
@@ -575,15 +580,24 @@ export const NotesPage = () => {
 
       {isLoadingFolders && <p>Laster mapper...</p>}
 
-      {view === "all" && !isLoadingFolders && folders.length > 0 && (
+      {view === "all" && !isLoadingFolders && sortedFolders.length > 0 && (
         <SortableFolders key={subject.id} subjectId={subject.id} folders={sortedFolders}
-          enabled={isAdmin && !isGeneratingStructure && !isCreatingFolder} onReordered={setFolders}>
+          enabled={isAdmin && !isGeneratingStructure && !isCreatingFolder}
+          onReordered={(reordered) => setFolders((currentFolders) => [
+            // Drag-sorting returns only top-level folders; keep the subfolders already loaded.
+            ...currentFolders.filter((currentFolder) => !reordered.some((item) => item.id === currentFolder.id)),
+            ...reordered,
+          ])}>
           {(folder) => (
             <FolderCard
               key={folder.id}
               folder={folder}
               subjectId={subject.id}
               noteCount={folderNoteCounts[folder.id] ?? 0}
+              allFolders={folders}
+              onFolderCreated={(createdFolder) => {
+                setFolders((currentFolders) => [...currentFolders, createdFolder]);
+              }}
               onFolderUpdated={(updatedFolder) => {
                 setFolders((currentFolders) =>
                   currentFolders.map((currentFolder) =>
