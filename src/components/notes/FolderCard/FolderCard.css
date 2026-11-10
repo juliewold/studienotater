@@ -70,7 +70,7 @@
   right: 0;
   z-index: 100;
   display: grid;
-  min-width: 180px;
+  min-width: 200px;
   padding: 8px;
   border: 1px solid var(--theme-border, #e5dff0);
   border-radius: 12px;
@@ -80,6 +80,7 @@
 
 .folder-card-dropdown button {
   display: flex;
+  white-space: nowrap;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
@@ -265,3 +266,38 @@ html[data-theme="dark"] .folder-card-wrapper .folder-card {
   border-left: 3px solid color-mix(in srgb, var(--folder-tone) 55%, var(--app-surface, #fff));
 }
 .folder-card-icon { color: var(--folder-tone); }
+
+.folder-move-hint {
+  margin: -8px 0 16px;
+  color: var(--theme-muted, #817788);
+  font-size: 0.92rem;
+}
+
+.folder-move-options {
+  display: grid;
+  gap: 8px;
+  max-height: min(50vh, 360px);
+  margin-bottom: 18px;
+  overflow-y: auto;
+}
+
+.folder-move-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-border, #e7deef);
+  border-radius: 12px;
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #28232d);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.folder-move-option:hover {
+  background: var(--theme-surface-raised, #f7f4f9);
+}
+
+.folder-move-option input {
+  accent-color: #8564a8;
+}

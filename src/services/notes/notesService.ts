@@ -151,6 +151,17 @@ export async function getNoteMetadataByFolder(subjectId: string, folderId: strin
   return sortNotes(((data ?? []) as NoteMetadataRow[]).map(mapNoteMetadata));
 }
 
+// Only folder_id is selected: enough to show note counts on folder cards, without content.
+export async function getNoteCountsByFolder(subjectId: string): Promise<Record<string, number>> {
+  const { data, error } = await supabase.from("notes").select("folder_id")
+    .eq("subject_id", subjectId).not("folder_id", "is", null);
+  if (error) throw error;
+  return ((data ?? []) as { folder_id: string }[]).reduce<Record<string, number>>((counts, row) => {
+    counts[row.folder_id] = (counts[row.folder_id] ?? 0) + 1;
+    return counts;
+  }, {});
+}
+
 export async function getNoteMetadataWithoutFolder(subjectId: string): Promise<NoteMetadata[]> {
   const { data, error } = await supabase.from("notes").select(noteMetadataSelect)
     .eq("subject_id", subjectId).is("folder_id", null)

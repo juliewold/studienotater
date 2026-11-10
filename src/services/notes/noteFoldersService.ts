@@ -6,6 +6,9 @@ export type NoteFolder = {
   id: string;
   subjectId: string;
 
+  // null means top level. Subfolders point at their direct parent folder.
+  parentId: string | null;
+
   topicId: string | null;
   topicName: string | null;
 
@@ -24,6 +27,7 @@ type TopicRelation = {
 type NoteFolderRow = {
   id: string;
   subject_id: string;
+  parent_id: string | null;
   topic_id: string | null;
   name: string;
   created_at: string;
@@ -35,6 +39,7 @@ type NoteFolderRow = {
 const noteFolderSelect = `
   id,
   subject_id,
+  parent_id,
   topic_id,
   name,
   created_at,
@@ -61,6 +66,8 @@ const mapNoteFolder = (folder: NoteFolderRow): NoteFolder => {
   return {
     id: folder.id,
     subjectId: folder.subject_id,
+
+    parentId: folder.parent_id,
 
     topicId: folder.topic_id,
     topicName: topic?.name ?? null,
@@ -114,12 +121,14 @@ export async function createNoteFolder(
   subjectId: string,
   name: string,
   topicId: string | null = null,
+  parentId: string | null = null,
 ): Promise<NoteFolder> {
   const { data, error } = await supabase
     .from("note_folders")
     .insert({
       subject_id: subjectId,
       topic_id: topicId,
+      parent_id: parentId,
       name,
     })
     .select(noteFolderSelect)
@@ -152,6 +161,25 @@ export async function updateNoteFolder(
   notifyNotesChanged();
 }
 
+// The database rejects cycles and cross-subject parents; the UI checks first for clear feedback.
+export async function updateNoteFolderParent(
+  id: string,
+  parentId: string | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from("note_folders")
+    .update({
+      parent_id: parentId,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw error;
+  }
+
+  notifyNotesChanged();
+}
+
 export async function updateNoteFolderTopic(
   id: string,
   topicId: string | null,
@@ -170,8 +198,11 @@ export async function updateNoteFolderTopic(
   notifyNotesChanged();
 }
 
+// Subfolders and notes move one level up instead of being deleted (see delete_note_folder).
 export async function deleteNoteFolder(id: string): Promise<void> {
-  const { error } = await supabase.from("note_folders").delete().eq("id", id);
+  const { error } = await supabase.rpc("delete_note_folder", {
+    p_folder_id: id,
+  });
 
   if (error) {
     throw error;

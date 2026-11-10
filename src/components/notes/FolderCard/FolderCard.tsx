@@ -4,47 +4,57 @@ import "./folderColors.css";
 import "./FolderCard.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Folder, MoreVertical, Pencil, Trash2, X } from "lucide-react";
+import { Folder, FolderInput, FolderPlus, MoreVertical, Pencil, Trash2, X } from "lucide-react";
 
 import {
+  createNoteFolder,
   deleteNoteFolder,
   updateNoteFolder,
+  updateNoteFolderParent,
   type NoteFolder,
 } from "../../../services/notes/noteFoldersService";
+import { getChildFolders } from "../../../services/notes/folderTree";
+import { FolderNameModal } from "./FolderNameModal";
+import { FolderMoveModal } from "./FolderMoveModal";
 
 type FolderCardProps = {
   folder: NoteFolder;
   subjectId: string;
   noteCount: number;
+  // All folders of the subject, used for the move picker and the delete summary.
+  allFolders: NoteFolder[];
+  onFolderCreated: (createdFolder: NoteFolder) => void;
   onFolderUpdated: (updatedFolder: NoteFolder) => void;
   onFolderDeleted: (deletedFolderId: string) => void;
 };
+
+type FolderModal = "create" | "rename" | "move" | "delete";
 
 export const FolderCard = ({
   folder,
   subjectId,
   noteCount,
+  allFolders,
+  onFolderCreated,
   onFolderUpdated,
   onFolderDeleted,
 }: FolderCardProps) => {
   const { isAdmin } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const [isRenaming, setIsRenaming] = useState(false);
-
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const [folderName, setFolderName] = useState(folder.name);
-
-  const [isSaving, setIsSaving] = useState(false);
+  const [activeModal, setActiveModal] = useState<FolderModal | null>(null);
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-
-  const [errorMessage, setErrorMessage] = useState("");
 
   const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  const childFolders = getChildFolders(allFolders, folder.id);
+
+  const parentFolder = allFolders.find(
+    (currentFolder) => currentFolder.id === folder.parentId,
+  );
 
   useEffect(() => {
     if (!isMenuOpen) {
@@ -65,23 +75,13 @@ export const FolderCard = ({
   }, [isMenuOpen]);
 
   useEffect(() => {
-    if (!isRenaming && !isDeleting) {
+    if (activeModal !== "delete") {
       return;
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") {
-        return;
-      }
-
-      if (isRenaming && !isSaving) {
-        setIsRenaming(false);
-        setErrorMessage("");
-        setFolderName(folder.name);
-      }
-
-      if (isDeleting && !isDeleteLoading) {
-        setIsDeleting(false);
+      if (event.key === "Escape" && !isDeleteLoading) {
+        setActiveModal(null);
         setDeleteErrorMessage("");
       }
     };
@@ -91,76 +91,50 @@ export const FolderCard = ({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isRenaming, isDeleting, isSaving, isDeleteLoading, folder.name]);
+  }, [activeModal, isDeleteLoading]);
 
-  const openRenameModal = () => {
-    setFolderName(folder.name);
-    setErrorMessage("");
-    setIsMenuOpen(false);
-    setIsRenaming(true);
-  };
-
-  const closeRenameModal = () => {
-    if (isSaving) {
-      return;
-    }
-
-    setIsRenaming(false);
-    setErrorMessage("");
-    setFolderName(folder.name);
-  };
-
-  const openDeleteModal = () => {
+  const openModal = (modal: FolderModal) => {
     setDeleteErrorMessage("");
     setIsMenuOpen(false);
-    setIsDeleting(true);
+    setActiveModal(modal);
   };
 
-  const closeDeleteModal = () => {
-    if (isDeleteLoading) {
-      return;
-    }
-
-    setIsDeleting(false);
+  const closeModal = () => {
+    setActiveModal(null);
     setDeleteErrorMessage("");
   };
 
-  const handleRename = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleCreateSubfolder = async (name: string) => {
     if (!isAdmin) return;
 
-    const trimmedName = folderName.trim();
+    const createdFolder = await createNoteFolder(subjectId, name, null, folder.id);
 
-    if (!trimmedName) {
-      setErrorMessage("Du må skrive inn et mappenavn.");
-      return;
-    }
+    onFolderCreated(createdFolder);
+    setActiveModal(null);
+  };
 
-    if (trimmedName === folder.name) {
-      setIsRenaming(false);
-      setErrorMessage("");
-      return;
-    }
+  const handleRename = async (name: string) => {
+    if (!isAdmin) return;
 
-    try {
-      setIsSaving(true);
-      setErrorMessage("");
+    await updateNoteFolder(folder.id, name);
 
-      await updateNoteFolder(folder.id, trimmedName);
+    onFolderUpdated({
+      ...folder,
+      name,
+    });
+    setActiveModal(null);
+  };
 
-      onFolderUpdated({
-        ...folder,
-        name: trimmedName,
-      });
+  const handleMove = async (parentId: string | null) => {
+    if (!isAdmin) return;
 
-      setIsRenaming(false);
-    } catch (error) {
-      console.error("Kunne ikke oppdatere mappen:", error);
+    await updateNoteFolderParent(folder.id, parentId);
 
-      setErrorMessage("Kunne ikke endre navnet. Prøv igjen.");
-    } finally {
-      setIsSaving(false);
-    }
+    onFolderUpdated({
+      ...folder,
+      parentId,
+    });
+    setActiveModal(null);
   };
 
   const handleDelete = async () => {
@@ -172,7 +146,7 @@ export const FolderCard = ({
       await deleteNoteFolder(folder.id);
 
       onFolderDeleted(folder.id);
-      setIsDeleting(false);
+      setActiveModal(null);
     } catch (error) {
       console.error("Kunne ikke slette mappen:", error);
 
@@ -181,6 +155,17 @@ export const FolderCard = ({
       setIsDeleteLoading(false);
     }
   };
+
+  const contentSummary = [
+    noteCount > 0 ? (noteCount === 1 ? "1 notat" : `${noteCount} notater`) : null,
+    childFolders.length > 0
+      ? childFolders.length === 1
+        ? "1 undermappe"
+        : `${childFolders.length} undermapper`
+      : null,
+  ].filter(Boolean);
+
+  const destinationName = parentFolder ? `«${parentFolder.name}»` : "notatsiden";
 
   return (
     <>
@@ -220,12 +205,22 @@ export const FolderCard = ({
 
           {isMenuOpen && (
             <div className="folder-card-dropdown">
-              <button type="button" onClick={openRenameModal}>
+              <button type="button" onClick={() => openModal("create")}>
+                <FolderPlus size={16} />
+                Ny undermappe
+              </button>
+
+              <button type="button" onClick={() => openModal("move")}>
+                <FolderInput size={16} />
+                Flytt til mappe
+              </button>
+
+              <button type="button" onClick={() => openModal("rename")}>
                 <Pencil size={16} />
                 Gi nytt navn
               </button>
 
-              <button type="button" onClick={openDeleteModal}>
+              <button type="button" onClick={() => openModal("delete")}>
                 <Trash2 size={16} />
                 Slett mappe
               </button>
@@ -234,94 +229,51 @@ export const FolderCard = ({
         </div>}
       </div>
 
-      {isAdmin && isRenaming && (
-        <div
-          className="folder-modal-backdrop"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              closeRenameModal();
-            }
-          }}
-        >
-          <div
-            className="folder-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={`rename-folder-${folder.id}`}
-          >
-            <div className="folder-modal-header">
-              <div>
-                <p className="folder-modal-label">Mappe</p>
-
-                <h2 id={`rename-folder-${folder.id}`}>Gi nytt navn</h2>
-              </div>
-
-              <button
-                type="button"
-                className="folder-modal-close"
-                aria-label="Lukk"
-                disabled={isSaving}
-                onClick={closeRenameModal}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleRename}>
-              <label
-                className="folder-modal-field"
-                htmlFor={`folder-name-${folder.id}`}
-              >
-                Mappenavn
-                <input
-                  id={`folder-name-${folder.id}`}
-                  type="text"
-                  value={folderName}
-                  autoFocus
-                  disabled={isSaving}
-                  onChange={(event) => {
-                    setFolderName(event.target.value);
-
-                    if (errorMessage) {
-                      setErrorMessage("");
-                    }
-                  }}
-                />
-              </label>
-
-              {errorMessage && (
-                <p className="folder-modal-error">{errorMessage}</p>
-              )}
-
-              <div className="folder-modal-actions">
-                <button
-                  type="button"
-                  className="folder-modal-cancel"
-                  disabled={isSaving}
-                  onClick={closeRenameModal}
-                >
-                  Avbryt
-                </button>
-
-                <button
-                  type="submit"
-                  className="folder-modal-submit"
-                  disabled={isSaving}
-                >
-                  {isSaving ? "Lagrer..." : "Lagre navn"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {isAdmin && activeModal === "create" && (
+        <FolderNameModal
+          idPrefix={`create-subfolder-${folder.id}`}
+          label="Ny undermappe"
+          title={`Opprett i ${folder.name}`}
+          fieldLabel="Mappenavn"
+          initialName=""
+          submitLabel="Opprett undermappe"
+          savingLabel="Oppretter..."
+          errorMessage="Kunne ikke opprette undermappen. Prøv igjen."
+          onSave={handleCreateSubfolder}
+          onClose={closeModal}
+        />
       )}
 
-      {isAdmin && isDeleting && (
+      {isAdmin && activeModal === "rename" && (
+        <FolderNameModal
+          idPrefix={`rename-folder-${folder.id}`}
+          label="Mappe"
+          title="Gi nytt navn"
+          fieldLabel="Mappenavn"
+          initialName={folder.name}
+          submitLabel="Lagre navn"
+          savingLabel="Lagrer..."
+          errorMessage="Kunne ikke endre navnet. Prøv igjen."
+          onSave={handleRename}
+          onClose={closeModal}
+        />
+      )}
+
+      {isAdmin && activeModal === "move" && (
+        <FolderMoveModal
+          folder={folder}
+          allFolders={allFolders}
+          onSave={handleMove}
+          onClose={closeModal}
+        />
+      )}
+
+      {isAdmin && activeModal === "delete" && (
         <div
           className="folder-modal-backdrop"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
-              closeDeleteModal();
+              if (!isDeleteLoading) closeModal();
             }
           }}
         >
@@ -343,7 +295,7 @@ export const FolderCard = ({
                 className="folder-modal-close"
                 aria-label="Lukk"
                 disabled={isDeleteLoading}
-                onClick={closeDeleteModal}
+                onClick={closeModal}
               >
                 <X size={20} />
               </button>
@@ -353,10 +305,14 @@ export const FolderCard = ({
               Mappen <strong>{folder.name}</strong> blir slettet.
             </p>
 
-            <p className="folder-delete-info">
-              Notatene i mappen blir ikke slettet. De flyttes tilbake til
-              notatsiden.
-            </p>
+            {contentSummary.length > 0 ? (
+              <p className="folder-delete-info">
+                Innholdet slettes ikke: {contentSummary.join(" og ")} flyttes til{" "}
+                {destinationName}.
+              </p>
+            ) : (
+              <p className="folder-delete-info">Mappen er tom.</p>
+            )}
 
             {deleteErrorMessage && (
               <p className="folder-modal-error">{deleteErrorMessage}</p>
@@ -367,7 +323,7 @@ export const FolderCard = ({
                 type="button"
                 className="folder-modal-cancel"
                 disabled={isDeleteLoading}
-                onClick={closeDeleteModal}
+                onClick={closeModal}
               >
                 Avbryt
               </button>

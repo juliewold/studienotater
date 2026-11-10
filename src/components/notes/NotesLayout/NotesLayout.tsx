@@ -6,6 +6,7 @@ import { ChevronDown, FileText, Folder, PanelLeftClose, PanelLeftOpen, X } from 
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 import { getNoteFoldersBySubject } from "../../../services/notes/noteFoldersService";
+import { flattenFolderTree } from "../../../services/notes/folderTree";
 import { getNoteBySlug, getNoteMetadataBySubject } from "../../../services/notes/notesService";
 import { createNotesNavigationStore, createPendingNoteLoader } from "../../../services/notes/notesNavigationStore";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
@@ -87,11 +88,11 @@ const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
     {loading && <p className="notes-outline-status">Laster mapper og notater…</p>}
     {error && <div className="notes-outline-status" role="alert">{error} <button onClick={() => void store.refresh()}>Prøv igjen</button></div>}
     <nav aria-label={`Mapper og notater i ${code}`}>
-      {data.folders.map((folder) => {
+      {flattenFolderTree(data.folders).map(({ folder, depth }) => {
         const notes = data.notes.filter(note => note.folderId === folder.id);
         const active = currentFolder === folder.id;
         const open = expanded[folder.id] ?? active;
-        return <section key={folder.id} className={`notes-outline-folder ${folderToneClass(folder)}${active ? " is-current-folder" : ""}`}>
+        return <section key={folder.id} style={{ marginLeft: depth * 12 }} className={`notes-outline-folder ${folderToneClass(folder)}${active ? " is-current-folder" : ""}`}>
           <div className="notes-outline-folder-heading"><button aria-label={`${open ? "Skjul" : "Vis"} notater i ${folder.name}`} aria-expanded={open} onClick={() => setExpanded(previous => ({ ...previous, [folder.id]: !open }))}><ChevronDown size={16} /></button><Link to={`${base}/mappe/${encodeURIComponent(folder.id)}`} onClick={event => void go(event, `${base}/mappe/${encodeURIComponent(folder.id)}`, folder.id)} aria-current={folderMatch?.params.folderId === folder.id ? "page" : undefined}><Folder size={16} /><span>{folder.name}</span><small>{notes.length}</small></Link></div>
           {open && <div className="notes-outline-children">{notes.length ? notes.map(noteLink) : <p className="notes-outline-status">Ingen notater i mappen.</p>}</div>}
         </section>;

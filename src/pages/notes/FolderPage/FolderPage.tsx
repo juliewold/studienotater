@@ -1,19 +1,27 @@
 import { sortNotes } from "../../../services/notes/noteOrder";
 import { SortableNotes } from "../../../components/notes/SortableNotes/SortableNotes";
 import "./FolderPage.css";
-import { useContext, useEffect, useState } from "react";
+import "../NotesPage/NotesPage.css";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { FolderPlus, Plus } from "lucide-react";
 
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 
 import {
-  getNoteFolderById,
+  createNoteFolder,
+  getNoteFoldersBySubject,
   type NoteFolder,
 } from "../../../services/notes/noteFoldersService";
 
 import {
+  getChildFolders,
+  getFolderAncestors,
+} from "../../../services/notes/folderTree";
+
+import {
   createNote,
+  getNoteCountsByFolder,
   getNoteMetadataByFolder,
   type NoteMetadata,
 } from "../../../services/notes/notesService";
@@ -26,6 +34,9 @@ import {
 import { getAllProgress, type Progress } from "../../../services/progress/progressService";
 
 import { FolderNoteCard } from "../../../components/notes/FolderNoteCard/FolderNoteCard";
+import { FolderCard } from "../../../components/notes/FolderCard/FolderCard";
+import { FolderNameModal } from "../../../components/notes/FolderCard/FolderNameModal";
+import { FolderBreadcrumbs } from "../../../components/notes/FolderBreadcrumbs/FolderBreadcrumbs";
 
 export const FolderPage = () => {
   const { subjectId, folderId } = useParams();
@@ -35,7 +46,11 @@ export const FolderPage = () => {
 
   const userId = user?.id;
 
-  const [folder, setFolder] = useState<NoteFolder | null>(null);
+  // One request loads every folder of the subject. Breadcrumbs, subfolders and move
+  // targets are derived from it, so navigating the tree does not query again.
+  const [allFolders, setAllFolders] = useState<NoteFolder[]>([]);
+
+  const [folderNoteCounts, setFolderNoteCounts] = useState<Record<string, number>>({});
 
   const [notes, setNotes] = useState<NoteMetadata[]>([]);
 
@@ -46,6 +61,8 @@ export const FolderPage = () => {
   const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
 
   const [isCreateNoteModalOpen, setIsCreateNoteModalOpen] = useState(false);
+
+  const [isCreateSubfolderModalOpen, setIsCreateSubfolderModalOpen] = useState(false);
 
   const [newNoteTitle, setNewNoteTitle] = useState("");
 
@@ -59,9 +76,31 @@ export const FolderPage = () => {
 
   const [error, setError] = useState("");
 
+  const folder = useMemo(
+    () => allFolders.find((currentFolder) => currentFolder.id === folderId) ?? null,
+    [allFolders, folderId],
+  );
+
+  const childFolders = useMemo(
+    () => (folder ? getChildFolders(allFolders, folder.id) : []),
+    [allFolders, folder],
+  );
+
+  const ancestors = useMemo(
+    () => (folder ? getFolderAncestors(allFolders, folder.id) : []),
+    [allFolders, folder],
+  );
+
   const sortedNotes = sortNotes(notes);
 
+  // A change inside this page refreshes the contents silently, without the loading state.
+  const silentReload = useRef(false);
+  const [reloadToken, setReloadToken] = useState(0);
+
   useEffect(() => {
+    const silent = silentReload.current;
+    silentReload.current = false;
+
     const loadData = async () => {
       if (!subjectId || !folderId) {
         setError("Mangler informasjon om faget eller mappen.");
@@ -69,18 +108,27 @@ export const FolderPage = () => {
         return;
       }
 
-      setIsLoading(true);
-      setError("");
+      if (!silent) {
+        setIsLoading(true);
+        setError("");
+      }
 
       try {
-        const loadedFolder = await getNoteFolderById(folderId);
+        const [loadedFolders, loadedNotes, loadedCounts] = await Promise.all([
+          getNoteFoldersBySubject(subjectId),
+          getNoteMetadataByFolder(subjectId, folderId),
+          getNoteCountsByFolder(subjectId),
+        ]);
+
+        const loadedFolder = loadedFolders.find(
+          (currentFolder) => currentFolder.id === folderId,
+        );
 
         if (!loadedFolder || loadedFolder.subjectId !== subjectId) {
+          setAllFolders([]);
           setError("Fant ikke mappen.");
           return;
         }
-
-        const loadedNotes = await getNoteMetadataByFolder(subjectId, folderId);
 
         let loadedSubtopics: DatabaseSubtopic[] = [];
 
@@ -111,7 +159,8 @@ export const FolderPage = () => {
           }
         }
 
-        setFolder(loadedFolder);
+        setAllFolders(loadedFolders);
+        setFolderNoteCounts(loadedCounts);
         setNotes(loadedNotes);
         setSubtopics(loadedSubtopics);
         setProgressByNoteId(loadedProgressByNoteId);
@@ -124,8 +173,13 @@ export const FolderPage = () => {
       }
     };
 
-    loadData();
-  }, [subjectId, folderId, userId]);
+    void loadData();
+  }, [subjectId, folderId, userId, reloadToken]);
+
+  const refreshSilently = () => {
+    silentReload.current = true;
+    setReloadToken((token) => token + 1);
+  };
 
   const createSlug = (value: string) => {
     return value
@@ -240,6 +294,12 @@ export const FolderPage = () => {
         ← Tilbake til notater
       </Link>
 
+      <FolderBreadcrumbs
+        subjectId={subjectId!}
+        ancestors={ancestors}
+        current={folder}
+      />
+
       <div className="folder-page-header">
         <div>
           <p className="notes-label">Mappe</p>
@@ -252,23 +312,72 @@ export const FolderPage = () => {
         </div>
 
         {isAdmin && (
-          <button
-            type="button"
-            className="new-folder-button"
-            onClick={openCreateNoteModal}
-            disabled={isCreatingNote}
-          >
-            <Plus size={20} />
+          <div className="folder-page-actions">
+            <button
+              type="button"
+              className="new-folder-button"
+              onClick={() => setIsCreateSubfolderModalOpen(true)}
+              disabled={isCreatingNote}
+            >
+              <FolderPlus size={20} />
 
-            {isCreatingNote ? "Oppretter..." : "Nytt notat"}
-          </button>
+              Ny undermappe
+            </button>
+
+            <button
+              type="button"
+              className="new-folder-button"
+              onClick={openCreateNoteModal}
+              disabled={isCreatingNote}
+            >
+              <Plus size={20} />
+
+              {isCreatingNote ? "Oppretter..." : "Nytt notat"}
+            </button>
+          </div>
         )}
       </div>
 
       {error && <p>{error}</p>}
 
+      {childFolders.length > 0 && (
+        <section className="folder-subfolders" aria-label="Undermapper">
+          <div className="notes-folders">
+            {childFolders.map((childFolder) => (
+              <FolderCard
+                key={childFolder.id}
+                folder={childFolder}
+                subjectId={subjectId!}
+                noteCount={folderNoteCounts[childFolder.id] ?? 0}
+                allFolders={allFolders}
+                onFolderCreated={(createdFolder) => {
+                  setAllFolders((currentFolders) => [...currentFolders, createdFolder]);
+                }}
+                onFolderUpdated={(updatedFolder) => {
+                  setAllFolders((currentFolders) =>
+                    currentFolders.map((currentFolder) =>
+                      currentFolder.id === updatedFolder.id
+                        ? updatedFolder
+                        : currentFolder,
+                    ),
+                  );
+                }}
+                onFolderDeleted={() => {
+                  // Deleted folders move their notes and subfolders here, so reload the contents.
+                  refreshSilently();
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {notes.length === 0 ? (
-        <p>Denne mappen er tom.</p>
+        childFolders.length === 0 ? (
+          <p>Denne mappen er tom.</p>
+        ) : (
+          <p>Ingen notater direkte i denne mappen.</p>
+        )
       ) : (
         <SortableNotes key={`${subjectId}:${folderId}`} subjectId={subjectId!} folderId={folderId!}
           notes={sortedNotes} className="folder-notes-grid" enabled={isAdmin && !isCreatingNote} onReordered={setNotes}>
@@ -320,6 +429,26 @@ export const FolderPage = () => {
             />
           )}
         </SortableNotes>
+      )}
+
+      {isAdmin && isCreateSubfolderModalOpen && (
+        <FolderNameModal
+          idPrefix={`create-subfolder-page-${folder.id}`}
+          label="Ny undermappe"
+          title={`Opprett i ${folder.name}`}
+          fieldLabel="Mappenavn"
+          initialName=""
+          submitLabel="Opprett undermappe"
+          savingLabel="Oppretter..."
+          errorMessage="Kunne ikke opprette undermappen. Prøv igjen."
+          onSave={async (name) => {
+            const createdFolder = await createNoteFolder(subjectId!, name, null, folder.id);
+
+            setAllFolders((currentFolders) => [...currentFolders, createdFolder]);
+            setIsCreateSubfolderModalOpen(false);
+          }}
+          onClose={() => setIsCreateSubfolderModalOpen(false)}
+        />
       )}
 
       {isAdmin && isCreateNoteModalOpen && (

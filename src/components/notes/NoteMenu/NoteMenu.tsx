@@ -7,6 +7,7 @@ import {
   getNoteFoldersBySubject,
   type NoteFolder,
 } from "../../../services/notes/noteFoldersService";
+import { flattenFolderTree } from "../../../services/notes/folderTree";
 import {
   deleteNote,
   moveNoteToFolder,
@@ -319,8 +320,12 @@ export const NoteMenu = ({
                       <span>Ingen mappe</span>
                     </label>
 
-                    {folders.map((folder) => (
-                      <label key={folder.id} className="note-move-option">
+                    {flattenFolderTree(folders).map(({ folder, depth }) => (
+                      <label
+                        key={folder.id}
+                        className="note-move-option"
+                        style={{ marginLeft: depth * 16 }}
+                      >
                         <input
                           type="radio"
                           name={`folder-${noteId}`}
