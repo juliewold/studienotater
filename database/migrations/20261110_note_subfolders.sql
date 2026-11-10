@@ -13,11 +13,15 @@ CREATE OR REPLACE FUNCTION public.validate_note_folder_parent()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 DECLARE parent_subject text;
 BEGIN
+ -- A folder keeps its subject for life. Changing it would leave subfolders and notes
+ -- behind in another subject, so the hierarchy invariant cannot be checked afterwards.
+ IF TG_OP = 'UPDATE' AND NEW.subject_id IS DISTINCT FROM OLD.subject_id THEN
+   RAISE EXCEPTION 'A folder cannot be moved to another subject' USING ERRCODE = '23514';
+ END IF;
  IF NEW.parent_id IS NULL THEN
    RETURN NEW;
  END IF;
- IF TG_OP = 'UPDATE' AND NEW.parent_id IS NOT DISTINCT FROM OLD.parent_id
-    AND NEW.subject_id IS NOT DISTINCT FROM OLD.subject_id THEN
+ IF TG_OP = 'UPDATE' AND NEW.parent_id IS NOT DISTINCT FROM OLD.parent_id THEN
    RETURN NEW;
  END IF;
  PERFORM pg_advisory_xact_lock(hashtextextended('folder-tree:' || NEW.subject_id::text, 0));
@@ -50,21 +54,42 @@ FOR EACH ROW EXECUTE FUNCTION public.validate_note_folder_parent();
 
 -- Deleting a folder never deletes content: direct subfolders and notes move up one
 -- level (to the parent folder, or to the top level when the folder was top level).
+-- Every move is verified against the rows that were expected to move. If RLS or a
+-- policy blocks any of them, the whole call raises and rolls back, so the folder is
+-- never deleted with its content silently re-parented somewhere else.
 CREATE OR REPLACE FUNCTION public.delete_note_folder(p_folder_id uuid)
 RETURNS void LANGUAGE plpgsql SECURITY INVOKER SET search_path = public, pg_temp AS $$
-DECLARE target public.note_folders%ROWTYPE;
+DECLARE target public.note_folders%ROWTYPE; expected_folders integer; expected_notes integer; changed integer;
 BEGIN
  IF NOT public.can_manage_note_folders() THEN
    RAISE EXCEPTION 'Only admins may delete shared folders' USING ERRCODE = '42501';
  END IF;
  SELECT * INTO target FROM public.note_folders WHERE id = p_folder_id FOR UPDATE;
  IF NOT FOUND THEN
-   RETURN;
+   RAISE EXCEPTION 'Unknown or inaccessible folder' USING ERRCODE = 'P0002';
  END IF;
  PERFORM pg_advisory_xact_lock(hashtextextended('folder-tree:' || target.subject_id::text, 0));
+
+ SELECT count(*) INTO expected_folders FROM public.note_folders WHERE parent_id = target.id;
+ SELECT count(*) INTO expected_notes FROM public.notes WHERE folder_id = target.id;
+
  UPDATE public.note_folders SET parent_id = target.parent_id WHERE parent_id = target.id;
+ GET DIAGNOSTICS changed = ROW_COUNT;
+ IF changed <> expected_folders THEN
+   RAISE EXCEPTION 'Could not move all subfolders; the folder was not deleted' USING ERRCODE = '42501';
+ END IF;
+
  UPDATE public.notes SET folder_id = target.parent_id WHERE folder_id = target.id;
+ GET DIAGNOSTICS changed = ROW_COUNT;
+ IF changed <> expected_notes THEN
+   RAISE EXCEPTION 'Could not move all notes; the folder was not deleted' USING ERRCODE = '42501';
+ END IF;
+
  DELETE FROM public.note_folders WHERE id = target.id;
+ GET DIAGNOSTICS changed = ROW_COUNT;
+ IF changed <> 1 THEN
+   RAISE EXCEPTION 'The folder could not be deleted' USING ERRCODE = '42501';
+ END IF;
 END $$;
 REVOKE ALL ON FUNCTION public.delete_note_folder(uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.delete_note_folder(uuid) TO authenticated;

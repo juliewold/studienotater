@@ -113,10 +113,16 @@ END $$;
 -- Admin: deleting A1 moves A1a up to A and its note up to A. Nothing is lost.
 SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',false);
 SELECT public.delete_note_folder('00000000-0000-0000-0000-000000000013');
--- Deleting top-level B moves its subfolder B1 to the top level, and deleting a missing folder is a no-op.
+-- Deleting top-level B moves its subfolder B1 to the top level.
 INSERT INTO note_folders(id, subject_id, name, parent_id) VALUES ('00000000-0000-0000-0000-000000000017','subject','B1b','00000000-0000-0000-0000-000000000012');
 SELECT public.delete_note_folder('00000000-0000-0000-0000-000000000012');
-SELECT public.delete_note_folder('00000000-0000-0000-0000-000000000012');
+-- A missing folder must fail loudly instead of pretending the delete succeeded.
+DO $$ BEGIN
+ BEGIN
+  PERFORM public.delete_note_folder('00000000-0000-0000-0000-000000000012');
+  RAISE EXCEPTION 'Missing folder delete reported success';
+ EXCEPTION WHEN no_data_found THEN NULL; END;
+END $$;
 
 DO $$ DECLARE a1a_parent uuid; b1b_parent uuid; note_folder uuid; loose uuid; total integer; BEGIN
  SELECT parent_id INTO a1a_parent FROM note_folders WHERE id = '00000000-0000-0000-0000-000000000014';

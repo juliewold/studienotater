@@ -210,10 +210,13 @@ What it does:
   Existing folders get `NULL`, so they stay top-level with the same notes and order.
 - Adds the trigger `validate_note_folder_parent`: a folder cannot be its own parent,
   cannot be moved into one of its own subfolders, and must have a parent in the same
-  subject. The trigger applies to every writer, so the rules hold even outside the UI.
+  subject. A folder's `subject_id` cannot change after creation, so a subfolder can never
+  end up in a different subject from its parent. The trigger applies to every writer.
 - Adds the RPC `delete_note_folder(p_folder_id)`: in one transaction it moves direct
   subfolders and notes up one level (to the parent folder, or to the top level), then
   deletes the folder. No content is deleted. Admin only, through the existing RLS.
+  Each move is counted and checked. If RLS blocks any move, the call raises and rolls
+  back, so the folder is kept. A missing folder raises instead of reporting success.
 - Replaces `reorder_note_folders(text, uuid[])` with the same signature. Drag sorting
   now covers top-level folders only, which matches the top-level list it sends.
 
@@ -224,11 +227,20 @@ Verify on a disposable database only (never on Supabase with existing data):
 
 ```sh
 psql -v ON_ERROR_STOP=1 -d <empty-test-db> -f tests/note-subfolders.sql
+psql -v ON_ERROR_STOP=1 -d <another-empty-test-db> -f tests/note-subfolders-rls.sql
 ```
 
-The script creates the Supabase roles `anon` and `authenticated` when they are missing,
-then runs the migration twice. It checks cycle and cross-subject rejection, reader RLS,
-content moving up on delete, and root-only reordering. It prints `note subfolder tests passed`.
+Both scripts create the Supabase roles `anon` and `authenticated` when they are missing.
+`note-subfolders.sql` runs the migration twice and checks cycle and cross-subject
+rejection, reader RLS, content moving up on delete, a missing folder, and root-only reordering.
+`note-subfolders-rls.sql` uses the repo's real folder and shared-note migrations with
+production-style note policies. It covers notes created by another user, a subject change
+on folders with and without children, and a delete that must roll back when the admin's
+notes UPDATE policy is missing. Each prints a `... tests passed` line.
+
+Note: the notes SELECT policy must let admins see all notes in a folder, or the
+delete's count check cannot see them. Production policies have not been inspected from
+here; check them before applying.
 
 Manual check after applying: as an admin, open a top-level folder, create a subfolder
 from the card menu, move it, and delete it. The confirmation shows what will move.
