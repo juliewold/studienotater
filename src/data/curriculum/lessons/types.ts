@@ -4,12 +4,21 @@ import type { CurriculumLink } from "../types";
 /** Inline text supports $math$, **bold** and `code`. */
 export type LessonText = string;
 
+/**
+ * Where a formula stands in the allowed formula book («Tabeller og formler i statistikk»).
+ * `pages` is the printed page number(s). `partial` means the book has part of the formula, and `missing` says what must be learned.
+ */
+export type FormulaBookStatus =
+  | { status: "book"; pages: string }
+  | { status: "partial"; pages: string; missing: string }
+  | { status: "missing" };
+
 export type LessonBlock =
   | { type: "text"; text: LessonText }
   | { type: "list"; items: LessonText[]; ordered?: boolean }
   | { type: "box"; variant: "definition" | "theorem" | "tip" | "pitfall"; title?: string; blocks: LessonBlock[] }
-  /** Display formula. A `name` adds it to the formula collection. */
-  | { type: "formula"; latex: string; name?: string; caption?: LessonText }
+  /** Display formula. A `name` adds it to the formula collection. `book` says where it stands in the allowed formula book. */
+  | { type: "formula"; latex: string; name?: string; caption?: LessonText; book?: FormulaBookStatus }
   | { type: "pseudocode"; title: string; lines: string[]; caption?: LessonText }
   | { type: "table"; head: LessonText[]; rows: LessonText[][]; caption?: LessonText }
   /** Figures are drawn as inline SVG so they follow the theme and need no storage. */

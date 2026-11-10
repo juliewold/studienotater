@@ -49,7 +49,7 @@ export const lesson: Lesson = {
           ] },
           { type: "text", text: "Aksiomene står ikke i formelboka. Når en oppgave spør om en tallfunksjon er et sannsynlighetsmål, sjekker du de tre punktene." },
         ] },
-        { type: "formula", latex: "P(A^c) = 1 - P(A)", name: "Komplementregelen", caption: "Ikke i formelboka. Brukes ofte når «minst én» er enklere å finne enn «ingen»." },
+        { type: "formula", latex: "P(A^c) = 1 - P(A)", name: "Komplementregelen", book: { status: "missing" }, caption: "Ikke i formelboka. Brukes ofte når «minst én» er enklere å finne enn «ingen»." },
         { type: "example", title: "Komplementregelen i praksis", blocks: [
           { type: "text", text: "Tre uavhengige forsøk med $P(\\text{suksess}) = 0{,}2$ hver. Sannsynligheten for minst én suksess er $1 - 0{,}8^3 = 1 - 0{,}512 = 0{,}488$." },
         ] },
@@ -59,7 +59,7 @@ export const lesson: Lesson = {
       id: "addisjon",
       title: "Addisjon og union",
       blocks: [
-        { type: "formula", latex: "P(A \\cup B) = P(A) + P(B) - P(A \\cap B)", name: "Addisjonssetningen (to hendelser)", caption: `Generell form for flere hendelser står i formelboka ${formelbok(32)}.` },
+        { type: "formula", latex: "P(A \\cup B) = P(A) + P(B) - P(A \\cap B)", name: "Addisjonssetningen (to hendelser)", book: { status: "book", pages: "32" }, caption: `Generell form for flere hendelser står i formelboka ${formelbok(32)}.` },
         { type: "text", text: "Hvis $A$ og $B$ er disjunkte, er $P(A \\cap B) = 0$, og formelen blir $P(A) + P(B)$. Trekk fra snittet når hendelsene kan skje samtidig." },
         { type: "example", title: "Union med snitt", blocks: [
           { type: "text", text: "$P(A) = 0{,}5$, $P(B) = 0{,}4$ og $P(A \\cap B) = 0{,}2$. Da er $P(A \\cup B) = 0{,}5 + 0{,}4 - 0{,}2 = 0{,}7$." },
@@ -74,8 +74,8 @@ export const lesson: Lesson = {
       title: "Uniform modell og kombinatorikk",
       blocks: [
         { type: "text", text: "Hvis alle utfall er like sannsynlige, er $P(A) = |A|/|S|$. Da må du telle utfall. Bruk **permutasjon** når rekkefølgen teller, og **kombinasjon** når den ikke gjør det." },
-        { type: "formula", latex: "{}_nP_r = \\dfrac{n!}{(n-r)!}", name: "Permutasjoner (ordnet utvalg)", caption: `Ordnede utvalg av $r$ fra $n$ uten tilbakelegging ${formelbok(32)}.` },
-        { type: "formula", latex: "\\binom{n}{r} = \\dfrac{n!}{r!\\,(n-r)!}", name: "Kombinasjoner (uordnet utvalg)", caption: `Uordnede utvalg av $r$ fra $n$ uten tilbakelegging ${formelbok(32)}.` },
+        { type: "formula", latex: "{}_nP_r = \\dfrac{n!}{(n-r)!}", name: "Permutasjoner (ordnet utvalg)", book: { status: "book", pages: "32" }, caption: `Ordnede utvalg av $r$ fra $n$ uten tilbakelegging ${formelbok(32)}.` },
+        { type: "formula", latex: "\\binom{n}{r} = \\dfrac{n!}{r!\\,(n-r)!}", name: "Kombinasjoner (uordnet utvalg)", book: { status: "book", pages: "32" }, caption: `Uordnede utvalg av $r$ fra $n$ uten tilbakelegging ${formelbok(32)}.` },
         { type: "example", title: "Velge 4 forsvarsspillere av 9", blocks: [
           { type: "text", text: "Rekkefølgen er ikke viktig, så kombinasjoner. Med kalkulator: $\\binom{9}{4} = 126$." },
           { type: "text", text: "Hvis en bestemt spiller alltid må være med, velger du 3 av de 8 andre: $\\binom{8}{3} = 56$." },
@@ -86,10 +86,10 @@ export const lesson: Lesson = {
       id: "betinget",
       title: "Betinget sannsynlighet og uavhengighet",
       blocks: [
-        { type: "formula", latex: "P(A|B) = \\dfrac{P(A \\cap B)}{P(B)}, \\qquad P(B) > 0", name: "Betinget sannsynlighet", caption: `Formelen står i formelboka som $P(B_r|A) = P(B_r \\cap A)/P(A)$ under Bayes' regel ${formelbok(32)}. Den er lik i begge retninger.` },
+        { type: "formula", latex: "P(A|B) = \\dfrac{P(A \\cap B)}{P(B)}, \\qquad P(B) > 0", name: "Betinget sannsynlighet", book: { status: "book", pages: "32" }, caption: `Formelen står i formelboka som $P(B_r|A) = P(B_r \\cap A)/P(A)$ under Bayes' regel ${formelbok(32)}. Den er lik i begge retninger.` },
         { type: "text", text: "$P(A|B)$ er sannsynligheten for $A$ når vi vet at $B$ har skjedd. Hendelsen $B$ blir da det nye utfallsrommet." },
-        { type: "formula", latex: "P(A \\cap B) = P(A)\\,P(B)", name: "Uavhengige hendelser", caption: "Ikke i formelboka i denne formen. Den følger av multiplikasjonssetningen i formelboka, når $P(A|B) = P(A)$." },
-        { type: "formula", latex: "P(A_1 \\cap \\cdots \\cap A_n) = P(A_1)\\,P(A_2|A_1)\\cdots P(A_n|A_1 \\cap \\cdots \\cap A_{n-1})", name: "Multiplikasjonssetningen", caption: `Formelboka ${formelbok(32)}. Brukes når trekninger skjer uten tilbakelegging.` },
+        { type: "formula", latex: "P(A \\cap B) = P(A)\\,P(B)", name: "Uavhengige hendelser", book: { status: "partial", pages: "32", missing: "P(A ∩ B) = P(A)P(B) må læres; boka har bare multiplikasjonssetningen" }, caption: "Ikke i formelboka i denne formen. Den følger av multiplikasjonssetningen i formelboka, når $P(A|B) = P(A)$." },
+        { type: "formula", latex: "P(A_1 \\cap \\cdots \\cap A_n) = P(A_1)\\,P(A_2|A_1)\\cdots P(A_n|A_1 \\cap \\cdots \\cap A_{n-1})", name: "Multiplikasjonssetningen", book: { status: "book", pages: "32" }, caption: `Formelboka ${formelbok(32)}. Brukes når trekninger skjer uten tilbakelegging.` },
         { type: "example", title: "To defekte av 10, uten tilbakelegging", blocks: [
           { type: "text", text: "Det er 3 defekte av 10 varer. Sannsynligheten for at de to første er defekte er $P(D_1 \\cap D_2) = \\dfrac{3}{10} \\cdot \\dfrac{2}{9} = \\dfrac{1}{15} \\approx 0{,}067$." },
           { type: "text", text: "Den andre faktoren er betinget på at den første var defekt. Det er 2 defekte igjen av 9 varer." },
@@ -101,8 +101,8 @@ export const lesson: Lesson = {
       title: "Total sannsynlighet og Bayes' regel",
       blocks: [
         { type: "text", text: "**Bruk** når en hendelse $A$ skjer gjennom flere mulige årsaker $B_1, \\ldots, B_k$ som er disjunkte og dekker alle utfall. Deretter spør oppgaven: gitt at $A$ har skjedd, hva er sannsynligheten for årsak $B_r$?" },
-        { type: "formula", latex: "P(A) = \\sum_{i=1}^{k} P(A|B_i)\\,P(B_i)", name: "Total sannsynlighet", caption: `Formelboka ${formelbok(32)}. Partisjonen $B_1, \\ldots, B_k$ må dekke hele utfallsrommet.` },
-        { type: "formula", latex: "P(B_r|A) = \\dfrac{P(A|B_r)\\,P(B_r)}{\\sum_{i=1}^{k} P(A|B_i)\\,P(B_i)}", name: "Bayes' regel", caption: `Formelboka ${formelbok(32)}. Nevneren er $P(A)$ fra total sannsynlighet.` },
+        { type: "formula", latex: "P(A) = \\sum_{i=1}^{k} P(A|B_i)\\,P(B_i)", name: "Total sannsynlighet", book: { status: "book", pages: "32" }, caption: `Formelboka ${formelbok(32)}. Partisjonen $B_1, \\ldots, B_k$ må dekke hele utfallsrommet.` },
+        { type: "formula", latex: "P(B_r|A) = \\dfrac{P(A|B_r)\\,P(B_r)}{\\sum_{i=1}^{k} P(A|B_i)\\,P(B_i)}", name: "Bayes' regel", book: { status: "book", pages: "32" }, caption: `Formelboka ${formelbok(32)}. Nevneren er $P(A)$ fra total sannsynlighet.` },
         { type: "figure", component: BayesTreeFigure, caption: "Tre maskiner produserer 50 %, 30 % og 20 % av varene. Sannsynlighetene for defekt er 1 %, 2 % og 3 %. Tretdiagrammet viser hvordan grenene multipliseres." },
         { type: "example", title: "Hvilken maskin lagde den defekte varen?", blocks: [
           { type: "text", text: "**Steg 1: total sannsynlighet.** $P(D) = 0{,}5 \\cdot 0{,}01 + 0{,}3 \\cdot 0{,}02 + 0{,}2 \\cdot 0{,}03 = 0{,}005 + 0{,}006 + 0{,}006 = 0{,}017$." },

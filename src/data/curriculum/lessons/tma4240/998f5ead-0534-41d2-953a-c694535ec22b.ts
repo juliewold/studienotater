@@ -43,8 +43,8 @@ export const lesson: Lesson = {
       title: "Hypoteser og testobservator",
       blocks: [
         { type: "text", text: "$H_0$ er det du antar inntil det motsatte er vist, for eksempel $\\mu = \\mu_0$. $H_1$ er alternativet, for eksempel $\\mu > \\mu_0$ (ensidig) eller $\\mu \\ne \\mu_0$ (tosidig). Hypotesene settes før du ser på dataene." },
-        { type: "formula", latex: "Z = \\dfrac{\\bar{X} - \\mu_0}{\\sigma/\\sqrt{n}} \\sim N(0, 1) \\text{ under } H_0", name: "z-test for μ (σ kjent)", caption: `Formelboka ${formelbok("s. 1–3")}. Samplingfordelingen følger av normalitet eller CLT ${formelbok("s. 38")}.` },
-        { type: "formula", latex: "T = \\dfrac{\\bar{X} - \\mu_0}{S/\\sqrt{n}} \\sim t_{n-1} \\text{ under } H_0", name: "t-test for μ (σ ukjent)", caption: `Formelboka ${formelbok("s. 27")}. Kritisk verdi fra tabellen på side 4.` },
+        { type: "formula", latex: "Z = \\dfrac{\\bar{X} - \\mu_0}{\\sigma/\\sqrt{n}} \\sim N(0, 1) \\text{ under } H_0", name: "z-test for μ (σ kjent)", book: { status: "partial", pages: "3", missing: "Testobservatoren Z = (X̄ − μ₀)/(σ/√n) må læres; boka har tabellen" }, caption: `Formelboka ${formelbok("s. 1–3")}. Samplingfordelingen følger av normalitet eller CLT ${formelbok("s. 38")}.` },
+        { type: "formula", latex: "T = \\dfrac{\\bar{X} - \\mu_0}{S/\\sqrt{n}} \\sim t_{n-1} \\text{ under } H_0", name: "t-test for μ (σ ukjent)", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. Kritisk verdi fra tabellen på side 4.` },
         { type: "example", title: "$\\mu_0 = 50$, $\\sigma = 8$, $n = 16$, $\\bar{x} = 54$", blocks: [
           { type: "text", text: "$H_0: \\mu = 50$ mot $H_1: \\mu \\ne 50$. $z = (54 - 50)/(8/4) = 2$." },
           { type: "text", text: "Tosidig $p = 2(1 - \\Phi(2)) = 2 \\cdot 0{,}0228 = 0{,}0455$. Siden $0{,}0455 < 0{,}05$, forkastes $H_0$ på 5 %-nivå." },
@@ -57,7 +57,7 @@ export const lesson: Lesson = {
       title: "Type I- og type II-feil og styrke",
       blocks: [
         { type: "text", text: "$\\alpha$ bestemmer hvor stor type I-feilsannsynligheten skal være, og du velger den før testen. $\\beta$ avhenger av hvor sann $H_1$ er, og av $n$. Styrken $1 - \\beta$ er sannsynligheten for å forkaste $H_0$ når $H_1$ er sann." },
-        { type: "formula", latex: "\\beta = \\Phi\\!\\left(z_\\alpha - \\dfrac{(\\mu_1 - \\mu_0)\\sqrt{n}}{\\sigma}\\right), \\qquad 1 - \\beta = \\text{styrke}", name: "Type II-feil for høyresidig z-test", caption: `Formelbokas $\\Phi$-tabell side 1–2 og kritisk verdi $z_\\alpha$ side 3. Ikke i boka som formel.` },
+        { type: "formula", latex: "\\beta = \\Phi\\!\\left(z_\\alpha - \\dfrac{(\\mu_1 - \\mu_0)\\sqrt{n}}{\\sigma}\\right), \\qquad 1 - \\beta = \\text{styrke}", name: "Type II-feil for høyresidig z-test", book: { status: "missing" }, caption: `Formelbokas $\\Phi$-tabell side 1–2 og kritisk verdi $z_\\alpha$ side 3. Ikke i boka som formel.` },
         { type: "example", title: "Styrke ved $\\mu_1 = 54$", blocks: [
           { type: "text", text: "Høyresidig test, $\\alpha = 0{,}05$, $z_\\alpha = 1{,}645$. $\\delta = \\mu_1 - \\mu_0 = 4$, og $\\delta\\sqrt{n}/\\sigma = 4 \\cdot 4/8 = 2$." },
           { type: "text", text: "$\\beta = \\Phi(1{,}645 - 2) = \\Phi(-0{,}355) \\approx 0{,}361$. Styrken er $0{,}639$." },
@@ -76,7 +76,7 @@ export const lesson: Lesson = {
       title: "p-verdien",
       blocks: [
         { type: "text", text: "$p$-verdien er sannsynligheten under $H_0$ for å få en testobservator minst like ekstrem som den observerte. Liten $p$ betyr at dataene er lite forenlige med $H_0$." },
-        { type: "formula", latex: "p = P(\\text{testobservator så ekstrem som observert} \\mid H_0)", name: "p-verdi", caption: "Ikke i formelboka. For t-testen finner du intervallet for $p$ med tabellen på side 4." },
+        { type: "formula", latex: "p = P(\\text{testobservator så ekstrem som observert} \\mid H_0)", name: "p-verdi", book: { status: "missing" }, caption: "Ikke i formelboka. For t-testen finner du intervallet for $p$ med tabellen på side 4." },
         { type: "example", title: "Samme data, t-test", blocks: [
           { type: "text", text: "$s = 8$, så $t = (54 - 50)/(8/4) = 2$ med $\\nu = 15$. Side 4: $t_{0{,}025, 15} = 2{,}131$ og $t_{0{,}05, 15} = 1{,}753$." },
           { type: "text", text: "Siden $1{,}753 < 2 < 2{,}131$, er den tosidige $p$-verdien mellom 0,05 og 0,10. Ikke forkast $H_0$ på 5 %-nivå." },
@@ -90,9 +90,9 @@ export const lesson: Lesson = {
       id: "andre-tester",
       title: "Varians, andel og forhold mellom varianser",
       blocks: [
-        { type: "formula", latex: "\\dfrac{(n-1)S^2}{\\sigma_0^2} \\sim \\chi^2_{n-1} \\text{ under } H_0", name: "χ²-test for σ²", caption: `Formelboka ${formelbok("s. 27")}, med kritiske verdier fra side 5.` },
-        { type: "formula", latex: "\\dfrac{S_1^2}{S_2^2} \\sim F_{n_1-1,\\, n_2-1} \\text{ under } H_0: \\sigma_1^2 = \\sigma_2^2", name: "F-test for to varianser", caption: `Formelboka ${formelbok("s. 6–11")}. Telleren har $n_1 - 1$ frihetsgrader.` },
-        { type: "formula", latex: "Z = \\dfrac{\\hat{p} - p_0}{\\sqrt{p_0(1-p_0)/n}} \\approx N(0, 1)", name: "z-test for andel", caption: `Tilnærmingen følger av CLT ${formelbok("s. 38")}. Bruk $p_0$ i standardfeilen under $H_0$.` },
+        { type: "formula", latex: "\\dfrac{(n-1)S^2}{\\sigma_0^2} \\sim \\chi^2_{n-1} \\text{ under } H_0", name: "χ²-test for σ²", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}, med kritiske verdier fra side 5.` },
+        { type: "formula", latex: "\\dfrac{S_1^2}{S_2^2} \\sim F_{n_1-1,\\, n_2-1} \\text{ under } H_0: \\sigma_1^2 = \\sigma_2^2", name: "F-test for to varianser", book: { status: "partial", pages: "28", missing: "Teststørrelsen S₁²/S₂² under H₀ må læres; boka har F-fordelingen" }, caption: `Formelboka ${formelbok("s. 6–11")}. Telleren har $n_1 - 1$ frihetsgrader.` },
+        { type: "formula", latex: "Z = \\dfrac{\\hat{p} - p_0}{\\sqrt{p_0(1-p_0)/n}} \\approx N(0, 1)", name: "z-test for andel", book: { status: "partial", pages: "38", missing: "Teststørrelsen for p må læres; boka har bare CLT" }, caption: `Tilnærmingen følger av CLT ${formelbok("s. 38")}. Bruk $p_0$ i standardfeilen under $H_0$.` },
       ],
     },
     {
@@ -110,7 +110,7 @@ export const lesson: Lesson = {
       title: "Fortegnstesten og permutasjonstest",
       blocks: [
         { type: "text", text: "Fortegnstesten brukes når du ikke kan anta normalitet. Du teller hvor mange differanser som er positive. Under $H_0$ (medianen er $\\mu_0$) er antallet $X \\sim \\text{Bin}(n, \\tfrac{1}{2})$." },
-        { type: "formula", latex: "P(X \\ge x) = \\sum_{k=x}^{n} \\binom{n}{k} \\left(\\tfrac{1}{2}\\right)^n", name: "Fortegnstesten", caption: `Tabell for binomisk på side 12–17 med $p = 0{,}50$ ${formelbok("s. 12–17")}. Pensum er til eksempel 16.2.` },
+        { type: "formula", latex: "P(X \\ge x) = \\sum_{k=x}^{n} \\binom{n}{k} \\left(\\tfrac{1}{2}\\right)^n", name: "Fortegnstesten", book: { status: "partial", pages: "25", missing: "Selve testen med p = 1/2 må læres; boka har binomisk fordeling" }, caption: `Tabell for binomisk på side 12–17 med $p = 0{,}50$ ${formelbok("s. 12–17")}. Pensum er til eksempel 16.2.` },
         { type: "example", title: "8 av 10 positive", blocks: [
           { type: "text", text: "Tosidig: $P(X \\ge 8) = \\dfrac{45 + 10 + 1}{1024} = 0{,}0547$. Dobbelt for tosidig gir $0{,}109$. Ikke forkast $H_0$ på 5 %-nivå." },
           { type: "text", text: "Hvis testen er ensidig og $\\alpha = 0{,}05$, forkastes $H_0$ ikke, fordi $0{,}0547 > 0{,}05$." },
@@ -159,14 +159,14 @@ export const lesson: Lesson = {
       id: "to-utvalg-parede",
       title: "To utvalg, parede observasjoner og utvalgsstørrelse",
       blocks: [
-        { type: "formula", latex: "T = \\dfrac{(\\bar{X}_1 - \\bar{X}_2) - \\delta_0}{\\sqrt{S_1^2/n_1 + S_2^2/n_2}}, \\qquad \\nu \\text{ fra Welch}", name: "To-utvalgs t-test (ulik varians)", caption: "Pensum 10.5 (før «Unknown But Equal Variances»). Frihetsgradene $\\nu$ er som i KI for $\\mu_1 - \\mu_2$, og Welch-formelen står ikke i formelboka." },
+        { type: "formula", latex: "T = \\dfrac{(\\bar{X}_1 - \\bar{X}_2) - \\delta_0}{\\sqrt{S_1^2/n_1 + S_2^2/n_2}}, \\qquad \\nu \\text{ fra Welch}", name: "To-utvalgs t-test (ulik varians)", book: { status: "missing" }, caption: "Pensum 10.5 (før «Unknown But Equal Variances»). Frihetsgradene $\\nu$ er som i KI for $\\mu_1 - \\mu_2$, og Welch-formelen står ikke i formelboka." },
         { type: "text", text: "**Parede observasjoner** (samme enhet målt to ganger, for eksempel blodtrykk før og etter). Bruk differansene $D_i = X_i - Y_i$ og gjør en vanlig ett-utvalgs-t-test på dem. Dette er øvingsstoff (STACK 11), og gir $n - 1$ frihetsgrader." },
-        { type: "formula", latex: "\\bar{D} = \\dfrac{1}{n}\\sum D_i, \\qquad T = \\dfrac{\\bar{D} - \\delta_0}{S_D/\\sqrt{n}} \\sim t_{n-1}", name: "Parede observasjoner", caption: `Samme form som t-størrelsen i formelboka ${formelbok("s. 27")}, anvendt på differansene.` },
+        { type: "formula", latex: "\\bar{D} = \\dfrac{1}{n}\\sum D_i, \\qquad T = \\dfrac{\\bar{D} - \\delta_0}{S_D/\\sqrt{n}} \\sim t_{n-1}", name: "Parede observasjoner", book: { status: "partial", pages: "27", missing: "Differansene D_i og anvendelsen må læres; boka har t-størrelsen" }, caption: `Samme form som t-størrelsen i formelboka ${formelbok("s. 27")}, anvendt på differansene.` },
         { type: "example", title: "Fire par, $H_0: \\mu_D = 0$", blocks: [
           { type: "text", text: "Differanser $d = (2, 3, 1, 4)$: $\\bar{d} = 2{,}5$ og $s_D^2 = 5/3$, så $s_D = 1{,}291$." },
           { type: "text", text: "$t = 2{,}5/(1{,}291/2) = 3{,}87$ med 3 frihetsgrader. Siden $3{,}182 < 3{,}87 < 4{,}541$, er tosidig $p$-verdi mellom 0,02 og 0,05. Forkast $H_0$ på 5 %-nivå." },
         ] },
-        { type: "formula", latex: "n \\ge \\left(\\dfrac{(z_\\alpha + z_\\beta)\\,\\sigma}{\\delta}\\right)^2", name: "Utvalgsstørrelse for test (ensidig)", caption: "Læreboka 10.6 (pensum). Ikke i formelboka. $\\delta$ er forskjellen du vil oppdage, og $z_\\beta$ gir ønsket styrke $1 - \\beta$." },
+        { type: "formula", latex: "n \\ge \\left(\\dfrac{(z_\\alpha + z_\\beta)\\,\\sigma}{\\delta}\\right)^2", name: "Utvalgsstørrelse for test (ensidig)", book: { status: "missing" }, caption: "Læreboka 10.6 (pensum). Ikke i formelboka. $\\delta$ er forskjellen du vil oppdage, og $z_\\beta$ gir ønsket styrke $1 - \\beta$." },
         { type: "example", title: "Styrke 0,8, $\\sigma = 8$, $\\delta = 4$, $\\alpha = 0{,}05$", blocks: [
           { type: "text", text: "$z_{0{,}05} = 1{,}645$ og $z_{0{,}20} = 0{,}842$. Da er $n \\ge (2{,}487 \\cdot 8/4)^2 = 24{,}7$, så $n = 25$." },
         ] },

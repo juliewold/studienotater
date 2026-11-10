@@ -50,8 +50,8 @@ export const lesson: Lesson = {
       id: "mu",
       title: "Gjennomsnitt μ",
       blocks: [
-        { type: "formula", latex: "\\bar{x} \\pm z_{\\alpha/2}\\dfrac{\\sigma}{\\sqrt{n}}", name: "KI for μ, σ kjent", caption: `Kritisk verdi $z_{\\alpha/2}$ fra formelboka ${formelbok("s. 3")}. For 95 % er $z_{0{,}025} = 1{,}960$.` },
-        { type: "formula", latex: "\\bar{x} \\pm t_{\\alpha/2,\\,n-1}\\dfrac{s}{\\sqrt{n}}", name: "KI for μ, σ ukjent", caption: `Kritisk verdi $t_{\\alpha/2, n-1}$ fra formelboka ${formelbok("s. 4")}. Tabellen gir øvre hale, så bruk $\\alpha/2$.` },
+        { type: "formula", latex: "\\bar{x} \\pm z_{\\alpha/2}\\dfrac{\\sigma}{\\sqrt{n}}", name: "KI for μ, σ kjent", book: { status: "partial", pages: "3", missing: "KI-formelen må læres; boka har z-verdiene" }, caption: `Kritisk verdi $z_{\\alpha/2}$ fra formelboka ${formelbok("s. 3")}. For 95 % er $z_{0{,}025} = 1{,}960$.` },
+        { type: "formula", latex: "\\bar{x} \\pm t_{\\alpha/2,\\,n-1}\\dfrac{s}{\\sqrt{n}}", name: "KI for μ, σ ukjent", book: { status: "partial", pages: "27", missing: "KI-formelen må læres; boka har t-tabellen på side 4" }, caption: `Kritisk verdi $t_{\\alpha/2, n-1}$ fra formelboka ${formelbok("s. 4")}. Tabellen gir øvre hale, så bruk $\\alpha/2$.` },
         { type: "example", title: "$n = 16$, $\\bar{x} = 50$, $s = 8$", blocks: [
           { type: "text", text: "$t_{0{,}025, 15} = 2{,}131$. Standardfeilen er $8/\\sqrt{16} = 2$." },
           { type: "text", text: "KI: $50 \\pm 2{,}131 \\cdot 2 = 50 \\pm 4{,}26$, altså $(45{,}74;\\ 54{,}26)$." },
@@ -62,7 +62,7 @@ export const lesson: Lesson = {
       id: "andel",
       title: "Andel p",
       blocks: [
-        { type: "formula", latex: "\\hat{p} \\pm z_{\\alpha/2}\\sqrt{\\dfrac{\\hat{p}(1-\\hat{p})}{n}}", name: "KI for andel", caption: `Tilnærmingen krever at $n\\hat{p}$ og $n(1-\\hat{p})$ er store. Kritisk verdi fra formelboka ${formelbok("s. 3")}.` },
+        { type: "formula", latex: "\\hat{p} \\pm z_{\\alpha/2}\\sqrt{\\dfrac{\\hat{p}(1-\\hat{p})}{n}}", name: "KI for andel", book: { status: "partial", pages: "3", missing: "KI-formelen må læres; boka har z-verdiene" }, caption: `Tilnærmingen krever at $n\\hat{p}$ og $n(1-\\hat{p})$ er store. Kritisk verdi fra formelboka ${formelbok("s. 3")}.` },
         { type: "example", title: "80 av 200", blocks: [
           { type: "text", text: "$\\hat{p} = 0{,}4$, og $\\sqrt{0{,}4 \\cdot 0{,}6/200} = 0{,}0346$. KI: $0{,}4 \\pm 1{,}96 \\cdot 0{,}0346 = 0{,}4 \\pm 0{,}068$, altså $(0{,}332;\\ 0{,}468)$." },
         ] },
@@ -72,7 +72,7 @@ export const lesson: Lesson = {
       id: "varians",
       title: "Varians σ²",
       blocks: [
-        { type: "formula", latex: "\\left(\\dfrac{(n-1)s^2}{\\chi^2_{\\alpha/2,\\,n-1}},\\ \\dfrac{(n-1)s^2}{\\chi^2_{1-\\alpha/2,\\,n-1}}\\right)", name: "KI for σ²", caption: `Formelboka ${formelbok("s. 5")} gir øvre hale. Øvre grense bruker $\\chi^2_{1-\\alpha/2}$, som er den nedre verdien. Brukes med normale data.` },
+        { type: "formula", latex: "\\left(\\dfrac{(n-1)s^2}{\\chi^2_{\\alpha/2,\\,n-1}},\\ \\dfrac{(n-1)s^2}{\\chi^2_{1-\\alpha/2,\\,n-1}}\\right)", name: "KI for σ²", book: { status: "partial", pages: "27", missing: "KI-formelen må læres; boka har χ²-tabellen på side 5" }, caption: `Formelboka ${formelbok("s. 5")} gir øvre hale. Øvre grense bruker $\\chi^2_{1-\\alpha/2}$, som er den nedre verdien. Brukes med normale data.` },
         { type: "example", title: "$n = 10$, $s^2 = 4$", blocks: [
           { type: "text", text: "$\\chi^2_{0{,}025, 9} = 19{,}023$ og $\\chi^2_{0{,}975, 9} = 2{,}700$ (side 5)." },
           { type: "text", text: "Nedre grense: $9 \\cdot 4/19{,}023 = 1{,}89$. Øvre grense: $9 \\cdot 4/2{,}700 = 13{,}33$. KI for $\\sigma^2$ er $(1{,}89;\\ 13{,}33)$." },
@@ -84,7 +84,7 @@ export const lesson: Lesson = {
       id: "to-utvalg",
       title: "To utvalg: forskjell i gjennomsnitt",
       blocks: [
-        { type: "formula", latex: "(\\bar{x}_1 - \\bar{x}_2) \\pm t_{\\alpha/2,\\,\\nu} \\sqrt{\\dfrac{s_1^2}{n_1} + \\dfrac{s_2^2}{n_2}}", name: "KI for μ₁ − μ₂ (ulik varians)", caption: "Pensum 9.8 (før «Variances Unknown but Equal»). Frihetsgradene $\\nu$ beregnes med Welch-formelen i læreboka, som ikke står i formelboka. Felles varians (pooled) er ikke pensum." },
+        { type: "formula", latex: "(\\bar{x}_1 - \\bar{x}_2) \\pm t_{\\alpha/2,\\,\\nu} \\sqrt{\\dfrac{s_1^2}{n_1} + \\dfrac{s_2^2}{n_2}}", name: "KI for μ₁ − μ₂ (ulik varians)", book: { status: "missing" }, caption: "Pensum 9.8 (før «Variances Unknown but Equal»). Frihetsgradene $\\nu$ beregnes med Welch-formelen i læreboka, som ikke står i formelboka. Felles varians (pooled) er ikke pensum." },
         { type: "box", variant: "pitfall", title: "Ikke pensum", blocks: [
           { type: "text", text: "KI for forholdet mellom to varianser (læreboka 9.13) og KI for forskjell i andeler (9.11) er ikke pensum. Variansforholdet brukes bare i testen i tema 10 (10.10)." },
         ] },
@@ -94,7 +94,7 @@ export const lesson: Lesson = {
       id: "prediksjon",
       title: "Prediksjonsintervall",
       blocks: [
-        { type: "formula", latex: "\\bar{x} \\pm t_{\\alpha/2,\\,n-1}\\, s\\sqrt{1 + \\dfrac{1}{n}}", name: "Prediksjonsintervall", caption: "Ikke i formelboka. Leddet $1$ er usikkerheten i den nye observasjonen, og $1/n$ er usikkerheten i gjennomsnittet." },
+        { type: "formula", latex: "\\bar{x} \\pm t_{\\alpha/2,\\,n-1}\\, s\\sqrt{1 + \\dfrac{1}{n}}", name: "Prediksjonsintervall", book: { status: "missing" }, caption: "Ikke i formelboka. Leddet $1$ er usikkerheten i den nye observasjonen, og $1/n$ er usikkerheten i gjennomsnittet." },
         { type: "example", title: "Samme data som over", blocks: [
           { type: "text", text: "$s\\sqrt{1 + 1/16} = 8 \\cdot 1{,}031 = 8{,}25$, og $2{,}131 \\cdot 8{,}25 = 17{,}57$." },
           { type: "text", text: "Prediksjonsintervall: $50 \\pm 17{,}57$, altså $(32{,}43;\\ 67{,}57)$. Det er mye bredere enn KI for $\\mu$." },
@@ -105,7 +105,7 @@ export const lesson: Lesson = {
       id: "utvalgsstorrelse",
       title: "Velge utvalgsstørrelse",
       blocks: [
-        { type: "formula", latex: "n \\ge \\left(\\dfrac{z_{\\alpha/2}\\,\\sigma}{E}\\right)^2", name: "Nødvendig utvalgsstørrelse", caption: "Ikke i formelboka. $E$ er ønsket feilmargin i KI for $\\mu$ med $\\sigma$ kjent. Rund alltid opp." },
+        { type: "formula", latex: "n \\ge \\left(\\dfrac{z_{\\alpha/2}\\,\\sigma}{E}\\right)^2", name: "Nødvendig utvalgsstørrelse", book: { status: "missing" }, caption: "Ikke i formelboka. $E$ er ønsket feilmargin i KI for $\\mu$ med $\\sigma$ kjent. Rund alltid opp." },
         { type: "example", title: "$\\sigma = 8$, $E = 2$, 95 %", blocks: [
           { type: "text", text: "$n \\ge (1{,}96 \\cdot 8/2)^2 = 7{,}84^2 = 61{,}5$. Velg $n = 62$." },
         ] },

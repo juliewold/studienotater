@@ -3,6 +3,7 @@ import type { ConceptType } from "../../../data/concepts/types";
 import { loadNoteSources, type CurriculumWorkspace } from "../../../services/subjects/curriculumWorkspaceService";
 import { extractFormulas, notesForUnit, OTHER_UNIT_ID, type CurriculumUnit, type NoteSource } from "../../../services/subjects/curriculumContent";
 import { lessonFormulas, loadSubjectLessons } from "../../../data/curriculum/lessons";
+import type { FormulaBookStatus } from "../../../data/curriculum/lessons/types";
 
 export const conceptTypeLabels: Record<ConceptType, string> = {
   definition: "Definisjon", theorem: "Teorem", formula: "Formel", method: "Metode",
@@ -16,6 +17,8 @@ export type FormulaItem = {
   source: { label: string; to: string };
   /** From a reviewed lesson, as opposed to a raw note. */
   reviewed: boolean;
+  /** Where the formula stands in the allowed formula book. Only set for subjects that have classified their formulas. */
+  book?: FormulaBookStatus;
 };
 export type UnitFormulas = { unit?: CurriculumUnit; reviewed: boolean; formulas: FormulaItem[] };
 
@@ -47,7 +50,7 @@ export function useSubjectFormulas(workspace: CurriculumWorkspace | null, includ
       const groups: UnitFormulas[] = workspace.units.map(unit => {
         const lesson = lessons.get(unit.id);
         if (lesson) return { unit, reviewed: true, formulas: take(lessonFormulas(lesson).map(formula => ({
-          key: formula.key, latex: formula.latex, title: formula.name, description: formula.caption ?? "", reviewed: true,
+          key: formula.key, latex: formula.latex, title: formula.name, description: formula.caption ?? "", reviewed: true, book: formula.book,
           source: { label: formula.sectionTitle, to: `${base}/tema/pensum/${unit.id}` },
         }))) };
         const notes = includeNotes ? notesForUnit(unit, workspace.notes, workspace.noteLinks).flatMap(note => byId.get(note.id) ?? []) : [];

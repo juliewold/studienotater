@@ -37,7 +37,7 @@ export const lesson: Lesson = {
       title: "Inversjonsmetoden",
       blocks: [
         { type: "text", text: "Anta at $F$ er strengt voksende. La $U \\sim \\text{U}(0, 1)$, og la $X = F^{-1}(U)$. Da er $P(X \\le x) = P(F^{-1}(U) \\le x) = P(U \\le F(x)) = F(x)$. Derfor har $X$ fordelingsfunksjon $F$." },
-        { type: "formula", latex: "P(X \\le x) = P(U \\le F(x)) = F(x)", name: "Hvorfor inversjonsmetoden virker", caption: "Argumentet må kunnes. Det står ikke i formelboka." },
+        { type: "formula", latex: "P(X \\le x) = P(U \\le F(x)) = F(x)", name: "Hvorfor inversjonsmetoden virker", book: { status: "missing" }, caption: "Argumentet må kunnes. Det står ikke i formelboka." },
         { type: "example", title: "Eksponensial med $\\beta = 10$", blocks: [
           { type: "text", text: "$F(x) = 1 - e^{-x/10}$. Løs $u = 1 - e^{-x/10}$ for $x$: $e^{-x/10} = 1 - u$, så $x = -10\\ln(1 - u)$." },
           { type: "text", text: "Med $u = 0{,}5$ får du $x = -10\\ln(0{,}5) \\approx 6{,}93$. Forventningen er $\\beta = 10$, så 6,93 er under medianen." },
@@ -52,7 +52,7 @@ export const lesson: Lesson = {
       title: "Simulering fra en diskret fordeling",
       blocks: [
         { type: "text", text: "For diskrete variabler er $F$ en trappefunksjon. Sett $X = x_k$ der $F(x_{k-1}) < U \\le F(x_k)$. Det er den minste $x$ med $F(x) \\ge U$." },
-        { type: "formula", latex: "X = x_k \\quad \\text{når} \\quad F(x_{k-1}) < U \\le F(x_k)", name: "Diskret inversjon", caption: "Ikke i formelboka. Metoden er den samme som for kontinuerlige fordelinger." },
+        { type: "formula", latex: "X = x_k \\quad \\text{når} \\quad F(x_{k-1}) < U \\le F(x_k)", name: "Diskret inversjon", book: { status: "missing" }, caption: "Ikke i formelboka. Metoden er den samme som for kontinuerlige fordelinger." },
         { type: "example", title: "Tre utfall", blocks: [
           { type: "text", text: "$P(X = 0) = 0{,}3$, $P(X = 1) = 0{,}5$ og $P(X = 2) = 0{,}2$. Da er $F(0) = 0{,}3$, $F(1) = 0{,}8$ og $F(2) = 1$." },
           { type: "text", text: "$U = 0{,}25$ gir $X = 0$. $U = 0{,}65$ gir $X = 1$. $U = 0{,}9$ gir $X = 2$." },
@@ -64,7 +64,7 @@ export const lesson: Lesson = {
       title: "Monte Carlo-estimat",
       blocks: [
         { type: "text", text: "Simuler $N$ uavhengige utfall og tell hvor ofte hendelsen $A$ inntreffer. Relativ frekvens estimerer $P(A)$. Estimatet er forventningsrett og har standardfeil som avtar med $\\sqrt{N}$." },
-        { type: "formula", latex: "\\hat{p} = \\dfrac{\\text{antall } A}{N}, \\qquad E(\\hat{p}) = p, \\qquad \\text{sd}(\\hat{p}) = \\sqrt{\\dfrac{p(1-p)}{N}}", name: "Monte Carlo-estimat", caption: "Ikke i formelboka. Usikkerheten avhenger av $p$ og $N$, ikke av størrelsen på populasjonen." },
+        { type: "formula", latex: "\\hat{p} = \\dfrac{\\text{antall } A}{N}, \\qquad E(\\hat{p}) = p, \\qquad \\text{sd}(\\hat{p}) = \\sqrt{\\dfrac{p(1-p)}{N}}", name: "Monte Carlo-estimat", book: { status: "missing" }, caption: "Ikke i formelboka. Usikkerheten avhenger av $p$ og $N$, ikke av størrelsen på populasjonen." },
         { type: "example", title: "Sum av tre terningkast", blocks: [
           { type: "text", text: "Simuler $W = X + Y + Z$ med tre terninger. Estimatet for $P(W \\ge 15)$ er antall simuleringer med $W \\ge 15$ delt på $N$." },
           { type: "text", text: "Teoretisk er $E(W) = 3 \\cdot 3{,}5 = 10{,}5$. Kontroller at simuleringen gir gjennomsnitt nær 10,5 før du stoler på resten." },
