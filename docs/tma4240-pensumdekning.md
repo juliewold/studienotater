@@ -54,14 +54,14 @@ Stokastisk simulering har ingen eget tema i emnematrisen (ingen temaside), men e
 Disse må løses i temasidene, ikke bare i kartleggingen.
 
 1. **Kap 8.1 er pensum, men er ikke plassert i emnematrisen.** Foreslått plassering: Parameterestimering (utvalg og utvalgsfordeling som innledning).
-2. **Kap 9.10 og 9.12 er pensum, men er ikke nevnt i emnematrisens KI-rad.** De er trolig to-utvalgs-/tilnærmede intervaller. Foreslått plassering: KI. Sjekk innholdet i læreboka.
+2. **Kap 9.10 og 9.12** er verifisert mot læreboka: 9.10 er KI for andel og 9.12 er KI for σ². Begge er pensum. Plassering: KI-temaet.
 3. **To-utvalg-t med felles varians er ikke pensum** (9.8, 10.5). Ikke ta med som hovedinnhold. Eventuelt nevnes det kort som «ikke pensum».
 4. **Hypergeometrisk fordeling (5.3) er ikke pensum.** Utelat den.
 5. **Teorem 7.2 og 7.4 er ikke pensum.** Utelat dem i Funksjoner.
 6. **Supabase har «Normal som tilnærming til binomisk» under Funksjoner, mens Walpole 6.5 ligger i Kap 6.** Emnematrisen bekrefter plasseringen under Funksjoner, så vi beholder den.
 7. **4.3 er delt:** Kovarians og lineære funksjoner hører til Forventning. Feilforplantning hører til Funksjoner.
 8. **Ernst (E 3, 4.2) og ER (2.10, 4.5) er pensum uten at de står i læreboka.** Ernst-innholdet hører til permutasjonstestene i Hypotesetesting. ER-innholdet hører til Stokastisk simulering.
-9. **Supabase mangler egne subtopics for:** to-utvalgs-KI og -test (9.10, 9.12, 10.7), og introduksjonen til diskrete og kontinuerlige fordelinger (emnematrisen, uke 37/38). Dekkes i temasidene.
+9. **Supabase mangler egne subtopics for:** to-utvalgs-test (10.5) og grafiske metoder (10.7). Dekkes i temasidene. 9.11 og 9.13 er ikke pensum.
 
 ## 4. Status
 

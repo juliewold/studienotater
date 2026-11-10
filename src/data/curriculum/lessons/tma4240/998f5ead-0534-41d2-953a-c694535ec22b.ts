@@ -140,6 +140,8 @@ export const lesson: Lesson = {
           ["Binomisk test, H0: p = 1/2", "Aug 2026, oppg. 5a", "Forkast for store $X$. Velg minste $c$ med $P(X > c \\mid H_0) \\le \\alpha$. Bruk binomisk tabell (side 12–17) med $p = 0{,}50$."],
           ["Teststyrke for binomisk test", "Aug 2026, oppg. 5b", "Styrken er $1 - P(X \\le c \\mid p)$. Finn den $p$ der styrken er omtrent 0,8."],
           ["Poisson-test med eksakt og normal p-verdi", "Des 2025, oppg. 7b–c", "Bruk eksakt p-verdi fra Poisson-tabellen når den finnes. Normaltilnærmingen er grovere for små $\\mu$."],
+          ["Gyldig testobservator (TMA4245)", "Mai 2026, oppg. 5", "En testobservator må være en observator (ingen ukjente parametre) og ha kjent fordeling under $H_0$. $(\\bar{X} - \\mu_0)/(\\sigma/\\sqrt{n})$ og $(\\bar{X} - \\mu_0)/(S/\\sqrt{n})$ kvalifiserer, men $\\bar{X} - \\mu$ gjør ikke det."],
+          ["Type I- og type II-feil for normal test (TMA4245)", "Mai 2026, oppg. 6", "Type I: $P(\\text{forkast} \\mid H_0)$, standardiser med $\\mu_0$. Type II: standardiser med den sanne $\\mu$, og bruk $\\Phi$."],
         ] },
         { type: "example", title: "Aug 2026, oppg. 5a: kritisk verdi for $n = 16$", blocks: [
           { type: "text", text: "$H_0: p = \\tfrac{1}{2}$ mot $H_1: p > \\tfrac{1}{2}$. Forkast for $X > c$." },
@@ -150,6 +152,23 @@ export const lesson: Lesson = {
           { type: "text", text: "$H_0: \\lambda = 9$ mot $H_1: \\lambda < 9$, altså $\\mu = 18$ for 2 år. Observert $x = 12$." },
           { type: "text", text: "Eksakt: forkast for $X \\le 10$. P-verdi $= P(X \\le 12 \\mid H_0) = 0{,}0917$. Normalt: $z = (12 - 18)/\\sqrt{18} = -1{,}41$, og $p \\approx \\Phi(-1{,}41) = 0{,}0787$. Vi beholder $H_0$ på 5 %-nivå." },
           { type: "text", text: "Styrke ved $\\lambda = 5$, altså $\\mu = 10$: eksakt $P(X \\le 10 \\mid \\mu = 10) = 0{,}5830$. Normaltilnærmingen gir $0{,}6255$." },
+        ] },
+      ],
+    },
+    {
+      id: "to-utvalg-parede",
+      title: "To utvalg, parede observasjoner og utvalgsstørrelse",
+      blocks: [
+        { type: "formula", latex: "T = \\dfrac{(\\bar{X}_1 - \\bar{X}_2) - \\delta_0}{\\sqrt{S_1^2/n_1 + S_2^2/n_2}}, \\qquad \\nu \\text{ fra Welch}", name: "To-utvalgs t-test (ulik varians)", caption: "Pensum 10.5 (før «Unknown But Equal Variances»). Frihetsgradene $\\nu$ er som i KI for $\\mu_1 - \\mu_2$, og Welch-formelen står ikke i formelboka." },
+        { type: "text", text: "**Parede observasjoner** (samme enhet målt to ganger, for eksempel blodtrykk før og etter). Bruk differansene $D_i = X_i - Y_i$ og gjør en vanlig ett-utvalgs-t-test på dem. Dette er øvingsstoff (STACK 11), og gir $n - 1$ frihetsgrader." },
+        { type: "formula", latex: "\\bar{D} = \\dfrac{1}{n}\\sum D_i, \\qquad T = \\dfrac{\\bar{D} - \\delta_0}{S_D/\\sqrt{n}} \\sim t_{n-1}", name: "Parede observasjoner", caption: `Samme form som t-størrelsen i formelboka ${formelbok("s. 27")}, anvendt på differansene.` },
+        { type: "example", title: "Fire par, $H_0: \\mu_D = 0$", blocks: [
+          { type: "text", text: "Differanser $d = (2, 3, 1, 4)$: $\\bar{d} = 2{,}5$ og $s_D^2 = 5/3$, så $s_D = 1{,}291$." },
+          { type: "text", text: "$t = 2{,}5/(1{,}291/2) = 3{,}87$ med 3 frihetsgrader. Siden $3{,}182 < 3{,}87 < 4{,}541$, er tosidig $p$-verdi mellom 0,02 og 0,05. Forkast $H_0$ på 5 %-nivå." },
+        ] },
+        { type: "formula", latex: "n \\ge \\left(\\dfrac{(z_\\alpha + z_\\beta)\\,\\sigma}{\\delta}\\right)^2", name: "Utvalgsstørrelse for test (ensidig)", caption: "Læreboka 10.6 (pensum). Ikke i formelboka. $\\delta$ er forskjellen du vil oppdage, og $z_\\beta$ gir ønsket styrke $1 - \\beta$." },
+        { type: "example", title: "Styrke 0,8, $\\sigma = 8$, $\\delta = 4$, $\\alpha = 0{,}05$", blocks: [
+          { type: "text", text: "$z_{0{,}05} = 1{,}645$ og $z_{0{,}20} = 0{,}842$. Da er $n \\ge (2{,}487 \\cdot 8/4)^2 = 24{,}7$, så $n = 25$." },
         ] },
       ],
     },

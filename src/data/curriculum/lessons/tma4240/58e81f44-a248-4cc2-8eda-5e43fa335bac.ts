@@ -118,5 +118,17 @@ export const lesson: Lesson = {
         ] },
       ],
     },
+    {
+      id: "oevinger",
+      title: "Seriekobling og Weibull (fra øvingene)",
+      blocks: [
+        { type: "text", text: "To fordelinger som ikke står i kapittel 6-pensumlisten, men som brukes i STACK 6 og 13. Øvingene er pensum, så kjenn dem." },
+        { type: "formula", latex: "P(\\min(X_1, \\ldots, X_n) > t) = \\prod_{i=1}^{n} P(X_i > t)", name: "Seriekobling: minimum av uavhengige", caption: "Et system med $n$ uavhengige komponenter virker bare så lenge alle virker. Ikke i formelboka." },
+        { type: "example", title: "Solcellepanel i serie", blocks: [
+          { type: "text", text: "Hver celle har eksponensiell levetid med forventning $\\beta$. For $n$ celler gir det $P(\\text{panel virker} > t) = e^{-nt/\\beta}$, altså eksponensial med forventning $\\beta/n$." },
+        ] },
+        { type: "formula", latex: "f(x) = \\alpha\\beta\\,x^{\\beta-1} e^{-\\alpha x^{\\beta}}, \\qquad x \\ge 0", name: "Weibull-fordelingen", caption: `Parametrisering som i formelboka ${formelbok("s. 28")}. Eksponensial er tilfellet $\\beta = 1$.` },
+      ],
+    },
   ],
 };
