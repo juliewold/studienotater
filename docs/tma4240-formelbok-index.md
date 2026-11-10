@@ -17,12 +17,12 @@ Intern arbeidsindeks. Den brukes til å knytte formelbokoppslag til temasidene i
 | 3 | Kritiske verdier z_α (P(Z > z_α) = α) | Ja | 9, 10 |
 | 4 | Kritiske verdier t (P(T > t) = α), ν = 1–∞ | Ja | 9, 10, 11 |
 | 5 | Kritiske verdier χ² (P(χ² > c) = α), ν = 1–100 | Ja | 6, 8, 9, 10 |
-| 6 | F-tabell, α = 0,05, ν₁ = 1–10 | Ja (10.8) | 10 |
-| 7 | F-tabell, α = 0,05, ν₁ = 11–∞ | Ja (10.8) | 10 |
-| 8 | F-tabell, α = 0,025, ν₁ = 1–10 | Ja (9.12, 10.8) | 9, 10 |
-| 9 | F-tabell, α = 0,025, ν₁ = 11–∞ | Ja (9.12, 10.8) | 9, 10 |
-| 10 | F-tabell, α = 0,01, ν₁ = 1–10 | Ja (10.8) | 10 |
-| 11 | F-tabell, α = 0,01, ν₁ = 11–∞ | Ja (10.8) | 10 |
+| 6 | F-tabell, α = 0,05, ν₁ = 1–10 | Ja (10.10, før Eksempel 10.13) | 10 |
+| 7 | F-tabell, α = 0,05, ν₁ = 11–∞ | Ja (10.10, før Eksempel 10.13) | 10 |
+| 8 | F-tabell, α = 0,025, ν₁ = 1–10 | Ja (10.10, før Eksempel 10.13). Ikke 9.12 | 10 |
+| 9 | F-tabell, α = 0,025, ν₁ = 11–∞ | Ja (10.10, før Eksempel 10.13). Ikke 9.12 | 10 |
+| 10 | F-tabell, α = 0,01, ν₁ = 1–10 | Ja (10.10, før Eksempel 10.13) | 10 |
+| 11 | F-tabell, α = 0,01, ν₁ = 11–∞ | Ja (10.10, før Eksempel 10.13) | 10 |
 | 12 | Binomisk fordeling, P(X ≤ x), n = 2–8 | Ja (5.2) | 5, 10 |
 | 13 | Binomisk fordeling, P(X ≤ x), n = 9–11 | Ja (5.2) | 5, 10 |
 | 14 | Binomisk fordeling, P(X ≤ x), n = 12–14 | Ja (5.2) | 5, 10 |
@@ -39,7 +39,7 @@ Intern arbeidsindeks. Den brukes til å knytte formelbokoppslag til temasidene i
 | 25 | Diskrete fordelinger: binomisk, Poisson, geometrisk, negativ binomisk | Ja (5.2, 5.4–5.6) | 5 |
 | 26 | Diskret uniform, multinomisk, normal, eksponential | Ja (5.1, 5.2, 6.1–6.2, 6.6) | 5, 6 |
 | 27 | χ²-fordeling og t-fordeling, med samplingresultater | Ja (6.7, 8.5–8.6) | 6, 8, 9, 11 |
-| 28 | Gamma, Weibull, F, kontinuerlig uniform | Ja (6.1, 6.6, 10.8) | 6, 10 |
+| 28 | Gamma, Weibull, F, kontinuerlig uniform | Ja (6.1, 6.6, 10.10) | 6, 10 |
 | 29 | Beta, Pareto, lognormal, Cauchy, Laplace | **Nei** | — |
 | 30 | Logistisk, invers Gauss, invers gamma, multinormal | **Nei** | — |
 | 31 | Sammenhengsdiagram mellom fordelinger (Leemis) | Støtte (6.5, 8.4) | 5, 6, 7 |
@@ -84,7 +84,7 @@ Intern arbeidsindeks. Den brukes til å knytte formelbokoppslag til temasidene i
   - side 6–7: α = 0,05
   - side 8–9: α = 0,025
   - side 10–11: α = 0,01
-- **Når:** to-utvalgs-test av σ₁²/σ₂² (10.8) og KI for variansforhold (9.12).
+- **Når:** to-utvalgs-test av σ₁²/σ₂² (10.10, før Eksempel 10.13). KI for variansforhold er 9.13 og er ikke pensum.
 - **Må kunne:** F_{1−α,ν₁,ν₂} = 1 / F_{α,ν₂,ν₁}. Det står på side 28 og brukes for venstrehalen.
 - **Eksempel:** f_{0,05,1,10} = 4,96.
 
@@ -248,5 +248,5 @@ Dette er ikke i formelboka, og det må du forstå eller huske selv:
 - [x] Pensumstatus for hver side er koblet til [pensumkartleggingen](tma4240-pensumdekning.md).
 - [ ] Typiske eksamensoppgaver er ikke verifisert mot eksamenspapirene, som ligger på Google Disk og ikke er lest. Oppgavehenvisninger i temasidene er basert på STACK-forsøk, innleveringer og tidligere arbeid med eksamen aug 2026.
 - [ ] Lærebokkapitlene er ikke lest. Forklaringene er basert på pensum, formelboka og forelesningsnotatene.
-- [ ] Innholdet i pensumpunktene 9.10 og 9.12 er antatt (to-utvalg/proporsjoner og variansforhold). Sjekk i læreboka før eksamen.
+- [x] Pensumpunktene 9.10 (KI for andel) og 9.12 (KI for σ²) er verifisert mot læreboka Walpole 9. utgave.
 - [ ] Forelesningsnotatene (Jupyter-PDF fra Jarle) er brukt til notasjon, ikke gjennomgått punkt for punkt.

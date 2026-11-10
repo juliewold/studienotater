@@ -54,7 +54,7 @@ export const lesson: Lesson = {
       blocks: [
         { type: "text", text: "Observatoren er en funksjon av de stokastiske $X_i$. Estimatet er verdien for dine observasjoner. Forventningsrett betyr at du i gjennomsnitt treffer riktig verdi. Varians forteller hvor mye estimatet varierer fra utvalg til utvalg." },
         { type: "formula", latex: "\\text{Bias}(\\hat{\\theta}) = E(\\hat{\\theta}) - \\theta", name: "Bias", caption: "Ikke i formelboka. $\\hat{\\theta}$ er forventningsrett når bias er 0." },
-        { type: "formula", latex: "E(\\bar{X}) = \\mu, \\qquad \\text{Var}(\\bar{X}) = \\dfrac{\\sigma^2}{n}", name: "Gjennomsnittet som estimator", caption: `Formelboka ${formelbok("s. 35")}: lineærkombinasjon med $a_i = 1/n$.` },
+        { type: "formula", latex: "E(\\bar{X}) = \\mu, \\qquad \\text{Var}(\\bar{X}) = \\dfrac{\\sigma^2}{n}", name: "Gjennomsnittet som estimator", caption: `Formelboka ${formelbok("s. 34")}: lineærkombinasjon med $a_i = 1/n$.` },
         { type: "formula", latex: "E(S^2) = \\sigma^2", name: "Utvalgsvariansen er forventningsrett", caption: `Formelboka ${formelbok("s. 27")} gir $(n-1)S^2/\\sigma^2 \\sim \\chi^2_{n-1}$, og forventningen til $\\chi^2_{n-1}$ er $n - 1$.` },
         { type: "example", title: "Hvorfor $n - 1$?", blocks: [
           { type: "text", text: "Med $\\sum (x_i - \\bar{x})^2$ er summen alltid mindre enn $\\sum (x_i - \\mu)^2$, fordi $\\bar{x}$ er valgt til å minimere den. Å dele på $n$ gir en systematisk underestimering av $\\sigma^2$. Å dele på $n - 1$ kompenserer for at en frihetsgrad er brukt på $\\bar{x}$." },
@@ -101,6 +101,8 @@ export const lesson: Lesson = {
         { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
           ["Maks. sannsynlighet, normal med kjent σ", "Aug 2026, oppg. 6a", "$L(\\mu) = \\prod f(x_i;\\mu)$, log og deriver. Løsningen er $\\hat\\mu = \\bar{X}$."],
           ["Maks. sannsynlighet med transformert log-sannsynlighet", "Des 2025, oppg. 5c", "Vis tettheten først. Deriver log-likelihood med hensyn på $\\mu$, og løs $\\ell'(\\mu) = 0$."],
+          ["Maks. sannsynlighet for en vektet sum (TMA4245)", "Mai 2026, oppg. 4", "Med $X \\sim N(\\mu, 4)$ og $Y \\sim N(2\\mu, 9)$ uavhengige: $\\ell'(\\mu) = 0$ gir $\\hat\\mu = (9X + 8Y)/25$."],
+          ["Velge mellom to forventningsrette estimatorer (TMA4245)", "Mai 2026, oppg. 9c", "Sjekk forventningsrett først. Foretrekk den med minst varians, og begrunn."],
         ] },
         { type: "example", title: "Aug 2026, oppg. 6a: estimat for forventet vektøkning", blocks: [
           { type: "text", text: "$\\hat\\mu = \\frac{1}{10}\\sum x_i = \\frac{52{,}65}{10} = 5{,}265$." },
@@ -108,6 +110,20 @@ export const lesson: Lesson = {
         { type: "example", title: "Des 2025, oppg. 5c: estimat for μ i flomhøyde-modellen", blocks: [
           { type: "text", text: "$\\hat\\mu = \\ln n - \\ln \\sum e^{-X_i}$. Med $n = 50$ og $\\sum e^{-x_i} = 253{,}4$ blir $\\hat\\mu = \\ln 50 - \\ln 253{,}4 \\approx -1{,}62$." },
         ] },
+      ],
+    },
+    {
+      id: "simulering-estimator",
+      title: "Estimering og stokastisk simulering",
+      blocks: [
+        { type: "text", text: "Når en estimator er vanskelig å analysere, simulerer du mange utvalg fra en modell med kjent parameter, beregner estimatoren for hvert utvalg, og ser på gjennomsnitt og spredning. Gjennomsnittet minus den sanne verdien estimerer bias, og standardavviket estimerer standardfeilen." },
+        { type: "pseudocode", title: "Simuler egenskapene til en estimator", lines: [
+          "for i = 1 til N:",
+          "  simuler x₁, …, xₙ fra modellen med sann θ",
+          "  θ̂ᵢ ← estimator(x₁, …, xₙ)",
+          "bias ≈ gjennomsnitt(θ̂ᵢ) − θ",
+          "standardfeil ≈ sd(θ̂ᵢ)",
+        ], caption: "Med stor $N$ er simuleringsfeilen liten. Den gir ikke en eksakt verdi." },
       ],
     },
   ],

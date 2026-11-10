@@ -25,7 +25,7 @@ export const lesson: Lesson = {
   ],
   goals: [
     "Kunne velge riktig kritisk verdi og standardfeil for μ, σ², andel og forskjell i gjennomsnitt.",
-    "Kunne finne KI for σ² og variansforholdet med $\\chi^2$ og $F$.",
+    "Kunne finne KI for σ² med $\\chi^2$ (læreboka 9.12) og KI for μ₁ − μ₂ når variansene er ulike (9.8).",
     "Kunne skille mellom konfidensintervall og prediksjonsintervall.",
     "Kunne beregne nødvendig utvalgsstørrelse for en gitt feilmargin.",
   ],
@@ -82,13 +82,11 @@ export const lesson: Lesson = {
     },
     {
       id: "to-utvalg",
-      title: "To utvalg: forskjell og variansforhold",
+      title: "To utvalg: forskjell i gjennomsnitt",
       blocks: [
-        { type: "formula", latex: "(\\bar{x}_1 - \\bar{x}_2) \\pm t_{\\alpha/2,\\,\\nu} \\sqrt{\\dfrac{s_1^2}{n_1} + \\dfrac{s_2^2}{n_2}}", name: "KI for μ₁ − μ₂ (ulik varians)", caption: "Frihetsgrader $\\nu$ fra Welch-formelen, som ikke står i formelboka. Pooled-versjonen med felles varians er ikke pensum." },
-        { type: "formula", latex: "\\left(\\dfrac{s_1^2}{s_2^2}\\cdot\\dfrac{1}{F_{\\alpha/2,\\,n_1-1,\\,n_2-1}},\\ \\dfrac{s_1^2}{s_2^2}\\cdot F_{\\alpha/2,\\,n_2-1,\\,n_1-1}\\right)", name: "KI for σ₁²/σ₂²", caption: `F-verdier for $\\alpha = 0{,}025$ fra formelboka ${formelbok("s. 8–9")}. Frihetsgradene $\\nu_1$ står i kolonnene og $\\nu_2$ i radene.` },
-        { type: "example", title: "$n_1 = n_2 = 10$, $s_1^2/s_2^2 = 2$", blocks: [
-          { type: "text", text: "$F_{0{,}025, 9, 9} = 4{,}03$ (side 8). Øvre grense: $2 \\cdot 4{,}03 = 8{,}06$. Nedre grense: $2/4{,}03 = 0{,}50$." },
-          { type: "text", text: "1 ligger i intervallet, så variansene kan være like." },
+        { type: "formula", latex: "(\\bar{x}_1 - \\bar{x}_2) \\pm t_{\\alpha/2,\\,\\nu} \\sqrt{\\dfrac{s_1^2}{n_1} + \\dfrac{s_2^2}{n_2}}", name: "KI for μ₁ − μ₂ (ulik varians)", caption: "Pensum 9.8 (før «Variances Unknown but Equal»). Frihetsgradene $\\nu$ beregnes med Welch-formelen i læreboka, som ikke står i formelboka. Felles varians (pooled) er ikke pensum." },
+        { type: "box", variant: "pitfall", title: "Ikke pensum", blocks: [
+          { type: "text", text: "KI for forholdet mellom to varianser (læreboka 9.13) og KI for forskjell i andeler (9.11) er ikke pensum. Variansforholdet brukes bare i testen i tema 10 (10.10)." },
         ] },
       ],
     },
@@ -117,7 +115,6 @@ export const lesson: Lesson = {
             "Gjennomsnitt, $\\sigma$ ukjent: $t_{n-1}$.",
             "Andel, stor $n$: $z$ med $\\hat{p}$.",
             "Varians: $\\chi^2_{n-1}$.",
-            "Forhold mellom varianser: $F$.",
             "Ny observasjon: prediksjonsintervall, bredere enn KI.",
           ] },
         ] },
@@ -142,6 +139,25 @@ export const lesson: Lesson = {
         { type: "example", title: "Des 2025, oppg. 5d: KI for μ med χ²-pivot", blocks: [
           { type: "text", text: "$2e^{\\mu}\\sum e^{-X_i} \\sim \\chi^2_{2n} = \\chi^2_{100}$. Med $\\chi^2_{0{,}975,100} = 74{,}222$ og $\\chi^2_{0{,}025,100} = 129{,}561$ (side 5)." },
           { type: "text", text: "KI for μ: $\\left(\\ln \\frac{74{,}222}{2 \\cdot 253{,}4},\\ \\ln \\frac{129{,}561}{2 \\cdot 253{,}4}\\right) = (-1{,}92;\\ -1{,}36)$." },
+        ] },
+      ],
+    },
+    {
+      id: "simulering",
+      title: "KI og stokastisk simulering",
+      blocks: [
+        { type: "text", text: "**Dekningssannsynlighet** er sannsynligheten for at et konfidensintervall inneholder den sanne parameteren. Den kan estimeres ved simulering: trekk mange utvalg fra en modell med kjent parameter, lag KI for hvert utvalg, og tell hvor ofte den sanne verdien ligger i intervallet. Dette er pensumemnet «KI og stokastisk simulering» og oppgave 8 i mai 2026 (TMA4245)." },
+        { type: "pseudocode", title: "Estimer dekningssannsynligheten", lines: [
+          "tell ← 0",
+          "for i = 1 til N:",
+          "  simuler x₁, …, xₙ fra modellen med sann parameter",
+          "  beregn intervallet (L, U) fra utvalget",
+          "  if L ≤ sann parameter ≤ U: tell ← tell + 1",
+          "p̂ ← tell / N",
+        ], caption: "Den forventningsrette estimatoren er $\\hat{p} = \\text{tell}/N$. Standardfeilen er $\\sqrt{\\hat{p}(1-\\hat{p})/N}$." },
+        { type: "example", title: "Mai 2026, oppg. 8: gamma med kjent α = 4", blocks: [
+          { type: "text", text: "Utvalget kommer fra en gammafordeling med $\\alpha = 4$ og ukjent $\\beta$. Den tilnærmede KI-en for $\\beta$ er gitt i oppgaven som $\\bar{X}/(4 + 3{,}92/\\sqrt{n}) \\le \\beta \\le \\bar{X}/(4 - 3{,}92/\\sqrt{n})$." },
+          { type: "text", text: "Simuler $N$ utvalg med sann $\\beta$, lag intervallet for hvert utvalg, og tell hvor ofte $\\beta$ ligger i intervallet. Løsningsforslaget gjør dette med en Python-funksjon med `gamma.rvs`." },
         ] },
       ],
     },

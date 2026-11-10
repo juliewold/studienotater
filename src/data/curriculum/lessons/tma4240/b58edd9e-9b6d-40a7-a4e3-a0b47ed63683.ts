@@ -106,9 +106,8 @@ export const lesson: Lesson = {
           "**QQ-plott av residualer:** punktene skal ligge nær en rett linje hvis støyen er normal.",
           "**Utligger eller innflytelsespunkt:** ett punkt kan styre hele $\\hat{\\beta}$. Sjekk hva som skjer når du fjerner det.",
         ] },
-        { type: "formula", latex: "r = \\dfrac{S_{xy}}{\\sqrt{S_{xx} S_{yy}}}, \\qquad r^2 = \\dfrac{\\text{forklart variasjon}}{\\text{total variasjon}}", name: "Korrelasjon og forklaringsgrad", caption: "Ikke i formelboka. $r$ måler lineær sammenheng. $r^2$ er andelen av variasjonen i $Y$ som forklares av $x$." },
-        { type: "example", title: "Samme data", blocks: [
-          { type: "text", text: "$S_{yy} = 6$, så $r = 6/\\sqrt{10 \\cdot 6} = 0{,}775$ og $r^2 = 0{,}60$." },
+        { type: "box", variant: "pitfall", title: "Ikke pensum", blocks: [
+          { type: "text", text: "Korrelasjonskoeffisienten $r$ og forklaringsgraden $r^2$ (læreboka 11.12) er ikke pensum. Ikke bruk dem i besvarelsen." },
         ] },
       ],
     },
@@ -117,7 +116,6 @@ export const lesson: Lesson = {
       title: "Typiske feil",
       blocks: [
         { type: "list", items: [
-          "Å tro at $r = 0$ betyr at det ikke er sammenheng. Det betyr bare at det ikke er lineær sammenheng.",
           "Å bruke regresjon av $x$ på $y$ når oppgaven spør om $y$ gitt $x$. Retningen betyr noe.",
           "Å glemme å sjekke residualene før du tolker KI og test.",
         ] },
@@ -130,6 +128,7 @@ export const lesson: Lesson = {
         { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
           ["Stigningstall i log-lineær modell", "Des 2025, oppg. 6a", "$\\hat\\beta_1 = \\sum(t_i - \\bar t)\\ln k_i \\,/\\, \\sum(t_i - \\bar t)^2$. Standardfeil: $s/\\sqrt{\\sum(t_i - \\bar t)^2}$ (formelbok s. 36)."],
           ["Halveringstid", "Des 2025, oppg. 6b", "Forventet verdi går som $e^{\\beta_1 t}$. Løs $e^{\\beta_1 t_{1/2}} = 1/2$. Feilforplantning gir standardfeilen (formelbok s. 35)."],
+          ["Residualplott: tolkning (TMA4245)", "Mai 2026, oppg. 7", "Plott $x_i$ langs x-aksen og $e_i = y_i - \\hat\\alpha - \\hat\\beta x_i$ langs y-aksen. Buet mønster: ikke lineær. Trakt: varians ikke konstant. Tilfeldig band rundt null: modellen passer."],
         ] },
         { type: "example", title: "Des 2025, oppg. 6a: stigning og standardfeil", blocks: [
           { type: "text", text: "$\\sum(t_i - \\bar t)\\ln k_i = -143{,}6$ og $\\sum(t_i - \\bar t)^2 = 825$. Da er $\\hat\\beta_1 = -143{,}6/825 = -0{,}174$." },
@@ -139,6 +138,14 @@ export const lesson: Lesson = {
           { type: "text", text: "$t_{1/2} = -\\ln 2/\\hat\\beta_1 = 0{,}693/0{,}174 \\approx 3{,}98$ timer." },
           { type: "text", text: "Feilforplantning gir $\\text{SE}(\\hat t_{1/2}) \\approx \\frac{\\ln 2}{\\hat\\beta_1^2}\\,\\text{SE}(\\hat\\beta_1) = \\frac{0{,}693}{0{,}0303} \\cdot 0{,}00628 \\approx 0{,}144$ timer." },
         ] },
+      ],
+    },
+    {
+      id: "egenskaper",
+      title: "Egenskaper til estimatorene og SME",
+      blocks: [
+        { type: "text", text: "Minste kvadraters estimatorer er også maksimum-likelihood-estimatorer når feilleddene er normale. Da er $\\hat\\alpha$ og $\\hat\\beta$ de samme som i MK, og $\\hat\\sigma^2 = \\frac{1}{n}\\sum(Y_i - \\hat\\alpha - \\hat\\beta x_i)^2$ er SME for $\\sigma^2$. Den deler på $n$, og er derfor ikke forventningsrett (bruk $S^2$ med $n - 2$)." },
+        { type: "formula", latex: "E(\\hat\\beta) = \\beta, \\quad \\text{Var}(\\hat\\beta) = \\dfrac{\\sigma^2}{S_{xx}}, \\quad \\text{Var}(\\hat\\alpha) = \\sigma^2\\left(\\dfrac{1}{n} + \\dfrac{\\bar{x}^2}{S_{xx}}\\right)", name: "Forventning og varians til α̂ og β̂", caption: `Lineærkombinasjoner av $Y_i$ ${formelbok("s. 34")}. Pensum 11.4.` },
       ],
     },
   ],
