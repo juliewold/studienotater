@@ -1,4 +1,6 @@
 import type { Lesson } from "../types";
+import { BinomialFigure, PoissonFigure } from "./figures-fordelinger";
+import { DistributionChoiceFigure } from "./figures-metode";
 
 // Tema 5, Viktige diskrete fordelinger. Pensum: WMMY 5.1–5.2 og 5.4–5.6 (5.3 hypergeometrisk er ikke pensum).
 // Formelbok: side 25 (formler), 26 (diskret uniform, multinomisk), 12–17 (binomisk tabell), 18–20 (Poisson tabell), 31 (grenser).
@@ -40,8 +42,10 @@ export const lesson: Lesson = {
       id: "binomisk",
       title: "Binomisk fordeling",
       blocks: [
+        { type: "figure", component: DistributionChoiceFigure, caption: "Start med det du måler, velg fordeling, og sjekk forutsetningene før du regner." },
         { type: "text", text: "Bruk den binomiske fordelingen når du har $n$ **uavhengige** forsøk med samme suksessannsynlighet $p$, og teller antall suksesser $X$. Hvis $p$ eller $n$ endrer seg underveis, er ikke modellen riktig." },
         { type: "formula", latex: "P(X = x) = \\binom{n}{x} p^x (1-p)^{n-x}, \\quad x = 0, 1, \\ldots, n", name: "Binomisk fordeling", book: { status: "book", pages: "25" }, caption: `Formelboka ${formelbok("s. 25")}. Forventning $np$ og varians $np(1-p)$ står på samme side.` },
+        { type: "figure", component: BinomialFigure, caption: "Binomisk fordeling for n = 10. Med p = 0,3 er den skjev mot høyre, og med p = 0,6 mot venstre. Forventningen er np og variansen np(1 − p)." },
         { type: "text", text: "Tabellen på side 12–17 gir $P(X \\le x)$ for $p \\in \\{0{,}05, \\ldots, 0{,}90\\}$. Da trekker du fra forrige rad for å få $P(X = x)$." },
         { type: "formula", latex: "P(X = x) = P(X \\le x) - P(X \\le x-1), \\qquad P(X \\ge x) = 1 - P(X \\le x-1)", name: "Bruk av tabell (binomisk)", book: { status: "partial", pages: "12–17", missing: "P(X = x) = P(X ≤ x) − P(X ≤ x−1) og P(X ≥ x) må læres" }, caption: `Formelboka ${formelbok("s. 12–17")}. Tabellen gir kumulative verdier.` },
         { type: "example", title: "$X \\sim \\text{Bin}(10, 0{,}3)$", blocks: [
@@ -64,6 +68,7 @@ export const lesson: Lesson = {
       blocks: [
         { type: "text", text: "Poisson telle hendelser i et tidsrom eller område når de skjer tilfeldig, uavhengig og med konstant rate. Hvis rate er $\\lambda$ per enhet og intervallet har lengde $t$, er $\\mu = \\lambda t$." },
         { type: "formula", latex: "P(X = x) = \\dfrac{\\mu^x e^{-\\mu}}{x!}, \\quad x = 0, 1, \\ldots; \\qquad E(X) = \\text{Var}(X) = \\mu", name: "Poissonfordeling", book: { status: "book", pages: "25" }, caption: `Formelboka ${formelbok("s. 25")}. Tabell for $P(X \\le x)$ på side 18–20.` },
+        { type: "figure", component: PoissonFigure, caption: "Poissonfordeling. Større μ flytter fordelingen mot høyre og gjør den bredere. Forventning og varians er begge μ." },
         { type: "formula", latex: "\\mu = \\lambda t", name: "Poisson-prosess", book: { status: "missing" }, caption: "Ikke i formelboka i denne formen. Formelboka har bare $\\mu$. Rate per enhet og lengde på intervallet må du sette selv." },
         { type: "example", title: "Hendelser per time", blocks: [
           { type: "text", text: "$\\lambda = 3$ per time. For 20 minutter er $\\mu = 3 \\cdot \\tfrac{1}{3} = 1$, og $P(X = 0) = e^{-1} \\approx 0{,}368$." },

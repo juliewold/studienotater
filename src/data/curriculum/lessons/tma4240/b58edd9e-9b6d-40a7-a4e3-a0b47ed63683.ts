@@ -1,4 +1,6 @@
 import type { Lesson } from "../types";
+import { QQFigure, RegressionIntervalsFigure, ResidualFigure } from "./figures-begreper";
+import { RegressionMethodFigure } from "./figures-metode";
 import { RegressionFigure } from "./figures";
 
 // Tema 11, Enkel lineær regresjon. Pensum: WMMY 11.1–11.6 og 11.10 (fra «Diagnostic Plots of Residuals»).
@@ -45,6 +47,7 @@ export const lesson: Lesson = {
         { type: "text", text: "$x$ er forklaringsvariabelen, og er kjent eller satt av deg. $Y$ er responsen. Modellen sier at forventet respons ligger på en rett linje, og at avviket er normalt med konstant varians." },
         { type: "formula", latex: "Y_i = \\alpha + \\beta x_i + \\varepsilon_i, \\qquad \\varepsilon_i \\sim N(0, \\sigma^2) \\text{ uavhengige}", name: "Enkel lineær regresjon", book: { status: "partial", pages: "36", missing: "Forutsetningene om uavhengige og normale feilledd må læres" }, caption: `Formelboka ${formelbok("s. 36")} gir $E(Y_i) = \\alpha + \\beta x_i$.` },
         { type: "figure", component: RegressionFigure, caption: "Datapunktene, den fitted linjen og residualene (stiplede linjer) for eksempelet under." },
+        { type: "figure", component: RegressionMethodFigure, caption: "Fremgangsmåte: estimer, kontroller residualene, og bruk inferens bare når modellen passer." },
       ],
     },
     {
@@ -81,6 +84,7 @@ export const lesson: Lesson = {
       title: "Forventet verdi og prediksjon",
       blocks: [
         { type: "formula", latex: "\\hat{\\alpha} + \\hat{\\beta}x_0 \\pm t_{\\alpha/2,\\,n-2}\\,S\\sqrt{\\dfrac{1}{n} + \\dfrac{(x_0-\\bar{x})^2}{S_{xx}}}", name: "KI for forventet verdi", book: { status: "missing" }, caption: "Ikke i formelboka. Usikkerheten i linjen ved $x_0$." },
+        { type: "figure", component: RegressionIntervalsFigure, caption: "KI for forventet verdi (mørk) er smalere enn prediksjonsintervall for en ny observasjon (lys). Begge er smalest nær x̄ = 3. Data fra eksempelet i temaet." },
         { type: "formula", latex: "\\hat{\\alpha} + \\hat{\\beta}x_0 \\pm t_{\\alpha/2,\\,n-2}\\,S\\sqrt{1 + \\dfrac{1}{n} + \\dfrac{(x_0-\\bar{x})^2}{S_{xx}}}", name: "Prediksjonsintervall", book: { status: "missing" }, caption: "Ikke i formelboka. Leddet $1$ er støyen i den nye observasjonen. Det gjør intervallet bredere." },
         { type: "example", title: "Ved $x_0 = 3$", blocks: [
           { type: "text", text: "$\\hat{y} = 2{,}2 + 0{,}6 \\cdot 3 = 4{,}0$. Ved $x_0 = \\bar{x}$ er $(x_0 - \\bar{x})^2 = 0$." },
@@ -100,6 +104,8 @@ export const lesson: Lesson = {
       title: "Residualer og modellkontroll",
       blocks: [
         { type: "text", text: "Residualene er estimater av støyen $\\varepsilon_i$. Plott $e_i$ mot $\\hat{y}_i$ og mot $x_i$. Et tilfeldig spredt bånd rundt null betyr at modellen passer. Et buet mønster betyr at linjen er feil. Et trakt-mønster betyr at variansen ikke er konstant." },
+        { type: "figure", component: QQFigure, caption: "Normalplott: punkter nær en rett linje betyr at residualene passer normalfordelingen." },
+        { type: "figure", component: ResidualFigure, caption: "Venstre: tilfeldig spredning rundt null, modellen passer. Høyre: buet mønster, lineær modell passer ikke." },
         { type: "list", items: [
           "**Buet mønster:** lineær modell passer ikke. Vurder transformasjon eller ekstra ledd.",
           "**Trakt:** variansen øker eller minker med $x$.",

@@ -1,4 +1,5 @@
 import type { Lesson } from "../types";
+import { CLTFigure } from "./figures-begreper";
 
 // Tema 7, Funksjoner av stokastiske variabler. Pensum: WMMY 7.1, 7.2 (unntatt teorem 7.2 og 7.4 med eksempler), 7.3,
 // 4.3 fra «What If the Function Is Nonlinear?», 6.5 (normal som tilnærming til binomisk), 8.4 (CLT).
@@ -98,6 +99,7 @@ export const lesson: Lesson = {
       title: "Sentralgrenseteoremet",
       blocks: [
         { type: "formula", latex: "\\dfrac{\\bar{X} - \\mu}{\\sigma/\\sqrt{n}} \\ \\xrightarrow{d}\\ N(0, 1)", name: "Sentralgrenseteoremet", book: { status: "book", pages: "38" }, caption: `Formelboka ${formelbok("s. 38")}. Gjelder for uavhengige og identisk fordelte $X_i$ med endelig varians.` },
+        { type: "figure", component: CLTFigure, caption: "Gjennomsnittet av n eksponensialfordelte variable blir mer symmetrisk og smalere når n øker. Den stiplede normalkurven er tilnærmingen for n = 16." },
         { type: "example", title: "Eksponensial med $\\beta = 2$, $n = 50$", blocks: [
           { type: "text", text: "$E(X) = 2$, $\\text{Var}(X) = 4$, så $\\text{sd}(\\bar{X}) = \\sqrt{4/50} = 0{,}283$." },
           { type: "text", text: "$P(\\bar{X} > 2{,}5) \\approx 1 - \\Phi\\!\\left(\\dfrac{0{,}5}{0{,}283}\\right) = 1 - \\Phi(1{,}77) \\approx 0{,}038$." },
