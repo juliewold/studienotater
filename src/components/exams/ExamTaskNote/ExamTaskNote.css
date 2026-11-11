@@ -1,0 +1,375 @@
+/* Eksamensvisning: kompakt. Oppgave og besvarelse i hovedområdet, støtte i smale kort ved siden av.
+   Bokser og markeringer fargelegges i examNoteStyles.css, slik at de også gjelder redigering. */
+
+.exam-task-note {
+  --exam-card: #ffffff;
+  --exam-border: #e4dff0;
+  --exam-muted: #6b6280;
+  --exam-answer-accent: #1f7a4d;
+  --exam-answer-border: #9fd8b4;
+  --exam-learning-bg: #f9f8fb;
+  color: var(--app-text, #1f1a2b);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 24px;
+  container-type: inline-size;
+}
+
+:root[data-theme="dark"] .exam-task-note {
+  --exam-card: #231e2e;
+  --exam-border: #3b314a;
+  --exam-muted: #b7abc8;
+  --exam-answer-accent: #9fe0b4;
+  --exam-answer-border: #2f6b4b;
+  --exam-learning-bg: #201b2b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .exam-task-note {
+    --exam-card: #231e2e;
+    --exam-border: #3b314a;
+    --exam-muted: #b7abc8;
+    --exam-answer-accent: #9fe0b4;
+    --exam-answer-border: #2f6b4b;
+    --exam-learning-bg: #201b2b;
+  }
+}
+
+/* Verktøyraden over notatet får mindre bunnmarg i eksamensvisningen. */
+.editable-note-reading:has(.exam-task-note) .note-reading-tools {
+  padding-bottom: 4px;
+}
+
+.editable-note-reading:has(.exam-task-note) .note-ai-tools {
+  margin-top: 6px;
+}
+
+/* Oppgavetittel: venstrejustert, tydelig fet og større enn seksjonsoverskriftene.
+   Undertittelen er mindre og grå. Avstanden over tittelen er liten, og under er den god. */
+.exam-task-note .editable-note-document-header {
+  max-width: none;
+  margin: 0 0 16px;
+  padding: 0;
+  text-align: left;
+}
+
+.exam-task-note .editable-note-title {
+  margin: 0;
+  color: var(--theme-text, #24202a);
+  font-size: 30px;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-align: left;
+}
+
+.exam-task-note .editable-note-description {
+  max-width: none;
+  margin: 4px 0 0;
+  color: var(--theme-muted, #7a7480);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.exam-task-note .editable-note-classification-display {
+  justify-content: flex-start;
+  margin: 6px 0 0;
+  font-size: 0.74rem;
+  color: var(--theme-muted, #7a7480);
+}
+
+/* To kolonner når innholdsområdet er bredt nok. Støtten er smal og ligger til venstre, som designbildet. */
+.exam-task-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.exam-task-main,
+.exam-task-support {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Kolonnene brukes først når oppgaven fortsatt blir lett å lese ved siden av støtten. */
+@container (min-width: 1040px) {
+  .exam-task-layout {
+    grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+  }
+
+  .exam-task-support {
+    order: 1;
+  }
+
+  .exam-task-main {
+    order: 2;
+  }
+}
+
+/* Det vanlige notatoppsettet har bunnmarg og lang luft mellom blokker. Den fjernes her. */
+.exam-task-note .read-only-note {
+  padding: 0;
+  gap: 0;
+}
+
+/* Oppgaveboksen og støtteboksene bruker det vanlige boksdesignet, men mindre. */
+.exam-task-section .read-only-note-content > .note-callout,
+.exam-task-support .read-only-note-content > .note-callout {
+  margin: 0 0 8px;
+  border-radius: 10px;
+}
+
+.exam-task-support .read-only-note-content > .note-callout:last-child {
+  margin-bottom: 0;
+}
+
+.exam-task-note .note-callout-header {
+  min-height: 0;
+  padding: 4px 9px;
+  gap: 6px;
+}
+
+.exam-task-note .note-callout-heading {
+  font-size: 0.8rem;
+  line-height: 1.25;
+  font-weight: 700;
+  gap: 5px;
+}
+
+.exam-task-note .note-callout-heading svg {
+  width: 14px;
+  height: 14px;
+}
+
+.exam-task-note .note-callout-body {
+  padding: 6px 9px 7px;
+}
+
+.exam-task-note .note-callout-body p {
+  margin: 0 0 3px;
+  line-height: 1.45;
+}
+
+.exam-task-note .note-callout-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* Oppgavetekst: lett å lese, men mer kompakt enn vanlig brødtekst. */
+.exam-task-section .read-only-note-content {
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+
+.exam-task-section .read-only-note-content p {
+  margin: 0 0 0.35rem;
+}
+
+/* Støtteboksene: mindre skrift og mindre luft. */
+.exam-task-support .read-only-note-content {
+  font-size: 0.82rem;
+  line-height: 1.42;
+}
+
+.exam-task-support .read-only-note-content p {
+  margin: 0 0 0.2rem;
+}
+
+/* Besvarelsen er hovedfokus: ren bakgrunn, god skrift og tydelige formler. */
+.exam-answer-section {
+  border-left: 3px solid var(--exam-answer-border);
+  padding: 0 0 0 12px;
+  min-width: 0;
+}
+
+.exam-answer-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+  margin-bottom: 4px;
+}
+
+.exam-answer-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--exam-answer-accent);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.exam-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.exam-pill-answer {
+  background: #dff5e7;
+  color: #1f7a4d;
+  border: 1px solid var(--exam-answer-border);
+}
+
+:root[data-theme="dark"] .exam-pill-answer {
+  background: #20392f;
+  color: #9fe0b4;
+}
+
+.exam-answer-body {
+  counter-reset: exam-step;
+  background: transparent;
+  padding: 0;
+}
+
+.exam-answer-body .note-outline,
+.exam-task-note .note-outline {
+  display: none;
+}
+
+.exam-answer-body .read-only-note-content {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.exam-answer-body .read-only-note-content > .note-callout {
+  margin: 8px 0 4px;
+}
+
+.exam-answer-body .read-only-note-content h2 {
+  counter-increment: exam-step;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.02rem;
+  line-height: 1.3;
+  margin: 12px 0 4px;
+}
+
+.exam-answer-body .read-only-note-content h2:first-child {
+  margin-top: 0;
+}
+
+.exam-answer-body .read-only-note-content h2::before {
+  content: counter(exam-step);
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--exam-answer-accent);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+:root[data-theme="dark"] .exam-answer-body .read-only-note-content h2::before {
+  color: #1d2e26;
+}
+
+.exam-answer-body .read-only-note-content p {
+  margin: 0 0 0.4rem;
+}
+
+/* Formler i besvarelsen skal være godt synlige, men uten ekstra luft rundt. */
+.exam-answer-body .read-only-note-content .tiptap-mathematics-render[data-type="block-math"] {
+  margin: 0.45rem 0;
+  padding: 0.2rem 0;
+}
+
+/* Inline-matematikk i tekst og markeringer: holder seg på linja og gir ikke ekstra høyde. */
+.exam-task-note .tiptap-mathematics-render[data-type="inline-math"] {
+  display: inline;
+  margin: 0 0.1em;
+  vertical-align: baseline;
+}
+
+.exam-task-note .katex {
+  display: inline;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.exam-task-note .katex .base {
+  display: inline;
+  line-height: 0;
+}
+
+/* Læringshjelp: sammenleggbar i lesemodus. Redigering skjer fortsatt i notatet. */
+.exam-learning {
+  background: var(--exam-learning-bg);
+  border: 1px dashed var(--exam-border);
+  border-radius: 10px;
+  padding: 0;
+  font-size: 0.82rem;
+}
+
+.exam-learning-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 6px 9px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.exam-learning-summary::-webkit-details-marker {
+  display: none;
+}
+
+.exam-learning-chevron {
+  flex: none;
+  transition: transform 0.15s ease;
+}
+
+.exam-learning[open] .exam-learning-chevron {
+  transform: rotate(180deg);
+}
+
+.exam-learning-title {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.exam-pill-learning {
+  color: var(--exam-muted);
+  background: var(--exam-card);
+  border: 1px solid var(--exam-border);
+  white-space: normal;
+  font-weight: 500;
+}
+
+.exam-learning-items {
+  display: grid;
+  gap: 4px;
+  padding: 0 9px 7px;
+  line-height: 1.42;
+}
+
+.exam-learning-item {
+  margin: 0;
+}
+
+.exam-learning-item strong {
+  font-weight: 700;
+}
+
+/* Smale skjermer: oppgave og besvarelse først, støtte etterpå. */
+@media (max-width: 560px) {
+  .exam-task-note .editable-note-title {
+    font-size: 24px;
+  }
+
+  .exam-answer-section {
+    padding-left: 10px;
+  }
+}

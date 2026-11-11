@@ -2,6 +2,8 @@ import { getMathTarget, applyMathEdit, type MathTarget } from "./mathEditing";
 import "./NoteEditor.css";
 import "katex/dist/katex.min.css";
 import { Callout, type CalloutType } from "./Callout";
+import { ExamMark } from "./ExamMark";
+import { ExamMarkControls } from "./ExamMarkControls";
 import { ConceptLink } from "../../concepts/ConceptLink/ConceptLink";
 import { ConceptPicker } from "../../concepts/ConceptPicker/ConceptPicker";
 
@@ -26,9 +28,16 @@ import {
   Trash2,
   Undo2,
   BadgeCheck,
+  BookMarked,
   BookOpen,
+  FileText,
+  GraduationCap,
+  Layers,
   Lightbulb,
+  ListChecks,
   Puzzle,
+  Search,
+  XCircle,
 } from "lucide-react";
 
 import { useEditor, useEditorState, type Editor } from "@tiptap/react";
@@ -51,6 +60,17 @@ import { NoteDocument } from "../NoteDocument/NoteDocument";
 import { createHeadingAnchors } from "../NoteDocument/headingAnchors";
 
 const lowlight = createLowlight(common);
+
+// Eksamensbokser i «Innholdsbokser». Stilen er i examNoteStyles.css.
+const EXAM_CALLOUT_BUTTONS: { type: CalloutType; label: string; icon: typeof FileText }[] = [
+  { type: "exam-task", label: "Oppgavetekst", icon: FileText },
+  { type: "exam-signal", label: "Hva ser vi etter", icon: Search },
+  { type: "exam-book", label: "I formelboka", icon: BookMarked },
+  { type: "exam-missing", label: "Ikke i formelboka", icon: XCircle },
+  { type: "exam-partial", label: "Delvis i formelboka", icon: Layers },
+  { type: "exam-given", label: "Gitt i oppgaven", icon: ListChecks },
+  { type: "exam-learning", label: "Læringshjelp", icon: GraduationCap },
+];
 
 
 
@@ -205,6 +225,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
       }),
 
       Callout,
+      ExamMark,
       ConceptLink,
       FormulaConceptLink,
     ],
@@ -909,6 +930,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
         </button>
 
         </div>
+        <ExamMarkControls editor={editor} />
         <div className="note-toolbar-group note-toolbar-history" role="group" aria-label="Historikk">
         <button
           type="button"
@@ -1149,6 +1171,20 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
           <BadgeCheck size={18} />
           <span>Eksamen</span>
         </button>
+
+        {EXAM_CALLOUT_BUTTONS.map((item) => (
+          <button
+            key={item.type}
+            type="button"
+            onMouseDown={event => event.preventDefault()}
+            onClick={() => handleInsertCallout(item.type)}
+            title={`Sett inn: ${item.label}`}
+            aria-label={`Sett inn: ${item.label}`}
+          >
+            <item.icon size={18} />
+            <span>{item.label}</span>
+          </button>
+        ))}
 
         <button
           type="button"

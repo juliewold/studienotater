@@ -18,6 +18,7 @@ import { PrivateImage } from "../NoteEditor/PrivateImage";
 import { common, createLowlight } from "lowlight";
 import { TableKit } from "@tiptap/extension-table";
 import { Callout } from "../NoteEditor/Callout";
+import { ExamMark } from "../NoteEditor/ExamMark";
 import { ConceptLink } from "../../concepts/ConceptLink/ConceptLink";
 import { AutomaticConceptLinks } from "../../concepts/AutomaticConceptLinks/AutomaticConceptLinks";
 
@@ -96,6 +97,7 @@ export const ReadOnlyNote = ({ content, header }: ReadOnlyNoteProps) => {
         }),
 
         Callout,
+        ExamMark,
         ConceptLink,
 
         AutomaticConceptLinks.configure({
