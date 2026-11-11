@@ -1,0 +1,205 @@
+/* Eksamensbokser og markeringer. Gjelder i både editoren og lesevisningen. */
+
+/* Fargene settes per boktype under. Disse reglene bruker bare variablene, uten egne standardverdier. */
+.note-editor-content .note-callout[data-callout-type^="exam-"],
+.read-only-note-content .note-callout[data-callout-type^="exam-"] {
+  border-color: var(--exam-box-border, #d9ccf5);
+  background: var(--exam-box-bg, #f8f5ff);
+}
+
+.note-editor-content .note-callout[data-callout-type^="exam-"] .note-callout-header,
+.read-only-note-content .note-callout[data-callout-type^="exam-"] .note-callout-header {
+  background: var(--exam-box-head, #ece4ff);
+  color: var(--exam-box-text, #5b33a8);
+}
+
+/* Oppgavetekst: lilla, nøytral tekst. */
+.note-callout[data-callout-type="exam-task"] {
+  --exam-box-bg: #f8f5ff;
+  --exam-box-border: #d9ccf5;
+  --exam-box-head: #ece4ff;
+  --exam-box-text: #5b33a8;
+}
+
+/* Hva ser vi etter: lyseblå. */
+.note-callout[data-callout-type="exam-signal"] {
+  --exam-box-bg: #f4f8ff;
+  --exam-box-border: #cfe0f7;
+  --exam-box-head: #e3eeff;
+  --exam-box-text: #2f6ea5;
+}
+
+/* I formelboka: blå, med sidetall i teksten. */
+.note-callout[data-callout-type="exam-book"] {
+  --exam-box-bg: #eef5ff;
+  --exam-box-border: #bcd3f2;
+  --exam-box-head: #dbe9ff;
+  --exam-box-text: #2d5f9a;
+}
+
+/* Ikke i formelboka: rød, for det du må forstå selv. */
+.note-callout[data-callout-type="exam-missing"] {
+  --exam-box-bg: #fff3f4;
+  --exam-box-border: #f1c4cb;
+  --exam-box-head: #fde0e4;
+  --exam-box-text: #a83a48;
+}
+
+/* Delvis i formelboka: oransje. */
+.note-callout[data-callout-type="exam-partial"] {
+  --exam-box-bg: #fff6ec;
+  --exam-box-border: #f5d9b8;
+  --exam-box-head: #ffe9cf;
+  --exam-box-text: #9a5a12;
+}
+
+/* Gitt i oppgaven: gul. */
+.note-callout[data-callout-type="exam-given"] {
+  --exam-box-bg: #fffbea;
+  --exam-box-border: #f2e099;
+  --exam-box-head: #fff1b8;
+  --exam-box-text: #7a5d00;
+}
+
+/* Læringshjelp: nøytral, for forståelse. */
+.note-callout[data-callout-type="exam-learning"] {
+  --exam-box-bg: #f9f8fb;
+  --exam-box-border: #dedbe6;
+  --exam-box-head: #ecebf2;
+  --exam-box-text: #4b4560;
+}
+
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-task"],
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-signal"],
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-book"],
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-missing"],
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-partial"],
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-given"],
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-learning"] {
+  --exam-box-bg: #2a2237;
+  --exam-box-border: #4a3d63;
+  --exam-box-head: #352b47;
+  --exam-box-text: #d7c8f5;
+}
+
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-signal"] { --exam-box-bg: #1f2638; --exam-box-border: #34496e; --exam-box-head: #22304a; --exam-box-text: #9cc4f5; }
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-book"] { --exam-box-bg: #1d2a40; --exam-box-border: #34496e; --exam-box-head: #22344f; --exam-box-text: #9cc4f5; }
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-missing"] { --exam-box-bg: #3a1f26; --exam-box-border: #6b3440; --exam-box-head: #4a2530; --exam-box-text: #ffb3ba; }
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-partial"] { --exam-box-bg: #3a2a1a; --exam-box-border: #6b4d2a; --exam-box-head: #4a3620; --exam-box-text: #f5d18c; }
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-given"] { --exam-box-bg: #3a3420; --exam-box-border: #6b5e2a; --exam-box-head: #4a4226; --exam-box-text: #f5e08c; }
+:root[data-theme="dark"] .note-callout[data-callout-type="exam-learning"] { --exam-box-bg: #201b2b; --exam-box-border: #3b314a; --exam-box-head: #2a2338; --exam-box-text: #b7abc8; }
+
+/* Markering i teksten. Forklaringen vises ved hover, og ved klikk på mobil. */
+.note-editor-content mark.exam-mark,
+.read-only-note-content mark.exam-mark {
+  position: relative;
+  border-radius: 4px;
+  padding: 0 0.15em;
+  color: inherit;
+  cursor: help;
+  background: #fff0a6;
+}
+
+.note-editor-content mark.exam-mark-method,
+.read-only-note-content mark.exam-mark-method { background: #e6dbff; }
+.note-editor-content mark.exam-mark-model,
+.read-only-note-content mark.exam-mark-model { background: #d8e7ff; }
+.note-editor-content mark.exam-mark-requirement,
+.read-only-note-content mark.exam-mark-requirement { background: #ffe0cc; }
+.note-editor-content mark.exam-mark-constraint,
+.read-only-note-content mark.exam-mark-constraint { background: #ffd3da; }
+
+/* Forklaringsboblen er et felles element i <body>, se examMarkPopover.ts. */
+.exam-mark-popover {
+  position: fixed;
+  z-index: 2000;
+  box-sizing: border-box;
+  width: min(320px, calc(100vw - 16px));
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #1f1a2b;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 400;
+  line-height: 1.4;
+  box-shadow: 0 6px 18px rgba(20, 14, 30, 0.25);
+  overflow-wrap: anywhere;
+}
+
+.exam-mark-popover[hidden] {
+  display: none;
+}
+
+.exam-mark-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.exam-mark-popover-header strong {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #e6dbff;
+}
+
+.exam-mark-popover-close {
+  flex: none;
+  min-width: 32px;
+  min-height: 32px;
+  margin: -6px -6px -6px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.exam-mark-popover-close:focus-visible {
+  outline: 2px solid #e6dbff;
+  outline-offset: 1px;
+}
+
+.exam-mark-popover-text {
+  margin: 2px 0 0;
+  white-space: normal;
+}
+
+:root[data-theme="dark"] .note-editor-content mark.exam-mark,
+:root[data-theme="dark"] .read-only-note-content mark.exam-mark { background: #5c5024; }
+:root[data-theme="dark"] .note-editor-content mark.exam-mark-method,
+:root[data-theme="dark"] .read-only-note-content mark.exam-mark-method { background: #3f2f6b; }
+:root[data-theme="dark"] .note-editor-content mark.exam-mark-model,
+:root[data-theme="dark"] .read-only-note-content mark.exam-mark-model { background: #22406b; }
+:root[data-theme="dark"] .note-editor-content mark.exam-mark-requirement,
+:root[data-theme="dark"] .read-only-note-content mark.exam-mark-requirement { background: #5a3a22; }
+:root[data-theme="dark"] .note-editor-content mark.exam-mark-constraint,
+:root[data-theme="dark"] .read-only-note-content mark.exam-mark-constraint { background: #5a2630; }
+:root[data-theme="dark"] .exam-mark-popover {
+  background: #eee9f5;
+  color: #1f1a2b;
+}
+
+:root[data-theme="dark"] .exam-mark-popover-header strong {
+  color: #5b33a8;
+}
+
+/* Kontroller for markering i verktøylinjen. */
+.exam-mark-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.exam-mark-controls .exam-mark-explanation-input {
+  min-width: 180px;
+  max-width: 260px;
+  font-size: 0.85rem;
+}

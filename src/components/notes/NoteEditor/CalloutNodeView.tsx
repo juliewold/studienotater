@@ -6,13 +6,20 @@ import {
 import { useEffect, useState } from "react";
 import {
   BadgeCheck,
+  BookMarked,
   BookOpen,
+  FileText,
+  GraduationCap,
+  Layers,
   Lightbulb,
   Link2,
+  ListChecks,
   Puzzle,
+  Search,
   Sigma,
   Trash2,
   Unlink,
+  XCircle,
 } from "lucide-react";
 
 import type { Concept } from "../../../data/concepts/types";
@@ -46,6 +53,41 @@ const calloutInformation = {
   exam: {
     title: "Dette må du kunne til eksamen",
     icon: BadgeCheck,
+  },
+
+  "exam-task": {
+    title: "Oppgavetekst",
+    icon: FileText,
+  },
+
+  "exam-signal": {
+    title: "Hva ser vi etter i oppgaveteksten?",
+    icon: Search,
+  },
+
+  "exam-book": {
+    title: "I formelboka",
+    icon: BookMarked,
+  },
+
+  "exam-missing": {
+    title: "Ikke i formelboka",
+    icon: XCircle,
+  },
+
+  "exam-partial": {
+    title: "Delvis i formelboka",
+    icon: Layers,
+  },
+
+  "exam-given": {
+    title: "Gitt i oppgaven",
+    icon: ListChecks,
+  },
+
+  "exam-learning": {
+    title: "Læringshjelp",
+    icon: GraduationCap,
   },
 } satisfies Record<
   CalloutType,
@@ -160,6 +202,16 @@ export const CalloutNodeView = ({
               <option value="example">Eksempel</option>
 
               <option value="exam">Dette må du kunne til eksamen</option>
+
+              <optgroup label="Eksamensoppgave">
+                <option value="exam-task">Oppgavetekst</option>
+                <option value="exam-signal">Hva ser vi etter</option>
+                <option value="exam-book">I formelboka</option>
+                <option value="exam-missing">Ikke i formelboka</option>
+                <option value="exam-partial">Delvis i formelboka</option>
+                <option value="exam-given">Gitt i oppgaven</option>
+                <option value="exam-learning">Læringshjelp</option>
+              </optgroup>
             </select>
 
             <button

@@ -1,20 +1,27 @@
 import type { Editor } from "@tiptap/react";
 import {
   BadgeCheck,
+  BookMarked,
   BookOpen,
   Braces,
   Code2,
+  FileText,
+  GraduationCap,
   Heading1,
   Heading2,
   ImagePlus,
+  Layers,
   Lightbulb,
   List,
+  ListChecks,
   ListOrdered,
   Minus,
   Puzzle,
   Quote,
+  Search,
   Sigma,
   Table2,
+  XCircle,
 } from "lucide-react";
 
 export type SlashCalloutType =
@@ -22,7 +29,14 @@ export type SlashCalloutType =
   | "tip"
   | "theorem"
   | "example"
-  | "exam";
+  | "exam"
+  | "exam-task"
+  | "exam-signal"
+  | "exam-book"
+  | "exam-missing"
+  | "exam-partial"
+  | "exam-given"
+  | "exam-learning";
 
 export type SlashCommandActions = {
   openMathDialog: (type: "inline" | "block") => void;
@@ -160,6 +174,76 @@ export const slashCommands: SlashCommandItem[] = [
     calloutType: "exam",
     command: (_editor, actions) => {
       actions.insertCallout("exam");
+    },
+  },
+  {
+    title: "Eksamen: oppgavetekst",
+    description: "Boks for oppgaveteksten, med markeringer",
+    searchTerms: ["eksamen", "oppgave", "oppgavetekst", "callout"],
+    icon: FileText,
+    calloutType: "exam-task",
+    command: (_editor, actions) => {
+      actions.insertCallout("exam-task");
+    },
+  },
+  {
+    title: "Eksamen: hva ser vi etter",
+    description: "Boks som viser opplysning, tolkning og metodevalg",
+    searchTerms: ["eksamen", "metode", "signal", "opplysning", "callout"],
+    icon: Search,
+    calloutType: "exam-signal",
+    command: (_editor, actions) => {
+      actions.insertCallout("exam-signal");
+    },
+  },
+  {
+    title: "Eksamen: i formelboka",
+    description: "Formel eller tabell som står i formelboka, med sidetall",
+    searchTerms: ["eksamen", "formelbok", "formelboka", "side", "callout"],
+    icon: BookMarked,
+    calloutType: "exam-book",
+    command: (_editor, actions) => {
+      actions.insertCallout("exam-book");
+    },
+  },
+  {
+    title: "Eksamen: ikke i formelboka",
+    description: "Begreper og formler du må forstå selv",
+    searchTerms: ["eksamen", "ikke i formelboka", "forklaring", "callout"],
+    icon: XCircle,
+    calloutType: "exam-missing",
+    command: (_editor, actions) => {
+      actions.insertCallout("exam-missing");
+    },
+  },
+  {
+    title: "Eksamen: delvis i formelboka",
+    description: "Det du kan slå opp, og det som mangler",
+    searchTerms: ["eksamen", "delvis", "mangler", "callout"],
+    icon: Layers,
+    calloutType: "exam-partial",
+    command: (_editor, actions) => {
+      actions.insertCallout("exam-partial");
+    },
+  },
+  {
+    title: "Eksamen: gitt i oppgaven",
+    description: "Opplysninger og formler som allerede er oppgitt",
+    searchTerms: ["eksamen", "gitt", "opplysninger", "callout"],
+    icon: ListChecks,
+    calloutType: "exam-given",
+    command: (_editor, actions) => {
+      actions.insertCallout("exam-given");
+    },
+  },
+  {
+    title: "Eksamen: læringshjelp",
+    description: "Forklaring av hvorfor metoden fungerer, til forståelse",
+    searchTerms: ["eksamen", "læring", "forklaring", "hvorfor", "callout"],
+    icon: GraduationCap,
+    calloutType: "exam-learning",
+    command: (_editor, actions) => {
+      actions.insertCallout("exam-learning");
     },
   },
   {

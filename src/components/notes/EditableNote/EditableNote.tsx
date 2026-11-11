@@ -41,6 +41,9 @@ import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
 import { NoteAITools } from "../NoteAITools/NoteAITools";
 
+import { ExamTaskNote } from "../../exams/ExamTaskNote/ExamTaskNote";
+import { splitExamNoteHtml } from "../../exams/splitExamNote";
+
 type EditableNoteProps = {
   note: DatabaseNote;
   subjectCode: string;
@@ -71,6 +74,8 @@ export const EditableNote = ({
   resourceId,
 }: EditableNoteProps) => {
   const data = useMemo(() => createNoteEditorData(note.id, note.subjectId), [note.id, note.subjectId]);
+  // Notater med eksamensbokser vises i eksamensvisning. Andre notater vises som før.
+  const examSplit = useMemo(() => splitExamNoteHtml(note.content), [note.content]);
   const editorReady = useRef<typeof data | null>(null);
   const activeData = useRef(data);
   useEffect(() => { activeData.current = data; }, [data]);
@@ -644,7 +649,11 @@ export const EditableNote = ({
 
     </>;
 
-  const readingContent = <ReadOnlyNote key={note.id + note.content} content={note.content} header={documentHeader} />;
+  const readingContent = examSplit ? (
+    <ExamTaskNote key={note.id + note.content} split={examSplit} header={documentHeader} />
+  ) : (
+    <ReadOnlyNote key={note.id + note.content} content={note.content} header={documentHeader} />
+  );
 
   return (
     <article className="editable-note editable-note-reading">

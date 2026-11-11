@@ -4,7 +4,22 @@ import { ReactNodeViewRenderer } from "@tiptap/react";
 
 import { CalloutNodeView } from "./CalloutNodeView";
 
-export type CalloutType = "definition" | "tip" | "theorem" | "example" | "exam" | "method" | "formula";
+// Eksamensboksene (exam-*) brukes av eksamensvisningen: oppgavetekst og støtte rundt besvarelsen.
+export type CalloutType =
+  | "definition"
+  | "tip"
+  | "theorem"
+  | "example"
+  | "exam"
+  | "method"
+  | "formula"
+  | "exam-task"
+  | "exam-signal"
+  | "exam-book"
+  | "exam-missing"
+  | "exam-partial"
+  | "exam-given"
+  | "exam-learning";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
