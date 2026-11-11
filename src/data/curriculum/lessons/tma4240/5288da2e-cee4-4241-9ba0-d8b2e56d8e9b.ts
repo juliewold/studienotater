@@ -1,4 +1,5 @@
 import type { Lesson } from "../types";
+import { QQFigure } from "./figures-begreper";
 
 // Tema 8, Parameterestimering. Pensum: WMMY Kap 1 (1.1–1.7), 8.1–8.3, 8.8 (QQ-plott), 9.1–9.5 og 9.14 (maks. sannsynlighet).
 // Formelbok: side 27 (S² og χ²/t-fordelinger), 35 (varians av lineærkombinasjoner), 38 (konsistens).
@@ -43,6 +44,7 @@ export const lesson: Lesson = {
         { type: "text", text: "Før du estimerer, se på dataene. Histogram og boksplott viser form og utliggere. Et **boksplott** har boks fra $Q_1$ til $Q_3$ og en utligger hvis den ligger utenfor $Q_1 - 1{,}5\\,\\text{IQR}$ eller $Q_3 + 1{,}5\\,\\text{IQR}$, der $\\text{IQR} = Q_3 - Q_1$." },
         { type: "formula", latex: "\\bar{x} = \\dfrac{1}{n}\\sum x_i, \\qquad s = \\sqrt{\\dfrac{1}{n-1}\\sum (x_i - \\bar{x})^2}", name: "Gjennomsnitt og standardavvik", book: { status: "partial", pages: "27", missing: "Gjennomsnittet x̄ og s = √S² må læres; S² står i boka" }, caption: `Formelboka ${formelbok("s. 27")} for $S^2$. Den samme formelen er kvadratroten av varians.` },
         { type: "text", text: "Et **QQ-plott** setter utvalgskvantiler mot de teoretiske normalkvantilene. Punktene ligger nær en rett linje hvis dataene er normale. Kraftig avvik i halene tyder på tunge haler, og en buet linje tyder på skjevhet." },
+        { type: "figure", component: QQFigure, caption: "Punkter nær en rett linje betyr at dataene passer normalfordelingen. Høyre figur viser eksponensialfordelte data, som bøyer av i halen. Figuren er beregnet fra eksakte kvantiler." },
         { type: "box", variant: "pitfall", title: "Vanlig feil", blocks: [
           { type: "text", text: "Å tolke et QQ-plott som et histogram. Det som betyr noe, er hvor punktene ligger i forhold til linjen, ikke hvor høyt de ligger." },
         ] },

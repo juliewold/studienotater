@@ -1,4 +1,6 @@
 import type { Lesson } from "../types";
+import { PValueFigure, TypeIIPowerFigure } from "./figures-begreper";
+import { FFigure } from "./figures-fordelinger";
 import { NormalRegionFigure, TestChoiceFigure } from "./figures";
 
 // Tema 10, Hypotesetesting. Pensum: WMMY 10.1–10.4, 10.5 (til «Unknown But Equal Variances»), 10.6, 10.7 (delvis), 10.8,
@@ -57,6 +59,7 @@ export const lesson: Lesson = {
       title: "Type I- og type II-feil og styrke",
       blocks: [
         { type: "text", text: "$\\alpha$ bestemmer hvor stor type I-feilsannsynligheten skal være, og du velger den før testen. $\\beta$ avhenger av hvor sann $H_1$ er, og av $n$. Styrken $1 - \\beta$ er sannsynligheten for å forkaste $H_0$ når $H_1$ er sann." },
+        { type: "figure", component: TypeIIPowerFigure, caption: "H₀ er til venstre og H₁ til høyre, med σ_x̄ = 1. α er arealet av H₀ til høyre for grensen (type I-feil). β er arealet av H₁ til venstre for grensen (type II-feil). Styrken 1 − β ≈ 0,64 er arealet av H₁ til høyre for grensen." },
         { type: "formula", latex: "\\beta = \\Phi\\!\\left(z_\\alpha - \\dfrac{(\\mu_1 - \\mu_0)\\sqrt{n}}{\\sigma}\\right), \\qquad 1 - \\beta = \\text{styrke}", name: "Type II-feil for høyresidig z-test", book: { status: "missing" }, caption: `Formelbokas $\\Phi$-tabell side 1–2 og kritisk verdi $z_\\alpha$ side 3. Ikke i boka som formel.` },
         { type: "example", title: "Styrke ved $\\mu_1 = 54$", blocks: [
           { type: "text", text: "Høyresidig test, $\\alpha = 0{,}05$, $z_\\alpha = 1{,}645$. $\\delta = \\mu_1 - \\mu_0 = 4$, og $\\delta\\sqrt{n}/\\sigma = 4 \\cdot 4/8 = 2$." },
@@ -76,6 +79,7 @@ export const lesson: Lesson = {
       title: "p-verdien",
       blocks: [
         { type: "text", text: "$p$-verdien er sannsynligheten under $H_0$ for å få en testobservator minst like ekstrem som den observerte. Liten $p$ betyr at dataene er lite forenlige med $H_0$." },
+        { type: "figure", component: PValueFigure, caption: "Under H₀ er Z ~ N(0, 1). Observert z = 2 gir tosidig p = 2(1 − Φ(2)) ≈ 0,046, som er det skraverte arealet." },
         { type: "formula", latex: "p = P(\\text{testobservator så ekstrem som observert} \\mid H_0)", name: "p-verdi", book: { status: "missing" }, caption: "Ikke i formelboka. For t-testen finner du intervallet for $p$ med tabellen på side 4." },
         { type: "example", title: "Samme data, t-test", blocks: [
           { type: "text", text: "$s = 8$, så $t = (54 - 50)/(8/4) = 2$ med $\\nu = 15$. Side 4: $t_{0{,}025, 15} = 2{,}131$ og $t_{0{,}05, 15} = 1{,}753$." },
@@ -92,6 +96,7 @@ export const lesson: Lesson = {
       blocks: [
         { type: "formula", latex: "\\dfrac{(n-1)S^2}{\\sigma_0^2} \\sim \\chi^2_{n-1} \\text{ under } H_0", name: "χ²-test for σ²", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}, med kritiske verdier fra side 5.` },
         { type: "formula", latex: "\\dfrac{S_1^2}{S_2^2} \\sim F_{n_1-1,\\, n_2-1} \\text{ under } H_0: \\sigma_1^2 = \\sigma_2^2", name: "F-test for to varianser", book: { status: "partial", pages: "28", missing: "Teststørrelsen S₁²/S₂² under H₀ må læres; boka har F-fordelingen" }, caption: `Formelboka ${formelbok("s. 6–11")}. Telleren har $n_1 - 1$ frihetsgrader.` },
+        { type: "figure", component: FFigure, caption: "F-fordelingen er positiv og skjev. Den brukes til forholdet mellom to varianser, med ν₁ og ν₂ frihetsgrader i teller og nevner." },
         { type: "formula", latex: "Z = \\dfrac{\\hat{p} - p_0}{\\sqrt{p_0(1-p_0)/n}} \\approx N(0, 1)", name: "z-test for andel", book: { status: "partial", pages: "38", missing: "Teststørrelsen for p må læres; boka har bare CLT" }, caption: `Tilnærmingen følger av CLT ${formelbok("s. 38")}. Bruk $p_0$ i standardfeilen under $H_0$.` },
       ],
     },

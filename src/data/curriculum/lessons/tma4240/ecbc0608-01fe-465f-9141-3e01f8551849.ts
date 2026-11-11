@@ -1,4 +1,6 @@
 import type { Lesson } from "../types";
+import { ConfidenceIntervalsFigure } from "./figures-begreper";
+import { IntervalChoiceFigure } from "./figures-metode";
 
 // Tema 9, Konfidens- og prediksjonsintervall. Pensum: WMMY 8.5–8.6, 9.2–9.6, 9.8 (til «Variances Unknown but Equal»), 9.10, 9.12.
 // Formelbok: side 3 (z), 4 (t), 5 (χ²), 8–9 (F, α = 0,025).
@@ -41,6 +43,7 @@ export const lesson: Lesson = {
       title: "Hva et konfidensintervall er",
       blocks: [
         { type: "text", text: "Et 95 % KI betyr at metoden fanger den sanne $\\mu$ i 95 % av gjentatte utvalg. For et enkelt utvalg kan du ikke si at $\\mu$ ligger inne i intervallet med 95 % sannsynlighet, for $\\mu$ er ikke tilfeldig. Intervallet er tilfeldig." },
+        { type: "figure", component: ConfidenceIntervalsFigure, caption: "Illustrasjon: tjue konfidensintervall fra gjentatte utvalg med σ kjent. Intervallet dekker μ = 0 i 19 av 20 tilfeller. Det er metoden som har 95 % dekning, ikke sannsynligheten for ett bestemt intervall." },
         { type: "box", variant: "pitfall", title: "Vanlig feil", blocks: [
           { type: "text", text: "«Det er 95 % sannsynlighet for at $\\mu$ ligger mellom 45 og 55.» Dette er feil tolkning. Riktig: «Metoden gir intervaller som dekker $\\mu$ i 95 % av utvalgene.»" },
         ] },
@@ -124,6 +127,7 @@ export const lesson: Lesson = {
       id: "eksamen",
       title: "Eksamensoppgaver og metodevalg",
       blocks: [
+        { type: "figure", component: IntervalChoiceFigure, caption: "Flyten går fra det du vil anslå til intervallet du bruker. Tabellen under viser de samme valgene i eksamensoppgaver." },
         { type: "table", head: ["Oppgavetype", "Eksamen", "Metodevalg"], rows: [
           ["KI for μ med kjent σ", "Aug 2026, oppg. 6b", "$\\bar{x} \\pm z_{0{,}025}\\,\\sigma/\\sqrt{n}$. Her er $\\sigma = 2$ gitt i oppgaven."],
           ["KI for en funksjon av parameteren", "Aug 2026, oppg. 6d", "Transformer grensene med en monoton funksjon. Her avtar $p$ i $\\mu$, så grensene bytter plass."],

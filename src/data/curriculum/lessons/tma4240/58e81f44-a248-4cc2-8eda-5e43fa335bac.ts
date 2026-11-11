@@ -1,4 +1,5 @@
 import type { Lesson } from "../types";
+import { Chi2Figure, ExponentialFigure, GammaFigure, NormalFigure, TFigure, WeibullFigure } from "./figures-fordelinger";
 import { NormalRegionFigure } from "./figures";
 
 // Tema 6, Viktige kontinuerlige fordelinger. Pensum: WMMY 6.1–6.4 og 6.6–6.7 (6.5 ligger under Funksjoner, jf. emnematrisa).
@@ -52,6 +53,7 @@ export const lesson: Lesson = {
       title: "Normalfordelingen",
       blocks: [
         { type: "formula", latex: "f(x) = \\dfrac{1}{\\sqrt{2\\pi}\\,\\sigma} \\exp\\!\\left(-\\dfrac{(x-\\mu)^2}{2\\sigma^2}\\right), \\qquad E(X) = \\mu, \\quad \\text{Var}(X) = \\sigma^2", name: "Normalfordeling", book: { status: "book", pages: "26" }, caption: `Formelboka ${formelbok("s. 26")}. Sannsynligheter slås opp i $\\Phi$-tabellen på side 1–2.` },
+        { type: "figure", component: NormalFigure, caption: "μ flytter kurven, og σ styrer bredden. Arealet under kurven er alltid 1." },
         { type: "formula", latex: "P(X \\le x) = \\Phi\\!\\left(\\dfrac{x - \\mu}{\\sigma}\\right)", name: "Sannsynlighet i normalfordelingen", book: { status: "book", pages: "26" }, caption: `Formelboka ${formelbok("s. 1–2, 26")}. Tabellen gir $\\Phi(z)$ for $z$ fra $-3{,}7$ til $3{,}7$.` },
         { type: "figure", component: () => NormalRegionFigure({ label: "Standard normal med areal over z = 1", shaded: [[1, 4]], marks: [{ z: 1, text: "z = 1" }] }), caption: "Arealet til høyre for $z = 1$ er $1 - \\Phi(1) = 0{,}1587$." },
         { type: "example", title: "$X \\sim N(10, 4)$", blocks: [
@@ -72,6 +74,7 @@ export const lesson: Lesson = {
       blocks: [
         { type: "text", text: "Eksponensialfordelingen beskriver tiden til neste hendelse i en Poisson-prosess. Formelboka bruker gjennomsnittet $\\beta$. Hvis oppgaven gir intensiteten $\\lambda$, er $\\beta = 1/\\lambda$." },
         { type: "formula", latex: "f(x) = \\dfrac{1}{\\beta} e^{-x/\\beta}, \\quad x \\ge 0; \\qquad P(X > x) = e^{-x/\\beta}", name: "Eksponensialfordeling", book: { status: "partial", pages: "26", missing: "P(X > x) = e^(−x/β) må læres" }, caption: `Formelboka ${formelbok("s. 26")}. Sannsynligheten for å overskride $x$ er $e^{-x/\\beta}$, som ikke står i boka.` },
+        { type: "figure", component: ExponentialFigure, caption: "β er gjennomsnittet. Større β gir lengre hale og lavere høyde i starten." },
         { type: "example", title: "$\\beta = 5$", blocks: [
           { type: "text", text: "$P(X > 3) = e^{-3/5} = e^{-0{,}6} \\approx 0{,}5488$. Forventningen er 5, og variansen er 25." },
         ] },
@@ -82,7 +85,9 @@ export const lesson: Lesson = {
       title: "Gamma- og χ²-fordelingen",
       blocks: [
         { type: "formula", latex: "E(X) = \\alpha\\beta, \\qquad \\text{Var}(X) = \\alpha\\beta^2", name: "Gamma-fordelingen", book: { status: "book", pages: "28" }, caption: `Formelboka ${formelbok("s. 28")}. Eksponensial er $\\alpha = 1$, og $\\chi^2_\\nu$ er $\\alpha = \\nu/2$, $\\beta = 2$.` },
+        { type: "figure", component: GammaFigure, caption: "β skalerer x-aksen, og α styrer formen. Med α = 1 er fordelingen eksponensial." },
         { type: "formula", latex: "E(X) = \\nu, \\qquad \\text{Var}(X) = 2\\nu", name: "χ²-fordelingen", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. Hvis $X_1, \\ldots, X_n$ er uavhengige og standard normale, er $\\sum X_i^2 \\sim \\chi^2_n$.` },
+        { type: "figure", component: Chi2Figure, caption: "Frihetsgradene ν bestemmer formen. Forventningen er ν, og fordelingen blir mer symmetrisk når ν vokser." },
         { type: "formula", latex: "\\dfrac{(n-1)S^2}{\\sigma^2} \\sim \\chi^2_{n-1}", name: "Variansen i et normalt utvalg", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. $\\bar{X}$ og $\\sum(X_i - \\bar{X})^2$ er uavhengige.` },
         { type: "example", title: "Øvre 5 % for $\\chi^2_{10}$", blocks: [
           { type: "text", text: "Side 5: $P(\\chi^2_{10} > 18{,}307) = 0{,}05$. Kolonnen er $\\alpha = 0{,}050$, og raden er $\\nu = 10$." },
@@ -95,6 +100,7 @@ export const lesson: Lesson = {
       blocks: [
         { type: "text", text: "Hvis $Z \\sim N(0,1)$ og $V \\sim \\chi^2_\\nu$ er uavhengige, er $Z/\\sqrt{V/\\nu}$ t-fordelt med $\\nu$ frihetsgrader. Det er dette som gir t-test og t-intervall for et normalt utvalg med ukjent $\\sigma$." },
         { type: "formula", latex: "\\dfrac{\\bar{X} - \\mu}{S/\\sqrt{n}} \\sim t_{n-1}", name: "t-størrelsen", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. Gjelder for normale $X_i$. Tabellen på side 4.` },
+        { type: "figure", component: TFigure, caption: "t-fordelingen har tykkere haler enn normalfordelingen. Den nærmer seg normalfordelingen når ν vokser." },
         { type: "formula", latex: "E(T) = 0 \\ (\\nu \\ge 2), \\qquad \\text{Var}(T) = \\dfrac{\\nu}{\\nu - 2} \\ (\\nu \\ge 3)", name: "Forventning og varians i t", book: { status: "book", pages: "27" }, caption: `Formelboka ${formelbok("s. 27")}. $t_1$ er Cauchy, og $t_\\nu \\to N(0, 1)$ når $\\nu \\to \\infty$.` },
         { type: "example", title: "$\\nu = 15$, tosidig 95 %", blocks: [
           { type: "text", text: "Side 4: $t_{0{,}025, 15} = 2{,}131$. Sammenlign med $z_{0{,}025} = 1{,}960$. t-verdien er større fordi $\\nu$ er liten." },
@@ -128,6 +134,7 @@ export const lesson: Lesson = {
           { type: "text", text: "Hver celle har eksponensiell levetid med forventning $\\beta$. For $n$ celler gir det $P(\\text{panel virker} > t) = e^{-nt/\\beta}$, altså eksponensial med forventning $\\beta/n$." },
         ] },
         { type: "formula", latex: "f(x) = \\alpha\\beta\\,x^{\\beta-1} e^{-\\alpha x^{\\beta}}, \\qquad x \\ge 0", name: "Weibull-fordelingen", book: { status: "book", pages: "28" }, caption: `Parametrisering som i formelboka ${formelbok("s. 28")}. Eksponensial er tilfellet $\\beta = 1$.` },
+        { type: "figure", component: WeibullFigure, caption: "β bestemmer formen, og α skalerer. Med β = 1 får du eksponensialfordelingen. For β < 1 går tettheten mot uendelig ved x = 0, så den øverste delen av kurven er klippet. Weibull er øvingsstoff, se formelboka side 28." },
       ],
     },
   ],
