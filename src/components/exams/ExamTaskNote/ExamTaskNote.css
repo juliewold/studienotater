@@ -109,10 +109,11 @@
   }
 }
 
-/* Det vanlige notatoppsettet har bunnmarg og lang luft mellom blokker. Den fjernes her. */
+/* Det vanlige notatoppsettet har bunnmarg, minstehøyde og lang luft mellom blokker. Den fjernes her. */
 .exam-task-note .read-only-note {
   padding: 0;
   gap: 0;
+  min-height: 0;
 }
 
 /* Oppgaveboksen og støtteboksene bruker det vanlige boksdesignet, men mindre. */
