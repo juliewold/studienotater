@@ -244,3 +244,20 @@ here; check them before applying.
 
 Manual check after applying: as an admin, open a top-level folder, create a subfolder
 from the card menu, move it, and delete it. The confirmation shows what will move.
+
+## Exam task solutions
+
+`migrations/20261117_exam_task_notes.sql` adds `exam_task_notes`, which links one
+exam sub-task (`exam_id`, `task_label`, for example `1a`) to one written solution
+note (`note_id`). `note_id` is unique, so a note answers one sub-task. A trigger
+requires the note and the exam to belong to the same subject. Signed-in users can
+read the links, and only admins can write them, the same as notes and note folders.
+
+The migration adds one table and changes no existing rows. Apply it in Supabase
+**before** deploying the exam pages. Until it is applied, the PDF tabs still work,
+but the «Mine skrevne løsninger» tab shows an error for links. Check that
+`exams.id` and `notes.id` are `uuid` before applying it. If they are not, the
+transaction fails and rolls back.
+
+Deleting an exam or a note removes only its link row. The note content and the
+notes in Notater are kept. Unlinking a sub-task deletes only the link.
