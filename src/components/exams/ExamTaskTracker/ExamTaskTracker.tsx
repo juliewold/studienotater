@@ -1,82 +1,111 @@
 import "./ExamTaskTracker.css";
-import { useEffect, useMemo, useState } from "react";
-import {
-  getExamTaskProgress,
-  setExamTaskCompleted,
-} from "../../../services/exams/examTaskProgressService";
+import { useMemo, useState } from "react";
+import { Check, ChevronDown } from "lucide-react";
+import { groupExamTasks } from "../examTaskGroups";
 
 type Props = {
-  examId: string;
   tasks: string[];
+  completedTasks: Set<string>;
+  selectedTask: string | null;
+  onSelectTask: (task: string) => void;
+  onToggleTask: (task: string) => void;
 };
 
-export const ExamTaskTracker = ({ examId, tasks }: Props) => {
-  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
+// Oppgavelisten er kontrollert av eksamenssiden: fullført-status og valgt deloppgave deles med alle faner.
+export const ExamTaskTracker = ({
+  tasks,
+  completedTasks,
+  selectedTask,
+  onSelectTask,
+  onToggleTask,
+}: Props) => {
+  const groups = useMemo(() => groupExamTasks(tasks), [tasks]);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    const loadProgress = async () => {
-      try {
-        const progress = await getExamTaskProgress(examId);
+  const completedCount = tasks.filter((task) => completedTasks.has(task)).length;
 
-        setCompletedTasks(
-          new Set(
-            progress
-              .filter((task) => task.completed)
-              .map((task) => task.taskLabel),
-          ),
-        );
-      } catch (error) {
-        console.error(error);
+  const toggleGroup = (key: string) => {
+    setCollapsedGroups((current) => {
+      const next = new Set(current);
+
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
       }
-    };
 
-    loadProgress();
-  }, [examId]);
-
-  const completedCount = useMemo(
-    () => tasks.filter((task) => completedTasks.has(task)).length,
-    [tasks, completedTasks],
-  );
-
-  const progress =
-    tasks.length === 0 ? 0 : (completedCount / tasks.length) * 100;
-
-  const toggleTask = async (task: string) => {
-    const isCompleted = completedTasks.has(task);
-
-    const nextCompleted = new Set(completedTasks);
-
-    if (isCompleted) {
-      nextCompleted.delete(task);
-    } else {
-      nextCompleted.add(task);
-    }
-
-    setCompletedTasks(nextCompleted);
-
-    await setExamTaskCompleted(examId, task, !isCompleted);
+      return next;
+    });
   };
 
   return (
-    <section className="exam-task-tracker">
+    <section className="exam-task-tracker" aria-label="Deloppgaver">
       <h2>Oppgaver</h2>
 
-      {tasks.map((task) => (
-        <label key={task} className="exam-task-item">
-          <input
-            type="checkbox"
-            checked={completedTasks.has(task)}
-            onChange={() => toggleTask(task)}
-          />
-          Oppgave {task}
-        </label>
-      ))}
+      {groups.map((group, groupIndex) => {
+        const isOpen = !collapsedGroups.has(group.key);
+        const groupCompleted = group.tasks.filter((task) => completedTasks.has(task)).length;
+        const isGroupDone = groupCompleted === group.tasks.length;
+        const listId = `exam-task-group-${groupIndex}`;
+
+        return (
+          <div key={group.key} className="exam-task-group">
+            <button
+              type="button"
+              className="exam-task-group-header"
+              aria-expanded={isOpen}
+              aria-controls={listId}
+              onClick={() => toggleGroup(group.key)}
+            >
+              <ChevronDown
+                size={16}
+                aria-hidden="true"
+                className={`exam-task-group-chevron${isOpen ? " is-open" : ""}`}
+              />
+              <span className="exam-task-group-label">{group.label}</span>
+              <span className={`exam-task-group-count${isGroupDone ? " is-done" : ""}`}>
+                {isGroupDone && <Check size={13} aria-hidden="true" />}
+                {groupCompleted}/{group.tasks.length}
+              </span>
+            </button>
+
+            {isOpen && (
+              <ul id={listId} className="exam-task-list">
+                {group.tasks.map((task) => {
+                  const isSelected = selectedTask === task;
+
+                  return (
+                    <li key={task} className="exam-task-row">
+                      <input
+                        type="checkbox"
+                        className="exam-task-checkbox"
+                        checked={completedTasks.has(task)}
+                        onChange={() => onToggleTask(task)}
+                        aria-label={`Fullført: oppgave ${task}`}
+                      />
+
+                      <button
+                        type="button"
+                        className="exam-task-select"
+                        aria-current={isSelected ? "true" : undefined}
+                        onClick={() => onSelectTask(task)}
+                      >
+                        Oppgave {task}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        );
+      })}
 
       <p className="exam-task-progress">
         {completedCount} / {tasks.length} fullført
       </p>
 
-      <progress value={progress} max={100} />
+      <progress value={tasks.length === 0 ? 0 : (completedCount / tasks.length) * 100} max={100} />
     </section>
   );
 };

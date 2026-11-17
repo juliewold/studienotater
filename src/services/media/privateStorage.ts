@@ -47,6 +47,17 @@ export async function createPrivateStorageUrl(bucket: StudyBucket, path: string)
   return data.signedUrl;
 }
 
+// Ingen filtilgang skal kunne henge uten feilmelding, for eksempel hvis nettverk eller auth stopper.
+const STORAGE_URL_TIMEOUT_MS = 15000;
+
+export function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 /** No cross-user URL cache. Invalidate in-flight requests on auth changes/disposal. */
 export function watchPrivateStorageUrl(bucket: StudyBucket, path: string, receive: (state: StorageUrlState) => void): () => void {
   let disposed = false;
@@ -57,7 +68,11 @@ export function watchPrivateStorageUrl(bucket: StudyBucket, path: string, receiv
     const current = ++generation;
     clearTimeout(timer);
     try {
-      const url = await createPrivateStorageUrl(bucket, path);
+      const url = await withTimeout(
+        createPrivateStorageUrl(bucket, path),
+        STORAGE_URL_TIMEOUT_MS,
+        "Filtilgangen tok for lang tid. Prøv igjen.",
+      );
       if (disposed || current !== generation) return;
       receive({ url, loading: false, error: null });
       timer = setTimeout(renew, (STORAGE_URL_LIFETIME - 60) * 1000);

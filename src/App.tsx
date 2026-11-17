@@ -324,7 +324,16 @@ function App() {
         />
 
         <Route
-          path="/fag/:subjectId/eksamen/:source/:examId/:fileId"
+          path="/fag/:subjectId/eksamen/:source/:examId"
+          element={
+            <ProtectedRoute>
+              <ExamViewerPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fag/:subjectId/eksamen/:source/:examId/:view/:task?"
           element={
             <ProtectedRoute>
               <ExamViewerPage />

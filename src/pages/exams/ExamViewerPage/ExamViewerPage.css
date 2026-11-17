@@ -1,119 +1,152 @@
 .exam-viewer-page {
-
   padding-top: 0.75rem;
 }
 
-.exam-compact-header {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
+.exam-back-link {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.exam-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
   gap: 1rem;
 
-  min-height: 44px;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.exam-compact-back {
-  color: var(--theme-accent, #7c3aed);
-  font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
-
-  transition: color 0.2s ease;
+.exam-page-heading h1 {
+  margin: 0.15rem 0 0.1rem;
 }
 
-.exam-compact-back:hover {
-  color: var(--theme-accent, #5b21b6);
+.exam-page-heading .exam-meta {
+  margin: 0;
+  color: var(--theme-muted, #6b6486);
 }
 
-.exam-compact-title {
-  grid-column: 2;
+.exam-page-progress {
+  min-width: 260px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--theme-border, #ece8f7);
+  border-radius: 16px;
+  background: var(--theme-surface, white);
+}
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.45rem;
-
-  min-width: 0;
-
-  color: var(--theme-accent, #8b5cf6);
+.exam-page-progress-label {
+  display: block;
+  margin-bottom: 0.45rem;
   font-size: 0.9rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }
 
-.exam-compact-title span:first-child {
-  min-width: 0;
+.exam-page-progress-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #ece6fb;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.exam-compact-title strong {
+.exam-page-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8b5cf6, #a855f7);
+  transition: width 0.3s ease;
+}
+
+.exam-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.exam-tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--theme-border, #ddd3f5);
+  border-radius: 12px;
+  background: var(--theme-surface, white);
+
   color: var(--theme-text, #201a39);
-  font-weight: 800;
-  white-space: nowrap;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.exam-compact-separator {
-  color: #b9a8e8;
+.exam-tab:hover {
+  border-color: #c4b0f5;
+  color: var(--theme-accent, #6d28d9);
+}
+
+.exam-tab.is-active {
+  border-color: #a78bfa;
+  background: var(--theme-soft, #f1eaff);
+  color: var(--theme-accent, #6d28d9);
+  box-shadow: inset 0 -2px 0 #8b5cf6;
+}
+
+.exam-tab:focus-visible {
+  outline: 2px solid var(--theme-accent, #8b5cf6);
+  outline-offset: 2px;
 }
 
 .exam-workspace {
   display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
-  gap: 0.9rem;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
 
-  height: calc(100vh - 160px);
-  min-height: 650px;
+.exam-workspace.is-pdf {
+  height: calc(100vh - 290px);
+  min-height: 600px;
 }
 
 .exam-workspace-sidebar {
-  display: flex;
-  flex-direction: column;
-
-  height: 100%;
+  position: sticky;
+  top: 1rem;
   min-height: 0;
-
-  overflow: hidden;
-}
-
-.exam-workspace-sidebar .exam-task-tracker {
-  flex: 1;
-  min-height: 0;
-
-  grid-template-columns: 1fr;
-
-  margin: 0;
-  padding: 0.9rem;
-
+  max-height: 100%;
   overflow-y: auto;
 }
 
-.exam-workspace-sidebar .exam-task-tracker h2 {
-  margin-bottom: 0.75rem;
-  font-size: 1.15rem;
+.exam-workspace.is-pdf .exam-workspace-sidebar {
+  height: 100%;
 }
 
-.exam-workspace-sidebar .exam-task-item {
-  width: 100%;
-  padding: 0.65rem 0.7rem;
-}
-
-.exam-workspace-sidebar .exam-task-progress {
-  margin-top: 0.35rem;
-}
-
-.exam-workspace-pdf {
+.exam-workspace-main {
   min-width: 0;
   height: 100%;
 }
 
+.exam-workspace.is-notes .exam-workspace-main {
+  height: auto;
+}
+
+.exam-pdf-panel,
+.exam-ipad-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  height: 100%;
+}
+
+.exam-ipad-panel .exam-pdf-panel {
+  flex: 1;
+  min-height: 0;
+}
+
 .exam-viewer {
   display: block;
-
+  flex: 1;
   width: 100%;
+  min-height: 0;
   height: 100%;
 
   border: none;
@@ -123,55 +156,98 @@
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
 }
 
+.exam-pane-message {
+  margin: 0 0 0.75rem;
+  padding: 1rem;
+  border: 1px dashed var(--theme-border, #d8c7ff);
+  border-radius: 16px;
+  background: var(--theme-surface-raised, #faf8ff);
+  color: var(--theme-muted, #6b6486);
+}
+
+.exam-pane-error {
+  border-style: solid;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.exam-ipad-upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.exam-upload-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.exam-upload-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.exam-uploaded-pdf {
+  margin-top: 0.75rem;
+}
+
+.exam-pdf-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.exam-open-pdf-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--theme-border, #ddd3f5);
+  border-radius: 12px;
+  background: var(--theme-surface, white);
+  color: var(--theme-accent, #6d28d9);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.exam-open-pdf-link:hover {
+  border-color: #c4b0f5;
+}
+
 .exam-mobile-pdf-link {
   display: none;
 }
 
 @media (max-width: 1100px) {
   .exam-workspace {
-    grid-template-columns: 190px minmax(0, 1fr);
-  }
-
-  .exam-compact-title {
-    justify-content: flex-start;
+    grid-template-columns: 220px minmax(0, 1fr);
   }
 }
 
 @media (max-width: 900px) {
-  .exam-compact-header {
-    grid-template-columns: 1fr;
-    gap: 0.45rem;
-  }
-
-  .exam-compact-title {
-    grid-column: 1;
-    justify-content: flex-start;
-  }
-
-  .exam-workspace {
+  .exam-workspace,
+  .exam-workspace.is-pdf {
     grid-template-columns: 1fr;
     height: auto;
+    min-height: 0;
   }
 
   .exam-workspace-sidebar {
-    height: auto;
+    position: static;
+    max-height: none;
     overflow: visible;
   }
 
-  .exam-workspace-sidebar .exam-task-tracker {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow: visible;
-  }
-
-  .exam-workspace-pdf {
-    width: 100%;
+  .exam-workspace.is-pdf .exam-workspace-main {
     height: 80vh;
     min-height: 600px;
   }
 
   .exam-viewer {
-    width: 100%;
-    max-width: 100%;
     height: 100%;
   }
 }
@@ -181,58 +257,26 @@
     padding-top: 0.25rem;
   }
 
-  .exam-compact-header {
-    gap: 0.35rem;
-    margin-bottom: 0.5rem;
+  .exam-page-progress {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .exam-compact-back {
+  .exam-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .exam-tab {
+    justify-content: center;
+    text-align: center;
     font-size: 0.9rem;
   }
 
-  .exam-compact-title {
-    flex-wrap: wrap;
-    gap: 0.3rem;
-
-    font-size: 0.75rem;
-    line-height: 1.35;
-  }
-
-  .exam-workspace {
-    gap: 0.75rem;
-  }
-
-  .exam-workspace-sidebar .exam-task-tracker {
-    grid-template-columns: 1fr;
-
-    padding: 0.75rem;
-    border-radius: 18px;
-  }
-
-  .exam-workspace-sidebar .exam-task-tracker h2 {
-    margin-bottom: 0.65rem;
-
-    font-size: 1.05rem;
-  }
-
-  .exam-workspace-sidebar .exam-task-item {
-    padding: 0.5rem 0.6rem;
-  }
-
-  .exam-workspace-sidebar .exam-task-item + .exam-task-item {
-    margin-top: 0.4rem;
-  }
-
-  .exam-workspace-sidebar .exam-task-progress {
-    margin-top: 0.6rem;
-  }
-
-  .exam-workspace-pdf {
-    width: 100%;
+  .exam-workspace.is-pdf .exam-workspace-main {
     height: auto;
     min-height: 0;
-
-    overflow: visible;
   }
 
   .exam-viewer {
