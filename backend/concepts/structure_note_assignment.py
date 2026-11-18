@@ -1,8 +1,21 @@
 """Ground primary placement in one note, without trusting batch note-ID choices."""
 import json
+import re
 from html.parser import HTMLParser
 
 from ai.llm import NTNU_LLM_MODEL
+
+
+def same_text(quote, source):
+    """True when the quote is a real part of the source text.
+
+    Formatting, punctuation, LaTeX markers and line breaks are ignored, so a correct quote
+    is not rejected because the model wrote a formula slightly differently. Words must still match.
+    """
+    def words(text):
+        return " ".join(re.findall(r"[0-9a-zæøå]+", text.lower()))
+    normalized_quote = words(quote)
+    return len(normalized_quote) > 0 and normalized_quote in words(source)
 
 
 class _NoteText(HTMLParser):
@@ -89,7 +102,7 @@ def select_note_subtopic(client, note, choices):
     if not isinstance(evidence, str) or len(evidence.strip()) < 12 or not isinstance(reason, str) or not reason.strip():
         raise ValueError("Placement must include source evidence and a reason.")
     # Evidence from another note, hallucinated quotes and title-only guesses fail closed.
-    if " ".join(evidence.split()) not in " ".join(note["content"].split()):
+    if not same_text(evidence, note["content"]):
         raise ValueError("Placement evidence does not belong to this note.")
     return options[result["choice"]]
 
@@ -109,7 +122,12 @@ def assign_notes(client, notes, topics, existing_topics):
     placements = []
     for note in notes:
         if note.get("organize", True):
-            placements.append((note["id"], choices[select_note_subtopic(client, note, choices)]))
+            # One retry: the model sometimes writes a quote that does not match. A second failure still rejects the batch.
+            try:
+                selected = select_note_subtopic(client, note, choices)
+            except ValueError:
+                selected = select_note_subtopic(client, note, choices)
+            placements.append((note["id"], choices[selected]))
     for topic in topics:
         for subtopic in topic["subtopics"]:
             subtopic["noteIds"] = []
