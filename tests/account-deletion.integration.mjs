@@ -99,6 +99,7 @@ if(process.argv[3]==='setup'){
  const schema=await readFile('tests/account-deletion.integration-schema.sql','utf8');
  sql("SET app.account_deletion.integration='synthetic-only';"+schema);
  sql(await readFile('database/migrations/20261101_account_deletion.sql','utf8'));
+sql(await readFile('database/migrations/20261118_account_deletion_log.sql','utf8'));
  const names=['survivor','reader-success','admin-success','storage-owner','unknown-dependency','silent-child','silent-parent','raised-error','early-parent','ui-success','ui-owner'];
  const users={};for(const label of names)users[label]=await createUser(label,label==='admin-success'?'admin':'user');
  sql(`INSERT INTO notes(content,created_by) VALUES ('synthetic shared note',${uuid(users['reader-success'].id)});`);
@@ -148,6 +149,9 @@ if(process.argv[3]==='setup'){
    const r=await remove(users[label]);assert.deepEqual(r,{status:200,code:'ACCOUNT_DELETED'},label+' deletion failed');erased(users[label]);
    console.log('PASS: real Auth/identity/session/token and all personal rows erased for '+label);
   }
+  // Exactly one log row per successful deletion, with no user identifier column.
+  assert.equal(sql("SELECT count(*) FROM public.account_deletion_log WHERE outcome='ACCOUNT_DELETED'"),'2','Successful deletions were not logged once each');
+  assert.equal(sql("SELECT count(*) FROM information_schema.columns WHERE table_schema='public' AND table_name='account_deletion_log'"),'3','Log table has unexpected columns');
   await assertBlocked(users['storage-owner'],'STORAGE_REVIEW_REQUIRED',409);
   console.log('PASS: real Storage ownership blocks deletion without changing account/data/files');
   sql('CREATE TABLE extra_personal_data(id int,user_id uuid REFERENCES auth.users ON DELETE SET NULL,private_text text);'+`INSERT INTO extra_personal_data VALUES (1,${uuid(users['unknown-dependency'].id)},'synthetic private text');`);
@@ -167,6 +171,8 @@ if(process.argv[3]==='setup'){
   sql('CREATE FUNCTION public.integration_fail_delete() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION \'synthetic failure\'; END $$; CREATE TRIGGER fail_delete BEFORE DELETE ON progress FOR EACH ROW EXECUTE FUNCTION integration_fail_delete();');
   await assertBlocked(users['raised-error'],'DELETION_NOT_CONFIRMED');sql('DROP TRIGGER fail_delete ON progress;');
   console.log('PASS: injected database exception rolls back real Auth and personal cleanup');
+  // Blocked and rolled-back attempts must not add log rows.
+  assert.equal(sql('SELECT count(*) FROM public.account_deletion_log'),'2','Rolled-back or blocked deletion was logged');
   assert.ok(isDeepStrictEqual(snapshot(users.survivor),untouched),'Other user changed');
   assert.equal(sql('SELECT jsonb_agg(to_jsonb(o) ORDER BY id) FROM storage.objects o'),files,'Storage files/metadata changed');
   assert.equal(sql("SELECT count(*) FROM notes WHERE content='synthetic shared note' AND created_by IS NULL"),'1');
