@@ -178,3 +178,33 @@
     padding: 0 16px 18px;
   }
 }
+
+.video-youtube-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  box-sizing: border-box;
+  border-radius: 14px;
+  background: var(--theme-surface-raised, #f5f1fa);
+  color: var(--theme-text, inherit);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.video-youtube-link:hover {
+  text-decoration: underline;
+}
+
+.video-youtube-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 40px;
+  border-radius: 12px;
+  background: #d90000;
+  color: #fff;
+}

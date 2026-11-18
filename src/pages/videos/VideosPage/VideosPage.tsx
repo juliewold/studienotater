@@ -22,10 +22,6 @@ type TopicGroup = {
 export const VideosPage = () => {
   const { subjectId } = useParams();
 
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(
-    null,
-  );
-
   const [videos, setVideos] = useState<DatabaseVideo[]>([]);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -178,38 +174,21 @@ export const VideosPage = () => {
 
                     <div className="video-grid">
                       {subtopicGroup.videos.map((video) => {
-                        const isActive =
-                          activeVideoId === video.id;
-
                         return (
                           <div
                             key={video.id}
                             className="video-card"
                           >
-                            {isActive ? (
-                              <iframe
-                                src={`https://www.youtube.com/embed/${video.youtubeId}`}
-                                title={video.title}
-                                allowFullScreen
-                              />
-                            ) : (
-                              <button
-                                type="button"
-                                className="video-thumbnail-button"
-                                onClick={() =>
-                                  setActiveVideoId(video.id)
-                                }
-                              >
-                                <img
-                                  src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
-                                  alt={video.title}
-                                />
-
-                                <span className="play-button">
-                                  ▶
-                                </span>
-                              </button>
-                            )}
+                            {/* Opens YouTube in a new tab. Nothing is loaded from YouTube on this page, so no cookies or IP addresses are sent from here. */}
+                            <a
+                              className="video-youtube-link"
+                              href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <span className="video-youtube-icon" aria-hidden="true">▶</span>
+                              <span>Åpne på YouTube</span>
+                            </a>
 
                             <h4>{video.title}</h4>
 

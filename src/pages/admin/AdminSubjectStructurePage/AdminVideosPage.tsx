@@ -79,10 +79,6 @@ export const AdminVideosPage = () => {
       : videoSubjectId.toUpperCase();
   };
 
-  const getYoutubeEmbedUrl = (id: string) => {
-    return `https://www.youtube.com/embed/${id}`;
-  };
-
   const groupedVideos = useMemo<AdminSubjectGroup[]>(() => {
     const subjectGroups = new Map<
       string,
@@ -386,12 +382,14 @@ export const AdminVideosPage = () => {
           </div>
 
           {youtubeId.trim() ? (
-            <iframe
-              className="video-preview-frame"
-              src={getYoutubeEmbedUrl(youtubeId.trim())}
-              title={title.trim() || "Forhåndsvisning av video"}
-              allowFullScreen
-            />
+            <a
+              className="video-preview-placeholder"
+              href={`https://www.youtube.com/watch?v=${youtubeId.trim()}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Åpne videoen på YouTube
+            </a>
           ) : (
             <div className="video-preview-placeholder">
               Videoen vises her når du skriver inn en YouTube-ID.
