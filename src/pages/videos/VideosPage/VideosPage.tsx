@@ -1,6 +1,7 @@
 import "./VideosPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Cookie } from "lucide-react";
 import {
   getVideosBySubject,
   type DatabaseVideo,
@@ -157,7 +158,10 @@ export const VideosPage = () => {
             aria-modal="true"
             aria-labelledby="youtube-consent-title"
           >
-            <h2 id="youtube-consent-title">Vise YouTube-videoer?</h2>
+            <h2 id="youtube-consent-title" className="consent-title">
+              <Cookie size={26} aria-hidden="true" />
+              Vise YouTube-videoer?
+            </h2>
             <p>
               Videoene på denne siden ligger på YouTube. Hvis du spiller dem av her, setter YouTube informasjonskapsler i
               nettleseren din og får IP-adressen din.
