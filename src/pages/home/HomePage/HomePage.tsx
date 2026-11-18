@@ -8,7 +8,6 @@ import { BookOpen } from "lucide-react";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 
-import { Footer } from "../../../components/layout/Footer/Footer";
 import { HomeProgress } from "../../../components/home/HomeProgress/HomeProgress";
 import { ExamOverview } from "../../../components/exams/ExamOverview/ExamOverview";
 import { WeeklyUpdates } from "../../../components/home/WeeklyUpdates/WeeklyUpdates";
@@ -105,7 +104,6 @@ export const HomePage = () => {
           </section>
         </main>
 
-        <Footer />
       </>
     );
   }
@@ -134,7 +132,6 @@ export const HomePage = () => {
           </section>
         </main>
 
-        <Footer />
       </>
     );
   }
@@ -165,6 +162,5 @@ const HomeDashboard = () => {
       <HomeProgress {...progress} />
       <ExamOverview />
     </main>
-    <Footer />
   </>;
 };
