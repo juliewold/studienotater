@@ -57,6 +57,10 @@ export const PrivacyPage = () => {
         <p>
           Appen bruker ikke analyseverktøy eller sporingscookies.
         </p>
+        <p>
+          Videoer åpnes på YouTube i en ny fane. Appen laster ikke inn noe fra YouTube på sidene sine. Når du er på
+          YouTube, gjelder YouTubes og Googles egne personvernregler og informasjonskapsler.
+        </p>
       </section>
 
       <section className="privacy-section">
