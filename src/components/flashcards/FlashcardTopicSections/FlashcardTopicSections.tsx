@@ -77,7 +77,8 @@ export const FlashcardTopicSections = ({ subjectId, groups, onStartPractice }: F
 
       setSuccessMessage(
         `${plural(result.cardsSaved, "flashcard", "flashcards")} lagret i ${topic.topicName} fra ${plural(result.notesProcessed, "notat", "notater")}.` +
-          (result.failedNotes.length > 0 ? ` Ingen kort for: ${result.failedNotes.join(", ")}.` : ""),
+          (result.failedNotes.length > 0 ? ` Ingen kort for: ${result.failedNotes.join(", ")}.` : "") +
+          (result.stoppedReason ? ` Stoppet: ${result.stoppedReason} Prøv igjen senere.` : ""),
       );
 
       await reload();
