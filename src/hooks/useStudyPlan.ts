@@ -51,6 +51,13 @@ type TopicProgressItem =
       resourceType: StudyPlanResourceType;
     };
 
+const getStudyItemProgressId = (
+  topic: DatabaseStudyTopic,
+  item: DatabaseStudyTopicItem,
+) => {
+  return `study-topic-${topic.id}-item-${item.id}`;
+};
+
 export const useStudyPlan = (subjectId?: string) => {
   const { user } = useContext(AuthContext);
   const loadNoteMetadata = useStudyPlanNoteMetadata();
@@ -259,14 +266,7 @@ export const useStudyPlan = (subjectId?: string) => {
     };
   };
 
-  const getStudyItemProgressId = (
-    topic: DatabaseStudyTopic,
-    item: DatabaseStudyTopicItem,
-  ) => {
-    return `study-topic-${topic.id}-item-${item.id}`;
-  };
-
-  const getResourceProgressId = (resource: DatabaseStudyTopicResource) => {
+  const getResourceProgressId = useCallback((resource: DatabaseStudyTopicResource) => {
     const source = "database";
 
     if (resource.resourceType === "pdf") {
@@ -290,7 +290,7 @@ export const useStudyPlan = (subjectId?: string) => {
     return video
       ? `video-${subjectId}-${source}-${video.youtubeId}`
       : `video-${subjectId}-${source}-${resource.resourceId}`;
-  };
+  }, [subjectId, notes, videos]);
 
   const isStudyItemCompleted = (
     topic: DatabaseStudyTopic,
@@ -311,32 +311,36 @@ export const useStudyPlan = (subjectId?: string) => {
     return getProgress(getResourceProgressId(resource), "resource").completed;
   };
 
-  const getTopicProgressItems = (
-    topic: DatabaseStudyTopic,
-  ): TopicProgressItem[] => {
-    const studyItems: TopicProgressItem[] = topic.items.map((item) => ({
-      id: getStudyItemProgressId(topic, item),
-      type: "study-plan",
-    }));
+  const getTopicProgressItems = useCallback(
+    (topic: DatabaseStudyTopic): TopicProgressItem[] => {
+      const studyItems: TopicProgressItem[] = topic.items.map((item) => ({
+        id: getStudyItemProgressId(topic, item),
+        type: "study-plan",
+      }));
 
-    const resourceItems: TopicProgressItem[] = topic.resources.map(
-      (resource) => ({
-        id: getResourceProgressId(resource),
-        type: "resource",
-        resourceType: resource.resourceType,
-      }),
-    );
+      const resourceItems: TopicProgressItem[] = topic.resources.map(
+        (resource) => ({
+          id: getResourceProgressId(resource),
+          type: "resource",
+          resourceType: resource.resourceType,
+        }),
+      );
 
-    return [...studyItems, ...resourceItems];
-  };
+      return [...studyItems, ...resourceItems];
+    },
+    [getResourceProgressId],
+  );
 
-  const isTopicProgressItemCompleted = (item: TopicProgressItem) => {
-    if (item.type === "study-plan") {
-      return completedStudyPlanItems.includes(item.id);
-    }
+  const isTopicProgressItemCompleted = useCallback(
+    (item: TopicProgressItem) => {
+      if (item.type === "study-plan") {
+        return completedStudyPlanItems.includes(item.id);
+      }
 
-    return getProgress(item.id, "resource").completed;
-  };
+      return getProgress(item.id, "resource").completed;
+    },
+    [completedStudyPlanItems, getProgress],
+  );
 
   const progressSummary = useMemo(() => {
     const allItems = topics.flatMap((topic) => getTopicProgressItems(topic));
@@ -353,7 +357,7 @@ export const useStudyPlan = (subjectId?: string) => {
       total: allItems.length,
       percentage,
     };
-  }, [completedStudyPlanItems, getProgress, notes, topics, videos]);
+  }, [getTopicProgressItems, isTopicProgressItemCompleted, topics]);
 
   const getTopicProgress = (topic: DatabaseStudyTopic) => {
     const topicItems = getTopicProgressItems(topic);
