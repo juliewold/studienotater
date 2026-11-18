@@ -1,6 +1,5 @@
 import "./PrivacyPage.css";
 
-// Fields in [FYLL INN: …] must be replaced by the operator before publishing.
 // The deletion sentence follows the same build flag as the Settings section,
 // so the notice never claims a deletion option that is not active.
 const deletionEnabled = import.meta.env.VITE_ACCOUNT_DELETION_ENABLED === "true";
@@ -76,7 +75,7 @@ export const PrivacyPage = () => {
         <h2>Hvem deler vi opplysninger med?</h2>
         <p>Vi bruker disse tjenestene til å drive nettsiden. De behandler opplysninger på våre vegne:</p>
         <ul>
-          <li><strong>Supabase:</strong> database, innlogging og lagring av filer. Region og databehandleravtale: [FYLL INN: region og avtalegrunnlag].</li>
+          <li><strong>Supabase:</strong> database, innlogging og lagring av filer. Databasen ligger i EU (region Stockholm). Supabase behandler opplysningene etter en databehandleravtale (DPA) som er en del av vilkårene deres.</li>
           <li><strong>GitHub Pages:</strong> hosting av selve nettsiden.</li>
           <li><strong>NTNU:</strong> språkmodelltjenesten som brukes til KI-funksjoner. Bare tekst du selv sender inn, sendes dit.</li>
         </ul>
@@ -88,7 +87,7 @@ export const PrivacyPage = () => {
         <p>
           Kontoopplysninger og personlig bruk lagres så lenge kontoen finnes. Når kontoen slettes, fjernes de fra den
           aktive databasen. Sikkerhetskopier og tekniske logger hos tjenesteleverandørene kan beholdes i en begrenset
-          periode: [FYLL INN: oppbevaringstid for sikkerhetskopier og logger].
+          periode: Supabase tar daglige sikkerhetskopier og beholder dem i 7 dager.
         </p>
       </section>
 
