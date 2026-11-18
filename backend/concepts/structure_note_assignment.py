@@ -1,9 +1,12 @@
 """Ground primary placement in one note, without trusting batch note-ID choices."""
 import json
+import logging
 import re
 from html.parser import HTMLParser
 
 from ai.llm import NTNU_LLM_MODEL
+
+logger = logging.getLogger(__name__)
 
 
 def same_text(quote, source):
@@ -68,7 +71,7 @@ def read_json_response(response):
         raise ValueError("Invalid structure JSON.") from error
 
 
-def select_note_subtopic(client, note, choices):
+def select_note_subtopic(client, note, choices, hint=""):
     """The caller owns the note ID. The model can select only a topic path."""
     result = read_json_response(client.chat.completions.create(
         model=NTNU_LLM_MODEL,
@@ -91,6 +94,7 @@ def select_note_subtopic(client, note, choices):
                 "note": {"title": note["title"], "content": note["content"]},
                 "choices": [{"key": f"s{i}", "topic": topic["name"], "subtopic": subtopic["name"]}
                             for i, (topic, subtopic) in enumerate(choices)],
+                **({"hint": hint} if hint else {}),
             }, ensure_ascii=False)},
         ],
     ))
@@ -103,6 +107,7 @@ def select_note_subtopic(client, note, choices):
         raise ValueError("Placement must include source evidence and a reason.")
     # Evidence from another note, hallucinated quotes and title-only guesses fail closed.
     if not same_text(evidence, note["content"]):
+        logger.warning("Evidence not in note %s: %r", note.get("id"), evidence[:160])
         raise ValueError("Placement evidence does not belong to this note.")
     return options[result["choice"]]
 
@@ -126,7 +131,10 @@ def assign_notes(client, notes, topics, existing_topics):
             try:
                 selected = select_note_subtopic(client, note, choices)
             except ValueError:
-                selected = select_note_subtopic(client, note, choices)
+                selected = select_note_subtopic(client, note, choices, hint=(
+                    "Forrige svar var ugyldig. Siter en hel setning ordrett fra notatets tekst. "
+                    "Tittelen på temaet eller undertemaet er ikke et gyldig sitat."
+                ))
             placements.append((note["id"], choices[selected]))
     for topic in topics:
         for subtopic in topic["subtopics"]:
