@@ -32,3 +32,4 @@ __pycache__/
 
 # Local project handover
 /OVERLEVERING.md
+supabase/.temp/

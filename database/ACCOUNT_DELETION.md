@@ -1,8 +1,14 @@
 # Self-service account deletion: inventory and manual rollout
 
-Status: implemented on a feature branch, **not deployed**. No production users,
-rows, objects, ownership metadata or bucket settings have been changed. Do not
-test DELETE against a real account, including your own administrator account.
+Status: **active in production since 2026-11-18.**
+
+- Migrations `20261101_account_deletion.sql` and `20261118_account_deletion_log.sql` are applied.
+- Edge Function `delete-account` is deployed with Verify JWT off. The handler performs the authentication itself.
+- Server flag `ACCOUNT_DELETION_ENABLED=true` and GitHub Actions variable `VITE_ACCOUNT_DELETION_ENABLED=true`.
+- Accounts that own storage objects are blocked by design (`STORAGE_REVIEW_REQUIRED`). The administrator account keeps its shared files.
+- Each successful deletion writes one `account_deletion_log` row with no user identifier. Rows are kept for 90 days.
+
+The sections below are the rollout record. The manual steps are kept as history; do not repeat them.
 
 ## Evidence and data inventory
 
