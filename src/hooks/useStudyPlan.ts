@@ -73,106 +73,108 @@ export const useStudyPlan = (subjectId?: string) => {
     string[]
   >([]);
 
-  const [isLoadingPlan, setIsLoadingPlan] = useState(true);
-  const [isLoadingBooks, setIsLoadingBooks] = useState(true);
+  // Loading is derived from the subject each load last finished for, so a
+  // subject change needs no synchronous state update inside the effects below.
+  const [planLoadedFor, setPlanLoadedFor] = useState<string | undefined>();
+  const [booksLoadedFor, setBooksLoadedFor] = useState<string | undefined>();
+  const isLoadingPlan = Boolean(subjectId) && planLoadedFor !== subjectId;
+  const isLoadingBooks = Boolean(subjectId) && booksLoadedFor !== subjectId;
 
   const [errorMessage, setErrorMessage] = useState("");
 
-  const loadStudyPlan = useCallback(async () => {
-    if (!subjectId) {
-      setTopics([]);
-      setPdfs([]);
-      setNotes([]);
-      setVideos([]);
-      setIsLoadingPlan(false);
-      return;
-    }
+  // Loaders set state only inside promise callbacks. Without a subject nothing
+  // is loaded; the study plan page always has one.
+  const loadStudyPlan = useCallback((isCurrent: () => boolean = () => true) => {
+    if (!subjectId) return Promise.resolve();
 
-    setIsLoadingPlan(true);
-    setErrorMessage("");
-
-    try {
-      const [loadedTopics, loadedPdfs, loadedNotes, loadedVideos] =
-        await Promise.all([
-          getStudyTopicsBySubject(subjectId),
-          getPdfsBySubject(subjectId),
-          loadNoteMetadata(subjectId),
-          getVideosBySubject(subjectId),
-        ]);
-
-      setTopics(loadedTopics);
-      setPdfs(loadedPdfs);
-      setNotes(loadedNotes);
-      setVideos(loadedVideos);
-    } catch (error) {
-      console.error("Kunne ikke hente studieplan:", error);
-      setErrorMessage("Kunne ikke hente studieplanen.");
-    } finally {
-      setIsLoadingPlan(false);
-    }
+    return Promise.all([
+      getStudyTopicsBySubject(subjectId),
+      getPdfsBySubject(subjectId),
+      loadNoteMetadata(subjectId),
+      getVideosBySubject(subjectId),
+    ])
+      .then(([loadedTopics, loadedPdfs, loadedNotes, loadedVideos]) => {
+        if (!isCurrent()) return;
+        setErrorMessage("");
+        setTopics(loadedTopics);
+        setPdfs(loadedPdfs);
+        setNotes(loadedNotes);
+        setVideos(loadedVideos);
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente studieplan:", error);
+        if (isCurrent()) setErrorMessage("Kunne ikke hente studieplanen.");
+      })
+      .finally(() => {
+        if (isCurrent()) setPlanLoadedFor(subjectId);
+      });
   }, [subjectId, loadNoteMetadata]);
 
-  const loadBooks = useCallback(async () => {
-    if (!subjectId) {
-      setBooks([]);
-      setBook(null);
-      setIsLoadingBooks(false);
-      return;
-    }
+  const loadBooks = useCallback((isCurrent: () => boolean = () => true) => {
+    if (!subjectId) return Promise.resolve();
 
-    setIsLoadingBooks(true);
+    return getBooksBySubject(subjectId)
+      .then((loadedBooks) =>
+        Promise.all(
+          loadedBooks.map((currentBook) => getBookBySlug(subjectId, currentBook.slug)),
+        ),
+      )
+      .then((loadedBooksWithChapters) => {
+        const availableBooks = loadedBooksWithChapters.filter(
+          (currentBook): currentBook is DatabaseBook => currentBook !== null,
+        );
 
-    try {
-      const loadedBooks = await getBooksBySubject(subjectId);
-
-      const loadedBooksWithChapters = await Promise.all(
-        loadedBooks.map(async (currentBook) => {
-          const completeBook = await getBookBySlug(subjectId, currentBook.slug);
-
-          return completeBook;
-        }),
-      );
-
-      const availableBooks = loadedBooksWithChapters.filter(
-        (currentBook): currentBook is DatabaseBook => currentBook !== null,
-      );
-
-      setBooks(availableBooks);
-      setBook(availableBooks[0] ?? null);
-    } catch (error) {
-      console.error("Kunne ikke hente bøker:", error);
-      setBooks([]);
-      setBook(null);
-    } finally {
-      setIsLoadingBooks(false);
-    }
+        if (isCurrent()) {
+          setBooks(availableBooks);
+          setBook(availableBooks[0] ?? null);
+        }
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente bøker:", error);
+        if (isCurrent()) {
+          setBooks([]);
+          setBook(null);
+        }
+      })
+      .finally(() => {
+        if (isCurrent()) setBooksLoadedFor(subjectId);
+      });
   }, [subjectId]);
 
-  const loadCompletedItems = useCallback(async () => {
-    if (!user || !subjectId) {
-      setCompletedStudyPlanItems([]);
-      return;
-    }
+  const loadCompletedItems = useCallback((isCurrent: () => boolean = () => true) => {
+    if (!user || !subjectId) return Promise.resolve();
 
-    try {
-      const completedItems = await getStudyPlanItems(user.id, subjectId);
-
-      setCompletedStudyPlanItems(completedItems);
-    } catch (error) {
-      console.error("Kunne ikke hente studieplanfremdrift:", error);
-    }
+    return getStudyPlanItems(user.id, subjectId)
+      .then((completedItems) => {
+        if (isCurrent()) setCompletedStudyPlanItems(completedItems);
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente studieplanfremdrift:", error);
+      });
   }, [subjectId, user]);
 
   useEffect(() => {
-    loadStudyPlan();
+    let isCurrent = true;
+    void loadStudyPlan(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadStudyPlan]);
 
   useEffect(() => {
-    loadBooks();
+    let isCurrent = true;
+    void loadBooks(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadBooks]);
 
   useEffect(() => {
-    loadCompletedItems();
+    let isCurrent = true;
+    void loadCompletedItems(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadCompletedItems]);
 
   const toggleItem = async (itemId: string) => {
