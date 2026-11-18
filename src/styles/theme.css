@@ -12,7 +12,7 @@
 [data-theme="dark"] body { background: var(--app-background); color: var(--app-text); }
 [data-theme="dark"] :is(h1,h2,h3,h4,h5,h6) { color: var(--app-text); }
 [data-theme="dark"] :is(.page-description,.subject-description,.weekly-update-name,.semester-subject-item h3,.home-progress-details,.home-progress-rating,.upcoming-task p,.upcoming-task time,.exam-card p,.search-description,.search-snippet,.search-message,.note-description,.read-only-note-content,.ProseMirror) { color: var(--app-muted); }
-[data-theme="dark"] :is(.upcoming-task,.semester-subject-item,.home-progress-item,.exam-card,.subject-card,.subject-feature-card,.subject-progress,.subject-knowledge-base,.note-card,.folder-card,.pdf-card,.video-card,.flashcard,.settings-card,.profile-card,.auth-card,.search-results,.exam-section,.calendar-card,.calendar-sidebar,.calendar-main,.note-editor-toolbar,.note-outline,.editable-note-editor-wrapper,.editor-toolbar,.note-reading-tools,.note-ai-tools) {
+[data-theme="dark"] :is(.upcoming-task,.semester-subject-item,.home-progress-item,.exam-card,.subject-card,.subject-feature-card,.subject-progress,.subject-knowledge-base,.note-card,.folder-card,.pdf-card,.video-card,.flashcard,.settings-card,.profile-card,.auth-card,.search-results,.exam-section,.calendar-card,.calendar-sidebar,.calendar-main,.note-editor-toolbar,.note-outline,.editable-note-editor-wrapper,.editor-toolbar,.note-reading-tools) {
   background: var(--app-surface); border-color: var(--app-border); color: var(--app-text);
 }
 [data-theme="dark"] :is(input,textarea,select) { background: var(--app-surface); color: var(--app-text); border-color: var(--app-border); }
@@ -36,9 +36,9 @@
 [data-theme="dark"] :is(.read-only-note-content,.note-editor-content) .tiptap-mathematics-render[data-type="block-math"] { background: var(--app-surface); color: var(--app-text); }
 [data-theme="dark"] .note-outline :is(summary,a[aria-current]) { color: var(--app-accent); }
 [data-theme="dark"] .note-outline a[aria-current] { background: var(--app-soft); }
-[data-theme="dark"] :is(.note-reading-tools,.note-editor-toolbar,.note-navigation,.note-ai-tools) :is(button,a,summary),
+[data-theme="dark"] :is(.note-reading-tools,.note-editor-toolbar,.note-navigation) :is(button,a,summary),
 [data-theme="dark"] :is(.note-toolbar-options,.math-dialog,.concept-picker,.slash-menu-popover) { background: var(--app-surface); color: var(--app-text); border-color: var(--app-border); }
-[data-theme="dark"] :is(.note-reading-tools,.note-editor-toolbar,.note-ai-tools) button:disabled { color: var(--app-muted); opacity: .5; }
+[data-theme="dark"] :is(.note-reading-tools,.note-editor-toolbar) button:disabled { color: var(--app-muted); opacity: .5; }
 [data-theme="dark"] .note-reading-tools { background: transparent; }
 /* Legacy page cards use literal light backgrounds. Keep their dark surfaces consistent. */
 [data-theme="dark"] :is([class$="-card"],[class*="-card "],[class$="-panel"],.subject-syllabus-topic,.subject-progress-category,.topic-progress-item,.calendar-day,.calendar-day-header,.calendar-time-column,.calendar-week-grid,.programming-sidebar,.programming-content) { background: var(--app-surface); border-color: var(--app-border); color: var(--app-text); }

@@ -40,10 +40,6 @@
   padding-bottom: 4px;
 }
 
-.editable-note-reading:has(.exam-task-note) .note-ai-tools {
-  margin-top: 6px;
-}
-
 /* Oppgavetittel: venstrejustert, tydelig fet og større enn seksjonsoverskriftene.
    Undertittelen er mindre og grå. Avstanden over tittelen er liten, og under er den god. */
 .exam-task-note .editable-note-document-header {
