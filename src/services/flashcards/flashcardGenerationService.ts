@@ -16,6 +16,8 @@ type FlashcardGenerationResponse = {
   flashcards: GeneratedFlashcard[];
 };
 
+export class AiServiceUnavailableError extends Error {}
+
 export async function generateFlashcards(
   content: string,
   subtopics: AvailableFlashcardSubtopic[],
@@ -49,6 +51,11 @@ export async function generateFlashcards(
       typeof failure?.error === "string"
         ? failure.error
         : "Kunne ikke generere flashcards. Prøv igjen senere.";
+
+    // 503 means the AI service cannot be reached. Callers stop instead of trying every note.
+    if (response.status === 503) {
+      throw new AiServiceUnavailableError(message);
+    }
 
     throw new Error(message);
   }

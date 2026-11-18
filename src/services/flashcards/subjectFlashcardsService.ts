@@ -2,7 +2,7 @@ import { getPlainTextFromNote } from "../concepts/conceptExtractionService";
 import { getSubtopicLinksForNotes } from "../notes/noteSubtopicsService";
 import { getAllSubtopicsBySubject, getTopicsBySubject } from "../subjects/subjectStructureService";
 import { createFlashcard, getFlashcardsBySubject } from "../study/flashcardsService";
-import { generateFlashcards, type AvailableFlashcardSubtopic } from "./flashcardGenerationService";
+import { AiServiceUnavailableError, generateFlashcards, type AvailableFlashcardSubtopic } from "./flashcardGenerationService";
 import {
   getFlashcardSourceNotes,
   hashNoteContent,
@@ -27,6 +27,8 @@ export type FlashcardBatchResult = {
   cardsSaved: number;
   unplacedCards: number;
   failedNotes: string[];
+  /** Set when the run stopped early because the AI service could not be reached. */
+  stoppedReason?: string;
 };
 
 const createSlug = (value: string) => {
@@ -141,6 +143,12 @@ export async function generateAndSaveFlashcardsForNotes(
       await markNotesFlashcardsCovered([{ noteId: note.id, contentHash }]);
       result.notesProcessed += 1;
     } catch (error) {
+      if (error instanceof AiServiceUnavailableError) {
+        // The service is down, so the remaining notes would fail the same way. Stop here.
+        result.stoppedReason = error.message;
+        break;
+      }
+
       console.error(`Kunne ikke lage flashcards for ${note.title}:`, error);
       result.failedNotes.push(note.title);
     }

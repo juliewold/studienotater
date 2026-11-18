@@ -14,6 +14,8 @@ export const exportTables = [
   { table: "book_task_progress", column: "user_id" },
   { table: "exam_task_progress", column: "user_id" },
   { table: "semester_subjects", column: "user_id" },
+  { table: "practice_sessions", column: "user_id" },
+  { table: "practice_active_sessions", column: "user_id" },
 ] as const;
 
 export type ExportUser = {
@@ -28,7 +30,7 @@ export type RowFetcher = (table: string, column: string, userId: string) => Prom
 export type AccountExport = {
   exportedAt: string;
   account: { id: string; email: string | null; createdAt: string | null; username: string | null; fullName: string | null };
-  /** Rows per table. Browser-only practice history is not included; see the privacy notice. */
+  /** Rows per table, one entry for each account-owned personal table. */
   tables: Record<string, unknown[]>;
 };
 

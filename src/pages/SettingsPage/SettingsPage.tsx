@@ -116,11 +116,8 @@ export const SettingsPage = () => {
         <section className="settings-card" aria-labelledby="my-data-title">
           <h2 id="my-data-title">Dine data</h2>
           <p>
-            Last ned opplysningene som er knyttet til kontoen din: profil, favoritter, fremdrift, fagvalg og
-            oppgave- og eksamensfremdrift, som én JSON-fil.
-          </p>
-          <p>
-            Øvingshistorikk som er lagret i nettleseren, er ikke med i filen.
+            Last ned opplysningene som er knyttet til kontoen din: profil, favoritter, fremdrift, fagvalg,
+            oppgave- og eksamensfremdrift og øvingshistorikk, som én JSON-fil.
           </p>
           {user ? (
             <div className="setting-row">
@@ -139,7 +136,7 @@ export const SettingsPage = () => {
           <h2 id="delete-account-title">Slett konto</h2>
           <p>Kontoen, profilen, favorittene, fagvalgene og den personlige fremdriften slettes permanent. Felles notater, PDF-er, bilder og eksamensfiler bevares.</p>
           <p>Sikkerhetskopier og sikkerhetslogger kan beholdes i en begrenset periode. Nedlastede filer og data i andre nettlesere slettes ikke automatisk.</p>
-          <p>Øvingshistorikk og påbegynte økter er lagret per nettleser, ikke per konto. De slettes ikke automatisk, siden de også kan tilhøre andre brukere av nettleseren. Du kan tømme historikken på øvingssiden.</p>
+          <p>Øvingshistorikken og påbegynte økter er knyttet til kontoen din og slettes sammen med den.</p>
           {deleted ? <p role="status">Kontoen er slettet.</p> : !user ? <a href="#/logg-inn">Logg inn for å administrere kontoen</a> : !confirming ? (
             <button className="delete-account-button" type="button" onClick={() => setConfirming(true)}>Slett konto</button>
           ) : (
