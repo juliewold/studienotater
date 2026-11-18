@@ -58,10 +58,10 @@ export const PrivacyPage = () => {
           Appen bruker ikke analyseverktøy eller sporingscookies.
         </p>
         <p>
-          Videoer fra YouTube vises på sidene våre først når du selv trykker på «Godta YouTube-cookies og spill av»
-          for den videoen. Før det lastes ingenting fra YouTube. Når du spiller av videoen, setter YouTube
-          informasjonskapsler og kan behandle IP-adressen din, etter YouTubes egne regler. Valget ditt lagres ikke, og
-          du må godta på nytt for neste video. Du kan også åpne videoen direkte på YouTube.
+          Videoer fra YouTube vises på sidene våre først når du har godtatt det én gang. Før det lastes ingenting fra
+          YouTube. Når du spiller av videoene, setter YouTube informasjonskapsler og kan behandle IP-adressen din, etter
+          YouTubes egne regler. Valget ditt lagres i nettleseren din (nøkkelen <code>youtube-consent</code>) til du
+          trekker det tilbake under Innstillinger. Du kan også åpne videoene direkte på YouTube.
         </p>
       </section>
 
