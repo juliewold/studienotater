@@ -8,7 +8,9 @@
   --app-soft: #f3edfc;
   --app-accent: #7c3aed;
 }
-.app-workspace { margin-left: var(--sidebar-width); min-width: 0; min-height: calc(100dvh - 76px); }
+.app-workspace { margin-left: var(--sidebar-width); min-width: 0; min-height: calc(100dvh - 76px); display: flex; flex-direction: column; }
+/* Keep the footer at the bottom of the viewport when page content is short. */
+.app-workspace > .footer { margin-top: auto; }
 .app-workspace:focus { outline: none; }
 .app-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 60; width: var(--sidebar-width); padding: 28px 18px 18px; overflow-y: auto; background: var(--app-surface); border-right: 1px solid var(--app-border); scrollbar-width: thin; }
 .app-brand { display: flex; align-items: center; gap: 10px; margin: 0 8px 32px; color: var(--app-text); text-decoration: none; font-size: 1rem; font-weight: 750; letter-spacing: -.03em; }
