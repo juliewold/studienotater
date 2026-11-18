@@ -5,7 +5,7 @@ import unicodedata
 from difflib import SequenceMatcher
 
 from ai.llm import NTNU_LLM_MODEL, get_client
-from .structure_note_assignment import note_text, read_json_response
+from .structure_note_assignment import note_text, read_json_response, same_text
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,7 @@ def _generate_once(client, text, hint):
         ):
             raise ValueError('Each card needs question, answer, learningPoint and evidence.')
         # A card whose quote is not in the note is dropped. The other cards from the note are still useful.
-        if ' '.join(card['evidence'].split()) not in ' '.join(text.split()):
+        if not same_text(card['evidence'], text):
             ungrounded += 1
             continue
         if len(cards) >= 15:
