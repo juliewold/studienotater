@@ -2,6 +2,7 @@
 import json
 import logging
 import re
+import unicodedata
 from html.parser import HTMLParser
 
 from ai.llm import NTNU_LLM_MODEL
@@ -16,7 +17,9 @@ def same_text(quote, source):
     is not rejected because the model wrote a formula slightly differently. Words must still match.
     """
     def words(text):
-        return " ".join(re.findall(r"[0-9a-zæøå]+", text.lower()))
+        # NFKC turns subscripts and superscripts (Z₁, χ²) into plain digits, so they match Z_1 and χ^2.
+        text = unicodedata.normalize("NFKC", text).lower()
+        return " ".join(re.findall(r"[0-9a-zæøå]+", text))
     normalized_quote = words(quote)
     return len(normalized_quote) > 0 and normalized_quote in words(source)
 
