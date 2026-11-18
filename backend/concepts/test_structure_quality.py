@@ -72,15 +72,18 @@ class StructureQualityTests(SimpleTestCase):
         ids = [i for topic in result["topics"] for sub in topic["subtopics"] for i in sub["noteIds"]]
         self.assertNotIn("id-reductions", ids)
 
-    def test_bad_or_other_note_evidence_rejects_entire_plan(self):
+    def test_bad_or_other_note_evidence_leaves_the_note_unplaced(self):
         for invalid in [
             {"choice": None, "evidence": "", "reason": "Uncertain"},
             {"choice": "unknown", "evidence": "long enough source", "reason": "Reason"},
             {"choice": "s0", "evidence": "Turing, Cook, Levin og Karp transformerer problemer.", "reason": "Other note"},
             {"choice": "s0", "evidence": "Tabeller", "reason": "Too short"},
         ]:
-            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
-                self.run_plan(invalid=invalid)
+            with self.subTest(invalid=invalid):
+                result, _ = self.run_plan(invalid=invalid)
+                placed = [note_id for topic in result["topics"] for subtopic in topic["subtopics"] for note_id in subtopic["noteIds"]]
+                # The note with the bad placement is left out. Other notes may still be placed.
+                self.assertNotIn("id-data", placed)
 
     def test_full_text_preserves_boundaries_math_and_tail_without_html_noise(self):
         html = '<h2>Stakker</h2><p>A &amp; B</p><p>' + 'Lang tekst. ' * 5000 + '</p><span data-latex="n^2"></span><p>Viktig slutt.</p><script>ignore()</script>'

@@ -271,6 +271,23 @@
   font-size: clamp(1.5rem, 3vw, 2.15rem);
   line-height: 1.45;
   white-space: pre-wrap;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Long formulas scroll inside the card instead of making the whole page wider. */
+.flashcard-practice-card math {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+/* Previous and next share the row: they split the width instead of each taking 100%. */
+.flashcard-practice-navigation > button {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
 }
 
 .flashcard-hint {

@@ -13,21 +13,51 @@ export type GenerateSubjectStructureResult = {
   notesOrganized: number;
   notesSkipped: number;
   structureStatus: "completed" | "no-content" | "not-requested";
+  /** Titles of notes in batches the AI could not process. They are not placed yet. */
+  skippedNoteTitles: string[];
 };
 
 export const emptyStructureResult = (): GenerateSubjectStructureResult => ({
   topicsCreated: 0, subtopicsCreated: 0, topicsReused: 0, subtopicsReused: 0,
-  notesOrganized: 0, notesSkipped: 0, structureStatus: "not-requested",
+  notesOrganized: 0, notesSkipped: 0, skippedNoteTitles: [], structureStatus: "not-requested",
 });
+
+// The AI service fails on large requests, so notes are sent in small batches: at most this many
+// characters of text and this many notes per request.
+const BATCH_TEXT_LIMIT = 15_000;
+const BATCH_NOTE_LIMIT = 8;
+
+const plainText = (html: string) => new DOMParser().parseFromString(html, "text/html").body.textContent?.trim() ?? "";
+
+/** Groups notes into batches within the limits above. A single long note is its own batch. */
+function batchNotes<T extends { content: string }>(notes: T[]): T[][] {
+  const batches: T[][] = [];
+  let current: T[] = [];
+  let size = 0;
+
+  for (const note of notes) {
+    const length = plainText(note.content).length;
+
+    if (current.length > 0 && (size + length > BATCH_TEXT_LIMIT || current.length >= BATCH_NOTE_LIMIT)) {
+      batches.push(current);
+      current = [];
+      size = 0;
+    }
+
+    current.push(note);
+    size += length;
+  }
+
+  if (current.length > 0) batches.push(current);
+  return batches;
+}
 
 export async function generateAndSaveSubjectStructure(
   subjectId: string,
   subjectName: string,
 ): Promise<GenerateSubjectStructureResult> {
-  const [notes, topics, subtopics] = await Promise.all([
-    getNotesBySubject(subjectId), getTopicsBySubject(subjectId), getAllSubtopicsBySubject(subjectId),
-  ]);
-  const withContent = notes.filter(note => new DOMParser().parseFromString(note.content, "text/html").body.textContent?.trim());
+  const notes = await getNotesBySubject(subjectId);
+  const withContent = notes.filter(note => plainText(note.content));
   if (!withContent.length) return { ...emptyStructureResult(), structureStatus: "no-content", notesSkipped: notes.length };
 
   const links = await getSubtopicLinksForNotes(notes.map(note => note.id));
@@ -36,32 +66,63 @@ export async function generateAndSaveSubjectStructure(
   const apiUrl = import.meta.env.VITE_API_URL;
   if (!apiUrl) throw new Error("VITE_API_URL is not configured.");
 
-  const response = await fetch(`${apiUrl}/api/concepts/generate-structure/`, {
-    method: "POST",
-    headers: await getAIAuthHeaders(),
-    body: JSON.stringify({
+  // Batches run one after another. Each batch reads the topics saved by the batches before it,
+  // so later batches reuse them instead of creating duplicates.
+  const batches = batchNotes(withContent.filter(note => eligible.has(note.id)));
+  const totals = { topicsCreated: 0, subtopicsCreated: 0, topicsReused: 0, subtopicsReused: 0, notesOrganized: 0, notesSkipped: 0 };
+  const skippedNoteTitles: string[] = [];
+
+  for (const [index, batch] of batches.entries()) {
+    const [topics, subtopics] = await Promise.all([getTopicsBySubject(subjectId), getAllSubtopicsBySubject(subjectId)]);
+
+    const body = JSON.stringify({
       subjectName,
-      notes: withContent.map(note => ({ id: note.id, title: note.title, content: note.content, organize: eligible.has(note.id) })),
+      notes: batch.map(note => ({ id: note.id, title: note.title, content: note.content, organize: true })),
       existingTopics: topics.map(topic => ({ id: topic.id, name: topic.name,
         subtopics: subtopics.filter(subtopic => subtopic.topicId === topic.id).map(({ id, name }) => ({ id, name })),
       })),
-    }),
-  });
-  if (!response.ok) {
-    const failure = await response.json().catch(() => null);
-    throw new Error(typeof failure?.error === "string" ? failure.error : "Kunne ikke generere fagstruktur. Ingen struktur er lagret.");
+    });
+    // The AI answer is sometimes rejected by the backend checks. One more try for the same batch
+    // usually works, and the checks themselves stay unchanged.
+    let response = await fetch(`${apiUrl}/api/concepts/generate-structure/`, { method: "POST", headers: await getAIAuthHeaders(), body });
+    if (!response.ok) {
+      response = await fetch(`${apiUrl}/api/concepts/generate-structure/`, { method: "POST", headers: await getAIAuthHeaders(), body });
+    }
+    if (!response.ok) {
+      // This batch is skipped and the rest of the subject continues. Its notes stay unplaced,
+      // so running the knowledge base again tries them once more.
+      skippedNoteTitles.push(...batch.map(note => note.title));
+      continue;
+    }
+    const plan = await response.json();
+    // Notes the AI could not place are not in the plan, so only placed notes are passed on.
+    const placedIds = new Set<string>(
+      (plan.topics ?? []).flatMap((topic: { subtopics: { noteIds: string[] }[] }) =>
+        topic.subtopics.flatMap(subtopic => subtopic.noteIds)),
+    );
+    // One transaction rechecks ownership, reuse and manual placements at save time.
+    // Never fall back to separate REST writes: those cannot preserve both links atomically.
+    const { data, error } = await supabase.rpc("complete_subject_structure", {
+      p_subject_id: subjectId,
+      p_plan: plan,
+      p_note_ids: batch.filter(note => placedIds.has(note.id)).map(note => note.id),
+    });
+    if (error) {
+      throw new Error(`Kunne ikke bekrefte lagring av gruppe ${index + 1} av ${batches.length}. Ved databasefeil rulles den gruppen tilbake. Kontroller strukturen før du prøver igjen. ` + error.message);
+    }
+    totals.topicsCreated += data.topicsCreated;
+    totals.subtopicsCreated += data.subtopicsCreated;
+    totals.topicsReused += data.topicsReused;
+    totals.subtopicsReused += data.subtopicsReused;
+    totals.notesOrganized += data.notesOrganized;
+    totals.notesSkipped += data.notesSkipped;
   }
-  const plan = await response.json();
-  // One transaction rechecks ownership, reuse and manual placements at save time.
-  // Never fall back to separate REST writes: those cannot preserve both links atomically.
-  const { data, error } = await supabase.rpc("complete_subject_structure", {
-    p_subject_id: subjectId,
-    p_plan: plan,
-    p_note_ids: [...eligible],
-  });
-  if (error) {
-    throw new Error("Kunne ikke bekrefte lagring av fagstrukturen. Ved databasefeil rulles hele struktursteget tilbake; ved nettverksbrudd kan det ha blitt fullført. Kontroller strukturen før du prøver igjen. " + error.message);
-  }
+
   notifyNotesChanged();
-  return { ...data, notesSkipped: notes.length - eligible.size + data.notesSkipped, structureStatus: "completed" };
+  return {
+    ...totals,
+    notesSkipped: notes.length - totals.notesOrganized,
+    skippedNoteTitles,
+    structureStatus: "completed",
+  };
 }

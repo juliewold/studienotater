@@ -1,4 +1,5 @@
 import json
+import logging
 
 from openai import APIConnectionError, APIStatusError
 
@@ -8,6 +9,7 @@ from django.views.decorators.http import require_POST
 
 from .auth import require_ai_admin
 from .concept_extraction_service import extract_concept_candidates
+logger = logging.getLogger(__name__)
 from .flashcard_generation_service import generate_flashcards
 from .note_summary_service import summarize_note
 from .selected_text_service import explain_selected_text
@@ -188,7 +190,8 @@ def generate_structure(request):
             },
             status=502,
         )
-    except ValueError:
+    except ValueError as error:
+        logger.warning("Structure response rejected: %s", error)
         return JsonResponse(
             {
                 "error": (

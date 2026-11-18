@@ -77,7 +77,10 @@ export const SubjectPage = () => {
           `${result.topicsCreated} temaer og ` +
           `${result.subtopicsCreated} undertemaer opprettet. ` +
           `${result.topicsReused} temaer og ${result.subtopicsReused} undertemaer gjenbrukt. ` +
-          `${result.notesOrganized} notater organisert.`,
+          `${result.notesOrganized} notater organisert.` +
+          (result.skippedNoteTitles.length > 0
+            ? ` ${result.skippedNoteTitles.length} notater ble hoppet over fordi AI-svaret ikke ble godtatt. Kjør knappen igjen for å prøve dem på nytt.`
+            : ""),
       );
     } catch (error) {
       console.error("Kunne ikke generere kunnskapsbase:", error);
