@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./SubjectPage.css";
 
 import { useContext, useState } from "react";
@@ -157,7 +158,7 @@ export const SubjectPage = () => {
         </div>
 
         {isLoading ? (
-          <p className="subject-progress-status">Laster progresjon...</p>
+          <LoadingPlaceholder label="Laster progresjon..." />
         ) : errorMessage ? (
           <p className="subject-progress-error">{errorMessage}</p>
         ) : (

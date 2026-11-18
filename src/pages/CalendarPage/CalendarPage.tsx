@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./CalendarPage.css";
 import { useContext, useEffect, useMemo, useState } from "react";
 import {
@@ -1145,7 +1146,7 @@ export const CalendarPage = () => {
       </section>
 
       {isLoadingSemesterSubjects || isLoadingEvents ? (
-        <p>Laster kalender...</p>
+        <LoadingPlaceholder label="Laster kalender..." />
       ) : errorMessage ? (
         <p>{errorMessage}</p>
       ) : (

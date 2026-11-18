@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./ExamsPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -98,7 +99,7 @@ export const ExamsPage = () => {
 
       <h1>{subjectId?.toUpperCase()}</h1>
 
-      {isLoadingExams && <p>Laster eksamener...</p>}
+      {isLoadingExams && <LoadingPlaceholder label="Laster eksamener..." />}
 
       {errorMessage && <p>{errorMessage}</p>}
 

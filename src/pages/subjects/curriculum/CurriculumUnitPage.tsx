@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Check, ExternalLink, FileText, PlayCircle } from "lucide-react";
@@ -17,7 +18,7 @@ export function CurriculumUnitPage() {
   const { unitId = "" } = useParams();
   const { workspace, errorMessage } = useCurriculum();
   if (errorMessage) return <CurriculumPage label="Pensum" title="Tema"><CurriculumStatus alert>{errorMessage}</CurriculumStatus></CurriculumPage>;
-  if (!workspace) return <CurriculumPage label="Pensum" title="Tema"><CurriculumStatus>Laster tema…</CurriculumStatus></CurriculumPage>;
+  if (!workspace) return <CurriculumPage label="Pensum" title="Tema"><LoadingPlaceholder label="Laster tema…" height={320} /></CurriculumPage>;
   const unit = workspace.units.find(item => item.id === unitId);
   if (!unit) return <CurriculumPage label="Pensum" title="Fant ikke temaet"><p>Temaet finnes ikke i dette faget.</p></CurriculumPage>;
   return <UnitDetails key={unit.id} unit={unit} />;

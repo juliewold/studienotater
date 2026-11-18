@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "../../../components/subjects/SubjectCard/SubjectCard.css";
 import "./ExamOverviewPage.css";
 import { useEffect, useMemo, useState } from "react";
@@ -89,7 +90,7 @@ export const ExamOverviewPage = () => {
 
       <p>Se kommende og tidligere eksamener for fagene dine.</p>
 
-      {isLoadingExams && <p>Laster eksamensdatoer...</p>}
+      {isLoadingExams && <LoadingPlaceholder label="Laster eksamensdatoer..." />}
 
       {errorMessage && <p>{errorMessage}</p>}
 

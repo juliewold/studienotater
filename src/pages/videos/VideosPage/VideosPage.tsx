@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./VideosPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -194,7 +195,7 @@ export const VideosPage = () => {
 
       <h1>{subjectId?.toUpperCase()}</h1>
 
-      {isLoadingVideos && <p>Laster videoer...</p>}
+      {isLoadingVideos && <LoadingPlaceholder label="Laster videoer..." />}
 
       {errorMessage && <p>{errorMessage}</p>}
 

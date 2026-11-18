@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./StudyPlanPage.css";
 
 import { Link, useParams } from "react-router-dom";
@@ -30,7 +31,7 @@ export const StudyPlanPage = () => {
   if (isLoading) {
     return (
       <main className="page-container">
-        <p>Laster fremdrift...</p>
+        <LoadingPlaceholder label="Laster fremdrift..." />
       </main>
     );
   }

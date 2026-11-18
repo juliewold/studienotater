@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import "./ExamNotesPanel.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -237,7 +238,7 @@ export const ExamNotesPanel = ({
         </p>
       )}
 
-      {linkedNoteId && !currentNote && !noteError && <p role="status">Laster skrevet løsning…</p>}
+      {linkedNoteId && !currentNote && !noteError && <LoadingPlaceholder label="Laster skrevet løsning…" />}
 
       {linkedNoteId && noteError && <p className="exam-notes-message exam-notes-error">{noteError}</p>}
 
@@ -291,7 +292,7 @@ export const ExamNotesPanel = ({
             />
           </label>
 
-          {isLoadingPicker && <p role="status">Laster notater…</p>}
+          {isLoadingPicker && <LoadingPlaceholder label="Laster notater…" />}
 
           {!isLoadingPicker && (
             <ul className="exam-notes-picker-list">

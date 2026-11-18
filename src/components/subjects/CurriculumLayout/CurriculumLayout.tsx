@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
 import { BookOpen, Check, ChevronLeft, LayoutGrid, Pi, Sigma } from "lucide-react";
@@ -63,7 +64,7 @@ function SubjectCurriculum({ subjectId }: { subjectId: string }) {
           <li><NavLink to={`${base}/begreper`} onClick={close} className="curriculum-tool"><BookOpen size={17} aria-hidden="true" />Begreper</NavLink></li>
         </ul>
         {errorMessage ? <p role="alert" className="curriculum-nav-message">{errorMessage}</p>
-          : !workspace ? <p role="status" className="curriculum-nav-message">Laster temaer…</p>
+          : !workspace ? <LoadingPlaceholder label="Laster temaer…" />
           : units.length === 0 ? <p className="curriculum-nav-message">Ingen temaer ennå.</p>
           : groupUnitsByPart(units).map((part, index) => <div key={part.name ?? index} className="curriculum-part">
             {part.name && <p className="curriculum-nav-heading">{part.name}</p>}

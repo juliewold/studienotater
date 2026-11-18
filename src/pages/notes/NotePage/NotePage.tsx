@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./NotePage.css";
 import { useContext, useEffect, useState } from "react";
 import { Link, useOutletContext, useParams } from "react-router-dom";
@@ -75,7 +76,7 @@ export const NotePage = () => {
   if (isLoadingNote) {
     return (
       <main className="note-page site-container">
-        <p>Laster notat...</p>
+        <LoadingPlaceholder label="Laster notat..." />
       </main>
     );
   }

@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./AdminStudyPlansPage.css";
 import { subjects } from "../../../data/subjects";
 import { useAdminStudyPlans } from "../../../hooks/admin/useAdminStudyPlans";
@@ -238,7 +239,7 @@ export const AdminStudyPlansPage = () => {
                 Velg et fag for å se tilgjengelige ressurser.
               </p>
             ) : isLoadingResources ? (
-              <p>Laster ressurser...</p>
+              <LoadingPlaceholder label="Laster ressurser..." />
             ) : (
               <div className="admin-resource-columns">
                 <div className="admin-resource-group">
@@ -351,7 +352,7 @@ export const AdminStudyPlansPage = () => {
         <h2>{subjectId ? "Temaer i valgt fag" : "Opprettede studietemaer"}</h2>
 
         {isLoadingTopics ? (
-          <p>Laster studieplaner...</p>
+          <LoadingPlaceholder label="Laster studieplaner..." />
         ) : !subjectId ? (
           <p>Velg et fag i skjemaet for å se temaene.</p>
         ) : subjectTopics.length === 0 ? (

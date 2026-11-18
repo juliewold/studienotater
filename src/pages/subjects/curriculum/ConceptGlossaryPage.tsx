@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { ConceptType } from "../../../data/concepts/types";
@@ -33,7 +34,7 @@ export function ConceptGlossaryPage() {
     return result;
   }, [workspace, lessonConcepts]);
   if (errorMessage) return <CurriculumPage label="Verktøy" title="Begreper"><CurriculumStatus alert>{errorMessage}</CurriculumStatus></CurriculumPage>;
-  if (!workspace) return <CurriculumPage label="Verktøy" title="Begreper"><CurriculumStatus>Laster begreper…</CurriculumStatus></CurriculumPage>;
+  if (!workspace) return <CurriculumPage label="Verktøy" title="Begreper"><LoadingPlaceholder label="Laster begreper…" height={320} /></CurriculumPage>;
 
   const types = (Object.keys(conceptTypeLabels) as ConceptType[]).filter(item => workspace.concepts.some(concept => concept.type === item));
   const visible = workspace.concepts.filter(concept => (type === "all" || concept.type === type) &&

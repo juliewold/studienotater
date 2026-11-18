@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./AdminVideosPage.css";
 import { useMemo } from "react";
 import { subjects } from "../../../data/subjects";
@@ -402,7 +403,7 @@ export const AdminVideosPage = () => {
         <h2>Opprettede videoer</h2>
 
         {isLoadingVideos ? (
-          <p>Laster videoer...</p>
+          <LoadingPlaceholder label="Laster videoer..." />
         ) : groupedVideos.length === 0 ? (
           <p>Ingen videoer er opprettet gjennom adminpanelet ennå.</p>
         ) : (

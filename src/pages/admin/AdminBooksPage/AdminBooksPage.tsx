@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./AdminBooksPage.css";
 
 import { useState } from "react";
@@ -579,7 +580,7 @@ export const AdminBooksPage = () => {
             <h2>Bøker</h2>
 
             {isLoadingBooks ? (
-              <p className="admin-books-empty">Laster bøker...</p>
+              <LoadingPlaceholder label="Laster bøker..." />
             ) : books.length === 0 ? (
               <p className="admin-books-empty">Ingen bøker er lagt til ennå.</p>
             ) : (
@@ -725,7 +726,7 @@ export const AdminBooksPage = () => {
             <h2>Kapitler</h2>
 
             {isLoadingChapters ? (
-              <p className="admin-books-empty">Laster kapitler...</p>
+              <LoadingPlaceholder label="Laster kapitler..." />
             ) : chapters.length === 0 ? (
               <p className="admin-books-empty">
                 Ingen kapitler er lagt til ennå.
@@ -846,7 +847,7 @@ export const AdminBooksPage = () => {
             <h2>Oppgaver</h2>
 
             {isLoadingTasks ? (
-              <p className="admin-books-empty">Laster oppgaver...</p>
+              <LoadingPlaceholder label="Laster oppgaver..." />
             ) : tasks.length === 0 ? (
               <p className="admin-books-empty">
                 Ingen oppgaver er lagt til ennå.

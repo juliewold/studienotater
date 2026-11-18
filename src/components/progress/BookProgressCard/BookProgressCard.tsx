@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import { Link } from "react-router-dom";
 
 import { useBookProgress } from "../../../hooks/useBookProgress";
@@ -31,7 +32,7 @@ export const BookProgressCard = ({
   if (isLoading) {
     return (
       <section className="book-progress-card">
-        <p>Laster bokfremdrift...</p>
+        <LoadingPlaceholder label="Laster bokfremdrift..." />
       </section>
     );
   }

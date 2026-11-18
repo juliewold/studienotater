@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import "./Navbar.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -30,7 +31,7 @@ const SidebarContent = ({ onNavigate }: { onNavigate: () => void }) => {
     </nav>
     <section className="sidebar-subjects" aria-label="Mine fag">
       <div className="sidebar-section-title"><h2>Mine fag</h2><Link to="/semesterstart" aria-label="Administrer mine fag" onClick={onNavigate}>+</Link></div>
-      {isLoadingSemesterSubjects ? <p className="sidebar-hint">Laster fag…</p> : semesterSubjects.length ? semesterSubjects.map(subject => {
+      {isLoadingSemesterSubjects ? <LoadingPlaceholder label="Laster fag…" height={140} /> : semesterSubjects.length ? semesterSubjects.map(subject => {
         const regular = subjects.find(item => item.id === subject.subjectId);
         const code = subject.customCode ?? regular?.code ?? subject.subjectId.toUpperCase();
         const name = subject.customName ?? regular?.name ?? "";

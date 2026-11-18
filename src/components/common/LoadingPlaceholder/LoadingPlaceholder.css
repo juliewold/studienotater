@@ -1,0 +1,5 @@
+.loading-placeholder { position: relative; margin: 12px 0; }
+.loading-placeholder-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.loading-placeholder-block { border: 1px solid var(--app-border); border-radius: 16px; background: var(--app-soft); animation: loading-placeholder-pulse 1.4s ease-in-out infinite; }
+@keyframes loading-placeholder-pulse { 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .loading-placeholder-block { animation: none; } }

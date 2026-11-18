@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./AllFlashcardsPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -84,7 +85,7 @@ export const AllFlashcardsPage = () => {
         }
       />
 
-      {isLoadingFlashcards && <p>Laster flashcards...</p>}
+      {isLoadingFlashcards && <LoadingPlaceholder label="Laster flashcards..." />}
 
       {errorMessage && <p>{errorMessage}</p>}
 

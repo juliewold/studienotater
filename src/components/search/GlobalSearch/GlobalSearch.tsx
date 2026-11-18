@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import "./GlobalSearch.css";
 
 import { useContext, useEffect, useMemo, useState } from "react";
@@ -76,7 +77,7 @@ const SessionGlobalSearch = ({ onNavigate }: Props) => {
       {focused && query.length >= 2 && (
         <div className="search-results">
           {loading ? (
-            <p className="search-message">Laster...</p>
+            <LoadingPlaceholder label="Laster..." height={120} />
           ) : results.length === 0 ? (
             <p className="search-message">Ingen treff.</p>
           ) : (
