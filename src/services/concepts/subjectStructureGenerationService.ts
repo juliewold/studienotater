@@ -13,11 +13,13 @@ export type GenerateSubjectStructureResult = {
   notesOrganized: number;
   notesSkipped: number;
   structureStatus: "completed" | "no-content" | "not-requested";
+  /** Titles of notes in batches the AI could not process. They are not placed yet. */
+  skippedNoteTitles: string[];
 };
 
 export const emptyStructureResult = (): GenerateSubjectStructureResult => ({
   topicsCreated: 0, subtopicsCreated: 0, topicsReused: 0, subtopicsReused: 0,
-  notesOrganized: 0, notesSkipped: 0, structureStatus: "not-requested",
+  notesOrganized: 0, notesSkipped: 0, skippedNoteTitles: [], structureStatus: "not-requested",
 });
 
 // The AI service fails on large requests, so notes are sent in small batches: at most this many
@@ -68,6 +70,7 @@ export async function generateAndSaveSubjectStructure(
   // so later batches reuse them instead of creating duplicates.
   const batches = batchNotes(withContent.filter(note => eligible.has(note.id)));
   const totals = { topicsCreated: 0, subtopicsCreated: 0, topicsReused: 0, subtopicsReused: 0, notesOrganized: 0, notesSkipped: 0 };
+  const skippedNoteTitles: string[] = [];
 
   for (const [index, batch] of batches.entries()) {
     const [topics, subtopics] = await Promise.all([getTopicsBySubject(subjectId), getAllSubtopicsBySubject(subjectId)]);
@@ -86,9 +89,10 @@ export async function generateAndSaveSubjectStructure(
       response = await fetch(`${apiUrl}/api/concepts/generate-structure/`, { method: "POST", headers: await getAIAuthHeaders(), body });
     }
     if (!response.ok) {
-      const failure = await response.json().catch(() => null);
-      const detail = typeof failure?.error === "string" ? failure.error : "Kunne ikke generere fagstruktur.";
-      throw new Error(`${detail} Gruppe ${index + 1} av ${batches.length} feilet. Grupper før den er lagret.`);
+      // This batch is skipped and the rest of the subject continues. Its notes stay unplaced,
+      // so running the knowledge base again tries them once more.
+      skippedNoteTitles.push(...batch.map(note => note.title));
+      continue;
     }
     const plan = await response.json();
     // Notes the AI could not place are not in the plan, so only placed notes are passed on.
@@ -118,6 +122,7 @@ export async function generateAndSaveSubjectStructure(
   return {
     ...totals,
     notesSkipped: notes.length - totals.notesOrganized,
+    skippedNoteTitles,
     structureStatus: "completed",
   };
 }
