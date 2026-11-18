@@ -158,10 +158,8 @@ export const VideosPage = () => {
             aria-modal="true"
             aria-labelledby="youtube-consent-title"
           >
-            <h2 id="youtube-consent-title" className="consent-title">
-              <img src={cookieImage} alt="" className="consent-icon" width={30} height={30} />
-              Vise YouTube-videoer?
-            </h2>
+            <img src={cookieImage} alt="" className="consent-icon" width={72} height={72} />
+            <h2 id="youtube-consent-title">Vise YouTube-videoer?</h2>
             <p>
               Videoene på denne siden ligger på YouTube. Hvis du spiller dem av her, setter YouTube informasjonskapsler i
               nettleseren din og får IP-adressen din.
