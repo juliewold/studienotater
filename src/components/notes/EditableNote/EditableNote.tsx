@@ -120,6 +120,8 @@ export const EditableNote = ({
       return;
     }
 
+    // Begrunnelse: Kladden følger notatet når det ikke redigeres. Synkroniseringen fra forelderen er bevisst, og det finnes ingen hendelse som dekker alle oppdateringsveiene.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
@@ -281,6 +283,8 @@ export const EditableNote = ({
       return;
     }
 
+    // Begrunnelse: Autolagring: lagringsstatus nullstilles når kladden endres. Kladden kommer fra editoren og har ingen andre kilder, så effekten er riktig her.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSaveStatus("idle");
 
     const autosaveTimer = window.setTimeout(() => {
