@@ -34,8 +34,6 @@ const isReloadOrBackForward = () => {
 export const KeepScrollPosition = () => {
   const { pathname, search, hash } = useLocation();
   const key = `${pathname}${search}${hash}`;
-  const keyRef = useRef(key);
-  keyRef.current = key;
   const restoringRef = useRef(false);
   // Read once, on the first render, before anything else can change the saved value.
   const [initialTarget] = useState(() => {
@@ -56,11 +54,11 @@ export const KeepScrollPosition = () => {
   // pages make the page short for a moment, which would store a wrong position.
   useEffect(() => {
     const onPageHide = () => {
-      if (!restoringRef.current) savePosition(keyRef.current, window.scrollY);
+      if (!restoringRef.current) savePosition(key, window.scrollY);
     };
     window.addEventListener("pagehide", onPageHide);
     return () => window.removeEventListener("pagehide", onPageHide);
-  }, []);
+  }, [key]);
 
   // Restore once, for the page the app was opened on.
   useEffect(() => {
