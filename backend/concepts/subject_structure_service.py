@@ -12,6 +12,7 @@ def generate_subject_structure(subject_name, notes, existing_topics=None):
     notes = [{**note, "content": note_text(note["content"])} for note in notes]
     existing_topics = existing_topics or []
     topic_lookup = {topic["id"]: topic for topic in existing_topics}
+    topics_by_name = {topic["name"].strip().casefold(): topic for topic in existing_topics}
     client = get_client()
 
     response = client.chat.completions.create(
@@ -102,11 +103,15 @@ def generate_subject_structure(subject_name, notes, existing_topics=None):
             raise ValueError("Topic must have a non-empty name.")
         if not isinstance(topic.get("subtopics"), list) or not topic["subtopics"]:
             raise ValueError("Topic must have a non-empty subtopics list.")
+        # The AI sometimes gives a wrong ID for an existing topic or subtopic. The name is then used
+        # to find it, inside the topic when it is a subtopic. If neither ID nor name matches, it is new.
         topic_id = topic.get("id")
         existing_topic = topic_lookup.get(topic_id) if isinstance(topic_id, str) else None
-        if topic_id is not None and existing_topic is None:
-            raise ValueError("Unknown existing topic ID.")
-        subtopic_lookup = {item["id"]: item for item in (existing_topic or {}).get("subtopics", [])}
+        if existing_topic is None:
+            existing_topic = topics_by_name.get(topic["name"].strip().casefold())
+        existing_subtopics = (existing_topic or {}).get("subtopics", [])
+        subtopic_lookup = {item["id"]: item for item in existing_subtopics}
+        subtopics_by_name = {item["name"].strip().casefold(): item for item in existing_subtopics}
         validated_subtopics = []
         for subtopic in topic["subtopics"]:
             if not isinstance(subtopic, dict) or not isinstance(subtopic.get("name"), str) or not subtopic["name"].strip():
@@ -115,15 +120,15 @@ def generate_subject_structure(subject_name, notes, existing_topics=None):
                 raise ValueError("Subtopic noteIds must be a list.")
             subtopic_id = subtopic.get("id")
             existing_subtopic = subtopic_lookup.get(subtopic_id) if isinstance(subtopic_id, str) else None
-            if subtopic_id is not None and existing_subtopic is None:
-                raise ValueError("Unknown subtopic ID or wrong parent.")
+            if existing_subtopic is None:
+                existing_subtopic = subtopics_by_name.get(subtopic["name"].strip().casefold())
             validated_subtopics.append({
-                **({"id": subtopic_id} if existing_subtopic else {}),
+                **({"id": existing_subtopic["id"]} if existing_subtopic else {}),
                 "name": existing_subtopic["name"] if existing_subtopic else subtopic["name"].strip(),
                 "noteIds": [],
             })
         validated_topics.append({
-            **({"id": topic_id} if existing_topic else {}),
+            **({"id": existing_topic["id"]} if existing_topic else {}),
             "name": existing_topic["name"] if existing_topic else topic["name"].strip(),
             "subtopics": validated_subtopics,
         })

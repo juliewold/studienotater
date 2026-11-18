@@ -345,11 +345,15 @@ class StructureCompletionTests(AuthenticatedAITestCase):
         self.assertEqual(result["topics"][0]["name"], "Original topic")
         self.assertEqual(result["topics"][0]["subtopics"], [{"id": "s1", "name": "Original subtopic", "noteIds": ["n1"]}])
 
-    def test_unknown_ids_and_wrong_parent_rejected(self):
-        for topic_id, subtopic_id in [("unknown", "s1"), ("t1", "unknown"), (None, "s1")]:
-            with self.subTest(topic=topic_id, subtopic=subtopic_id), self.assertRaises(ValueError):
-                self.generate({"topics": [{"id": topic_id, "name": "New", "subtopics": [
-                    {"id": subtopic_id, "name": "Sub", "noteIds": ["n1"]}]}]})
+    def test_wrong_ids_fall_back_to_names_and_unknown_names_are_new(self):
+        result = self.generate({"topics": [{"id": "unknown", "name": "Original topic", "subtopics": [
+            {"id": "unknown", "name": "Original subtopic", "noteIds": ["n1"]}]}]})
+        self.assertEqual(result["topics"][0].get("id"), "t1")
+        self.assertEqual(result["topics"][0]["subtopics"][0].get("id"), "s1")
+        result = self.generate({"topics": [{"id": "unknown", "name": "Brand new", "subtopics": [
+            {"id": "unknown", "name": "Also new", "noteIds": ["n1"]}]}]})
+        self.assertNotIn("id", result["topics"][0])
+        self.assertNotIn("id", result["topics"][0]["subtopics"][0])
 
     def test_existing_empty_topic_can_receive_new_subtopics(self):
         result = self.generate({"topics": [{"id": "t1", "name": "Original topic", "subtopics": [
