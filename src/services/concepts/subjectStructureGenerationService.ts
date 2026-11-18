@@ -72,17 +72,19 @@ export async function generateAndSaveSubjectStructure(
   for (const [index, batch] of batches.entries()) {
     const [topics, subtopics] = await Promise.all([getTopicsBySubject(subjectId), getAllSubtopicsBySubject(subjectId)]);
 
-    const response = await fetch(`${apiUrl}/api/concepts/generate-structure/`, {
-      method: "POST",
-      headers: await getAIAuthHeaders(),
-      body: JSON.stringify({
-        subjectName,
-        notes: batch.map(note => ({ id: note.id, title: note.title, content: note.content, organize: true })),
-        existingTopics: topics.map(topic => ({ id: topic.id, name: topic.name,
-          subtopics: subtopics.filter(subtopic => subtopic.topicId === topic.id).map(({ id, name }) => ({ id, name })),
-        })),
-      }),
+    const body = JSON.stringify({
+      subjectName,
+      notes: batch.map(note => ({ id: note.id, title: note.title, content: note.content, organize: true })),
+      existingTopics: topics.map(topic => ({ id: topic.id, name: topic.name,
+        subtopics: subtopics.filter(subtopic => subtopic.topicId === topic.id).map(({ id, name }) => ({ id, name })),
+      })),
     });
+    // The AI answer is sometimes rejected by the backend checks. One more try for the same batch
+    // usually works, and the checks themselves stay unchanged.
+    let response = await fetch(`${apiUrl}/api/concepts/generate-structure/`, { method: "POST", headers: await getAIAuthHeaders(), body });
+    if (!response.ok) {
+      response = await fetch(`${apiUrl}/api/concepts/generate-structure/`, { method: "POST", headers: await getAIAuthHeaders(), body });
+    }
     if (!response.ok) {
       const failure = await response.json().catch(() => null);
       const detail = typeof failure?.error === "string" ? failure.error : "Kunne ikke generere fagstruktur.";
