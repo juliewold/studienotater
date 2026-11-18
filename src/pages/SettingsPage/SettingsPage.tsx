@@ -4,11 +4,13 @@ import { useContext, useRef, useState, type SyntheticEvent } from "react";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 import { deleteOwnAccount, finishDeletedAccountSession } from "../../services/account/accountDeletionService";
 import { buildAccountExport, downloadAccountExport } from "../../services/account/accountDataExportService";
+import { clearYoutubeChoice, getYoutubeChoice, type YoutubeChoice } from "../../services/media/youtubeConsent";
 
 export const SettingsPage = () => {
   const { dark, toggleTheme } = useTheme();
   const { user } = useContext(AuthContext);
   const [exporting, setExporting] = useState(false);
+  const [youtubeChoice, setYoutubeChoice] = useState<YoutubeChoice | null>(getYoutubeChoice);
   const [exportError, setExportError] = useState("");
   const [confirming, setConfirming] = useState(false);
   const [confirmation, setConfirmation] = useState("");
@@ -130,6 +132,28 @@ export const SettingsPage = () => {
           )}
           {exportError && <p role="alert">{exportError}</p>}
           <p><a href="#/personvern">Les personvernerklæringen</a></p>
+        </section>
+
+        <section className="settings-card" aria-labelledby="youtube-title">
+          <h2 id="youtube-title">YouTube-videoer</h2>
+          {youtubeChoice === "granted" ? (
+            <p>Du har godtatt at YouTube kan sette informasjonskapsler og behandle IP-adressen din når videoene spilles av.</p>
+          ) : youtubeChoice === "declined" ? (
+            <p>Du har sagt nei til å vise YouTube-videoer. Videosidene viser bare lenker til YouTube.</p>
+          ) : (
+            <p>Du har ikke tatt stilling ennå. Du får spørsmålet første gang du åpner en videoside.</p>
+          )}
+          {youtubeChoice !== null && (
+            <button
+              type="button"
+              onClick={() => {
+                clearYoutubeChoice();
+                setYoutubeChoice(null);
+              }}
+            >
+              Tilbakestill valget
+            </button>
+          )}
         </section>
 
         {import.meta.env.VITE_ACCOUNT_DELETION_ENABLED === "true" && <section className="settings-card account-deletion" aria-labelledby="delete-account-title">

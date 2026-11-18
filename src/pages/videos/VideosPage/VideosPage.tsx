@@ -1,11 +1,17 @@
 import "./VideosPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import cookieImage from "../../../assets/cookie.png";
 import {
   getVideosBySubject,
   type DatabaseVideo,
 } from "../../../services/media/videosService";
 import { ResourceProgress } from "../../../components/progress/ResourceProgress/ResourceProgress";
+import {
+  getYoutubeChoice,
+  setYoutubeChoice,
+  type YoutubeChoice,
+} from "../../../services/media/youtubeConsent";
 
 type SubtopicGroup = {
   subtopic: string;
@@ -22,9 +28,12 @@ type TopicGroup = {
 export const VideosPage = () => {
   const { subjectId } = useParams();
 
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(
-    null,
-  );
+  const [youtubeChoice, setYoutubeChoiceState] = useState<YoutubeChoice | null>(getYoutubeChoice);
+
+  const decideYoutube = (choice: YoutubeChoice) => {
+    setYoutubeChoice(choice);
+    setYoutubeChoiceState(choice);
+  };
 
   const [videos, setVideos] = useState<DatabaseVideo[]>([]);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
@@ -141,6 +150,42 @@ export const VideosPage = () => {
 
   return (
     <main className="page-container">
+      {youtubeChoice === null && (
+        <div className="consent-overlay">
+          <div
+            className="consent-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="youtube-consent-title"
+          >
+            <img src={cookieImage} alt="" className="consent-icon" width={72} height={72} />
+            <h2 id="youtube-consent-title">Vise YouTube-videoer?</h2>
+            <p>
+              Videoene på denne siden ligger på YouTube. Hvis du spiller dem av her, setter YouTube informasjonskapsler i
+              nettleseren din og får IP-adressen din.
+            </p>
+            <p>Valget lagres i nettleseren din til du endrer det under Innstillinger.</p>
+            <div className="consent-actions">
+              <button
+                type="button"
+                className="consent-decline"
+                onClick={() => decideYoutube("declined")}
+              >
+                Nei, ikke vis
+              </button>
+              <button
+                type="button"
+                className="consent-accept"
+                autoFocus
+                onClick={() => decideYoutube("granted")}
+              >
+                Ja, vis videoene
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Link to={`/fag/${subjectId}`} className="back-link">
         ← Tilbake til faget
       </Link>
@@ -178,37 +223,38 @@ export const VideosPage = () => {
 
                     <div className="video-grid">
                       {subtopicGroup.videos.map((video) => {
-                        const isActive =
-                          activeVideoId === video.id;
-
                         return (
                           <div
                             key={video.id}
                             className="video-card"
                           >
-                            {isActive ? (
+                            {/* Nothing from YouTube is loaded unless the visitor has said yes. */}
+                            {youtubeChoice === "granted" ? (
                               <iframe
-                                src={`https://www.youtube.com/embed/${video.youtubeId}`}
+                                className="video-player"
+                                src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
                                 title={video.title}
+                                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
                               />
                             ) : (
-                              <button
-                                type="button"
-                                className="video-thumbnail-button"
-                                onClick={() =>
-                                  setActiveVideoId(video.id)
-                                }
-                              >
-                                <img
-                                  src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
-                                  alt={video.title}
-                                />
-
-                                <span className="play-button">
-                                  ▶
-                                </span>
-                              </button>
+                              <div className="video-consent">
+                                <p>Videoen vises her når du har godtatt YouTube-videoer.</p>
+                                <button
+                                  type="button"
+                                  className="video-consent-button"
+                                  onClick={() => decideYoutube("granted")}
+                                >
+                                  Godta og vis videoene
+                                </button>
+                                <a
+                                  href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Åpne på YouTube
+                                </a>
+                              </div>
                             )}
 
                             <h4>{video.title}</h4>

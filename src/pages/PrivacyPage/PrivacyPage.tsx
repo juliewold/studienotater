@@ -57,6 +57,13 @@ export const PrivacyPage = () => {
         <p>
           Appen bruker ikke analyseverktøy eller sporingscookies.
         </p>
+        <p>
+          Første gang du åpner en videoside, får du spørsmål om du vil vise YouTube-videoer. Før du svarer ja, lastes
+          ingenting fra YouTube. Når du spiller av videoene, setter YouTube informasjonskapsler og kan behandle
+          IP-adressen din, etter YouTubes egne regler. Svaret ditt lagres i nettleseren din (nøkkelen
+          <code>youtube-consent</code>). Du kan endre eller tilbakestille det under Innstillinger. Du kan også åpne
+          videoene direkte på YouTube.
+        </p>
       </section>
 
       <section className="privacy-section">
