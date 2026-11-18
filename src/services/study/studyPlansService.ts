@@ -343,15 +343,24 @@ export async function deleteStudyTopicResource(id: string) {
   }
 }
 
-export async function replaceStudyTopicItems(
+// Replaces all rows for a topic. The previous rows are read first and written back
+// if the new insert fails, so a failed save cannot leave the topic empty.
+async function replaceTopicRows(
+  table: "study_topic_items" | "study_topic_resources",
   topicId: string,
-  items: Array<{
-    type: StudyTopicItemType;
-    value: string;
-  }>,
+  rows: Record<string, unknown>[],
 ) {
+  const { data: previousRows, error: readError } = await supabase
+    .from(table)
+    .select("*")
+    .eq("topic_id", topicId);
+
+  if (readError) {
+    throw readError;
+  }
+
   const { error: deleteError } = await supabase
-    .from("study_topic_items")
+    .from(table)
     .delete()
     .eq("topic_id", topicId);
 
@@ -359,24 +368,43 @@ export async function replaceStudyTopicItems(
     throw deleteError;
   }
 
-  if (items.length === 0) {
+  if (rows.length === 0) {
     return;
   }
 
-  const { error: insertError } = await supabase
-    .from("study_topic_items")
-    .insert(
-      items.map((item, index) => ({
-        topic_id: topicId,
-        type: item.type,
-        value: item.value,
-        sort_order: index,
-      })),
-    );
+  const { error: insertError } = await supabase.from(table).insert(rows);
 
   if (insertError) {
+    if (previousRows && previousRows.length > 0) {
+      const { error: restoreError } = await supabase
+        .from(table)
+        .insert(previousRows);
+
+      if (restoreError) {
+        throw restoreError;
+      }
+    }
     throw insertError;
   }
+}
+
+export async function replaceStudyTopicItems(
+  topicId: string,
+  items: Array<{
+    type: StudyTopicItemType;
+    value: string;
+  }>,
+) {
+  await replaceTopicRows(
+    "study_topic_items",
+    topicId,
+    items.map((item, index) => ({
+      topic_id: topicId,
+      type: item.type,
+      value: item.value,
+      sort_order: index,
+    })),
+  );
 }
 
 export async function replaceStudyTopicResources(
@@ -386,31 +414,14 @@ export async function replaceStudyTopicResources(
     resourceId: string;
   }>,
 ) {
-  const { error: deleteError } = await supabase
-    .from("study_topic_resources")
-    .delete()
-    .eq("topic_id", topicId);
-
-  if (deleteError) {
-    throw deleteError;
-  }
-
-  if (resources.length === 0) {
-    return;
-  }
-
-  const { error: insertError } = await supabase
-    .from("study_topic_resources")
-    .insert(
-      resources.map((resource, index) => ({
-        topic_id: topicId,
-        resource_type: resource.resourceType,
-        resource_id: resource.resourceId,
-        sort_order: index,
-      })),
-    );
-
-  if (insertError) {
-    throw insertError;
-  }
+  await replaceTopicRows(
+    "study_topic_resources",
+    topicId,
+    resources.map((resource, index) => ({
+      topic_id: topicId,
+      resource_type: resource.resourceType,
+      resource_id: resource.resourceId,
+      sort_order: index,
+    })),
+  );
 }
