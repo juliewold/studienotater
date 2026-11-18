@@ -13,7 +13,7 @@ CREATE TABLE public.profiles(id uuid PRIMARY KEY REFERENCES auth.users ON DELETE
 CREATE TABLE storage.objects(id int PRIMARY KEY, owner_id text, owner uuid, name text);
 CREATE TABLE storage.buckets(id text PRIMARY KEY, owner uuid, public boolean);
 DO $$ DECLARE t text; BEGIN
- FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects'] LOOP
+ FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects','practice_sessions','practice_active_sessions'] LOOP
  EXECUTE format('CREATE TABLE public.%I(id int PRIMARY KEY, user_id uuid NOT NULL REFERENCES auth.users ON DELETE CASCADE, value text)',t);
  END LOOP;
 END $$;
@@ -22,7 +22,7 @@ CREATE TABLE public.calendar_events(id int PRIMARY KEY, title text);
 INSERT INTO auth.users VALUES ('00000000-0000-0000-0000-000000000001'),('00000000-0000-0000-0000-000000000002');
 INSERT INTO profiles SELECT id,'user' FROM auth.users;
 DO $$ DECLARE t text; BEGIN
- FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects'] LOOP
+ FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects','practice_sessions','practice_active_sessions'] LOOP
  EXECUTE format('INSERT INTO public.%I SELECT row_number() OVER ()::int,id,''private'' FROM auth.users ORDER BY id',t);
  END LOOP;
 END $$;
@@ -93,7 +93,7 @@ CREATE FUNCTION public.assert_account_fixture_intact() RETURNS void LANGUAGE plp
 DECLARE t text; row_count bigint; owner_count bigint; values_intact boolean;
 BEGIN
  IF (SELECT count(*) FROM auth.users)<>2 OR (SELECT count(*) FROM profiles)<>2 THEN RAISE EXCEPTION 'Account rollback incomplete'; END IF;
- FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects'] LOOP
+ FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects','practice_sessions','practice_active_sessions'] LOOP
   IF (SELECT count(*) FROM auth.users u WHERE EXISTS (
    SELECT 1 FROM public.profiles p WHERE p.id=u.id))<>2 THEN RAISE EXCEPTION 'Profile lost'; END IF;
   EXECUTE format('SELECT count(*), count(DISTINCT user_id), bool_and(value=''private'') FROM public.%I',t)
@@ -220,7 +220,7 @@ DO $$ BEGIN
 END $$;
 DO $$ DECLARE t text; n int; BEGIN
  IF (SELECT count(*) FROM auth.users)<>1 OR (SELECT count(*) FROM profiles)<>1 THEN RAISE EXCEPTION 'Auth/profile cleanup failed'; END IF;
- FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects'] LOOP
+ FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects','practice_sessions','practice_active_sessions'] LOOP
  EXECUTE format('SELECT count(*) FROM public.%I WHERE user_id=$1',t) INTO n USING '00000000-0000-0000-0000-000000000001'::uuid;
  IF n<>0 THEN RAISE EXCEPTION 'Personal row retained'; END IF;
  EXECUTE format('SELECT count(*) FROM public.%I WHERE user_id=$1',t) INTO n USING '00000000-0000-0000-0000-000000000002'::uuid;

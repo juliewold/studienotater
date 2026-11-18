@@ -23,7 +23,7 @@ const api=new URL(env.API_URL);const db=new URL(env.DB_URL);
 for(const endpoint of [api,db]) assert.ok(['127.0.0.1','localhost'].includes(endpoint.hostname),'Remote endpoint forbidden');
 assert.equal(api.protocol,'http:');assert.equal(db.pathname,'/postgres');
 const admin=createClient(api.origin,env.SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
-const tables=['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects'];
+const tables=['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects','practice_sessions','practice_active_sessions'];
 const password='Synthetic-Account-Delete-2026!';
 const sql=query=>execFileSync('psql',['-X','-q','-A','-t','-v','ON_ERROR_STOP=1','--dbname',env.DB_URL,'--command',query],{
  encoding:'utf8',stdio:['ignore','pipe','pipe'],env:{PATH:process.env.PATH,LANG:'en_US.UTF-8'},

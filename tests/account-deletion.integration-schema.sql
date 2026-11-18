@@ -14,7 +14,7 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY integration_profile_read ON public.profiles FOR SELECT TO authenticated USING (id=auth.uid());
 GRANT SELECT ON public.profiles TO authenticated;
 DO $$ DECLARE t text; BEGIN
- FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects'] LOOP
+ FOREACH t IN ARRAY ARRAY['favorites','progress','book_progress','book_task_progress','exam_task_progress','semester_subjects','practice_sessions','practice_active_sessions'] LOOP
   EXECUTE format('CREATE TABLE public.%I(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,value text NOT NULL)',t);
   EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY',t);
  END LOOP;
