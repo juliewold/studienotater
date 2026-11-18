@@ -208,3 +208,6 @@
     font-size: 0.8rem;
   }
 }
+
+/* Loading placeholder: keeps the section height while data loads. */
+.exam-overview-skeleton { height: 490px; margin-top: 12px; }

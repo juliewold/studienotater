@@ -288,3 +288,6 @@
     font-size: 0.72rem;
   }
 }
+
+/* Loading placeholder: keeps the section height while data loads. */
+.home-progress-skeleton { height: 254px; margin-top: 12px; }
