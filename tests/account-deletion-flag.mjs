@@ -22,6 +22,10 @@ for (const value of [undefined, 'false', '', 'TRUE', '1', 'true']) {
    deleteOwnAccount() { throw Error('Deletion forbidden in flag tests'); },
    finishDeletedAccountSession() { throw Error('Deletion forbidden in flag tests'); },
   },
+  '../../services/account/accountDataExportService': {
+   buildAccountExport() { throw Error('Export not called in flag tests'); },
+   downloadAccountExport() { throw Error('Export not called in flag tests'); },
+  },
  };
  const page = new vm.SourceTextModule(code, { context, initializeImportMeta(meta) {
   meta.env = value === undefined ? {} : { VITE_ACCOUNT_DELETION_ENABLED: value };

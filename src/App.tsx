@@ -43,6 +43,7 @@ import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { YearsPage } from "./pages/subjects/YearsPage/YearsPage";
 import { SemesterPlanPage } from "./pages/subjects/SemesterPlanPage/SemesterPlanPage";
 import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
+import { PrivacyPage } from "./pages/PrivacyPage/PrivacyPage";
 import { AdminPage } from "./pages/admin/AdminPage/AdminPage";
 import { AdminRoute } from "./components/auth/AdminRoute/AdminRoute";
 import { AdminPdfsPage } from "./pages/admin/AdminPdfsPage/AdminPdfsPage";
@@ -108,6 +109,7 @@ function App() {
         <Route path="/oppdater-passord" element={<UpdatePasswordPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutPage" element={<AboutPage />} />
+        <Route path="/personvern" element={<PrivacyPage />} />
 
         <Route
           path="/fag/:subjectId"

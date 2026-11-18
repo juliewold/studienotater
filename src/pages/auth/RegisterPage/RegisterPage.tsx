@@ -9,6 +9,7 @@ export const RegisterPage = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -21,6 +22,12 @@ export const RegisterPage = () => {
 
     setErrorMessage("");
     setSuccessMessage("");
+
+    if (!privacyAccepted) {
+      setErrorMessage("Du må lese og godta personvernerklæringen for å opprette konto.");
+      return;
+    }
+
     setIsLoading(true);
 
     const normalizedUsername = username.trim().toLowerCase();
@@ -61,6 +68,7 @@ export const RegisterPage = () => {
     setFullName("");
     setEmail("");
     setPassword("");
+    setPrivacyAccepted(false);
     setIsLoading(false);
   };
 
@@ -115,6 +123,19 @@ export const RegisterPage = () => {
           minLength={6}
           required
         />
+
+        <label className="auth-checkbox">
+          <input
+            type="checkbox"
+            checked={privacyAccepted}
+            onChange={(event) => setPrivacyAccepted(event.target.checked)}
+            required
+          />
+          <span>
+            Jeg har lest og godtar{" "}
+            <Link to="/personvern">personvernerklæringen</Link>.
+          </span>
+        </label>
 
         {errorMessage && (
           <p className="auth-message auth-message-error">
