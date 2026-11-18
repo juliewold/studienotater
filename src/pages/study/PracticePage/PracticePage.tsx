@@ -280,6 +280,8 @@ export const PracticePage = () => {
 
   useEffect(() => {
     if (!subjectId) {
+      // Begrunnelse: Aktiv økt leses fra localStorage når faget eller datalastingen endres. Synkronisering mot ekstern lagring.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveSession(null);
       return;
     }
@@ -292,6 +294,8 @@ export const PracticePage = () => {
   }, [subjectId, practiceDataLoaded]);
 
   useEffect(() => {
+    // Begrunnelse: Valgt tema for nullstilling settes til første tema når faget endres.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResetTopic(topics[0] ?? "");
   }, [subjectId]);
 
@@ -323,6 +327,8 @@ export const PracticePage = () => {
 
     saveActivePracticeSession(updatedActiveSession);
 
+    // Begrunnelse: Aktiv økt lagres i localStorage etter hver endring, og state speiler det som ble lagret. Synkronisering mot ekstern lagring.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveSession(updatedActiveSession);
   }, [
     stage,
