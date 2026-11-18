@@ -54,68 +54,74 @@ export const useAdminPdfs = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const loadUploadedPdfs = useCallback(async () => {
+  // State is only set inside promise callbacks, so the mount effect can call
+  // these loaders safely. Handlers that reload use the refresh variants.
+  const loadUploadedPdfs = useCallback((isCurrent: () => boolean = () => true) =>
+    getAllPdfs()
+      .then((loadedPdfs) => {
+        const sortedPdfs = [...loadedPdfs].sort((firstPdf, secondPdf) => {
+          const subjectComparison = firstPdf.subjectId.localeCompare(
+            secondPdf.subjectId,
+            "nb",
+          );
+
+          if (subjectComparison !== 0) {
+            return subjectComparison;
+          }
+
+          return firstPdf.title.localeCompare(secondPdf.title, "nb");
+        });
+
+        if (isCurrent()) setUploadedPdfs(sortedPdfs);
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente opplastede PDF-er:", error);
+
+        if (isCurrent()) setErrorMessage("Kunne ikke hente de opplastede PDF-ene.");
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingPdfs(false);
+      }), []);
+
+  const refreshUploadedPdfs = useCallback(() => {
     setIsLoadingPdfs(true);
     setErrorMessage("");
+    return loadUploadedPdfs();
+  }, [loadUploadedPdfs]);
 
-    try {
-      const loadedPdfs = await getAllPdfs();
+  const loadTopicStructure = useCallback((isCurrent: () => boolean = () => true) =>
+    Promise.all(subjects.map((subject) => getTopicsBySubject(subject.id)))
+      .then((topicsBySubject) => {
+        const loadedTopics = topicsBySubject.flat();
 
-      const sortedPdfs = [...loadedPdfs].sort((firstPdf, secondPdf) => {
-        const subjectComparison = firstPdf.subjectId.localeCompare(
-          secondPdf.subjectId,
-          "nb",
-        );
+        return Promise.all(loadedTopics.map((topic) => getSubtopicsByTopic(topic.id)))
+          .then((subtopicsByTopic) => {
+            if (isCurrent()) {
+              setTopics(loadedTopics);
+              setSubtopics(subtopicsByTopic.flat());
+            }
+          });
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente temaer og undertemaer:", error);
 
-        if (subjectComparison !== 0) {
-          return subjectComparison;
+        if (isCurrent()) {
+          setTopics([]);
+          setSubtopics([]);
+          setErrorMessage("Kunne ikke hente temaer og undertemaer.");
         }
-
-        return firstPdf.title.localeCompare(secondPdf.title, "nb");
-      });
-
-      setUploadedPdfs(sortedPdfs);
-    } catch (error) {
-      console.error("Kunne ikke hente opplastede PDF-er:", error);
-
-      setErrorMessage("Kunne ikke hente de opplastede PDF-ene.");
-    } finally {
-      setIsLoadingPdfs(false);
-    }
-  }, []);
-
-  const loadTopicStructure = useCallback(async () => {
-    setIsLoadingStructure(true);
-    setErrorMessage("");
-
-    try {
-      const topicsBySubject = await Promise.all(
-        subjects.map((subject) => getTopicsBySubject(subject.id)),
-      );
-
-      const loadedTopics = topicsBySubject.flat();
-
-      const subtopicsByTopic = await Promise.all(
-        loadedTopics.map((topic) => getSubtopicsByTopic(topic.id)),
-      );
-
-      setTopics(loadedTopics);
-      setSubtopics(subtopicsByTopic.flat());
-    } catch (error) {
-      console.error("Kunne ikke hente temaer og undertemaer:", error);
-
-      setTopics([]);
-      setSubtopics([]);
-
-      setErrorMessage("Kunne ikke hente temaer og undertemaer.");
-    } finally {
-      setIsLoadingStructure(false);
-    }
-  }, []);
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingStructure(false);
+      }), []);
 
   useEffect(() => {
-    loadUploadedPdfs();
-    loadTopicStructure();
+    let isCurrent = true;
+    void loadUploadedPdfs(() => isCurrent);
+    void loadTopicStructure(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadTopicStructure, loadUploadedPdfs]);
 
   const availableTopics = useMemo(() => {
@@ -198,7 +204,7 @@ export const useAdminPdfs = () => {
         fileInputRef.current.value = "";
       }
 
-      await loadUploadedPdfs();
+      await refreshUploadedPdfs();
 
       setSuccessMessage("PDF-en ble lastet opp.");
     } catch (error) {
@@ -221,7 +227,7 @@ export const useAdminPdfs = () => {
     try {
       await updatePdfSubtopic(pdfId, nextSubtopicId || null);
 
-      await loadUploadedPdfs();
+      await refreshUploadedPdfs();
 
       setSuccessMessage(
         nextSubtopicId
