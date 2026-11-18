@@ -6,6 +6,7 @@ import {
   type DatabaseVideo,
 } from "../../../services/media/videosService";
 import { ResourceProgress } from "../../../components/progress/ResourceProgress/ResourceProgress";
+import { giveYoutubeConsent, hasYoutubeConsent } from "../../../services/media/youtubeConsent";
 
 type SubtopicGroup = {
   subtopic: string;
@@ -22,7 +23,7 @@ type TopicGroup = {
 export const VideosPage = () => {
   const { subjectId } = useParams();
 
-  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const [youtubeConsent, setYoutubeConsent] = useState(hasYoutubeConsent);
 
   const [videos, setVideos] = useState<DatabaseVideo[]>([]);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
@@ -181,8 +182,8 @@ export const VideosPage = () => {
                             key={video.id}
                             className="video-card"
                           >
-                            {/* Nothing from YouTube is loaded until the visitor clicks the button for this video. */}
-                            {playingVideoId === video.id ? (
+                            {/* Nothing from YouTube is loaded until the visitor has consented, once, for all videos on the site. */}
+                            {youtubeConsent ? (
                               <iframe
                                 className="video-player"
                                 src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
@@ -193,12 +194,16 @@ export const VideosPage = () => {
                             ) : (
                               <div className="video-consent">
                                 <p>
-                                  Når du spiller av videoen, setter YouTube informasjonskapsler og får IP-adressen din.
+                                  Når du spiller av videoer, setter YouTube informasjonskapsler og får IP-adressen din.
+                                  Valget gjelder alle videoene på siden, til du trekker det tilbake under Innstillinger.
                                 </p>
                                 <button
                                   type="button"
                                   className="video-consent-button"
-                                  onClick={() => setPlayingVideoId(video.id)}
+                                  onClick={() => {
+                                    giveYoutubeConsent();
+                                    setYoutubeConsent(true);
+                                  }}
                                 >
                                   Godta YouTube-cookies og spill av
                                 </button>
