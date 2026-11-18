@@ -3,10 +3,13 @@ import { useTheme } from "../../hooks/useTheme";
 import { useContext, useRef, useState, type SyntheticEvent } from "react";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 import { deleteOwnAccount, finishDeletedAccountSession } from "../../services/account/accountDeletionService";
+import { buildAccountExport, downloadAccountExport } from "../../services/account/accountDataExportService";
 
 export const SettingsPage = () => {
   const { dark, toggleTheme } = useTheme();
   const { user } = useContext(AuthContext);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
   const [confirming, setConfirming] = useState(false);
   const [confirmation, setConfirmation] = useState("");
   const [password, setPassword] = useState("");
@@ -14,6 +17,19 @@ export const SettingsPage = () => {
   const [error, setError] = useState("");
   const [deleted, setDeleted] = useState(false);
   const inFlight = useRef(false);
+
+  const handleExport = async () => {
+    if (!user || exporting) return;
+    setExporting(true);
+    setExportError("");
+    try {
+      downloadAccountExport(await buildAccountExport(user));
+    } catch (problem) {
+      setExportError(problem instanceof Error ? problem.message : "Eksporten kunne ikke lages. Prøv igjen senere.");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleDelete = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -95,6 +111,28 @@ export const SettingsPage = () => {
               Endre passord
             </a>
           </div>
+        </section>
+
+        <section className="settings-card" aria-labelledby="my-data-title">
+          <h2 id="my-data-title">Dine data</h2>
+          <p>
+            Last ned opplysningene som er knyttet til kontoen din: profil, favoritter, fremdrift, fagvalg og
+            oppgave- og eksamensfremdrift, som én JSON-fil.
+          </p>
+          <p>
+            Øvingshistorikk som er lagret i nettleseren, er ikke med i filen.
+          </p>
+          {user ? (
+            <div className="setting-row">
+              <button type="button" className="setting-button" onClick={handleExport} disabled={exporting}>
+                {exporting ? "Lager fil…" : "Last ned mine data"}
+              </button>
+            </div>
+          ) : (
+            <a href="#/logg-inn">Logg inn for å laste ned dataene dine</a>
+          )}
+          {exportError && <p role="alert">{exportError}</p>}
+          <p><a href="#/personvern">Les personvernerklæringen</a></p>
         </section>
 
         {import.meta.env.VITE_ACCOUNT_DELETION_ENABLED === "true" && <section className="settings-card account-deletion" aria-labelledby="delete-account-title">

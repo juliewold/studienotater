@@ -11,7 +11,9 @@ export const Footer = () => {
           sted.
         </p>
 
-        <p className="footer-copy">© 2026 Julie Wold</p>
+        <p className="footer-copy">
+          © 2026 Julie Wold · <a href="#/personvern">Personvernerklæring</a>
+        </p>
       </div>
     </footer>
   );
