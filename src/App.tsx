@@ -44,6 +44,7 @@ import { YearsPage } from "./pages/subjects/YearsPage/YearsPage";
 import { SemesterPlanPage } from "./pages/subjects/SemesterPlanPage/SemesterPlanPage";
 import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
 import { PrivacyPage } from "./pages/PrivacyPage/PrivacyPage";
+import { Footer } from "./components/layout/Footer/Footer";
 import { TermsPage } from "./pages/TermsPage/TermsPage";
 import { AdminPage } from "./pages/admin/AdminPage/AdminPage";
 import { AdminRoute } from "./components/auth/AdminRoute/AdminRoute";
@@ -71,6 +72,7 @@ function App() {
       <Navbar />
 
       <div className="app-workspace" id="app-content" tabIndex={-1}>
+      <div className="app-page">
       <Routes>
         <Route
           path="/logg-inn"
@@ -463,6 +465,8 @@ function App() {
           }
         />
       </Routes>
+      </div>
+      <Footer />
       </div>
     </HashRouter>
     </SemesterSubjectsProvider>
