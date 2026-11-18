@@ -294,6 +294,8 @@ export const EditableNote = ({
     return () => {
       window.clearTimeout(autosaveTimer);
     };
+  // Begrunnelse: getCurrentDraft og saveDraft lages på nytt ved hver render. Med dem i listen ville autolagringen startes på nytt hele tiden og kunne lagre to ganger.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     title,
     description,
