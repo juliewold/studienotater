@@ -75,7 +75,7 @@ export const PrivacyPage = () => {
         <h2>Hvem deler vi opplysninger med?</h2>
         <p>Vi bruker disse tjenestene til å drive nettsiden. De behandler opplysninger på våre vegne:</p>
         <ul>
-          <li><strong>Supabase:</strong> database, innlogging og lagring av filer.</li>
+          <li><strong>Supabase:</strong> database, innlogging og lagring av filer. Databasen ligger i EU (region Stockholm).</li>
           <li><strong>GitHub Pages:</strong> hosting av selve nettsiden.</li>
           <li><strong>NTNU:</strong> språkmodelltjenesten som brukes til KI-funksjoner. Bare tekst du selv sender inn, sendes dit.</li>
         </ul>
@@ -87,7 +87,7 @@ export const PrivacyPage = () => {
         <p>
           Kontoopplysninger og personlig bruk lagres så lenge kontoen finnes. Når kontoen slettes, fjernes de fra den
           aktive databasen. Sikkerhetskopier og tekniske logger hos tjenesteleverandørene kan beholdes i en begrenset
-          periode.
+          periode: Supabase tar daglige sikkerhetskopier og beholder dem i 7 dager.
         </p>
       </section>
 
