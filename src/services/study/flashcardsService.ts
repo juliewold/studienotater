@@ -106,7 +106,7 @@ export async function getAllFlashcards(): Promise<DatabaseFlashcard[]> {
 
 export async function createFlashcard(
   subjectId: string,
-  subtopicId: string,
+  subtopicId: string | null,
   slug: string,
   question: string,
   answer: string,

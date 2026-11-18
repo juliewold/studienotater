@@ -1,5 +1,6 @@
 import "./FlashcardsPage.css";
 import { MathText } from "../../../components/common/MathText/MathText";
+import { FlashcardTopicSections } from "../../../components/flashcards/FlashcardTopicSections/FlashcardTopicSections";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -330,71 +331,15 @@ export const FlashcardsPage = () => {
             </button>
           </section>
 
-          <div className="flashcard-topics">
-            {groupedFlashcards.map((topic) => {
-              const topicFlashcards = topic.subtopics.flatMap(
-                (subtopic) => subtopic.flashcards,
-              );
-
-              return (
-                <section
-                  key={topic.topicId}
-                  className="flashcard-topic-section"
-                >
-                  <div className="flashcard-topic-header">
-                    <div>
-                      <p className="flashcard-topic-label">Tema</p>
-
-                      <h2>{topic.topicName}</h2>
-
-                      <p>{topicFlashcards.length} kort</p>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="flashcard-primary-button"
-                      onClick={() =>
-                        startPractice(topic.topicName, topicFlashcards)
-                      }
-                    >
-                      Start øving
-                    </button>
-                  </div>
-
-                  <div className="flashcard-subtopics">
-                    {topic.subtopics.map((subtopic) => (
-                      <article
-                        key={subtopic.subtopicId}
-                        className="flashcard-subtopic-card"
-                      >
-                        <div>
-                          <p className="flashcard-subtopic-label">Undertema</p>
-
-                          <h3>{subtopic.subtopicName}</h3>
-
-                          <span>{subtopic.flashcards.length} kort</span>
-                        </div>
-
-                        <button
-                          type="button"
-                          className="flashcard-secondary-button"
-                          onClick={() =>
-                            startPractice(
-                              subtopic.subtopicName,
-                              subtopic.flashcards,
-                            )
-                          }
-                        >
-                          Øv på undertema
-                        </button>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
         </>
+      )}
+
+      {subjectId && (
+        <FlashcardTopicSections
+          subjectId={subjectId}
+          groups={groupedFlashcards}
+          onStartPractice={startPractice}
+        />
       )}
     </main>
   );
