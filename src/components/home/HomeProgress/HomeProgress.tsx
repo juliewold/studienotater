@@ -6,7 +6,11 @@ export const HomeProgress = ({ progressSubjects, isLoading, resourcesError }: Re
   if (isLoading) {
     return (
       <section className="home-progress">
-        <p>Laster fremdrift...</p>
+        <div className="home-progress-header">
+          <h2>Pensumtracker</h2>
+        </div>
+        <span className="skeleton-label" role="status">Laster fremdrift…</span>
+        <div className="skeleton-block home-progress-skeleton" aria-hidden="true" />
       </section>
     );
   }

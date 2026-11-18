@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import { useContext, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
@@ -12,7 +13,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
   if (isLoading) {
     return (
       <main className="page-container">
-        <p>Laster...</p>
+        <LoadingPlaceholder label="Laster..." />
       </main>
     );
   }

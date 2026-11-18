@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { sortNotes } from "../../../services/notes/noteOrder";
 import { SortableNotes } from "../../../components/notes/SortableNotes/SortableNotes";
 import { NOTES_CHANGED } from "../../../services/notes/notesNavigationEvents";
@@ -578,7 +579,7 @@ export const NotesPage = () => {
 
       {foldersError && <p className="notes-error-message">{foldersError}</p>}
 
-      {isLoadingFolders && <p>Laster mapper...</p>}
+      {isLoadingFolders && <LoadingPlaceholder label="Laster mapper..." />}
 
       {view === "all" && !isLoadingFolders && sortedFolders.length > 0 && (
         <SortableFolders key={subject.id} subjectId={subject.id} folders={sortedFolders}
@@ -620,7 +621,7 @@ export const NotesPage = () => {
         </SortableFolders>
       )}
 
-      {(isLoadingProgress || isLoadingNotes) && <p>Laster notater...</p>}
+      {(isLoadingProgress || isLoadingNotes) && <LoadingPlaceholder label="Laster notater..." />}
 
       {notesError && <p className="notes-error-message">{notesError}</p>}
 

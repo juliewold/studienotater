@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { Link } from "react-router-dom";
 import { BookOpen, Check, ExternalLink, Pi, Sigma } from "lucide-react";
 import { subjects } from "../../../data/subjects";
@@ -11,7 +12,7 @@ export function CurriculumOverviewPage() {
   const base = `/fag/${subjectId}/tema`;
   const title = subject ? `${subject.code} ${subject.name}` : "Pensumoversikt";
   if (errorMessage) return <CurriculumPage label="Pensum" title={title}><CurriculumStatus alert>{errorMessage}</CurriculumStatus></CurriculumPage>;
-  if (!workspace) return <CurriculumPage label="Pensum" title={title}><CurriculumStatus>Laster pensumoversikt…</CurriculumStatus></CurriculumPage>;
+  if (!workspace) return <CurriculumPage label="Pensum" title={title}><LoadingPlaceholder label="Laster pensumoversikt…" height={320} /></CurriculumPage>;
   const { units, config } = workspace;
   const done = units.filter(unit => progress.completed.has(unit.id)).length;
 

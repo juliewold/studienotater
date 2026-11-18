@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { PrivateFileLink } from "../../../components/media/PrivateFileLink";
 import "./AdminExamsPage.css";
 import { subjects } from "../../../data/subjects";
@@ -297,7 +298,7 @@ export const AdminExamsPage = () => {
           <h2>Opprettede eksamener</h2>
 
           {isLoadingPreviousExams ? (
-            <p>Laster eksamener...</p>
+            <LoadingPlaceholder label="Laster eksamener..." />
           ) : uploadedExams.length === 0 ? (
             <p>
               Ingen tidligere eksamener er opprettet gjennom adminpanelet ennå.
@@ -481,7 +482,7 @@ export const AdminExamsPage = () => {
           <h2>Registrerte eksamensdatoer</h2>
 
           {isLoadingUpcomingExams ? (
-            <p>Laster eksamensdatoer...</p>
+            <LoadingPlaceholder label="Laster eksamensdatoer..." />
           ) : upcomingExams.length === 0 ? (
             <p>Ingen eksamensdatoer er registrert ennå.</p>
           ) : (

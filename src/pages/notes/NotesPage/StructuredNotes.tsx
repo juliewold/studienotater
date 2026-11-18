@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { useEffect, useState, type ReactNode } from "react";
 import type { NoteMetadata } from "../../../services/notes/notesService";
 import { getSubtopicLinksForNotes, type NoteSubtopicLink } from "../../../services/notes/noteSubtopicsService";
@@ -20,7 +21,7 @@ export function StructuredNotes({ subjectId, notes, query, renderNote }: {
   }, [subjectId, notes, retry]);
   const { groups, unassigned, count } = groupNotes(notes, structure?.topics ?? [], structure?.subtopics ?? [], structure?.links ?? [], query);
   return <section className="structured-notes" aria-label="Notater etter fagstruktur">
-    {error ? <p role="alert">Kunne ikke hente fagstrukturen. Notatene vises som en liste. <button type="button" onClick={() => setRetry(value => value + 1)}>Prøv igjen</button></p> : !structure ? <p>Laster fagstruktur …</p> : null}
+    {error ? <p role="alert">Kunne ikke hente fagstrukturen. Notatene vises som en liste. <button type="button" onClick={() => setRetry(value => value + 1)}>Prøv igjen</button></p> : !structure ? <LoadingPlaceholder label="Laster fagstruktur …" /> : null}
     <p role="status">{count} {count === 1 ? "notat" : "notater"}{query.trim() ? " funnet" : ""}</p>
     {count === 0 && <p>{query.trim() ? "Ingen notater matcher søket." : "Ingen notater er lagt til ennå."}</p>}
     {error || !structure ? <div className="notes-list">{groupNotes(notes, [], [], [], query).unassigned.map(renderNote)}</div> : <>

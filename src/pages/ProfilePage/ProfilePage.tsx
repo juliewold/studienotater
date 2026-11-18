@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./ProfilePage.css";
 import { useContext, useEffect, useState, type SyntheticEvent } from "react";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
@@ -92,7 +93,7 @@ export const ProfilePage = () => {
   if (isLoading) {
     return (
       <main className="profile-page site-container">
-        <p>Laster profil...</p>
+        <LoadingPlaceholder label="Laster profil..." />
       </main>
     );
   }

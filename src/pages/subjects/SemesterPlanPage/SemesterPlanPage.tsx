@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./SemesterPlanPage.css";
 import { Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -30,7 +31,7 @@ export const SemesterPlanPage = () => {
   if (isLoadingSemesterSubjects) {
     return (
       <main className="page-container">
-        <p>Laster fagplan...</p>
+        <LoadingPlaceholder label="Laster fagplan..." />
       </main>
     );
   }

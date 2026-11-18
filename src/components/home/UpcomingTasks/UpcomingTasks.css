@@ -268,3 +268,6 @@
     font-size: 0.76rem;
   }
 }
+
+/* Loading placeholder: keeps the section height while data loads. */
+.upcoming-tasks-skeleton { height: 148px; margin-top: 12px; }

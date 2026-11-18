@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { sortNotes } from "../../../services/notes/noteOrder";
 import { SortableNotes } from "../../../components/notes/SortableNotes/SortableNotes";
 import "./FolderPage.css";
@@ -267,7 +268,7 @@ export const FolderPage = () => {
   if (isLoading) {
     return (
       <main className="page-container">
-        <p>Laster...</p>
+        <LoadingPlaceholder label="Laster..." />
       </main>
     );
   }

@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./ExamViewerPage.css";
 import { useCallback, useContext, useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
@@ -315,7 +316,7 @@ export const ExamViewerPage = () => {
   if (isLoadingExam) {
     return (
       <main className="page-container">
-        <p>Laster eksamen...</p>
+        <LoadingPlaceholder label="Laster eksamen..." />
       </main>
     );
   }

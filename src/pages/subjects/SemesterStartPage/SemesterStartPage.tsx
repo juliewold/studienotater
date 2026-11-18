@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./SemesterStartPage.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -73,7 +74,7 @@ export const SemesterStartPage = () => {
   if (isLoadingSemesterSubjects) {
     return (
       <main className="page-container">
-        <p>Laster semesterfag...</p>
+        <LoadingPlaceholder label="Laster semesterfag..." />
       </main>
     );
   }

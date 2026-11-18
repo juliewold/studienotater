@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { usePrivateStorageUrl } from "../../../hooks/usePrivateStorageUrl";
 import "./PdfViewerPage.css";
 import { useContext, useEffect, useState } from "react";
@@ -137,7 +138,7 @@ export const PdfViewerPage = () => {
   if (isLoadingPdf) {
     return (
       <main className="page-container">
-        <p>Laster PDF...</p>
+        <LoadingPlaceholder label="Laster PDF..." />
       </main>
     );
   }
@@ -200,7 +201,7 @@ export const PdfViewerPage = () => {
         </div>
       </div>
 
-      {!fileAccess.url ? <p role="status">{fileAccess.loading ? "Laster filtilgang…" : fileAccess.error}</p> : useSeparatePdfView ? (
+      {!fileAccess.url ? (fileAccess.loading ? <LoadingPlaceholder label="Laster filtilgang…" height={480} /> : <p role="status">{fileAccess.error}</p>) : useSeparatePdfView ? (
         <div className="pdf-mobile-viewer">
           <a
             href={fileAccess.url ?? undefined}

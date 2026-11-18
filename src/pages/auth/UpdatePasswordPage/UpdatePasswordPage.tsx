@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../../components/auth/AuthLayout/AuthLayout";
@@ -112,7 +113,7 @@ export const UpdatePasswordPage = () => {
   if (isPreparingSession) {
     return (
       <AuthLayout label="Velg nytt passord" title="Oppdater passord">
-        <p>Laster tilbakestillingslenken...</p>
+        <LoadingPlaceholder label="Laster tilbakestillingslenken..." />
       </AuthLayout>
     );
   }

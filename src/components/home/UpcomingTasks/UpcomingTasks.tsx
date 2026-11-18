@@ -235,8 +235,11 @@ export const UpcomingTasks = () => {
         <Link to="/kalender">Se kalender →</Link>
       </div>
 
-      {(isLoadingSemesterSubjects || isLoadingEvents || upcomingTasks.length === 0) && <p className="upcoming-tasks-empty">
-        {isLoadingSemesterSubjects || isLoadingEvents ? "Laster kommende oppgaver…" : "Ingen kommende oppgaver. Se kalenderen for å planlegge studieuken."}
+      {isLoadingSemesterSubjects || isLoadingEvents ? <>
+        <span className="skeleton-label" role="status">Laster kommende oppgaver…</span>
+        <div className="skeleton-block upcoming-tasks-skeleton" aria-hidden="true" />
+      </> : upcomingTasks.length === 0 && <p className="upcoming-tasks-empty">
+        Ingen kommende oppgaver. Se kalenderen for å planlegge studieuken.
       </p>}
       <div className="upcoming-tasks-list">
         {visibleTasks.map((event) => {

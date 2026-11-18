@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./BookProgressPage.css";
 
 import { useEffect, useState } from "react";
@@ -113,7 +114,7 @@ export const BookProgressPage = () => {
   if (isLoadingBook) {
     return (
       <main className="page-container">
-        <p>Laster bok...</p>
+        <LoadingPlaceholder label="Laster bok..." />
       </main>
     );
   }
@@ -173,7 +174,7 @@ export const BookProgressPage = () => {
       </header>
 
       {isLoadingProgress ? (
-        <p>Laster fremdrift...</p>
+        <LoadingPlaceholder label="Laster fremdrift..." />
       ) : (
         <div className="book-chapter-list">
           {book.chapters.map((chapter) => {

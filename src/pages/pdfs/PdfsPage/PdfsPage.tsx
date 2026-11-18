@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./PdfsPage.css";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -71,7 +72,7 @@ export const PdfsPage = () => {
 
       <h1>{subjectId?.toUpperCase()}</h1>
 
-      {(isLoadingProgress || isLoadingPdfs) && <p>Laster PDF-er...</p>}
+      {(isLoadingProgress || isLoadingPdfs) && <LoadingPlaceholder label="Laster PDF-er..." />}
 
       {pdfError && <p>{pdfError}</p>}
 

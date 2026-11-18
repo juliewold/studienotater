@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { PrivateFileLink } from "../../../components/media/PrivateFileLink";
 import "./AdminPdfsPage.css";
 
@@ -232,7 +233,7 @@ export const AdminPdfsPage = () => {
         </div>
 
         {isLoadingPdfs || isLoadingStructure ? (
-          <p>Laster PDF-er...</p>
+          <LoadingPlaceholder label="Laster PDF-er..." />
         ) : uploadedPdfs.length === 0 ? (
           <p>Ingen PDF-er er lastet opp gjennom adminpanelet ennå.</p>
         ) : (

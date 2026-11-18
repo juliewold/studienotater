@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./FavoritesPage.css";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -74,7 +75,7 @@ export const FavoritesPage = () => {
   if (isLoading) {
     return (
       <main className="favorites-page site-container">
-        <p>Laster favoritter...</p>
+        <LoadingPlaceholder label="Laster favoritter..." />
       </main>
     );
   }

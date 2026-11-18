@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import { folderToneClass } from "../../../services/notes/noteFolderOrder";
 import "../FolderCard/folderColors.css";
 import { useContext, useEffect, useRef, useState, useSyncExternalStore, type MouseEvent } from "react";
@@ -85,7 +86,7 @@ const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
   const outline = <>
     <header className="notes-outline-header"><div><span>{code}</span><h2>{name}</h2></div></header>
     <Link className="notes-outline-all" to={base} onClick={event => void go(event, base)} aria-current={pathname === base ? "page" : undefined}>Alle notater</Link>
-    {loading && <p className="notes-outline-status">Laster mapper og notater…</p>}
+    {loading && <LoadingPlaceholder label="Laster mapper og notater…" />}
     {error && <div className="notes-outline-status" role="alert">{error} <button onClick={() => void store.refresh()}>Prøv igjen</button></div>}
     <nav aria-label={`Mapper og notater i ${code}`}>
       {flattenFolderTree(data.folders).map(({ folder, depth }) => {

@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./AdminFlashcardsPage.css";
 import { subjects } from "../../../data/subjects";
 import { useAdminFlashcards } from "../../../hooks/admin/useAdminFlashcards";
@@ -200,7 +201,7 @@ export const AdminFlashcardsPage = () => {
         <h2>Opprettede flashcards</h2>
 
         {isLoadingFlashcards ? (
-          <p>Laster flashcards...</p>
+          <LoadingPlaceholder label="Laster flashcards..." />
         ) : uploadedFlashcards.length === 0 ? (
           <p>Ingen flashcards er opprettet gjennom adminpanelet ennå.</p>
         ) : (

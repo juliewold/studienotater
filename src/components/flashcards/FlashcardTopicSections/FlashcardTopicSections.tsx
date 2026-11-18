@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import "./FlashcardTopicSections.css";
 
 import { useContext, useEffect, useState } from "react";
@@ -92,7 +93,7 @@ export const FlashcardTopicSections = ({ subjectId, groups, onStartPractice }: F
   };
 
   if (isLoading) {
-    return <p>Laster temaer...</p>;
+    return <LoadingPlaceholder label="Laster temaer..." />;
   }
 
   if (topics.length === 0) {

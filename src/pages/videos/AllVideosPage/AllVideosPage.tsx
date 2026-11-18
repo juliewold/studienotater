@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./AllVideosPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -83,7 +84,7 @@ export const AllVideosPage = () => {
       <p>Velg et fag for å se videoer og forelesninger.</p>
 
       {(isLoadingProgress || isLoadingVideos) && (
-        <p>Laster videoer...</p>
+        <LoadingPlaceholder label="Laster videoer..." />
       )}
 
       {errorMessage && <p>{errorMessage}</p>}

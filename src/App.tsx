@@ -12,6 +12,7 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeProvider";
 import { SemesterSubjectsProvider } from "./context/SemesterSubjectsProvider";
 import { Navbar } from "./components/layout/Navbar/Navbar";
+import { KeepScrollPosition } from "./components/layout/KeepScrollPosition/KeepScrollPosition";
 import { HomePage } from "./pages/home/HomePage/HomePage";
 import { SubjectPage } from "./pages/subjects/SubjectPage/SubjectPage";
 import { NotesPage } from "./pages/notes/NotesPage/NotesPage";
@@ -69,6 +70,7 @@ function App() {
     <ThemeProvider>
     <SemesterSubjectsProvider>
     <HashRouter>
+      <KeepScrollPosition />
       <Navbar />
 
       <div className="app-workspace" id="app-content" tabIndex={-1}>

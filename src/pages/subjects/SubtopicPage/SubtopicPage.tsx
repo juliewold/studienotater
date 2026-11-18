@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { groupSubtopicContent } from "./subtopicPresentation";
 import "./SubtopicPage.css";
 import { useEffect, useState } from "react";
@@ -21,7 +22,7 @@ function SubtopicDetails({ subjectId, topicId, subtopicId }: { subjectId: string
     }).catch(() => { if (!cancelled) setError("Kunne ikke hente undertemaet."); });
     return () => { cancelled = true; };
   }, [subjectId, topicId, subtopicId]);
-  if (error || !data) return <main className="subtopic-page learning-page site-container"><p role={error ? "alert" : "status"}>{error || "Laster undertema..."}</p></main>;
+  if (error || !data) return <main className="subtopic-page learning-page site-container">{error ? <p role="alert">{error}</p> : <LoadingPlaceholder label="Laster undertema..." height={300} />}</main>;
   const sections = groupSubtopicContent(data.content, data.sourceContent);
   const sourced = data.concepts.filter(concept => data.content.some(block => block.conceptId === concept.id));
   const fallback = data.concepts.filter(concept => !sourced.some(item => item.id === concept.id));

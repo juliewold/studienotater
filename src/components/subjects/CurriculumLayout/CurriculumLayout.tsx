@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
 import { BookOpen, Check, ChevronLeft, LayoutGrid, Pi, Sigma } from "lucide-react";
@@ -43,11 +44,12 @@ function SubjectCurriculum({ subjectId }: { subjectId: string }) {
       <header className="curriculum-sidebar-header">
         <Link className="curriculum-back" to={`/fag/${subjectId}`}><ChevronLeft size={15} aria-hidden="true" />{subject?.code ?? subjectId.toUpperCase()}</Link>
         <h2>{subject?.name ?? "Pensum"}</h2>
-        {units.length > 0 && <div className="curriculum-progress" aria-label={`${completedCount} av ${units.length} temaer gjennomgått`}>
+        {/* Keep the row while the structure loads, so the menu does not change height when the count appears. */}
+        <div className="curriculum-progress" aria-label={workspace ? `${completedCount} av ${units.length} temaer gjennomgått` : undefined} aria-hidden={workspace ? undefined : true}>
           <span>Gjennomgått</span>
-          <span className="curriculum-progress-bar" aria-hidden="true"><span style={{ width: `${(completedCount / units.length) * 100}%` }} /></span>
-          <span className="curriculum-progress-count">{completedCount}/{units.length}</span>
-        </div>}
+          <span className="curriculum-progress-bar" aria-hidden="true"><span style={{ width: `${units.length ? (completedCount / units.length) * 100 : 0}%` }} /></span>
+          <span className="curriculum-progress-count">{workspace ? `${completedCount}/${units.length}` : "\u00a0"}</span>
+        </div>
       </header>
       <button className="curriculum-toggle" aria-expanded={mobileOpen} aria-controls="curriculum-navigation" onClick={() => setMobileOpen(!mobileOpen)}>
         {mobileOpen ? "Skjul pensummeny" : "Vis pensummeny"}
@@ -63,7 +65,7 @@ function SubjectCurriculum({ subjectId }: { subjectId: string }) {
           <li><NavLink to={`${base}/begreper`} onClick={close} className="curriculum-tool"><BookOpen size={17} aria-hidden="true" />Begreper</NavLink></li>
         </ul>
         {errorMessage ? <p role="alert" className="curriculum-nav-message">{errorMessage}</p>
-          : !workspace ? <p role="status" className="curriculum-nav-message">Laster temaer…</p>
+          : !workspace ? <LoadingPlaceholder label="Laster temaer…" />
           : units.length === 0 ? <p className="curriculum-nav-message">Ingen temaer ennå.</p>
           : groupUnitsByPart(units).map((part, index) => <div key={part.name ?? index} className="curriculum-part">
             {part.name && <p className="curriculum-nav-heading">{part.name}</p>}

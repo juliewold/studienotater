@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./FlashcardsPage.css";
 import { MathText } from "../../../components/common/MathText/MathText";
 import { FlashcardTopicSections } from "../../../components/flashcards/FlashcardTopicSections/FlashcardTopicSections";
@@ -296,7 +297,7 @@ export const FlashcardsPage = () => {
 
       <p className="page-description">Velg hvilke flashcards du vil øve på.</p>
 
-      {isLoadingFlashcards && <p>Laster flashcards...</p>}
+      {isLoadingFlashcards && <LoadingPlaceholder label="Laster flashcards..." />}
 
       {errorMessage && <p className="flashcards-error">{errorMessage}</p>}
 

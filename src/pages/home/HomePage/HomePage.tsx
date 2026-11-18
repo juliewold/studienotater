@@ -21,8 +21,9 @@ export const HomePage = () => {
 
   const { semesterSubjects, isLoadingSemesterSubjects } = useSemesterSubjects();
 
+  // Reserve the page's height while data loads, so the browser can restore scroll and content does not jump.
   if (isLoading || isLoadingSemesterSubjects) {
-    return null;
+    return <HomeSkeleton />;
   }
 
   if (!user) {
@@ -138,6 +139,22 @@ export const HomePage = () => {
 
   return <HomeDashboard />;
 };
+
+const HomeSkeleton = () => (
+  <main className="home-dashboard site-container home-skeleton" aria-busy="true">
+    <span className="skeleton-label">Laster forsiden…</span>
+    <div className="home-skeleton-date" />
+    <div className="dashboard-focus-grid">
+      <div className="skeleton-block home-skeleton-focus" />
+      <div className="home-skeleton-column">
+        <div className="skeleton-block home-skeleton-tasks" />
+        <div className="skeleton-block home-skeleton-side-fill" />
+      </div>
+    </div>
+    <div className="skeleton-block home-skeleton-progress" />
+    <div className="skeleton-block home-skeleton-exams" />
+  </main>
+);
 
 const HomeDashboard = () => {
   const resources = useHomeResources();

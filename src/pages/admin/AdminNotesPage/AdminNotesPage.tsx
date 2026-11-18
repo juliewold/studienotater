@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./AdminNotesPage.css";
 
 import { NoteEditor } from "../../../components/notes/NoteEditor/NoteEditor";
@@ -214,7 +215,7 @@ export const AdminNotesPage = () => {
         <h2>Opprettede notater</h2>
 
         {isLoadingNotes || isLoadingStructure ? (
-          <p>Laster notater...</p>
+          <LoadingPlaceholder label="Laster notater..." />
         ) : uploadedNotes.length === 0 ? (
           <p>Ingen notater er opprettet gjennom adminpanelet ennå.</p>
         ) : (

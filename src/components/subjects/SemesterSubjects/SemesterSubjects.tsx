@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import "./SemesterSubjects.css";
 import { Link } from "react-router-dom";
 
@@ -29,7 +30,7 @@ export const SemesterSubjects = ({ progress }: { progress: Record<string, number
   if (isLoadingSemesterSubjects) {
     return (
       <section className="semester-subjects site-container">
-        <p>Laster semesterfag...</p>
+        <LoadingPlaceholder label="Laster semesterfag..." />
       </section>
     );
   }

@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./TopicPage.css";
 import "../../../components/notes/NoteEditor/NoteEditor.css";
 import { Link, useParams } from "react-router-dom";
@@ -45,7 +46,7 @@ function TopicDetails({ subjectId, topicId }: { subjectId?: string; topicId?: st
   </li>)}</ul>;
   return <main className="topic-page topic-learning learning-page site-container">
     <Link to={`/fag/${subjectId}`} className="back-link">← Tilbake til faget</Link>
-    {error ? <p role="alert">{error}</p> : !data ? <p>Laster tema...</p> : <>
+    {error ? <p role="alert">{error}</p> : !data ? <LoadingPlaceholder label="Laster tema..." /> : <>
       <header><p className="learning-label">Tema</p><h1>{data.topic.name}</h1>
         {data.introductionError && <p role="alert">{data.introductionError}</p>}
         {editing && isAdmin ? <form className="topic-introduction-editor" onSubmit={event => { event.preventDefault(); void save(); }}>

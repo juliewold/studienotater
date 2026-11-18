@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { Link } from "react-router-dom";
 import "./AdminConceptsPage.css";
 
@@ -70,7 +71,7 @@ export const AdminConceptsPage = () => {
               <p className="admin-concept-links-label">Koblet til</p>
 
               {isLoadingConceptLinks ? (
-                <p className="admin-concept-links-empty">Laster koblinger...</p>
+                <LoadingPlaceholder label="Laster koblinger..." />
               ) : conceptLinks.length === 0 ? (
                 <p className="admin-concept-links-empty">
                   Konseptet er ikke koblet til noen undertemaer ennå.

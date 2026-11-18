@@ -224,3 +224,6 @@
     font-size: 0.78rem;
   }
 }
+
+/* Loading placeholder: keeps the section height while data loads. */
+.weekly-updates-skeleton { height: 110px; margin-top: 12px; }

@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import "./SyllabusTracker.css";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
@@ -85,7 +86,7 @@ export const SyllabusTracker = ({
   if (isLoading) {
     return (
       <section className="syllabus-tracker">
-        <p>Laster pensumfremdrift...</p>
+        <LoadingPlaceholder label="Laster pensumfremdrift..." />
       </section>
     );
   }

@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./AdminSubjectStructurePage.css";
 import {
   useCallback,
@@ -532,7 +533,7 @@ export const AdminSubjectStructurePage = () => {
         </section>
       ) : isLoading ? (
         <section className="subject-structure-empty-card">
-          Laster fagstruktur...
+          <LoadingPlaceholder label="Laster fagstruktur..." height={240} />
         </section>
       ) : (
         <div className="subject-structure-layout">

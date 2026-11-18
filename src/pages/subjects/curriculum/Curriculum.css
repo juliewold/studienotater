@@ -51,7 +51,7 @@
 [data-theme="dark"] .curriculum-done-badge { color: #86dc9c; }
 
 /* Unit page */
-.curriculum-unit-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+.curriculum-unit-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; min-height: 40px; }
 .curriculum-mark, .curriculum-play { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: .9rem; font-weight: 600; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--app-border, #e6dfed); background: var(--app-surface, #fff); color: var(--app-text, #29252f); cursor: pointer; }
 .curriculum-mark:hover { border-color: var(--app-accent, #7c3aed); color: var(--app-accent, #7c3aed); }
 .curriculum-mark.is-done { border-color: #16a34a; background: #16a34a; color: #fff; }

@@ -55,7 +55,12 @@ export const WeeklyUpdates = ({ resources }: { resources: HomeResourcesSnapshot 
   if (isLoadingSemesterSubjects || resources.loading) {
     return (
       <section className="weekly-updates site-container">
-        <p>Laster ukens innhold...</p>
+        <div className="weekly-updates-header">
+          <h2>Denne uken</h2>
+          <span className="weekly-updates-week">Uke {getWeekNumber()}</span>
+        </div>
+        <span className="skeleton-label" role="status">Laster ukens innhold…</span>
+        <div className="skeleton-block weekly-updates-skeleton" aria-hidden="true" />
       </section>
     );
   }

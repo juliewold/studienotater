@@ -77,7 +77,9 @@ export const ExamOverview = () => {
   if (isLoadingSemesterSubjects || isLoadingExams) {
     return (
       <section className="exam-overview">
-        <p>Laster eksamensoversikt...</p>
+        <h2>Kommende eksamener</h2>
+        <span className="skeleton-label" role="status">Laster eksamensoversikt…</span>
+        <div className="skeleton-block exam-overview-skeleton" aria-hidden="true" />
       </section>
     );
   }

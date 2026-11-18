@@ -1,3 +1,4 @@
+import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import "./ResourceProgress.css";
 import { useContext, useEffect, useState } from "react";
 
@@ -87,7 +88,7 @@ export const ResourceProgress = ({
   if (isLoading) {
     return (
       <section className={`resource-progress resource-progress--${variant}`}>
-        <p>Laster fremdrift...</p>
+        <LoadingPlaceholder label="Laster fremdrift..." />
       </section>
     );
   }
