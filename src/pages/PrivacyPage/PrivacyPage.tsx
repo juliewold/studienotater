@@ -75,7 +75,7 @@ export const PrivacyPage = () => {
         <h2>Hvem deler vi opplysninger med?</h2>
         <p>Vi bruker disse tjenestene til å drive nettsiden. De behandler opplysninger på våre vegne:</p>
         <ul>
-          <li><strong>Supabase:</strong> database, innlogging og lagring av filer. Databasen ligger i EU (region Stockholm).</li>
+          <li><strong>Supabase:</strong> database, innlogging og lagring av filer. Databasen ligger i EU (region Stockholm). Supabase behandler opplysningene etter en databehandleravtale (DPA) som er en del av vilkårene deres.</li>
           <li><strong>GitHub Pages:</strong> hosting av selve nettsiden.</li>
           <li><strong>NTNU:</strong> språkmodelltjenesten som brukes til KI-funksjoner. Bare tekst du selv sender inn, sendes dit.</li>
         </ul>
