@@ -36,16 +36,18 @@ export const PrivacyPage = () => {
           </li>
           <li>
             <strong>Personlig bruk:</strong> favoritter, fagvalg, og fremdrift i pensum, oppgaver og eksamensoppgaver
-            knyttet til kontoen din.
+            knyttet til kontoen din. Øvingsøkter, svarene dine på øvingsoppgaver og påbegynte øvinger lagres også
+            knyttet til kontoen din, slik at de følger deg mellom enheter.
           </li>
           <li>
             <strong>Tekst du sender til KI-funksjoner:</strong> når du bruker KI-funksjoner i appen, sendes teksten
             du velger, for eksempel innholdet i et notat, til språkmodelltjenesten til NTNU for å generere resultatet.
           </li>
           <li>
-            <strong>Lokal lagring i nettleseren:</strong> enkelte innstillinger, som tema, og øvingshistorikk lagres
-            i nettleseren din. Dette sendes ikke til oss og slettes ikke automatisk når du sletter kontoen. Du kan
-            tømme øvingshistorikken på øvingssiden.
+            <strong>Lokal lagring i nettleseren:</strong> innloggingen din og enkelte innstillinger, som tema og
+            innstillinger i forelesningsspilleren, lagres i nettleseren din. Innloggingen er nødvendig for at tjenesten
+            skal fungere. Innstillingene er valg du gjør selv, og de inneholder ingen personopplysninger om deg. Disse
+            opplysningene slettes ikke automatisk når du sletter kontoen.
           </li>
           <li>
             <strong>Tekniske logger:</strong> tjenestene som driver nettsiden (hosting og database) registrerer
