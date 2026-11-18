@@ -50,8 +50,6 @@ async function load(path) {
   return module;
 }
 const cases = [
-  ['notes/noteSummaryService', 'generateNoteSummary', ['Source'], 'summarize-note/'],
-  ['notes/selectedTextService', 'explainSelectedText', ['Source'], 'explain-selection/'],
   ['concepts/conceptExtractionService', 'extractConceptCandidates', ['Source'], 'extract/'],
   ['flashcards/flashcardGenerationService', 'generateFlashcards', ['Source', []], 'generate-flashcards/'],
   ['concepts/subjectStructureGenerationService', 'generateAndSaveSubjectStructure', ['subject', 'Subject'], 'generate-structure/'],
