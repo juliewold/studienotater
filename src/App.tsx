@@ -72,6 +72,7 @@ function App() {
       <Navbar />
 
       <div className="app-workspace" id="app-content" tabIndex={-1}>
+      <div className="app-page">
       <Routes>
         <Route
           path="/logg-inn"
@@ -464,6 +465,7 @@ function App() {
           }
         />
       </Routes>
+      </div>
       <Footer />
       </div>
     </HashRouter>
