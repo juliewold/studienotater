@@ -58,8 +58,10 @@ export const PrivacyPage = () => {
           Appen bruker ikke analyseverktøy eller sporingscookies.
         </p>
         <p>
-          Videoer åpnes på YouTube i en ny fane. Appen laster ikke inn noe fra YouTube på sidene sine. Når du er på
-          YouTube, gjelder YouTubes og Googles egne personvernregler og informasjonskapsler.
+          Videoer fra YouTube vises på sidene våre først når du selv trykker på «Godta YouTube-cookies og spill av»
+          for den videoen. Før det lastes ingenting fra YouTube. Når du spiller av videoen, setter YouTube
+          informasjonskapsler og kan behandle IP-adressen din, etter YouTubes egne regler. Valget ditt lagres ikke, og
+          du må godta på nytt for neste video. Du kan også åpne videoen direkte på YouTube.
         </p>
       </section>
 
