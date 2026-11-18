@@ -1,1 +1,24 @@
 @import "../LoginPage/LoginPage.css";
+.auth-hints {
+  margin: 4px 0 12px;
+}
+
+.auth-hints p {
+  margin: 2px 0;
+  font-size: 0.85rem;
+}
+
+.auth-hint {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.auth-hint-ok {
+  color: #1f7a3a;
+  opacity: 1;
+}
+
+.auth-hint-bad {
+  color: #b42318;
+  opacity: 1;
+}
