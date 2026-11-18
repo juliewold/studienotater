@@ -20,12 +20,14 @@ export const emptyStructureResult = (): GenerateSubjectStructureResult => ({
   notesOrganized: 0, notesSkipped: 0, structureStatus: "not-requested",
 });
 
-// The AI service fails on large requests, so notes are sent in batches of about this many characters of text.
-const BATCH_TEXT_LIMIT = 60_000;
+// The AI service fails on large requests, so notes are sent in small batches: at most this many
+// characters of text and this many notes per request.
+const BATCH_TEXT_LIMIT = 15_000;
+const BATCH_NOTE_LIMIT = 8;
 
 const plainText = (html: string) => new DOMParser().parseFromString(html, "text/html").body.textContent?.trim() ?? "";
 
-/** Groups notes into batches of at most BATCH_TEXT_LIMIT characters. A single long note is its own batch. */
+/** Groups notes into batches within the limits above. A single long note is its own batch. */
 function batchNotes<T extends { content: string }>(notes: T[]): T[][] {
   const batches: T[][] = [];
   let current: T[] = [];
@@ -34,7 +36,7 @@ function batchNotes<T extends { content: string }>(notes: T[]): T[][] {
   for (const note of notes) {
     const length = plainText(note.content).length;
 
-    if (current.length > 0 && size + length > BATCH_TEXT_LIMIT) {
+    if (current.length > 0 && (size + length > BATCH_TEXT_LIMIT || current.length >= BATCH_NOTE_LIMIT)) {
       batches.push(current);
       current = [];
       size = 0;
