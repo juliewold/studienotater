@@ -134,10 +134,15 @@ def assign_notes(client, notes, topics, existing_topics):
             try:
                 selected = select_note_subtopic(client, note, choices)
             except ValueError:
-                selected = select_note_subtopic(client, note, choices, hint=(
-                    "Forrige svar var ugyldig. Siter en hel setning ordrett fra notatets tekst. "
-                    "Tittelen på temaet eller undertemaet er ikke et gyldig sitat."
-                ))
+                try:
+                    selected = select_note_subtopic(client, note, choices, hint=(
+                        "Forrige svar var ugyldig. Siter en hel setning ordrett fra notatets tekst. "
+                        "Tittelen på temaet eller undertemaet er ikke et gyldig sitat."
+                    ))
+                except ValueError as error:
+                    # The note stays unplaced. Running the knowledge base again tries it once more.
+                    logger.warning("Note left unplaced after two attempts: %s", error)
+                    continue
             placements.append((note["id"], choices[selected]))
     for topic in topics:
         for subtopic in topic["subtopics"]:
