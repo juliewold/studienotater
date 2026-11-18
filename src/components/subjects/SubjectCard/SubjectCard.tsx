@@ -28,40 +28,43 @@ type SubjectCardProps = {
   to?: string;
 };
 
-const getSubjectIcon = (icon: string | undefined) => {
+const renderSubjectIcon = (icon: string | undefined) => {
+  const size = 22;
+  const strokeWidth = 2;
+
   switch (icon) {
     case "code":
-      return Code2;
+      return <Code2 size={size} strokeWidth={strokeWidth} />;
     case "sigma":
-      return Sigma;
+      return <Sigma size={size} strokeWidth={strokeWidth} />;
     case "binary":
-      return Binary;
+      return <Binary size={size} strokeWidth={strokeWidth} />;
     case "book-open":
-      return BookOpen;
+      return <BookOpen size={size} strokeWidth={strokeWidth} />;
     case "braces":
-      return Braces;
+      return <Braces size={size} strokeWidth={strokeWidth} />;
     case "mouse-pointer":
-      return MousePointer2;
+      return <MousePointer2 size={size} strokeWidth={strokeWidth} />;
     case "function-square":
-      return FunctionSquare;
+      return <FunctionSquare size={size} strokeWidth={strokeWidth} />;
     case "circuit-board":
-      return CircuitBoard;
+      return <CircuitBoard size={size} strokeWidth={strokeWidth} />;
     case "network":
-      return Network;
+      return <Network size={size} strokeWidth={strokeWidth} />;
     case "cpu":
-      return Cpu;
+      return <Cpu size={size} strokeWidth={strokeWidth} />;
     case "chart":
-      return ChartNoAxesColumnIncreasing;
+      return <ChartNoAxesColumnIncreasing size={size} strokeWidth={strokeWidth} />;
     case "blocks":
-      return Blocks;
+      return <Blocks size={size} strokeWidth={strokeWidth} />;
     case "database":
-      return Database;
+      return <Database size={size} strokeWidth={strokeWidth} />;
     case "terminal":
-      return Terminal;
+      return <Terminal size={size} strokeWidth={strokeWidth} />;
     case "wifi":
-      return Wifi;
+      return <Wifi size={size} strokeWidth={strokeWidth} />;
     default:
-      return BookOpen;
+      return <BookOpen size={size} strokeWidth={strokeWidth} />;
   }
 };
 
@@ -74,15 +77,13 @@ export const SubjectCard = ({
   icon,
   to,
 }: SubjectCardProps) => {
-  const Icon = getSubjectIcon(icon);
-
   return (
     <Link
       to={to ?? `/fag/${id}`}
       className={`subject-card subject-card-${color}`}
     >
       <div className="subject-card-icon">
-        <Icon size={22} strokeWidth={2} />
+        {renderSubjectIcon(icon)}
       </div>
 
       <p className="subject-code">{code}</p>

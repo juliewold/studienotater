@@ -7,7 +7,7 @@ import { ExamMarkControls } from "./ExamMarkControls";
 import { ConceptLink } from "../../concepts/ConceptLink/ConceptLink";
 import { ConceptPicker } from "../../concepts/ConceptPicker/ConceptPicker";
 
-import { useEffect, useRef, useState, useId, useCallback, type ReactNode, type ChangeEvent } from "react";
+import { useEffect, useEffectEvent, useRef, useState, useId, useCallback, type ReactNode, type ChangeEvent } from "react";
 import {
   Bold,
   Braces,
@@ -125,6 +125,8 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
     useState<FormulaControlsPosition | null>(null);
   const [slashMenu, setSlashMenu] = useState<SlashMenuState | null>(null);
   const [slashSelectedIndex, setSlashSelectedIndex] = useState(0);
+  // Query of the open slash menu; null while closed. A new query starts again at the first item.
+  const slashQueryRef = useRef<string | null>(null);
   const [mathDialogType, setMathDialogType] = useState<
     "inline" | "block" | null
   >(null);
@@ -466,7 +468,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
   }, [slashSelectedIndex]);
 
   useEffect(() => {
-    setSlashSelectedIndex(0);
+    slashQueryRef.current = slashMenu?.query ?? null;
   }, [slashMenu?.query]);
 
   useEffect(() => {
@@ -506,6 +508,11 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
       const query = match[1] ?? "";
       const from = $from.pos - query.length - 1;
       const coordinates = editor.view.coordsAtPos($from.pos);
+
+      if (slashQueryRef.current !== query) {
+        slashQueryRef.current = query;
+        setSlashSelectedIndex(0);
+      }
 
       setSlashMenu({
         query,
@@ -644,6 +651,9 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
     focusInsideInsertedCallout(editor, insertionFrom);
   };
 
+  // Lets the slash menu's keyboard listener call the latest handler without re-subscribing.
+  const insertCalloutFromSlash = useEffectEvent(handleInsertCallout);
+
   const handleSlashCommand = (item: SlashCommandItem) => {
     if (!editor || !slashMenu) {
       return;
@@ -780,7 +790,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
         selectedItem.command(editor, {
           openMathDialog: (type) => openMath(type),
 
-          insertCallout: handleInsertCallout,
+          insertCallout: insertCalloutFromSlash,
 
           chooseImage: () => {
             fileInputRef.current?.click();

@@ -43,26 +43,35 @@ export const useAdminUpcomingExams = () => {
     setEditingExam(null);
   };
 
-  const loadUpcomingExams = useCallback(async () => {
+  // State is only set inside promise callbacks, so the mount effect can call this safely.
+  const loadUpcomingExams = useCallback((isCurrent: () => boolean = () => true) =>
+    getUpcomingExams()
+      .then((loadedExams) => {
+        if (isCurrent()) setUpcomingExams(loadedExams);
+      })
+      .catch((error: unknown) => {
+        console.error(
+          "Kunne ikke hente kommende eksamener:",
+          error,
+        );
+        if (isCurrent()) setErrorMessage("Kunne ikke hente kommende eksamener.");
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingExams(false);
+      }), []);
+
+  const refreshUpcomingExams = useCallback(() => {
     setIsLoadingExams(true);
     setErrorMessage("");
-
-    try {
-      const loadedExams = await getUpcomingExams();
-      setUpcomingExams(loadedExams);
-    } catch (error) {
-      console.error(
-        "Kunne ikke hente kommende eksamener:",
-        error,
-      );
-      setErrorMessage("Kunne ikke hente kommende eksamener.");
-    } finally {
-      setIsLoadingExams(false);
-    }
-  }, []);
+    return loadUpcomingExams();
+  }, [loadUpcomingExams]);
 
   useEffect(() => {
-    loadUpcomingExams();
+    let isCurrent = true;
+    void loadUpcomingExams(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadUpcomingExams]);
 
   const handleSubmit = async (
@@ -89,7 +98,7 @@ export const useAdminUpcomingExams = () => {
         );
 
         resetForm();
-        await loadUpcomingExams();
+        await refreshUpcomingExams();
         setSuccessMessage("Eksamensdatoen ble oppdatert.");
         return;
       }
@@ -103,7 +112,7 @@ export const useAdminUpcomingExams = () => {
       );
 
       resetForm();
-      await loadUpcomingExams();
+      await refreshUpcomingExams();
       setSuccessMessage("Eksamensdatoen ble opprettet.");
     } catch (error) {
       console.error(

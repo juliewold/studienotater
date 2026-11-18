@@ -68,36 +68,42 @@ export const useAdminExams = () => {
     resetFileInputs();
   };
 
-  const loadUploadedExams = useCallback(async () => {
+  // State is only set inside promise callbacks, so the mount effect can call this safely.
+  const loadUploadedExams = useCallback((isCurrent: () => boolean = () => true) =>
+    Promise.all(subjects.map((subject) => getExamsBySubject(subject.id)))
+      .then((examsBySubject) => {
+        const allUploadedExams = examsBySubject
+          .flat()
+          .sort((firstExam, secondExam) => {
+            if (firstExam.year !== secondExam.year) {
+              return secondExam.year - firstExam.year;
+            }
+
+            return firstExam.title.localeCompare(secondExam.title, "nb");
+          });
+
+        if (isCurrent()) setUploadedExams(allUploadedExams);
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente eksamener:", error);
+        if (isCurrent()) setErrorMessage("Kunne ikke hente eksamenene.");
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingExams(false);
+      }), []);
+
+  const refreshUploadedExams = useCallback(() => {
     setIsLoadingExams(true);
     setErrorMessage("");
-
-    try {
-      const examsBySubject = await Promise.all(
-        subjects.map((subject) => getExamsBySubject(subject.id)),
-      );
-
-      const allUploadedExams = examsBySubject
-        .flat()
-        .sort((firstExam, secondExam) => {
-          if (firstExam.year !== secondExam.year) {
-            return secondExam.year - firstExam.year;
-          }
-
-          return firstExam.title.localeCompare(secondExam.title, "nb");
-        });
-
-      setUploadedExams(allUploadedExams);
-    } catch (error) {
-      console.error("Kunne ikke hente eksamener:", error);
-      setErrorMessage("Kunne ikke hente eksamenene.");
-    } finally {
-      setIsLoadingExams(false);
-    }
-  }, []);
+    return loadUploadedExams();
+  }, [loadUploadedExams]);
 
   useEffect(() => {
-    loadUploadedExams();
+    let isCurrent = true;
+    void loadUploadedExams(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadUploadedExams]);
 
   const createSafeFileName = (fileName: string) => {
@@ -240,7 +246,7 @@ export const useAdminExams = () => {
         await removeFiles(replacedPaths);
 
         resetForm();
-        await loadUploadedExams();
+        await refreshUploadedExams();
         setSuccessMessage("Eksamenen ble oppdatert.");
         return;
       }
@@ -257,7 +263,7 @@ export const useAdminExams = () => {
       );
 
       resetForm();
-      await loadUploadedExams();
+      await refreshUploadedExams();
       setSuccessMessage("Eksamenen ble opprettet.");
     } catch (error) {
       if (newlyUploadedPaths.length > 0) {

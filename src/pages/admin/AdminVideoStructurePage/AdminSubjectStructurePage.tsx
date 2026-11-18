@@ -1,7 +1,6 @@
 import "./AdminSubjectStructurePage.css";
 import {
   useCallback,
-  useEffect,
   useMemo,
   useState,
   type SyntheticEvent,
@@ -163,13 +162,10 @@ export const AdminSubjectStructurePage = () => {
     }
   }, []);
 
-  useEffect(() => {
-    loadStructure(subjectId);
-  }, [loadStructure, subjectId]);
-
   const handleSubjectChange = (newSubjectId: string) => {
     setSubjectId(newSubjectId);
     setSelectedTopicId("");
+    void loadStructure(newSubjectId);
 
     resetTopicForm();
     resetSubtopicForm();

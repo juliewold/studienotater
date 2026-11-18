@@ -158,6 +158,8 @@ export const PracticePage = () => {
             accuracy: 0,
             bestSession: 0,
           },
+    // Begrunnelse: statisticsVersion endrer seg når statistikken oppdateres i localStorage, og memoen må beregnes på nytt. Verdien leses ikke i kroppen, så den må stå i listen som utløser.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [subjectId, statisticsVersion],
   );
 
@@ -180,6 +182,8 @@ export const PracticePage = () => {
         }
       );
     });
+  // Begrunnelse: statisticsVersion endrer seg når statistikken oppdateres i localStorage, og memoen må beregnes på nytt. Verdien leses ikke i kroppen, så den må stå i listen som utløser.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subjectId, topics, statisticsVersion]);
 
   const groupedTopicStatistics = topicGroups.map((group) => ({
@@ -212,10 +216,14 @@ export const PracticePage = () => {
         return getTopicMasteryStatistics(subjectId, topic, questionIds);
       }),
     }));
-  }, [subjectId, statisticsVersion]);
+  // Begrunnelse: statisticsVersion endrer seg når statistikken oppdateres i localStorage. Memoen leser den nye statistikken, så den må beregnes på nytt.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subjectId, statisticsVersion, topicGroups]);
 
   const incorrectQuestionIds = useMemo(
     () => (subjectId ? getIncorrectQuestionIds(subjectId) : []),
+    // Begrunnelse: statisticsVersion endrer seg når statistikken oppdateres i localStorage, og memoen må beregnes på nytt. Verdien leses ikke i kroppen, så den må stå i listen som utløser.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [subjectId, statisticsVersion],
   );
 
@@ -280,6 +288,8 @@ export const PracticePage = () => {
 
   useEffect(() => {
     if (!subjectId) {
+      // Begrunnelse: Aktiv økt leses fra localStorage når faget eller datalastingen endres. Synkronisering mot ekstern lagring.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveSession(null);
       return;
     }
@@ -292,7 +302,11 @@ export const PracticePage = () => {
   }, [subjectId, practiceDataLoaded]);
 
   useEffect(() => {
+    // Begrunnelse: Valgt tema for nullstilling settes til første tema når faget endres.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResetTopic(topics[0] ?? "");
+  // Begrunnelse: Valgt tema for nullstilling settes bare når faget endres. Topics endrer seg ikke uten at faget gjør det, og med dem i listen ville valget bli overskrevet ved hver render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subjectId]);
 
   const currentQuestion = sessionQuestions[currentQuestionIndex];
@@ -323,6 +337,8 @@ export const PracticePage = () => {
 
     saveActivePracticeSession(updatedActiveSession);
 
+    // Begrunnelse: Aktiv økt lagres i localStorage etter hver endring, og state speiler det som ble lagret. Synkronisering mot ekstern lagring.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveSession(updatedActiveSession);
   }, [
     stage,
@@ -371,6 +387,8 @@ export const PracticePage = () => {
       amount: availableQuestions.length,
       mode: selectionMode,
     });
+  // Begrunnelse: statisticsVersion endrer seg når statistikken oppdateres i localStorage, og memoen må beregnes på nytt. Verdien leses ikke i kroppen, så den må stå i listen som utløser.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableQuestions, selectionMode, subjectId, statisticsVersion]);
 
   const actualQuestionAmount =

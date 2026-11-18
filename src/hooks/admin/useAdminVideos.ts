@@ -56,70 +56,72 @@ export const useAdminVideos = () => {
     setEditingVideo(null);
   };
 
-  const loadUploadedVideos = useCallback(async () => {
+  // State is only set inside promise callbacks, so the mount effect can call this safely.
+  const loadUploadedVideos = useCallback((isCurrent: () => boolean = () => true) =>
+    Promise.all(subjects.map((subject) => getVideosBySubject(subject.id)))
+      .then((videosBySubject) => {
+        const allUploadedVideos = videosBySubject
+          .flat()
+          .sort((firstVideo, secondVideo) => {
+            const subjectComparison = firstVideo.subjectId.localeCompare(
+              secondVideo.subjectId,
+              "nb",
+            );
+
+            if (subjectComparison !== 0) {
+              return subjectComparison;
+            }
+
+            const topicOrderComparison =
+              firstVideo.topicOrder - secondVideo.topicOrder;
+
+            if (topicOrderComparison !== 0) {
+              return topicOrderComparison;
+            }
+
+            const topicComparison = firstVideo.topic.localeCompare(
+              secondVideo.topic,
+              "nb",
+            );
+
+            if (topicComparison !== 0) {
+              return topicComparison;
+            }
+
+            const subtopicOrderComparison =
+              firstVideo.subtopicOrder - secondVideo.subtopicOrder;
+
+            if (subtopicOrderComparison !== 0) {
+              return subtopicOrderComparison;
+            }
+
+            const subtopicComparison = firstVideo.subtopic.localeCompare(
+              secondVideo.subtopic,
+              "nb",
+            );
+
+            if (subtopicComparison !== 0) {
+              return subtopicComparison;
+            }
+
+            return firstVideo.sortOrder - secondVideo.sortOrder;
+          });
+
+        if (isCurrent()) setUploadedVideos(allUploadedVideos);
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente videoer:", error);
+        if (isCurrent()) setErrorMessage("Kunne ikke hente videoene.");
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingVideos(false);
+      }), []);
+
+  const refreshUploadedVideos = useCallback(() => {
     setIsLoadingVideos(true);
     setErrorMessage("");
-
-    try {
-      const videosBySubject = await Promise.all(
-        subjects.map((subject) => getVideosBySubject(subject.id)),
-      );
-
-      const allUploadedVideos = videosBySubject
-        .flat()
-        .sort((firstVideo, secondVideo) => {
-          const subjectComparison = firstVideo.subjectId.localeCompare(
-            secondVideo.subjectId,
-            "nb",
-          );
-
-          if (subjectComparison !== 0) {
-            return subjectComparison;
-          }
-
-          const topicOrderComparison =
-            firstVideo.topicOrder - secondVideo.topicOrder;
-
-          if (topicOrderComparison !== 0) {
-            return topicOrderComparison;
-          }
-
-          const topicComparison = firstVideo.topic.localeCompare(
-            secondVideo.topic,
-            "nb",
-          );
-
-          if (topicComparison !== 0) {
-            return topicComparison;
-          }
-
-          const subtopicOrderComparison =
-            firstVideo.subtopicOrder - secondVideo.subtopicOrder;
-
-          if (subtopicOrderComparison !== 0) {
-            return subtopicOrderComparison;
-          }
-
-          const subtopicComparison = firstVideo.subtopic.localeCompare(
-            secondVideo.subtopic,
-            "nb",
-          );
-
-          if (subtopicComparison !== 0) {
-            return subtopicComparison;
-          }
-
-          return firstVideo.sortOrder - secondVideo.sortOrder;
-        });
-
-      setUploadedVideos(allUploadedVideos);
-    } catch (error) {
-      console.error("Kunne ikke hente videoer:", error);
-      setErrorMessage("Kunne ikke hente videoene.");
-    } finally {
-      setIsLoadingVideos(false);
-    }
-  }, []);
+    return loadUploadedVideos();
+  }, [loadUploadedVideos]);
 
   const loadTopics = useCallback(async (selectedSubjectId: string) => {
     if (!selectedSubjectId) {
@@ -164,7 +166,11 @@ export const useAdminVideos = () => {
   }, []);
 
   useEffect(() => {
-    loadUploadedVideos();
+    let isCurrent = true;
+    void loadUploadedVideos(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadUploadedVideos]);
 
   const handleSubjectChange = async (newSubjectId: string) => {
@@ -244,7 +250,7 @@ export const useAdminVideos = () => {
         );
 
         resetForm();
-        await loadUploadedVideos();
+        await refreshUploadedVideos();
         setSuccessMessage("Videoen ble oppdatert.");
         return;
       }
@@ -258,7 +264,7 @@ export const useAdminVideos = () => {
       );
 
       resetForm();
-      await loadUploadedVideos();
+      await refreshUploadedVideos();
       setSuccessMessage("Videoen ble opprettet.");
     } catch (error) {
       console.error(

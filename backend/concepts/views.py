@@ -22,7 +22,7 @@ from .subject_structure_service import generate_subject_structure
 def extract_concepts(request):
     try:
         body = json.loads(request.body)
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, UnicodeDecodeError):
         return JsonResponse({"error": "Invalid JSON."}, status=400)
 
     if not isinstance(body, dict):
@@ -116,7 +116,7 @@ def extract_concepts(request):
 def generate_structure(request):
     try:
         body = json.loads(request.body)
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, UnicodeDecodeError):
         return JsonResponse({"error": "Invalid JSON."}, status=400)
 
     if not isinstance(body, dict):
@@ -212,7 +212,7 @@ def generate_structure(request):
 def generate_flashcard_suggestions(request):
     try:
         body = json.loads(request.body)
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, UnicodeDecodeError):
         return JsonResponse({"error": "Invalid JSON."}, status=400)
 
     if not isinstance(body, dict):

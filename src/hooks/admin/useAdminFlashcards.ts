@@ -149,33 +149,39 @@ export const useAdminFlashcards = () => {
     loadSubtopics();
   }, [topicId]);
 
-  const loadUploadedFlashcards = useCallback(async () => {
+  // State is only set inside promise callbacks, so the mount effect can call this safely.
+  const loadUploadedFlashcards = useCallback((isCurrent: () => boolean = () => true) =>
+    Promise.all(subjects.map((subject) => getFlashcardsBySubject(subject.id)))
+      .then((flashcardsBySubject) => {
+        const allUploadedFlashcards = flashcardsBySubject
+          .flat()
+          .sort((firstFlashcard, secondFlashcard) =>
+            firstFlashcard.question.localeCompare(secondFlashcard.question, "nb"),
+          );
+
+        if (isCurrent()) setUploadedFlashcards(allUploadedFlashcards);
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente flashcards:", error);
+
+        if (isCurrent()) setErrorMessage("Kunne ikke hente flashcards.");
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingFlashcards(false);
+      }), []);
+
+  const refreshUploadedFlashcards = useCallback(() => {
     setIsLoadingFlashcards(true);
     setErrorMessage("");
-
-    try {
-      const flashcardsBySubject = await Promise.all(
-        subjects.map((subject) => getFlashcardsBySubject(subject.id)),
-      );
-
-      const allUploadedFlashcards = flashcardsBySubject
-        .flat()
-        .sort((firstFlashcard, secondFlashcard) =>
-          firstFlashcard.question.localeCompare(secondFlashcard.question, "nb"),
-        );
-
-      setUploadedFlashcards(allUploadedFlashcards);
-    } catch (error) {
-      console.error("Kunne ikke hente flashcards:", error);
-
-      setErrorMessage("Kunne ikke hente flashcards.");
-    } finally {
-      setIsLoadingFlashcards(false);
-    }
-  }, []);
+    return loadUploadedFlashcards();
+  }, [loadUploadedFlashcards]);
 
   useEffect(() => {
-    loadUploadedFlashcards();
+    let isCurrent = true;
+    void loadUploadedFlashcards(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadUploadedFlashcards]);
 
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
@@ -224,7 +230,7 @@ export const useAdminFlashcards = () => {
         );
 
         resetForm();
-        await loadUploadedFlashcards();
+        await refreshUploadedFlashcards();
 
         setSuccessMessage("Flashcardet ble oppdatert.");
 
@@ -248,7 +254,7 @@ export const useAdminFlashcards = () => {
       );
 
       resetForm();
-      await loadUploadedFlashcards();
+      await refreshUploadedFlashcards();
 
       setSuccessMessage("Flashcardet ble opprettet.");
     } catch (error) {

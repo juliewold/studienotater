@@ -120,6 +120,8 @@ export const EditableNote = ({
       return;
     }
 
+    // Begrunnelse: Kladden følger notatet når det ikke redigeres. Synkroniseringen fra forelderen er bevisst, og det finnes ingen hendelse som dekker alle oppdateringsveiene.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTitle(note.title);
     setDescription(note.description);
     setContent(note.content);
@@ -281,6 +283,8 @@ export const EditableNote = ({
       return;
     }
 
+    // Begrunnelse: Autolagring: lagringsstatus nullstilles når kladden endres. Kladden kommer fra editoren og har ingen andre kilder, så effekten er riktig her.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSaveStatus("idle");
 
     const autosaveTimer = window.setTimeout(() => {
@@ -290,6 +294,8 @@ export const EditableNote = ({
     return () => {
       window.clearTimeout(autosaveTimer);
     };
+  // Begrunnelse: getCurrentDraft og saveDraft lages på nytt ved hver render. Med dem i listen ville autolagringen startes på nytt hele tiden og kunne lagre to ganger.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     title,
     description,

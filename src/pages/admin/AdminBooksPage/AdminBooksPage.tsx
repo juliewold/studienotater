@@ -1,6 +1,6 @@
 import "./AdminBooksPage.css";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { subjects } from "../../../data/subjects";
@@ -126,18 +126,6 @@ export const AdminBooksPage = () => {
     }
   };
 
-  useEffect(() => {
-    loadBooks(subjectId);
-  }, [subjectId]);
-
-  useEffect(() => {
-    loadChapters(selectedBookId);
-  }, [selectedBookId]);
-
-  useEffect(() => {
-    loadTasks(selectedChapterId);
-  }, [selectedChapterId]);
-
   const clearMessages = () => {
     setErrorMessage("");
     setSuccessMessage("");
@@ -170,6 +158,7 @@ export const AdminBooksPage = () => {
     setSelectedChapterId("");
     setChapters([]);
     setTasks([]);
+    void loadBooks(newSubjectId);
 
     resetBookForm();
     resetChapterForm();
@@ -181,6 +170,7 @@ export const AdminBooksPage = () => {
     setSelectedBookId(bookId);
     setSelectedChapterId("");
     setTasks([]);
+    void loadChapters(bookId);
 
     resetChapterForm();
     resetTaskForm();
@@ -189,6 +179,7 @@ export const AdminBooksPage = () => {
 
   const handleChapterChange = (chapterId: string) => {
     setSelectedChapterId(chapterId);
+    void loadTasks(chapterId);
 
     resetTaskForm();
     clearMessages();
@@ -245,6 +236,7 @@ export const AdminBooksPage = () => {
         });
 
         setSelectedBookId(createdBookId);
+        await loadChapters(createdBookId);
         setSuccessMessage("Boka ble opprettet.");
       }
 
@@ -343,6 +335,7 @@ export const AdminBooksPage = () => {
         });
 
         setSelectedChapterId(createdChapterId);
+        await loadTasks(createdChapterId);
         setSuccessMessage("Kapittelet ble opprettet.");
       }
 

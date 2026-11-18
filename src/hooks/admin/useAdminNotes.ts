@@ -73,72 +73,76 @@ export const useAdminNotes = () => {
     setEditingNote(null);
   };
 
-  const loadUploadedNotes = useCallback(async () => {
+  // State is only set inside promise callbacks, so the mount effect can call
+  // these loaders safely. Handlers that reload use the refresh variants.
+  const loadUploadedNotes = useCallback((isCurrent: () => boolean = () => true) =>
+    Promise.all(subjects.map((subject) => getNotesBySubject(subject.id)))
+      .then((notesBySubject) => {
+        const allUploadedNotes = notesBySubject
+          .flat()
+          .sort((firstNote, secondNote) => {
+            const subjectComparison = firstNote.subjectId.localeCompare(
+              secondNote.subjectId,
+              "nb",
+            );
+
+            if (subjectComparison !== 0) {
+              return subjectComparison;
+            }
+
+            return firstNote.title.localeCompare(secondNote.title, "nb");
+          });
+
+        if (isCurrent()) setUploadedNotes(allUploadedNotes);
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente notater:", error);
+
+        if (isCurrent()) setErrorMessage("Kunne ikke hente notatene.");
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingNotes(false);
+      }), []);
+
+  const refreshUploadedNotes = useCallback(() => {
     setIsLoadingNotes(true);
     setErrorMessage("");
+    return loadUploadedNotes();
+  }, [loadUploadedNotes]);
 
-    try {
-      const notesBySubject = await Promise.all(
-        subjects.map((subject) => getNotesBySubject(subject.id)),
-      );
+  const loadTopicStructure = useCallback((isCurrent: () => boolean = () => true) =>
+    Promise.all(subjects.map((subject) => getTopicsBySubject(subject.id)))
+      .then((topicsBySubject) => {
+        const loadedTopics = topicsBySubject.flat();
 
-      const allUploadedNotes = notesBySubject
-        .flat()
-        .sort((firstNote, secondNote) => {
-          const subjectComparison = firstNote.subjectId.localeCompare(
-            secondNote.subjectId,
-            "nb",
-          );
+        return Promise.all(loadedTopics.map((topic) => getSubtopicsByTopic(topic.id)))
+          .then((subtopicsByTopic) => {
+            if (isCurrent()) {
+              setTopics(loadedTopics);
+              setSubtopics(subtopicsByTopic.flat());
+            }
+          });
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente temaer og undertemaer:", error);
 
-          if (subjectComparison !== 0) {
-            return subjectComparison;
-          }
-
-          return firstNote.title.localeCompare(secondNote.title, "nb");
-        });
-
-      setUploadedNotes(allUploadedNotes);
-    } catch (error) {
-      console.error("Kunne ikke hente notater:", error);
-
-      setErrorMessage("Kunne ikke hente notatene.");
-    } finally {
-      setIsLoadingNotes(false);
-    }
-  }, []);
-
-  const loadTopicStructure = useCallback(async () => {
-    setIsLoadingStructure(true);
-    setErrorMessage("");
-
-    try {
-      const topicsBySubject = await Promise.all(
-        subjects.map((subject) => getTopicsBySubject(subject.id)),
-      );
-
-      const loadedTopics = topicsBySubject.flat();
-
-      const subtopicsByTopic = await Promise.all(
-        loadedTopics.map((topic) => getSubtopicsByTopic(topic.id)),
-      );
-
-      setTopics(loadedTopics);
-      setSubtopics(subtopicsByTopic.flat());
-    } catch (error) {
-      console.error("Kunne ikke hente temaer og undertemaer:", error);
-
-      setTopics([]);
-      setSubtopics([]);
-
-      setErrorMessage("Kunne ikke hente temaer og undertemaer.");
-    } finally {
-      setIsLoadingStructure(false);
-    }
-  }, []);
+        if (isCurrent()) {
+          setTopics([]);
+          setSubtopics([]);
+          setErrorMessage("Kunne ikke hente temaer og undertemaer.");
+        }
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingStructure(false);
+      }), []);
 
   useEffect(() => {
-    loadUploadedNotes();
-    loadTopicStructure();
+    let isCurrent = true;
+    void loadUploadedNotes(() => isCurrent);
+    void loadTopicStructure(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadTopicStructure, loadUploadedNotes]);
 
   const availableTopics = useMemo(() => {
@@ -193,7 +197,7 @@ export const useAdminNotes = () => {
         });
 
         resetForm();
-        await loadUploadedNotes();
+        await refreshUploadedNotes();
 
         setSuccessMessage("Notatet ble oppdatert.");
 
@@ -218,7 +222,7 @@ export const useAdminNotes = () => {
       });
 
       resetForm();
-      await loadUploadedNotes();
+      await refreshUploadedNotes();
 
       setSuccessMessage("Notatet ble opprettet.");
     } catch (error) {

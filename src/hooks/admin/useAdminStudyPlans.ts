@@ -72,7 +72,8 @@ export const useAdminStudyPlans = () => {
   const [availableVideos, setAvailableVideos] = useState<DatabaseVideo[]>([]);
 
   const [isLoadingTopics, setIsLoadingTopics] = useState(true);
-  const [isLoadingResources, setIsLoadingResources] = useState(false);
+  // The subject whose resources have finished loading; loading is derived from it.
+  const [resourcesSubjectId, setResourcesSubjectId] = useState<string | null>(null);
   const [isLoadingStructureTopics, setIsLoadingStructureTopics] =
     useState(false);
   const [isLoadingSubtopics, setIsLoadingSubtopics] = useState(false);
@@ -116,54 +117,56 @@ export const useAdminStudyPlans = () => {
     setEditingTopic(null);
   };
 
-  const loadStudyTopics = useCallback(async () => {
+  // State is only set inside promise callbacks, so the mount effect can call this safely.
+  const loadStudyTopics = useCallback((isCurrent: () => boolean = () => true) =>
+    Promise.all(subjects.map((subject) => getStudyTopicsBySubject(subject.id)))
+      .then((topicsBySubject) => {
+        const loadedTopics = topicsBySubject
+          .flat()
+          .sort((firstTopic, secondTopic) => {
+            if (firstTopic.subjectId !== secondTopic.subjectId) {
+              return firstTopic.subjectId.localeCompare(
+                secondTopic.subjectId,
+                "nb",
+              );
+            }
+
+            const firstMainOrder =
+              firstTopic.structureTopicOrder ?? firstTopic.sortOrder;
+
+            const secondMainOrder =
+              secondTopic.structureTopicOrder ?? secondTopic.sortOrder;
+
+            if (firstMainOrder !== secondMainOrder) {
+              return firstMainOrder - secondMainOrder;
+            }
+
+            const firstSubtopicOrder = firstTopic.structureSubtopicOrder ?? 0;
+
+            const secondSubtopicOrder = secondTopic.structureSubtopicOrder ?? 0;
+
+            if (firstSubtopicOrder !== secondSubtopicOrder) {
+              return firstSubtopicOrder - secondSubtopicOrder;
+            }
+
+            return firstTopic.title.localeCompare(secondTopic.title, "nb");
+          });
+
+        if (isCurrent()) setStudyTopics(loadedTopics);
+      })
+      .catch((error: unknown) => {
+        console.error("Kunne ikke hente studieplaner:", error);
+        if (isCurrent()) setErrorMessage("Kunne ikke hente studieplanene.");
+      })
+      .finally(() => {
+        if (isCurrent()) setIsLoadingTopics(false);
+      }), []);
+
+  const refreshStudyTopics = useCallback(() => {
     setIsLoadingTopics(true);
     setErrorMessage("");
-
-    try {
-      const topicsBySubject = await Promise.all(
-        subjects.map((subject) => getStudyTopicsBySubject(subject.id)),
-      );
-
-      const loadedTopics = topicsBySubject
-        .flat()
-        .sort((firstTopic, secondTopic) => {
-          if (firstTopic.subjectId !== secondTopic.subjectId) {
-            return firstTopic.subjectId.localeCompare(
-              secondTopic.subjectId,
-              "nb",
-            );
-          }
-
-          const firstMainOrder =
-            firstTopic.structureTopicOrder ?? firstTopic.sortOrder;
-
-          const secondMainOrder =
-            secondTopic.structureTopicOrder ?? secondTopic.sortOrder;
-
-          if (firstMainOrder !== secondMainOrder) {
-            return firstMainOrder - secondMainOrder;
-          }
-
-          const firstSubtopicOrder = firstTopic.structureSubtopicOrder ?? 0;
-
-          const secondSubtopicOrder = secondTopic.structureSubtopicOrder ?? 0;
-
-          if (firstSubtopicOrder !== secondSubtopicOrder) {
-            return firstSubtopicOrder - secondSubtopicOrder;
-          }
-
-          return firstTopic.title.localeCompare(secondTopic.title, "nb");
-        });
-
-      setStudyTopics(loadedTopics);
-    } catch (error) {
-      console.error("Kunne ikke hente studieplaner:", error);
-      setErrorMessage("Kunne ikke hente studieplanene.");
-    } finally {
-      setIsLoadingTopics(false);
-    }
-  }, []);
+    return loadStudyTopics();
+  }, [loadStudyTopics]);
 
   const loadSubtopics = useCallback(async (topicId: string) => {
     if (!topicId) {
@@ -206,44 +209,52 @@ export const useAdminStudyPlans = () => {
     }
   }, []);
 
+  // State is only set inside promise callbacks. Loading is derived from
+  // resourcesSubjectId, so a subject change needs no synchronous state update.
+  // The lists are only shown when a subject is selected (see AdminStudyPlansPage).
   const loadResourcesForSubject = useCallback(
-    async (selectedSubjectId: string) => {
-      if (!selectedSubjectId) {
-        setAvailablePdfs([]);
-        setAvailableNotes([]);
-        setAvailableVideos([]);
-        return;
-      }
+    (selectedSubjectId: string, isCurrent: () => boolean = () => true) => {
+      if (!selectedSubjectId) return Promise.resolve();
 
-      setIsLoadingResources(true);
+      return Promise.all([
+        getPdfsBySubject(selectedSubjectId),
+        loadNoteMetadata(selectedSubjectId),
+        getVideosBySubject(selectedSubjectId),
+      ])
+        .then(([pdfs, notes, videos]) => {
+          if (!isCurrent()) return;
+          setAvailablePdfs(pdfs);
+          setAvailableNotes(notes);
+          setAvailableVideos(videos);
+        })
+        .catch((error: unknown) => {
+          console.error("Kunne ikke hente ressurser til studieplanen:", error);
 
-      try {
-        const [pdfs, notes, videos] = await Promise.all([
-          getPdfsBySubject(selectedSubjectId),
-          loadNoteMetadata(selectedSubjectId),
-          getVideosBySubject(selectedSubjectId),
-        ]);
-
-        setAvailablePdfs(pdfs);
-        setAvailableNotes(notes);
-        setAvailableVideos(videos);
-      } catch (error) {
-        console.error("Kunne ikke hente ressurser til studieplanen:", error);
-
-        setErrorMessage("Kunne ikke hente PDF-er, notater og videoer.");
-      } finally {
-        setIsLoadingResources(false);
-      }
+          if (isCurrent()) setErrorMessage("Kunne ikke hente PDF-er, notater og videoer.");
+        })
+        .finally(() => {
+          if (isCurrent()) setResourcesSubjectId(selectedSubjectId);
+        });
     },
     [loadNoteMetadata],
   );
 
+  const isLoadingResources = Boolean(subjectId) && resourcesSubjectId !== subjectId;
+
   useEffect(() => {
-    loadStudyTopics();
+    let isCurrent = true;
+    void loadStudyTopics(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadStudyTopics]);
 
   useEffect(() => {
-    loadResourcesForSubject(subjectId);
+    let isCurrent = true;
+    void loadResourcesForSubject(subjectId, () => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, [loadResourcesForSubject, subjectId]);
 
   const subjectTopics = useMemo(() => {
@@ -362,7 +373,7 @@ export const useAdminStudyPlans = () => {
         await replaceStudyTopicResources(editingTopic.id, resources);
 
         resetForm();
-        await loadStudyTopics();
+        await refreshStudyTopics();
 
         setSuccessMessage("Studietemaet ble oppdatert.");
         return;
@@ -403,7 +414,7 @@ export const useAdminStudyPlans = () => {
       await replaceStudyTopicResources(createdTopicId, resources);
 
       resetForm();
-      await loadStudyTopics();
+      await refreshStudyTopics();
 
       setSuccessMessage("Studietemaet ble opprettet.");
     } catch (error) {
