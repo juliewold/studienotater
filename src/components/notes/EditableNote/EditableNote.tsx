@@ -39,8 +39,6 @@ import { ConceptSuggestions } from "../../concepts/ConceptSuggestions/ConceptSug
 
 import { ReadOnlyNote } from "../ReadOnlyNote/ReadOnlyNote";
 
-import { NoteAITools } from "../NoteAITools/NoteAITools";
-
 import { ExamTaskNote } from "../../exams/ExamTaskNote/ExamTaskNote";
 import { splitExamNoteHtml } from "../../exams/splitExamNote";
 
@@ -663,11 +661,8 @@ export const EditableNote = ({
 
   return (
     <article className="editable-note editable-note-reading">
-      {isAdmin ? (
-        <NoteAITools key={note.id + note.content} noteId={note.id} subjectId={note.subjectId} content={note.content} toolbar={toolbar}>
-          {readingContent}
-        </NoteAITools>
-      ) : <>{toolbar}{readingContent}</>}
+      {toolbar}
+      {readingContent}
 
       {isAdmin && (
         <details onToggle={event => {
