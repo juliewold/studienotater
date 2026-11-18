@@ -89,12 +89,17 @@ export async function generateAndSaveSubjectStructure(
       throw new Error(`${detail} Gruppe ${index + 1} av ${batches.length} feilet. Grupper før den er lagret.`);
     }
     const plan = await response.json();
+    // Notes the AI could not place are not in the plan, so only placed notes are passed on.
+    const placedIds = new Set<string>(
+      (plan.topics ?? []).flatMap((topic: { subtopics: { noteIds: string[] }[] }) =>
+        topic.subtopics.flatMap(subtopic => subtopic.noteIds)),
+    );
     // One transaction rechecks ownership, reuse and manual placements at save time.
     // Never fall back to separate REST writes: those cannot preserve both links atomically.
     const { data, error } = await supabase.rpc("complete_subject_structure", {
       p_subject_id: subjectId,
       p_plan: plan,
-      p_note_ids: batch.map(note => note.id),
+      p_note_ids: batch.filter(note => placedIds.has(note.id)).map(note => note.id),
     });
     if (error) {
       throw new Error(`Kunne ikke bekrefte lagring av gruppe ${index + 1} av ${batches.length}. Ved databasefeil rulles den gruppen tilbake. Kontroller strukturen før du prøver igjen. ` + error.message);
@@ -110,7 +115,7 @@ export async function generateAndSaveSubjectStructure(
   notifyNotesChanged();
   return {
     ...totals,
-    notesSkipped: notes.length - eligible.size + totals.notesSkipped,
+    notesSkipped: notes.length - totals.notesOrganized,
     structureStatus: "completed",
   };
 }
