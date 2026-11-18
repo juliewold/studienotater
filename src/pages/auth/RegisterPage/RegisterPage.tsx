@@ -47,10 +47,16 @@ export const RegisterPage = () => {
       const message = error.message.toLowerCase();
 
       if (message.includes("duplicate") || message.includes("username")) {
-        setErrorMessage("Dette brukernavnet er allerede i bruk.");
+        setErrorMessage("Dette brukernavnet er allerede i bruk. Velg et annet.");
       } else if (message.includes("already")) {
         setErrorMessage(
           "Det finnes allerede en konto med denne e-postadressen.",
+        );
+      } else if (message.includes("database error")) {
+        // Username uniqueness is enforced when the profile row is created, so a
+        // taken username surfaces as this generic Auth error.
+        setErrorMessage(
+          "Kontoen kunne ikke opprettes. Brukernavnet kan allerede være i bruk. Prøv et annet brukernavn.",
         );
       } else {
         setErrorMessage("Kunne ikke opprette kontoen. Prøv igjen.");
