@@ -1,0 +1,5 @@
+/* Shared loading placeholders. Give each one the height of the content it replaces, so the page does not move when data arrives. */
+.skeleton-block { border: 1px solid var(--app-border); border-radius: 20px; background: var(--app-soft); animation: skeleton-pulse 1.4s ease-in-out infinite; }
+.skeleton-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@keyframes skeleton-pulse { 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .skeleton-block { animation: none; } }

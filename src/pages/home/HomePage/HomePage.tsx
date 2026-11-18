@@ -142,17 +142,17 @@ export const HomePage = () => {
 
 const HomeSkeleton = () => (
   <main className="home-dashboard site-container home-skeleton" aria-busy="true">
-    <span className="home-skeleton-label">Laster forsiden…</span>
+    <span className="skeleton-label">Laster forsiden…</span>
     <div className="home-skeleton-date" />
     <div className="dashboard-focus-grid">
-      <div className="home-skeleton-block home-skeleton-focus" />
+      <div className="skeleton-block home-skeleton-focus" />
       <div className="home-skeleton-column">
-        <div className="home-skeleton-block home-skeleton-tasks" />
-        <div className="home-skeleton-block home-skeleton-side-fill" />
+        <div className="skeleton-block home-skeleton-tasks" />
+        <div className="skeleton-block home-skeleton-side-fill" />
       </div>
     </div>
-    <div className="home-skeleton-block home-skeleton-progress" />
-    <div className="home-skeleton-block home-skeleton-exams" />
+    <div className="skeleton-block home-skeleton-progress" />
+    <div className="skeleton-block home-skeleton-exams" />
   </main>
 );
 
