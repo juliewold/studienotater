@@ -4,7 +4,8 @@ import "./styles/PracticeSession.css";
 import "./styles/PracticeResult.css";
 import "./styles/PracticeProgress.css";
 import { Link, useParams } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import {
   BookOpen,
   Check,
@@ -37,6 +38,7 @@ import {
 import { getTopicMasteryStatistics } from "../../../services/practice/practiceQuestionProgress";
 import {
   clearPracticeSessions,
+  loadPracticeSessions,
   clearPracticeSessionsForSubject,
   clearPracticeSessionsForTopic,
   savePracticeSession,
@@ -46,6 +48,7 @@ import {
   clearActivePracticeSession,
   clearAllActivePracticeSessions,
   getActivePracticeSession,
+  loadActivePracticeSessions,
   saveActivePracticeSession,
   type ActivePracticeMode,
   type StoredActivePracticeSession,
@@ -116,6 +119,33 @@ export const PracticePage = () => {
       : [];
 
   const [statisticsVersion, setStatisticsVersion] = useState(0);
+
+  const { user } = useContext(AuthContext);
+
+  const [practiceDataLoaded, setPracticeDataLoaded] = useState(false);
+
+  // Practice history comes from the account. Nothing is read or written until it has loaded.
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.all([
+      loadPracticeSessions(user?.id ?? null),
+      loadActivePracticeSessions(user?.id ?? null),
+    ])
+      .catch((error: unknown) => {
+        console.error("Kunne ikke laste øvingsdata:", error);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setPracticeDataLoaded(true);
+          setStatisticsVersion((version) => version + 1);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const statistics = useMemo(
     () =>
@@ -254,8 +284,12 @@ export const PracticePage = () => {
       return;
     }
 
+    if (!practiceDataLoaded) {
+      return;
+    }
+
     setActiveSession(getActivePracticeSession(subjectId));
-  }, [subjectId]);
+  }, [subjectId, practiceDataLoaded]);
 
   useEffect(() => {
     setResetTopic(topics[0] ?? "");
@@ -264,7 +298,12 @@ export const PracticePage = () => {
   const currentQuestion = sessionQuestions[currentQuestionIndex];
 
   useEffect(() => {
-    if (stage !== "session" || !subjectId || sessionQuestions.length === 0) {
+    if (
+      stage !== "session" ||
+      !subjectId ||
+      sessionQuestions.length === 0 ||
+      !practiceDataLoaded
+    ) {
       return;
     }
 
@@ -297,6 +336,7 @@ export const PracticePage = () => {
     sessionAnswers,
     sessionStartedAt,
     practiceMode,
+    practiceDataLoaded,
   ]);
 
   const availableQuestions = useMemo(() => {
