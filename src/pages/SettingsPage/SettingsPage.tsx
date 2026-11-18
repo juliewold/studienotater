@@ -4,11 +4,13 @@ import { useContext, useRef, useState, type SyntheticEvent } from "react";
 import { AuthContext } from "../../context/AuthContext/AuthContext";
 import { deleteOwnAccount, finishDeletedAccountSession } from "../../services/account/accountDeletionService";
 import { buildAccountExport, downloadAccountExport } from "../../services/account/accountDataExportService";
+import { hasYoutubeConsent, withdrawYoutubeConsent } from "../../services/media/youtubeConsent";
 
 export const SettingsPage = () => {
   const { dark, toggleTheme } = useTheme();
   const { user } = useContext(AuthContext);
   const [exporting, setExporting] = useState(false);
+  const [youtubeConsent, setYoutubeConsent] = useState(hasYoutubeConsent);
   const [exportError, setExportError] = useState("");
   const [confirming, setConfirming] = useState(false);
   const [confirmation, setConfirmation] = useState("");
@@ -130,6 +132,26 @@ export const SettingsPage = () => {
           )}
           {exportError && <p role="alert">{exportError}</p>}
           <p><a href="#/personvern">Les personvernerklæringen</a></p>
+        </section>
+
+        <section className="settings-card" aria-labelledby="youtube-title">
+          <h2 id="youtube-title">YouTube-videoer</h2>
+          {youtubeConsent ? (
+            <>
+              <p>Du har godtatt at YouTube kan sette informasjonskapsler og behandle IP-adressen din når du spiller av videoer på siden.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  withdrawYoutubeConsent();
+                  setYoutubeConsent(false);
+                }}
+              >
+                Trekk tilbake samtykket
+              </button>
+            </>
+          ) : (
+            <p>Du har ikke godtatt YouTube-cookies. Videoer vises først når du godtar det på videosiden.</p>
+          )}
         </section>
 
         {import.meta.env.VITE_ACCOUNT_DELETION_ENABLED === "true" && <section className="settings-card account-deletion" aria-labelledby="delete-account-title">
