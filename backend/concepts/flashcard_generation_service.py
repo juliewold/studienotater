@@ -30,6 +30,9 @@ def _generate_once(client, text, hint):
         "metoder og faglige forskjeller. Ett konkret, selvstendig spørsmål og ett "
         "kort, presist svar per kort (normalt 1–2 setninger eller én formel). "
         "Unngå ja/nei-spørsmål, trivielle detaljer og oppramsing av hele avsnitt. "
+        "Skriv spørsmål og svar på norsk bokmål, også når notatet inneholder engelske ord. "
+        "Behold etablerte engelske fagbegreper (for eksempel greedy eller Big O) der de er vanlige, "
+        "men ikke oversett hele setninger til engelsk. Evidence er alltid det ordrette sitatet, uten oversettelse. "
         "Ikke legg til fakta som mangler i notatet. Bevar LaTeX og nødvendige betingelser. "
         "Lag normalt 5–15 kort, men færre eller ingen når kilden ikke gir grunnlag. "
         "Dekk ulike læringspunkter; fjern omformuleringer og nesten-like spørsmål. "
@@ -41,18 +44,21 @@ def _generate_once(client, text, hint):
     ), {"note": text})
     if not isinstance(result, dict) or not isinstance(result.get('flashcards'), list):
         raise ValueError('Expected flashcards list.')
-    if len(result['flashcards']) > 15:
-        raise ValueError('Return at most 15 distinct cards.')
     cards = []
     points = set()
+    ungrounded = 0
     for card in result['flashcards']:
         if not isinstance(card, dict) or any(
             not isinstance(card.get(key), str) or not card[key].strip()
             for key in ('question', 'answer', 'learningPoint', 'evidence')
         ):
             raise ValueError('Each card needs question, answer, learningPoint and evidence.')
+        # A card whose quote is not in the note is dropped. The other cards from the note are still useful.
         if ' '.join(card['evidence'].split()) not in ' '.join(text.split()):
-            raise ValueError('Evidence must be an exact quote from the note.')
+            ungrounded += 1
+            continue
+        if len(cards) >= 15:
+            break
         question, answer = card['question'].strip(), card['answer'].strip()
         point = _normalized(card['learningPoint'])
         # Preserve mathematical operators; stripping punctuation conflates e.g. < and >.
@@ -65,6 +71,9 @@ def _generate_once(client, text, hint):
         if not duplicate:
             cards.append({'question': question, 'answer': answer, 'subtopicId': None})
             points.add(point)
+    if not cards and ungrounded:
+        # Every card was ungrounded: ask the model once more instead of saving nothing.
+        raise ValueError('No flashcard had an exact quote from the note.')
     return cards
 
 

@@ -8,7 +8,7 @@ import { subjects } from "../../../data/subjects";
 import { SubjectFeatureCard } from "../../../components/subjects/SubjectFeatureCard/SubjectFeatureCard";
 import { useSubjectProgress } from "../../../hooks/useSubjectProgress";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
-import { generateKnowledgeBaseForSubject } from "../../../services/concepts/knowledgeBaseService";
+import { generateTopicsForSubject } from "../../../services/concepts/knowledgeBaseService";
 
 const INITIAL_VISIBLE_TOPICS = 4;
 
@@ -51,10 +51,8 @@ export const SubjectPage = () => {
     }
 
     const shouldGenerate = window.confirm(
-      `Vil du generere kunnskapsbasen for ${subject?.code ?? "dette faget"}? ` +
-        "AI kompletterer fagstrukturen og organiserer bare notater uten undertemaplassering eller manuelle undertemakoblinger. " +
-        "Deretter analyseres notatene, og begreper, forklaringer og koblinger genereres. " +
-        "Eksisterende fagstruktur, begrepsinnhold og manuelle koblinger bevares.",
+      `Vil du generere temaene for ${subject?.code ?? "dette faget"} fra notatene? ` +
+        "Eksisterende temaer beholdes. Flashcards lages per tema på flashcard-siden.",
     );
 
     if (!shouldGenerate) {
@@ -65,26 +63,21 @@ export const SubjectPage = () => {
     setKnowledgeBaseMessage(null);
 
     try {
-      const result = await generateKnowledgeBaseForSubject(
+      const result = await generateTopicsForSubject(
         subjectId,
         subject?.name ?? subjectId,
       );
 
       setKnowledgeBaseMessage(
-        (result.structureStatus === "no-content" ? "Struktursteget ble hoppet over: ingen notater med tekstinnhold. " : "Struktursteget fullført. ") +
+        (result.structureStatus === "no-content"
+          ? "Ingen notater med tekstinnhold, så det ble ikke laget temaer. "
+          : result.structureStatus === "not-requested"
+            ? "Fagets temaer finnes allerede og er beholdt. "
+            : "Temaene er laget fra notatene. ") +
           `${result.topicsCreated} temaer og ` +
           `${result.subtopicsCreated} undertemaer opprettet. ` +
           `${result.topicsReused} temaer og ${result.subtopicsReused} undertemaer gjenbrukt. ` +
-          `${result.notesOrganized} notater organisert; ${result.notesSkipped} beholdt uendret eller uten tekstinnhold. ` +
-          `${result.processedNotes} notater analysert og ` +
-          `${result.conceptsProcessed} begreper behandlet. ` +
-          `${result.linkedCallouts} definisjons- og teorembokser koblet til begreper. ` +
-          `${result.skippedNotes} notater hoppet over. ` +
-          (result.failedNotes.length > 0
-            ? `Genereringen er ufullstendig: ${result.failedNotes.length} notater ga ugyldige AI-svar etter to forsøk og ble ikke behandlet: ` +
-              result.failedNotes.map((note) => note.title).join(", ") +
-              ". Prøv disse notatene igjen senere. Eksisterende innhold og koblinger er bevart."
-            : ""),
+          `${result.notesOrganized} notater organisert.`,
       );
     } catch (error) {
       console.error("Kunne ikke generere kunnskapsbase:", error);

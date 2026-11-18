@@ -43,6 +43,7 @@ for (const [name, test] of tests) {
   try { await test(); report('PASS: ' + name); } catch (error) { report('FAIL: ' + name + ': ' + String(error)); }
 }
 // Every request is intercepted: this fixture never reads/writes real data.
+let coveredHash: string | null = null;
 window.fetch = async (input, options) => {
   const url = new URL(String(input));
   if (url.pathname.endsWith('/topics')) return Response.json([{ id: 'topic', subject_id: 'subject', name: 'Datastrukturer' }]);
@@ -62,11 +63,17 @@ window.fetch = async (input, options) => {
     report('SAVED (mock): ' + String(options.body));
     return new Response(null, { status: 201 });
   }
+  if (url.pathname.endsWith('/notes') && options?.method === 'PATCH') {
+    report('COVERED (mock): ' + String(options.body));
+    coveredHash = JSON.parse(String(options.body)).flashcards_content_hash;
+    return new Response(null, { status: 204 });
+  }
+  if (url.pathname.endsWith('/notes')) return Response.json([
+    { id: 'source-note', subject_id: 'subject', title: 'Stack og kø', content: '<p>En stack bruker LIFO. En kø bruker FIFO.</p>', flashcards_content_hash: coveredHash, sort_order: 1 },
+    { id: 'empty-note', subject_id: 'subject', title: 'Tom', content: '<p></p>', flashcards_content_hash: null, sort_order: 2 },  ]);
   throw Error('Unexpected request: ' + url.pathname);
 };
 export function Preview() {
-  const [noteId, setNoteId] = useState('source-note');
-  return <><button onClick={() => setNoteId('other-note')}>Bytt testnotat</button>
-    <FlashcardGenerator noteId={noteId} subjectId="subject" content="<p>En stack bruker LIFO. En kø bruker FIFO.</p>" /></>;
+  return <FlashcardGenerator subjectId="subject" />;
 }
 createRoot(document.getElementById('root')!).render(<Preview />);

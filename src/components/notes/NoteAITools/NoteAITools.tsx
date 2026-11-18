@@ -5,7 +5,7 @@ import { FlashcardGenerator } from "../../flashcards/FlashcardGenerator/Flashcar
 import { explainSelectedText, getSelectedNoteText } from "../../../services/notes/selectedTextService";
 import "./NoteAITools.css";
 
-export function NoteAITools({ noteId, subjectId, content, children, toolbar }: {
+export function NoteAITools({ subjectId, content, children, toolbar }: {
   noteId: string; subjectId: string; content: string; children: ReactNode; toolbar?: ReactNode;
 }) {
   const noteRoot = useRef<HTMLDivElement>(null);
@@ -59,7 +59,7 @@ export function NoteAITools({ noteId, subjectId, content, children, toolbar }: {
       <h2><Sparkles size={18} /> AI-verktøy</h2>
       <div className="note-ai-actions">
         <details><summary>Oppsummering</summary><NoteSummary content={content} /></details>
-        <details><summary>Flashcards</summary><FlashcardGenerator noteId={noteId} subjectId={subjectId} content={content} /></details>
+        <details><summary>Flashcards</summary><FlashcardGenerator subjectId={subjectId} /></details>
         <details><summary>Forklar markert tekst</summary>
           <p>Marker tekst i notatet. Bare det valgte utdraget sendes til AI-tjenesten.</p>
           {selection ? <><blockquote>{selection}</blockquote><button type="button" onClick={() => setSelection("")}>Fjern valgt tekst</button></> : <p>Ingen tekst valgt.</p>}
