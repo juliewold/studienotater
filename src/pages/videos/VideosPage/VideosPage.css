@@ -271,6 +271,12 @@
   gap: 0.5rem;
 }
 
+.consent-icon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+}
+
 .consent-actions button {
   padding: 0.6rem 1rem;
   border-radius: 10px;

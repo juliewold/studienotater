@@ -1,7 +1,7 @@
 import "./VideosPage.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Cookie } from "lucide-react";
+import cookieImage from "../../../assets/cookie.png";
 import {
   getVideosBySubject,
   type DatabaseVideo,
@@ -159,7 +159,7 @@ export const VideosPage = () => {
             aria-labelledby="youtube-consent-title"
           >
             <h2 id="youtube-consent-title" className="consent-title">
-              <Cookie size={26} aria-hidden="true" />
+              <img src={cookieImage} alt="" className="consent-icon" width={30} height={30} />
               Vise YouTube-videoer?
             </h2>
             <p>
