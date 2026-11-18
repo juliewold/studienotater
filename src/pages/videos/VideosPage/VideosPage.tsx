@@ -22,6 +22,8 @@ type TopicGroup = {
 export const VideosPage = () => {
   const { subjectId } = useParams();
 
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+
   const [videos, setVideos] = useState<DatabaseVideo[]>([]);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -179,16 +181,36 @@ export const VideosPage = () => {
                             key={video.id}
                             className="video-card"
                           >
-                            {/* Opens YouTube in a new tab. Nothing is loaded from YouTube on this page, so no cookies or IP addresses are sent from here. */}
-                            <a
-                              className="video-youtube-link"
-                              href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <span className="video-youtube-icon" aria-hidden="true">▶</span>
-                              <span>Åpne på YouTube</span>
-                            </a>
+                            {/* Nothing from YouTube is loaded until the visitor clicks the button for this video. */}
+                            {playingVideoId === video.id ? (
+                              <iframe
+                                className="video-player"
+                                src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
+                                title={video.title}
+                                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              />
+                            ) : (
+                              <div className="video-consent">
+                                <p>
+                                  Når du spiller av videoen, setter YouTube informasjonskapsler og får IP-adressen din.
+                                </p>
+                                <button
+                                  type="button"
+                                  className="video-consent-button"
+                                  onClick={() => setPlayingVideoId(video.id)}
+                                >
+                                  Godta YouTube-cookies og spill av
+                                </button>
+                                <a
+                                  href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Åpne på YouTube
+                                </a>
+                              </div>
+                            )}
 
                             <h4>{video.title}</h4>
 
