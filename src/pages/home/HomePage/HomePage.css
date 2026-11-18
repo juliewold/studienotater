@@ -568,3 +568,17 @@
 .home-dashboard .upcoming-tasks-empty { padding: 24px; margin: 0; border: 1px dashed var(--app-border); border-radius: 14px; color: var(--app-muted); font-size: .85rem; line-height: 1.7; }
 
 .dashboard-date { margin-bottom: 14px; color: var(--app-muted); font-size: .8rem; text-align: right; text-transform: capitalize; }
+
+/* Loading skeleton: same grid and heights as the dashboard, so the page keeps its size while data loads. */
+.home-skeleton { position: relative; }
+.home-skeleton-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.home-skeleton-date { width: 220px; height: 15px; margin-bottom: 24px; border-radius: 8px; background: var(--app-soft); }
+.home-skeleton-column { display: flex; flex-direction: column; gap: 24px; }
+.home-skeleton-block { border: 1px solid var(--app-border); border-radius: 20px; background: var(--app-soft); animation: home-skeleton-pulse 1.4s ease-in-out infinite; }
+.home-skeleton-focus { height: 380px; }
+.home-skeleton-tasks { height: 187px; }
+.home-skeleton-side-fill { height: 380px; }
+.home-skeleton-progress { height: 288px; margin-top: 24px; }
+.home-skeleton-exams { height: 528px; margin-top: 24px; }
+@keyframes home-skeleton-pulse { 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .home-skeleton-block { animation: none; } }
