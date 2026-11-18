@@ -125,6 +125,8 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
     useState<FormulaControlsPosition | null>(null);
   const [slashMenu, setSlashMenu] = useState<SlashMenuState | null>(null);
   const [slashSelectedIndex, setSlashSelectedIndex] = useState(0);
+  // Query of the open slash menu; null while closed. A new query starts again at the first item.
+  const slashQueryRef = useRef<string | null>(null);
   const [mathDialogType, setMathDialogType] = useState<
     "inline" | "block" | null
   >(null);
@@ -466,7 +468,7 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
   }, [slashSelectedIndex]);
 
   useEffect(() => {
-    setSlashSelectedIndex(0);
+    slashQueryRef.current = slashMenu?.query ?? null;
   }, [slashMenu?.query]);
 
   useEffect(() => {
@@ -506,6 +508,11 @@ export const NoteEditor = ({ value, onChange, header }: NoteEditorProps) => {
       const query = match[1] ?? "";
       const from = $from.pos - query.length - 1;
       const coordinates = editor.view.coordsAtPos($from.pos);
+
+      if (slashQueryRef.current !== query) {
+        slashQueryRef.current = query;
+        setSlashSelectedIndex(0);
+      }
 
       setSlashMenu({
         query,
