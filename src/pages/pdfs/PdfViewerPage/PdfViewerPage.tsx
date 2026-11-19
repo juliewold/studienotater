@@ -11,7 +11,7 @@ import {
   type DatabasePdf,
 } from "../../../services/media/pdfsService";
 
-import { lectureNumberLabel } from "../../../services/subjects/curriculumContent";
+import { lectureNumberLabel, pdfTitleAddsToTopic } from "../../../services/subjects/curriculumContent";
 import { loadLectureSequence, type LectureItem } from "../../../services/subjects/lectureSequenceService";
 
 import {
@@ -252,7 +252,7 @@ export const PdfViewerPage = () => {
 
           <h1>{lecture.title ?? pdf.title}</h1>
 
-          {lecture.title && <p className="pdf-lecture-file">{pdf.title}</p>}
+          {lecture.title && pdfTitleAddsToTopic(pdf.title, lecture.title) && <p className="pdf-lecture-file">{pdf.title}</p>}
         </>
       ) : (
         <>

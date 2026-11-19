@@ -105,6 +105,9 @@ export function lectureSequence(units: CurriculumUnit[], pdfs: DatabasePdf[]) {
 export const lectureTopicInTitle = (title: string) =>
   title.match(/^\s*forelesn(?:ing(?:er)?)?[\s_.-]*0*\d+[ab]?\s*[-–—:|]\s*(.+?)\s*$/iu)?.[1];
 
+/** Whether a PDF title says more than its lecture topic, so the title is worth showing under the topic. */
+export const pdfTitleAddsToTopic = (pdfTitle: string, topic: string) => lectureTopicInTitle(pdfTitle) !== topic;
+
 /** Lecture PDFs whose titles declare a lecture number, in lecture-number order. Works for any subject, without pensum units. */
 export function numberedLectureSequence(pdfs: DatabasePdf[]) {
   const order = (number: string) => [parseInt(number, 10), number.replace(/^\d+/, "")] as const;

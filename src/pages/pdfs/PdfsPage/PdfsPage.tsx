@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { getPdfsBySubject, type DatabasePdf } from "../../../services/media/pdfsService";
-import { lectureNumberLabel } from "../../../services/subjects/curriculumContent";
+import { lectureNumberLabel, pdfTitleAddsToTopic } from "../../../services/subjects/curriculumContent";
 import { loadLectureSequence } from "../../../services/subjects/lectureSequenceService";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useProgress } from "../../../hooks/useProgress";
@@ -157,7 +157,7 @@ export const PdfsPage = () => {
 
                               <h3>{lecture.title}</h3>
 
-                              <span className="pdf-card-file">{pdf.title}</span>
+                              {pdfTitleAddsToTopic(pdf.title, lecture.title) && <span className="pdf-card-file">{pdf.title}</span>}
                             </>
                           ) : (
                             <h3>{pdf.title}</h3>
