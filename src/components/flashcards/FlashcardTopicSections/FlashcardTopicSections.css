@@ -21,7 +21,7 @@
 }
 
 .flashcard-topic-open {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   display: grid;
   gap: 0.5rem;
   min-width: 0;
@@ -49,7 +49,8 @@ a.flashcard-topic-open:hover h2 {
   margin-top: 0;
 }
 
-.flashcard-topic-start {
+.flashcard-topic-row .flashcard-topic-start {
   flex: 0 0 auto;
+  width: auto;
   white-space: nowrap;
 }
