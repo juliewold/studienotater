@@ -5,6 +5,9 @@
 .curriculum-section-label { margin: -6px 0 12px; color: var(--app-muted, #716879); font-weight: 600; }
 .curriculum-page-header h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.18; letter-spacing: -.025em; color: inherit; }
 .curriculum-lead { margin: 18px 0 0; color: var(--app-muted, #716879); }
+.curriculum-source { margin: 40px 0 0; font-size: .8rem; color: var(--app-muted, #716879); }
+.curriculum-source a { color: inherit; }
+.curriculum-source a svg { margin-left: 3px; vertical-align: -1px; }
 .curriculum-lead a, .curriculum-callout a { color: var(--app-accent, #7c3aed); }
 .curriculum-lead a svg { margin-left: 3px; vertical-align: -1px; }
 .curriculum-status { margin: 24px 0; color: var(--app-muted, #716879); }
