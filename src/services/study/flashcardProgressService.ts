@@ -71,20 +71,14 @@ export async function setFlashcardLevel(
 }
 
 /** Undoes the last rating. A card that had no rating before is removed from progress. */
-export async function undoFlashcardLevel(
-  flashcardId: string,
-  previousLevel: PreviousFlashcardLevel,
-): Promise<void> {
+/** Removes the choice, so the card is back to not rated. */
+export async function clearFlashcardLevel(flashcardId: string): Promise<void> {
   await requireUserId();
 
-  const query = supabase.from("flashcard_progress");
-
-  const { error } =
-    previousLevel === "none"
-      ? await query.delete().eq("flashcard_id", flashcardId)
-      : await query
-          .update({ level: previousLevel, previous_level: null, updated_at: new Date().toISOString() })
-          .eq("flashcard_id", flashcardId);
+  const { error } = await supabase
+    .from("flashcard_progress")
+    .delete()
+    .eq("flashcard_id", flashcardId);
 
   if (error) {
     throw error;

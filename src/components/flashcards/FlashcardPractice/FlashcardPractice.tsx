@@ -4,8 +4,8 @@ import { useState, type KeyboardEvent, type MouseEvent } from "react";
 
 import { usePrivateStorageUrl } from "../../../hooks/usePrivateStorageUrl";
 import {
+  clearFlashcardLevel,
   setFlashcardLevel,
-  undoFlashcardLevel,
   type FlashcardLevel,
   type FlashcardProgress,
 } from "../../../services/study/flashcardProgressService";
@@ -170,28 +170,20 @@ export const FlashcardPractice = ({
   const isFirstCard = currentIndex === 0;
   const isLastCard = currentIndex === flashcards.length - 1;
 
-  // Pressing the rating that is already chosen undoes that choice, back to the level before it.
+  // Pressing the chosen rating again removes the choice, so the card is not rated.
   const rate = async (level: FlashcardLevel) => {
     if (!currentFlashcard) return;
 
-    const entry = progress.get(currentFlashcard.id);
-    const currentLevel = entry?.level ?? null;
-
-    if (currentLevel === level && !entry?.previousLevel) return;
+    const currentLevel = progress.get(currentFlashcard.id)?.level ?? null;
 
     setIsSaving(true);
     setErrorMessage("");
 
     try {
-      if (currentLevel === level && entry?.previousLevel) {
-        const previous = entry.previousLevel;
+      if (currentLevel === level) {
+        await clearFlashcardLevel(currentFlashcard.id);
 
-        await undoFlashcardLevel(currentFlashcard.id, previous);
-
-        onProgressChange(
-          currentFlashcard.id,
-          previous === "none" ? null : { level: previous, previousLevel: null },
-        );
+        onProgressChange(currentFlashcard.id, null);
       } else {
         await setFlashcardLevel(currentFlashcard.id, level, currentLevel);
 
