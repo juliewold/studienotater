@@ -16,6 +16,7 @@ export const exportTables = [
   { table: "semester_subjects", column: "user_id" },
   { table: "practice_sessions", column: "user_id" },
   { table: "practice_active_sessions", column: "user_id" },
+  { table: "flashcard_progress", column: "user_id" },
 ] as const;
 
 export type ExportUser = {

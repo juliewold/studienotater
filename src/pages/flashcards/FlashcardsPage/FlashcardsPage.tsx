@@ -1,10 +1,18 @@
 import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./FlashcardsPage.css";
-import { MathText } from "../../../components/common/MathText/MathText";
+import "./FlashcardFigure.css";
 import { FlashcardTopicSections } from "../../../components/flashcards/FlashcardTopicSections/FlashcardTopicSections";
+import { FlashcardPractice } from "../../../components/flashcards/FlashcardPractice/FlashcardPractice";
+import { FlashcardProgressBar } from "../../../components/flashcards/FlashcardProgressBar/FlashcardProgressBar";
+import { countFlashcardLevels } from "../../../services/study/flashcardProgressStats";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import {
+  getFlashcardProgress,
+  type FlashcardProgress,
+} from "../../../services/study/flashcardProgressService";
+import { orderFlashcardsForPractice } from "../../../services/study/flashcardPracticeOrder";
 import {
   getFlashcardsBySubject,
   type DatabaseFlashcard,
@@ -32,16 +40,16 @@ export const FlashcardsPage = () => {
 
   const [flashcards, setFlashcards] = useState<DatabaseFlashcard[]>([]);
 
+  const [progress, setProgress] = useState<Map<string, FlashcardProgress>>(
+    () => new Map(),
+  );
+
   const [isLoadingFlashcards, setIsLoadingFlashcards] = useState(true);
 
   const [errorMessage, setErrorMessage] = useState("");
 
   const [practiceSession, setPracticeSession] =
     useState<PracticeSession | null>(null);
-
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-
-  const [isFlipped, setIsFlipped] = useState(false);
 
   useEffect(() => {
     const loadFlashcards = async () => {
@@ -69,6 +77,55 @@ export const FlashcardsPage = () => {
 
     loadFlashcards();
   }, [subjectId]);
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    getFlashcardProgress()
+      .then((loadedProgress) => {
+        if (isCurrent) setProgress(loadedProgress);
+      })
+      .catch((error: unknown) => {
+        // Practice still works without progress; ratings just cannot be shown yet.
+        console.error("Kunne ikke hente fremdriften:", error);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
+  const handleProgressChange = (
+    flashcardId: string,
+    next: FlashcardProgress | null,
+  ) => {
+    setProgress((currentProgress) => {
+      const updatedProgress = new Map(currentProgress);
+
+      if (next) {
+        updatedProgress.set(flashcardId, next);
+      } else {
+        updatedProgress.delete(flashcardId);
+      }
+
+      return updatedProgress;
+    });
+  };
+
+  // Exam sub-tasks, so practice can follow an exam task instead of the curriculum structure.
+  const examTaskGroups = useMemo(() => {
+    const groups = new Map<string, DatabaseFlashcard[]>();
+
+    flashcards.forEach((flashcard) => {
+      if (!flashcard.examTask) return;
+
+      groups.set(flashcard.examTask, [...(groups.get(flashcard.examTask) ?? []), flashcard]);
+    });
+
+    return Array.from(groups.entries())
+      .map(([label, cards]) => ({ label, flashcards: cards }))
+      .sort((first, second) => first.label.localeCompare(second.label, "nb"));
+  }, [flashcards]);
 
   const groupedFlashcards = useMemo<GroupedTopic[]>(() => {
     const topics = new Map<
@@ -152,11 +209,8 @@ export const FlashcardsPage = () => {
 
     setPracticeSession({
       title,
-      flashcards: selectedFlashcards,
+      flashcards: orderFlashcardsForPractice(selectedFlashcards, progress),
     });
-
-    setCurrentCardIndex(0);
-    setIsFlipped(false);
 
     window.scrollTo({
       top: 0,
@@ -166,122 +220,17 @@ export const FlashcardsPage = () => {
 
   const endPractice = () => {
     setPracticeSession(null);
-    setCurrentCardIndex(0);
-    setIsFlipped(false);
   };
 
-  const showPreviousCard = () => {
-    setCurrentCardIndex((currentIndex) => Math.max(currentIndex - 1, 0));
-
-    setIsFlipped(false);
-  };
-
-  const showNextCard = () => {
-    if (!practiceSession) {
-      return;
-    }
-
-    setCurrentCardIndex((currentIndex) =>
-      Math.min(currentIndex + 1, practiceSession.flashcards.length - 1),
-    );
-
-    setIsFlipped(false);
-  };
-
-  const currentFlashcard = practiceSession?.flashcards[currentCardIndex];
-
-  if (practiceSession && currentFlashcard) {
-    const isFirstCard = currentCardIndex === 0;
-
-    const isLastCard =
-      currentCardIndex === practiceSession.flashcards.length - 1;
-
+  if (practiceSession) {
     return (
-      <main className="page-container">
-        <button
-          type="button"
-          className="flashcard-end-practice"
-          onClick={endPractice}
-        >
-          ← Avslutt øving
-        </button>
-
-        <div className="flashcard-practice-header">
-          <div>
-            <p className="page-label">Flashcards</p>
-
-            <h1>{practiceSession.title}</h1>
-          </div>
-
-          <span className="flashcard-practice-progress">
-            {currentCardIndex + 1} av {practiceSession.flashcards.length}
-          </span>
-        </div>
-
-        <div className="flashcard-progress-track">
-          <div
-            className="flashcard-progress-bar"
-            style={{
-              width: `${
-                ((currentCardIndex + 1) / practiceSession.flashcards.length) *
-                100
-              }%`,
-            }}
-          />
-        </div>
-
-        <button
-          type="button"
-          className={`flashcard-practice-card ${
-            isFlipped ? "flashcard-practice-card-flipped" : ""
-          }`}
-          onClick={() => setIsFlipped((currentValue) => !currentValue)}
-          aria-pressed={isFlipped}
-        >
-          <p className="flashcard-label">{isFlipped ? "Svar" : "Spørsmål"}</p>
-
-          <h2>
-            <MathText>
-              {isFlipped ? currentFlashcard.answer : currentFlashcard.question}
-            </MathText>
-          </h2>
-
-          <span className="flashcard-hint">
-            {isFlipped
-              ? "Trykk for å vise spørsmålet"
-              : "Trykk for å vise svaret"}
-          </span>
-        </button>
-
-        <div className="flashcard-practice-navigation">
-          <button
-            type="button"
-            className="flashcard-secondary-button"
-            onClick={showPreviousCard}
-            disabled={isFirstCard}
-          >
-            ← Forrige
-          </button>
-
-          {isLastCard ? (
-            <button
-              type="button"
-              className="flashcard-primary-button"
-              onClick={endPractice}
-            >
-              Fullfør øving
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="flashcard-primary-button"
-              onClick={showNextCard}
-            >
-              Neste →
-            </button>
-          )}
-        </div>
-      </main>
+      <FlashcardPractice
+        title={practiceSession.title}
+        flashcards={practiceSession.flashcards}
+        progress={progress}
+        onProgressChange={handleProgressChange}
+        onExit={endPractice}
+      />
     );
   }
 
@@ -303,6 +252,16 @@ export const FlashcardsPage = () => {
 
       {!isLoadingFlashcards && !errorMessage && flashcards.length === 0 && (
         <p>Ingen flashcards er lagt til ennå.</p>
+      )}
+
+      {!isLoadingFlashcards && !errorMessage && flashcards.length > 0 && (
+        <section className="flashcard-subject-progress" aria-label="Fremdrift">
+          <FlashcardProgressBar counts={countFlashcardLevels(flashcards, progress)} />
+
+          <p>
+            {countFlashcardLevels(flashcards, progress).green} av {flashcards.length} kan godt
+          </p>
+        </section>
       )}
 
       {!isLoadingFlashcards && !errorMessage && flashcards.length > 0 && (
@@ -335,10 +294,43 @@ export const FlashcardsPage = () => {
         </>
       )}
 
+      {!isLoadingFlashcards && !errorMessage && examTaskGroups.length > 0 && (
+        <section className="flashcard-exam-tasks">
+          <p className="flashcard-topic-label">Eksamensoppgaver</p>
+
+          <h2>Øv på en eksamensoppgave</h2>
+
+          <p className="page-description">Kortene blandes, og de du har vurdert som røde, kommer oftere først.</p>
+
+          <div className="flashcard-subtopics">
+            {examTaskGroups.map((group) => (
+              <article key={group.label} className="flashcard-subtopic-card">
+                <div>
+                  <p className="flashcard-subtopic-label">Oppgave</p>
+
+                  <h3>{group.label}</h3>
+
+                  <span>{group.flashcards.length} kort</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="flashcard-secondary-button"
+                  onClick={() => startPractice(group.label, group.flashcards)}
+                >
+                  Øv på oppgaven
+                </button>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
       {subjectId && (
         <FlashcardTopicSections
           subjectId={subjectId}
           groups={groupedFlashcards}
+          progress={progress}
           onStartPractice={startPractice}
         />
       )}

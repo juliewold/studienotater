@@ -2,6 +2,7 @@ import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholde
 import "./AdminFlashcardsPage.css";
 import { subjects } from "../../../data/subjects";
 import { useAdminFlashcards } from "../../../hooks/admin/useAdminFlashcards";
+import { FlashcardImageField } from "./FlashcardImageField";
 
 export const AdminFlashcardsPage = () => {
   const {
@@ -25,6 +26,24 @@ export const AdminFlashcardsPage = () => {
 
     answer,
     setAnswer,
+
+    examTask,
+    setExamTask,
+    examTaskOptions,
+
+    questionImagePath,
+    answerImagePath,
+    setQuestionImagePath,
+    setAnswerImagePath,
+    questionImageFile,
+    setQuestionImageFile,
+    answerImageFile,
+    setAnswerImageFile,
+
+    isMultipleChoice,
+    setIsMultipleChoice,
+    distractors,
+    setDistractors,
 
     editingFlashcard,
 
@@ -149,6 +168,81 @@ export const AdminFlashcardsPage = () => {
               required
             />
 
+            <label className="admin-flashcard-checkbox">
+              <input
+                type="checkbox"
+                checked={isMultipleChoice}
+                onChange={(event) => setIsMultipleChoice(event.target.checked)}
+              />
+              Flervalgskort (fire svaralternativer i øvingen)
+            </label>
+
+            {isMultipleChoice &&
+              distractors.map((distractor, index) => (
+                <div key={index} className="admin-flashcard-distractor">
+                  <label htmlFor={`flashcard-distractor-${index}`}>
+                    Feilsvar {index + 1}
+                  </label>
+
+                  <input
+                    id={`flashcard-distractor-${index}`}
+                    type="text"
+                    value={distractor}
+                    onChange={(event) =>
+                      setDistractors(
+                        distractors.map((currentValue, currentIndex) =>
+                          currentIndex === index ? event.target.value : currentValue,
+                        ),
+                      )
+                    }
+                    maxLength={300}
+                    required
+                  />
+                </div>
+              ))}
+
+            <label htmlFor="flashcard-exam-task">Eksamensoppgave (valgfri)</label>
+
+            <input
+              id="flashcard-exam-task"
+              type="text"
+              list="flashcard-exam-task-options"
+              value={examTask}
+              onChange={(event) => setExamTask(event.target.value)}
+              placeholder="Eksamen aug 2026 · 5a"
+              maxLength={80}
+            />
+
+            <datalist id="flashcard-exam-task-options">
+              {examTaskOptions.map((option) => (
+                <option key={option} value={option} />
+              ))}
+            </datalist>
+
+            <FlashcardImageField
+              id="flashcard-question-image"
+              label="Bilde til spørsmålet (valgfritt)"
+              savedPath={questionImagePath}
+              pendingFile={questionImageFile}
+              onFileChange={setQuestionImageFile}
+              onClear={() => {
+                setQuestionImagePath(null);
+                setQuestionImageFile(null);
+              }}
+            />
+
+            <FlashcardImageField
+              id="flashcard-answer-image"
+              label="Bilde til svaret (valgfritt)"
+              savedPath={answerImagePath}
+              pendingFile={answerImageFile}
+              onFileChange={setAnswerImageFile}
+              onClear={() => {
+                setAnswerImagePath(null);
+                setAnswerImageFile(null);
+              }}
+            />
+
             {errorMessage && (
               <p className="admin-flashcard-message admin-flashcard-error">
                 {errorMessage}
@@ -218,6 +312,10 @@ export const AdminFlashcardsPage = () => {
                   <span>{flashcard.topicName}</span>
 
                   <span>{flashcard.subtopicName}</span>
+
+                  {flashcard.examTask && <span>{flashcard.examTask}</span>}
+
+                  {flashcard.multipleChoice && <span>Flervalg</span>}
                 </div>
 
                 <div className="uploaded-flashcard-actions">

@@ -37,7 +37,7 @@ const user = {
   });
   assert.deepEqual(calls.map(([table]) => table), [
     'profiles', 'favorites', 'progress', 'book_progress', 'book_task_progress', 'exam_task_progress', 'semester_subjects',
-    'practice_sessions', 'practice_active_sessions',
+    'practice_sessions', 'practice_active_sessions', 'flashcard_progress',
   ]);
   assert.ok(calls.every(([, , userId]) => userId === user.id), 'every query must use the caller id');
   assert.ok(!calls.some(([table]) => table === 'calendar_events'), 'shared calendar_events must not be exported');
