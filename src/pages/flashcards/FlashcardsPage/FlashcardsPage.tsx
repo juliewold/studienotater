@@ -331,7 +331,6 @@ export const FlashcardsPage = () => {
           subjectId={subjectId}
           groups={groupedFlashcards}
           progress={progress}
-          onStartPractice={startPractice}
         />
       )}
     </main>
