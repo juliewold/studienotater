@@ -19,6 +19,8 @@ export type DatabaseFlashcard = {
   /** Path in the note-images bucket, or null when the card has no figure. */
   questionImagePath: string | null;
   answerImagePath: string | null;
+  /** Worked solution shown under the answer. Optional. */
+  explanation: string | null;
   /** Shown as four answer choices in practice when true. */
   multipleChoice: boolean;
   /** Three wrong answers. Only set for multiple-choice cards. */
@@ -33,6 +35,7 @@ export type FlashcardFields = {
   examTask: string | null;
   questionImagePath: string | null;
   answerImagePath: string | null;
+  explanation: string | null;
   multipleChoice: boolean;
   distractors: string[];
 };
@@ -61,6 +64,7 @@ type FlashcardRow = {
   exam_task: string | null;
   question_image_path: string | null;
   answer_image_path: string | null;
+  explanation: string | null;
   multiple_choice: boolean;
   distractors: string[] | null;
   created_at: string;
@@ -89,6 +93,7 @@ function toDatabaseFlashcard(flashcard: FlashcardRow): DatabaseFlashcard {
     examTask: flashcard.exam_task ?? null,
     questionImagePath: flashcard.question_image_path ?? null,
     answerImagePath: flashcard.answer_image_path ?? null,
+    explanation: flashcard.explanation ?? null,
     multipleChoice: flashcard.multiple_choice === true,
     distractors: flashcard.distractors ?? [],
     createdAt: flashcard.created_at,
@@ -139,6 +144,7 @@ export async function createFlashcard(input: {
     exam_task: input.examTask,
     question_image_path: input.questionImagePath,
     answer_image_path: input.answerImagePath,
+    explanation: input.explanation,
     multiple_choice: input.multipleChoice,
     distractors: input.multipleChoice ? input.distractors : null,
   });
@@ -158,6 +164,7 @@ export async function updateFlashcard(id: string, input: FlashcardFields) {
       exam_task: input.examTask,
       question_image_path: input.questionImagePath,
       answer_image_path: input.answerImagePath,
+      explanation: input.explanation,
       multiple_choice: input.multipleChoice,
       distractors: input.multipleChoice ? input.distractors : null,
     })

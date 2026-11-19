@@ -17,6 +17,54 @@
   font-size: 1.05rem;
 }
 
+/* Feedback after a multiple-choice answer, below the card. */
+.flashcard-feedback {
+  margin-top: 0.75rem;
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  border: 1px solid transparent;
+}
+
+.flashcard-feedback-correct {
+  background: #dff5e7;
+  border-color: rgba(46, 158, 91, 0.35);
+  color: #1f5f3b;
+}
+
+.flashcard-feedback-wrong {
+  background: #fde7e4;
+  border-color: rgba(201, 71, 63, 0.35);
+  color: #7a2e28;
+}
+
+.flashcard-feedback-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* Worked solution inside the feedback box. Line breaks from the admin editor are kept. */
+.flashcard-feedback-explanation {
+  margin-top: 0.6rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-x: auto;
+}
+
+/* Worked solution below the card, in its own box. Line breaks from the admin editor are kept. */
+.flashcard-explanation {
+  margin-top: 0.75rem;
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid rgba(124, 110, 230, 0.15);
+  text-align: left;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-x: auto;
+}
+
 .flashcard-choices {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));

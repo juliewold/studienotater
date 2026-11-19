@@ -31,6 +31,9 @@ export const AdminFlashcardsPage = () => {
     setExamTask,
     examTaskOptions,
 
+    explanation,
+    setExplanation,
+
     questionImagePath,
     answerImagePath,
     setQuestionImagePath,
@@ -200,6 +203,16 @@ export const AdminFlashcardsPage = () => {
                   />
                 </div>
               ))}
+
+            <label htmlFor="flashcard-explanation">Forklaring av løsningen (valgfri)</label>
+
+            <textarea
+              id="flashcard-explanation"
+              value={explanation}
+              onChange={(event) => setExplanation(event.target.value)}
+              rows={8}
+              placeholder="Skriv hvert steg på egen linje. Vises under svaret."
+            />
 
             <label htmlFor="flashcard-exam-task">Eksamensoppgave (valgfri)</label>
 
