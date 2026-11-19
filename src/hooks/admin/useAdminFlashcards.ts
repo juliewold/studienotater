@@ -40,6 +40,8 @@ export const useAdminFlashcards = () => {
 
   const [examTask, setExamTask] = useState("");
 
+  const [explanation, setExplanation] = useState("");
+
   const [isMultipleChoice, setIsMultipleChoice] = useState(false);
   const [distractors, setDistractors] = useState<string[]>(["", "", ""]);
 
@@ -89,6 +91,7 @@ export const useAdminFlashcards = () => {
     setAnswer("");
 
     setExamTask("");
+    setExplanation("");
     setQuestionImagePath(null);
     setAnswerImagePath(null);
     setQuestionImageFile(null);
@@ -264,6 +267,7 @@ export const useAdminFlashcards = () => {
         question: trimmedQuestion,
         answer: trimmedAnswer,
         examTask: examTask.trim() || null,
+        explanation: explanation.trim() || null,
         questionImagePath: questionImageFile
           ? (await storeNoteImage(questionImageFile)).path
           : questionImagePath,
@@ -328,6 +332,7 @@ export const useAdminFlashcards = () => {
     setAnswer(flashcard.answer);
 
     setExamTask(flashcard.examTask ?? "");
+    setExplanation(flashcard.explanation ?? "");
     setQuestionImagePath(flashcard.questionImagePath);
     setAnswerImagePath(flashcard.answerImagePath);
 
@@ -426,6 +431,9 @@ export const useAdminFlashcards = () => {
     examTask,
     setExamTask,
     examTaskOptions,
+
+    explanation,
+    setExplanation,
 
     questionImagePath,
     answerImagePath,
