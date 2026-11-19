@@ -1,6 +1,7 @@
 import "./FolderNoteCard.css";
 import { Check, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
+import { RatingStars } from "../../common/RatingStars/RatingStars";
 
 import type { NoteMetadata } from "../../../services/notes/notesService";
 import type { Progress } from "../../../services/progress/progressService";
@@ -49,22 +50,8 @@ export const FolderNoteCard = ({
               {progress.completed ? "Lest" : "Ikke lest"}
             </span>
 
-            <span
-              className="folder-note-rating"
-              aria-label={`${progress.rating} av 5 stjerner`}
-            >
-              {Array.from({ length: 5 }, (_, index) => (
-                <span
-                  key={index}
-                  className={
-                    index < progress.rating
-                      ? "folder-note-star folder-note-star-filled"
-                      : "folder-note-star"
-                  }
-                >
-                  ★
-                </span>
-              ))}
+            <span className="folder-note-rating">
+              <RatingStars value={progress.rating} total={5} />
             </span>
           </span>
         </span>

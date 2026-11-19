@@ -1,4 +1,5 @@
 import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
+import { StarIcon } from "../../common/RatingStars/RatingStars";
 import "./ResourceProgress.css";
 import { useContext, useEffect, useState } from "react";
 
@@ -129,7 +130,7 @@ export const ResourceProgress = ({
               className={star <= rating ? `star-${rating}` : ""}
               aria-label={`Vurder forståelse ${star} av 5`}
             >
-              ★
+              <StarIcon />
             </button>
           ))}
         </div>

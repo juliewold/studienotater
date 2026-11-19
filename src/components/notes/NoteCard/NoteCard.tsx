@@ -1,6 +1,7 @@
 import "./NoteCard.css";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { RatingStars } from "../../common/RatingStars/RatingStars";
 
 import type { NoteMetadata } from "../../../services/notes/notesService";
 import { NoteMenu } from "../NoteMenu/NoteMenu";
@@ -47,9 +48,7 @@ export const NoteCard = ({
           <div className="note-progress-preview">
             <span>{progress.completed ? "✓ Lest" : "Ikke lest"}</span>
 
-            <span className={`rating-${progress.rating}`}>
-              {"★".repeat(progress.rating)}
-            </span>
+            <RatingStars value={progress.rating} />
           </div>
         )}
       </Link>

@@ -10,6 +10,7 @@ import { SubjectFeatureCard } from "../../../components/subjects/SubjectFeatureC
 import { useSubjectProgress } from "../../../hooks/useSubjectProgress";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import { generateTopicsForSubject } from "../../../services/concepts/knowledgeBaseService";
+import { RatingStars } from "../../../components/common/RatingStars/RatingStars";
 
 const INITIAL_VISIBLE_TOPICS = 4;
 
@@ -182,7 +183,7 @@ export const SubjectPage = () => {
                 <p>
                   Forståelse:{" "}
                   <span className="subject-progress-stars">
-                    {"★".repeat(subjectProgress.averageRating)}
+                    <RatingStars value={subjectProgress.averageRating} />
                   </span>
                 </p>
               )}
@@ -306,7 +307,7 @@ export const SubjectPage = () => {
 
                   {topic.averageRating > 0 && (
                     <p className="subject-topic-progress-rating">
-                      Forståelse: <span>{"★".repeat(topic.averageRating)}</span>
+                      Forståelse: <RatingStars value={topic.averageRating} />
                     </p>
                   )}
                 </article>
