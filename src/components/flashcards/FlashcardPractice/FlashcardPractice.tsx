@@ -76,15 +76,21 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
 
   const shownFigure = isFlipped ? flashcard.answerImagePath : flashcard.questionImagePath;
 
+  // Multiple-choice cards are answered, not flipped. Other cards flip between question and answer.
+  const isMultipleChoice = flashcard.multipleChoice;
+  const hasChosen = selectedIndex !== null;
+  const wasCorrect = hasChosen && selectedIndex === correctIndex;
+  const showExplanation = Boolean(flashcard.explanation) && (isMultipleChoice ? hasChosen : isFlipped);
+
   return (
     <>
       <div
         className={`flashcard-practice-card ${progress ? `flashcard-card-${progress.level}` : ""}`}
-        role="button"
-        tabIndex={0}
-        aria-pressed={isFlipped}
-        onClick={flip}
-        onKeyDown={handleKeyDown}
+        role={isMultipleChoice ? undefined : "button"}
+        tabIndex={isMultipleChoice ? undefined : 0}
+        aria-pressed={isMultipleChoice ? undefined : isFlipped}
+        onClick={isMultipleChoice ? undefined : flip}
+        onKeyDown={isMultipleChoice ? undefined : handleKeyDown}
       >
         <p className="flashcard-label">{isFlipped ? "Svar" : "Spørsmål"}</p>
 
@@ -94,13 +100,7 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
 
         {shownFigure && <FlashcardFigure key={shownFigure} path={shownFigure} />}
 
-        {isFlipped && flashcard.explanation && (
-          <div className="flashcard-explanation">
-            <MathText>{flashcard.explanation}</MathText>
-          </div>
-        )}
-
-        {!isFlipped && flashcard.multipleChoice && (
+        {isMultipleChoice && (
           <div className="flashcard-choices" role="group" aria-label="Svaralternativer">
             {options.map((option, index) => {
               const stateClass =
@@ -127,6 +127,24 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
           </div>
         )}
       </div>
+
+      {isMultipleChoice && hasChosen && (
+        <div className={`flashcard-feedback ${wasCorrect ? "flashcard-feedback-correct" : "flashcard-feedback-wrong"}`}>
+          <div className="flashcard-feedback-title">{wasCorrect ? "Riktig!" : "Ikke helt riktig"}</div>
+
+          {!wasCorrect && (
+            <div className="flashcard-feedback-answer">
+              Riktig svar: <MathText>{flashcard.answer}</MathText>
+            </div>
+          )}
+        </div>
+      )}
+
+      {showExplanation && (
+        <div className="flashcard-explanation">
+          <MathText>{flashcard.explanation ?? ""}</MathText>
+        </div>
+      )}
 
       <div className="flashcard-rating" role="group" aria-label="Hvor godt kan du dette?">
         {levelOrder.map((level) => (
