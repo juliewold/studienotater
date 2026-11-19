@@ -11,7 +11,7 @@ import {
   type DatabasePdf,
 } from "../../../services/media/pdfsService";
 
-import { lectureSequence, type CurriculumUnit } from "../../../services/subjects/curriculumContent";
+import { lectureNumberLabel, lectureSequence, type CurriculumUnit } from "../../../services/subjects/curriculumContent";
 import { loadCurriculumWorkspace } from "../../../services/subjects/curriculumWorkspaceService";
 
 import {
@@ -40,7 +40,7 @@ type LectureSlot = {
 
 const lectureLink = (pdf: DatabasePdf, unit: CurriculumUnit): LectureLink => ({
   id: pdf.id,
-  title: `Forelesning ${unit.number ?? ""}`.trim() + `: ${unit.title}`,
+  title: `${lectureNumberLabel(unit)}: ${unit.title}`,
 });
 
 const isAppleMobileDevice = () => {
@@ -247,7 +247,7 @@ export const PdfViewerPage = () => {
 
       {lecture ? (
         <>
-          <p className="page-label">{`Forelesning ${lecture.unit.number ?? ""}`.trim()}</p>
+          <p className="page-label">{lectureNumberLabel(lecture.unit)}</p>
 
           <h1>{lecture.unit.title}</h1>
 

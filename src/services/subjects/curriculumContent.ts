@@ -94,6 +94,9 @@ export function lectureSequence(units: CurriculumUnit[], pdfs: DatabasePdf[]) {
     }));
 }
 
+/** "Forelesning 03", as the pensum names the lecture. */
+export const lectureNumberLabel = (unit: CurriculumUnit) => `Forelesning ${unit.number ?? ""}`.trim();
+
 export function exercisesForUnit(unit: CurriculumUnit, pdfs: DatabasePdf[], notes: NoteMetadata[]) {
   if (!unit.resourceNumber) return [];
   const pattern = numberPattern("øving", unit.resourceNumber);
