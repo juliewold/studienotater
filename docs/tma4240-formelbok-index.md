@@ -26,8 +26,8 @@ Intern arbeidsindeks. Den brukes til å knytte formelbokoppslag til temasidene i
 | 12 | Binomisk fordeling, P(X ≤ x), n = 2–8 | Ja (5.2) | 5, 10 |
 | 13 | Binomisk fordeling, P(X ≤ x), n = 9–11 | Ja (5.2) | 5, 10 |
 | 14 | Binomisk fordeling, P(X ≤ x), n = 12–14 | Ja (5.2) | 5, 10 |
-| 15 | Binomisk fordeling, P(X ≤ x), n = 15 | Ja (5.2) | 5, 10 |
-| 16 | Binomisk fordeling, P(X ≤ x), n = 16–18 | Ja (5.2) | 5, 10 |
+| 15 | Binomisk fordeling, P(X ≤ x), n = 15–16 | Ja (5.2) | 5, 10 |
+| 16 | Binomisk fordeling, P(X ≤ x), n = 17–18 | Ja (5.2) | 5, 10 |
 | 17 | Binomisk fordeling, P(X ≤ x), n = 19–20 | Ja (5.2) | 5, 10 |
 | 18 | Poissonfordeling, P(X ≤ x), μ = 0,1–0,9 og 1,0–5,0 | Ja (5.5–5.6) | 5 |
 | 19 | Poissonfordeling, P(X ≤ x), μ = 5,5–9,5 | Ja (5.5–5.6) | 5 |
@@ -90,7 +90,7 @@ Intern arbeidsindeks. Den brukes til å knytte formelbokoppslag til temasidene i
 
 ### Side 12–17: binomisk fordeling, P(X ≤ x)
 - **Innhold:** kumulativ tabell for n = 2–20, p = 0,05; 0,10; 0,15; 0,20; 0,25; 0,30; 0,40; 0,50; 0,60; 0,70; 0,80; 0,90.
-- **Side:** 12 = n 2–8; 13 = n 9–11; 14 = n 12–14; 15 = n 15; 16 = n 16–18; 17 = n 19–20.
+- **Side:** 12 = n 2–8; 13 = n 9–11; 14 = n 12–14; 15 = n 15–16; 16 = n 17–18; 17 = n 19–20.
 - **Når:** P(X = x) = P(X ≤ x) − P(X ≤ x − 1). P(X ≥ x) = 1 − P(X ≤ x − 1).
 - **Forutsetning:** uavhengige forsøk med samme p.
 - **Viktig:** tabellen gir ikke P(X = x) direkte. Trekk fra forrige rad.
