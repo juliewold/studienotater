@@ -40,6 +40,9 @@ export const useAdminFlashcards = () => {
 
   const [examTask, setExamTask] = useState("");
 
+  const [isMultipleChoice, setIsMultipleChoice] = useState(false);
+  const [distractors, setDistractors] = useState<string[]>(["", "", ""]);
+
   // Existing image path on the card, plus a newly chosen file that is uploaded on save.
   const [questionImagePath, setQuestionImagePath] = useState<string | null>(null);
   const [answerImagePath, setAnswerImagePath] = useState<string | null>(null);
@@ -90,6 +93,9 @@ export const useAdminFlashcards = () => {
     setAnswerImagePath(null);
     setQuestionImageFile(null);
     setAnswerImageFile(null);
+
+    setIsMultipleChoice(false);
+    setDistractors(["", "", ""]);
 
     setEditingFlashcard(null);
   };
@@ -233,6 +239,22 @@ export const useAdminFlashcards = () => {
       return;
     }
 
+    const trimmedDistractors = distractors.map((distractor) => distractor.trim());
+
+    if (isMultipleChoice) {
+      if (trimmedDistractors.some((distractor) => !distractor)) {
+        setErrorMessage("Et flervalgskort må ha tre feilsvar.");
+        return;
+      }
+
+      const allAnswers = [trimmedAnswer, ...trimmedDistractors];
+
+      if (new Set(allAnswers).size !== allAnswers.length) {
+        setErrorMessage("Svaralternativene må være ulike hverandre.");
+        return;
+      }
+    }
+
     setIsSaving(true);
 
     try {
@@ -248,6 +270,8 @@ export const useAdminFlashcards = () => {
         answerImagePath: answerImageFile
           ? (await storeNoteImage(answerImageFile)).path
           : answerImagePath,
+        multipleChoice: isMultipleChoice,
+        distractors: isMultipleChoice ? trimmedDistractors : [],
       };
 
       if (editingFlashcard) {
@@ -306,6 +330,13 @@ export const useAdminFlashcards = () => {
     setExamTask(flashcard.examTask ?? "");
     setQuestionImagePath(flashcard.questionImagePath);
     setAnswerImagePath(flashcard.answerImagePath);
+
+    setIsMultipleChoice(flashcard.multipleChoice);
+    setDistractors(
+      flashcard.multipleChoice
+        ? [...flashcard.distractors, "", ""].slice(0, 3)
+        : ["", "", ""],
+    );
     setQuestionImageFile(null);
     setAnswerImageFile(null);
 
@@ -404,6 +435,11 @@ export const useAdminFlashcards = () => {
     setQuestionImageFile,
     answerImageFile,
     setAnswerImageFile,
+
+    isMultipleChoice,
+    setIsMultipleChoice,
+    distractors,
+    setDistractors,
 
     editingFlashcard,
 

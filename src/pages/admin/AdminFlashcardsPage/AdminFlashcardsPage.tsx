@@ -40,6 +40,11 @@ export const AdminFlashcardsPage = () => {
     answerImageFile,
     setAnswerImageFile,
 
+    isMultipleChoice,
+    setIsMultipleChoice,
+    distractors,
+    setDistractors,
+
     editingFlashcard,
 
     uploadedFlashcards,
@@ -163,6 +168,39 @@ export const AdminFlashcardsPage = () => {
               required
             />
 
+            <label className="admin-flashcard-checkbox">
+              <input
+                type="checkbox"
+                checked={isMultipleChoice}
+                onChange={(event) => setIsMultipleChoice(event.target.checked)}
+              />
+              Flervalgskort (fire svaralternativer i øvingen)
+            </label>
+
+            {isMultipleChoice &&
+              distractors.map((distractor, index) => (
+                <div key={index} className="admin-flashcard-distractor">
+                  <label htmlFor={`flashcard-distractor-${index}`}>
+                    Feilsvar {index + 1}
+                  </label>
+
+                  <input
+                    id={`flashcard-distractor-${index}`}
+                    type="text"
+                    value={distractor}
+                    onChange={(event) =>
+                      setDistractors(
+                        distractors.map((currentValue, currentIndex) =>
+                          currentIndex === index ? event.target.value : currentValue,
+                        ),
+                      )
+                    }
+                    maxLength={300}
+                    required
+                  />
+                </div>
+              ))}
+
             <label htmlFor="flashcard-exam-task">Eksamensoppgave (valgfri)</label>
 
             <input
@@ -276,6 +314,8 @@ export const AdminFlashcardsPage = () => {
                   <span>{flashcard.subtopicName}</span>
 
                   {flashcard.examTask && <span>{flashcard.examTask}</span>}
+
+                  {flashcard.multipleChoice && <span>Flervalg</span>}
                 </div>
 
                 <div className="uploaded-flashcard-actions">

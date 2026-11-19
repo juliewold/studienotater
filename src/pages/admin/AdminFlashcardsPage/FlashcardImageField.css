@@ -1,3 +1,23 @@
+.admin-flashcard-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-flashcard-distractor {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-flashcard-distractor input {
+  font: inherit;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--theme-border, #e4dfeb);
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #24202a);
+}
+
 .admin-flashcard-image-field {
   display: grid;
   gap: 0.5rem;
