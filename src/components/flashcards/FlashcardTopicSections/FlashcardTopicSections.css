@@ -1,39 +1,56 @@
-/* Subtopic cards: keep them inside the tema section and let the button wrap instead of spilling out. */
-.flashcard-topic-section .flashcard-subtopics {
+.flashcard-topic-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
-  gap: 0.85rem;
+  gap: 0.6rem;
   min-width: 0;
 }
 
-.flashcard-topic-section .flashcard-subtopic-card {
+.flashcard-topic-row {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: space-between;
+  align-items: center;
   gap: 0.9rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 16px;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid rgba(124, 110, 230, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   min-width: 0;
-  box-sizing: border-box;
 }
 
-.flashcard-topic-section .flashcard-subtopic-card > div {
-  min-width: 0;
+.flashcard-topic-row-empty {
+  opacity: 0.7;
 }
 
-.flashcard-topic-section .flashcard-subtopic-card h3 {
+.flashcard-topic-open {
+  flex: 1 1 0;
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.flashcard-topic-open:hover h2 {
+  text-decoration: underline;
+}
+
+.flashcard-topic-row-text h2 {
+  margin: 0;
+  font-size: 1.05rem;
   overflow-wrap: anywhere;
 }
 
-.flashcard-topic-section .flashcard-subtopic-card button {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  white-space: normal;
-  text-align: center;
+.flashcard-topic-row-text p {
+  margin: 0.15rem 0 0;
+  color: var(--theme-muted, #746d79);
+  font-size: 0.88rem;
 }
 
-.flashcard-topic-section {
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
+.flashcard-topic-row .flashcard-progress-bar-stack {
+  margin-top: 0;
+}
+
+.flashcard-topic-row .flashcard-topic-start {
+  flex: 0 0 auto;
+  width: auto;
+  white-space: nowrap;
 }

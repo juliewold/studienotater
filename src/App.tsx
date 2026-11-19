@@ -18,6 +18,7 @@ import { SubjectPage } from "./pages/subjects/SubjectPage/SubjectPage";
 import { NotesPage } from "./pages/notes/NotesPage/NotesPage";
 import { NotePage } from "./pages/notes/NotePage/NotePage";
 import { FlashcardsPage } from "./pages/flashcards/FlashcardsPage/FlashcardsPage";
+import { TopicFlashcardsPage } from "./pages/flashcards/TopicFlashcardsPage/TopicFlashcardsPage";
 import { VideosPage } from "./pages/videos/VideosPage/VideosPage";
 import { ExamsPage } from "./pages/exams/ExamsPage/ExamsPage";
 import { AllNotesPage } from "./pages/notes/AllNotesPage/AllNotesPage";
@@ -147,6 +148,15 @@ function App() {
           element={
             <ProtectedRoute>
               <FlashcardsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fag/:subjectId/flashcards/:topicId"
+          element={
+            <ProtectedRoute>
+              <TopicFlashcardsPage />
             </ProtectedRoute>
           }
         />

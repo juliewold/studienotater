@@ -2,6 +2,7 @@ import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlace
 import "./FlashcardTopicSections.css";
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { getTopicsBySubject, type DatabaseTopic } from "../../../services/subjects/subjectStructureService";
 import type { FlashcardProgress } from "../../../services/study/flashcardProgressService";
@@ -30,8 +31,8 @@ const plural = (count: number, singular: string, pluralForm: string) =>
   `${count} ${count === 1 ? singular : pluralForm}`;
 
 /**
- * One section per tema, in the order of the subject's topics. Flashcards are written
- * by hand in the admin editor, so this view only reads them.
+ * One compact row per tema, in the order of the subject's topics. A row with cards opens
+ * the tema page, where the subtopics and practice are. Flashcards are written in the admin editor.
  */
 export const FlashcardTopicSections = ({ subjectId, groups, progress, onStartPractice }: FlashcardTopicSectionsProps) => {
   const [topics, setTopics] = useState<DatabaseTopic[]>([]);
@@ -68,7 +69,7 @@ export const FlashcardTopicSections = ({ subjectId, groups, progress, onStartPra
   }
 
   return (
-    <div className="flashcard-topics">
+    <div className="flashcard-topic-list">
       {errorMessage && <p className="flashcards-error">{errorMessage}</p>}
 
       {topics.map((topic) => {
@@ -76,53 +77,37 @@ export const FlashcardTopicSections = ({ subjectId, groups, progress, onStartPra
         const cards = group?.subtopics.flatMap((subtopic) => subtopic.flashcards) ?? [];
 
         return (
-          <section key={topic.id} className="flashcard-topic-section">
-            <div className="flashcard-topic-header">
-              <div>
-                <p className="flashcard-topic-label">Tema</p>
+          <div key={topic.id} className={`flashcard-topic-row ${cards.length === 0 ? "flashcard-topic-row-empty" : ""}`}>
+            {cards.length > 0 ? (
+              <Link to={`/fag/${subjectId}/flashcards/${topic.id}`} className="flashcard-topic-open">
+                <div className="flashcard-topic-row-text">
+                  <h2>{topic.name}</h2>
 
-                <h2>{topic.name}</h2>
+                  <p>{plural(cards.length, "kort", "kort")}</p>
+                </div>
 
-                <p>{cards.length === 0 ? "Flashcards kommer" : plural(cards.length, "kort", "kort")}</p>
+                <FlashcardProgressBar counts={countFlashcardLevels(cards, progress)} />
+              </Link>
+            ) : (
+              <div className="flashcard-topic-open">
+                <div className="flashcard-topic-row-text">
+                  <h2>{topic.name}</h2>
 
-                {cards.length > 0 && <FlashcardProgressBar counts={countFlashcardLevels(cards, progress)} />}
-              </div>
-
-              {cards.length > 0 && (
-                <button
-                  type="button"
-                  className="flashcard-primary-button"
-                  onClick={() => onStartPractice(topic.name, cards)}
-                >
-                  Start øving
-                </button>
-              )}
-            </div>
-
-            {group && (
-              <div className="flashcard-subtopics">
-                {group.subtopics.map((subtopic) => (
-                  <article key={subtopic.subtopicId} className="flashcard-subtopic-card">
-                    <div>
-                      <p className="flashcard-subtopic-label">Undertema</p>
-
-                      <h3>{subtopic.subtopicName}</h3>
-
-                      <span>{subtopic.flashcards.length} kort</span>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="flashcard-secondary-button"
-                      onClick={() => onStartPractice(subtopic.subtopicName, subtopic.flashcards)}
-                    >
-                      Øv på undertema
-                    </button>
-                  </article>
-                ))}
+                  <p>Flashcards kommer</p>
+                </div>
               </div>
             )}
-          </section>
+
+            {cards.length > 0 && (
+              <button
+                type="button"
+                className="flashcard-primary-button flashcard-topic-start"
+                onClick={() => onStartPractice(topic.name, cards)}
+              >
+                Start øving
+              </button>
+            )}
+          </div>
         );
       })}
     </div>
