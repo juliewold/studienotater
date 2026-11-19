@@ -84,6 +84,17 @@
   cursor: pointer;
 }
 
+/* Code options keep their line breaks and indentation. */
+.flashcard-choice-code {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  white-space: pre;
+  overflow-x: auto;
+  text-align: left;
+}
+
 .flashcard-choice:disabled {
   cursor: default;
 }

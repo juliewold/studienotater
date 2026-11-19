@@ -211,7 +211,7 @@ export const AdminFlashcardsPage = () => {
               value={explanation}
               onChange={(event) => setExplanation(event.target.value)}
               rows={8}
-              placeholder="Skriv hvert steg på egen linje. Vises under svaret."
+              placeholder="Skriv hvert steg på egen linje. Kode skrives mellom linjer med tre backticks (```), og vises som kodeblokk."
             />
 
             <label htmlFor="flashcard-exam-task">Eksamensoppgave (valgfri)</label>

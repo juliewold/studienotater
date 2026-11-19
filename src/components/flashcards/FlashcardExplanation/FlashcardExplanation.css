@@ -1,0 +1,21 @@
+.flashcard-explanation-text + .flashcard-explanation-text {
+  margin-top: 0.4rem;
+}
+
+.flashcard-code {
+  margin: 0.6rem 0;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  background: rgba(36, 32, 42, 0.06);
+  color: var(--theme-text, #24202a);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+  overflow-x: auto;
+  text-align: left;
+}
+
+.flashcard-code code {
+  font: inherit;
+}
