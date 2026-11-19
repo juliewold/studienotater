@@ -1,6 +1,6 @@
 import "./FlashcardPractice.css";
 
-import { useState } from "react";
+import { useState, type KeyboardEvent, type MouseEvent } from "react";
 
 import { usePrivateStorageUrl } from "../../../hooks/usePrivateStorageUrl";
 import {
@@ -12,13 +12,13 @@ import {
 import type { DatabaseFlashcard } from "../../../services/study/flashcardsService";
 import { MathText } from "../../common/MathText/MathText";
 
-const levelLabels: Record<FlashcardLevel, string> = {
-  red: "Rød: kan dårlig",
-  yellow: "Gul: usikker",
-  green: "Grønn: kan godt",
-};
-
 const levelOrder: FlashcardLevel[] = ["red", "yellow", "green"];
+
+const levelNames: Record<FlashcardLevel, string> = {
+  red: "Rød",
+  yellow: "Gul",
+  green: "Grønn",
+};
 
 function shuffle<T>(items: T[]): T[] {
   const shuffled = [...items];
@@ -39,11 +39,7 @@ const FlashcardFigure = ({ path }: { path: string }) => {
     return <img className="flashcard-figure" src={image.url} alt="" />;
   }
 
-  if (image.error) {
-    return <span className="flashcard-hint">Kunne ikke vise figuren.</span>;
-  }
-
-  return <span className="flashcard-hint">Laster figur …</span>;
+  return null;
 };
 
 type PracticeCardProps = {
@@ -51,111 +47,106 @@ type PracticeCardProps = {
   progress: FlashcardProgress | undefined;
   isSaving: boolean;
   onRate: (level: FlashcardLevel) => void;
-  onUndo: () => void;
 };
 
-/** One card. Its state (revealed, chosen option) resets when the parent gives a new card key. */
-const PracticeCard = ({ flashcard, progress, isSaving, onRate, onUndo }: PracticeCardProps) => {
-  const [isRevealed, setIsRevealed] = useState(false);
+/** One card. Its state (side, chosen option) resets because the parent gives each card its own key. */
+const PracticeCard = ({ flashcard, progress, isSaving, onRate }: PracticeCardProps) => {
+  const [isFlipped, setIsFlipped] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [options] = useState(() =>
     flashcard.multipleChoice ? shuffle([flashcard.answer, ...flashcard.distractors]) : [],
   );
 
   const correctIndex = options.indexOf(flashcard.answer);
-  const wasCorrect = selectedIndex !== null && selectedIndex === correctIndex;
 
-  const chooseOption = (index: number) => {
-    setSelectedIndex(index);
-    setIsRevealed(true);
+  const flip = () => setIsFlipped((current) => !current);
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      flip();
+    }
   };
 
+  const chooseOption = (event: MouseEvent, index: number) => {
+    // Choosing an answer must not also flip the card.
+    event.stopPropagation();
+
+    if (selectedIndex === null) {
+      setSelectedIndex(index);
+    }
+  };
+
+  const shownFigure = isFlipped ? flashcard.answerImagePath : flashcard.questionImagePath;
+
   return (
-    <section className="flashcard-practice-card">
-      <p className="flashcard-label">Spørsmål</p>
+    <>
+      <div
+        className="flashcard-practice-card"
+        role="button"
+        tabIndex={0}
+        aria-pressed={isFlipped}
+        onClick={flip}
+        onKeyDown={handleKeyDown}
+      >
+        <p className="flashcard-label">{isFlipped ? "Svar" : "Spørsmål"}</p>
 
-      <h2>
-        <MathText>{flashcard.question}</MathText>
-      </h2>
-
-      {flashcard.questionImagePath && <FlashcardFigure path={flashcard.questionImagePath} />}
-
-      {flashcard.multipleChoice ? (
-        <div className="flashcard-choices" role="group" aria-label="Svaralternativer">
-          {options.map((option, index) => {
-            const stateClass = !isRevealed
-              ? ""
-              : index === correctIndex
-                ? "flashcard-choice-correct"
-                : index === selectedIndex
-                  ? "flashcard-choice-wrong"
-                  : "";
-
-            return (
-              <button
-                key={option}
-                type="button"
-                className={`flashcard-choice ${stateClass}`}
-                disabled={isRevealed}
-                onClick={() => chooseOption(index)}
-              >
-                <MathText>{option}</MathText>
-              </button>
-            );
-          })}
-        </div>
-      ) : (
-        !isRevealed && (
-          <button type="button" className="flashcard-primary-button" onClick={() => setIsRevealed(true)}>
-            Vis svaret
-          </button>
-        )
-      )}
-
-      {isRevealed && (
-        <div className="flashcard-answer-panel">
-          {flashcard.multipleChoice && selectedIndex !== null && (
-            <p className={wasCorrect ? "flashcard-result-correct" : "flashcard-result-wrong"}>
-              {wasCorrect ? "Riktig!" : "Feil. Riktig svar er markert."}
-            </p>
-          )}
-
-          <p className="flashcard-label">Svar</p>
-
+        {isFlipped ? (
           <div className="flashcard-answer-text">
             <MathText>{flashcard.answer}</MathText>
           </div>
+        ) : (
+          <h2>
+            <MathText>{flashcard.question}</MathText>
+          </h2>
+        )}
 
-          {flashcard.answerImagePath && <FlashcardFigure path={flashcard.answerImagePath} />}
+        {shownFigure && <FlashcardFigure key={shownFigure} path={shownFigure} />}
 
-          <p className="flashcard-hint">
-            {progress ? `Din vurdering nå: ${levelLabels[progress.level]}` : "Ikke vurdert ennå"}
-          </p>
+        {!isFlipped && flashcard.multipleChoice && (
+          <div className="flashcard-choices" role="group" aria-label="Svaralternativer">
+            {options.map((option, index) => {
+              const stateClass =
+                selectedIndex === null
+                  ? ""
+                  : index === correctIndex
+                    ? "flashcard-choice-correct"
+                    : index === selectedIndex
+                      ? "flashcard-choice-wrong"
+                      : "";
 
-          <div className="flashcard-rating" role="group" aria-label="Hvor godt kan du dette?">
-            {levelOrder.map((level) => (
-              <button
-                key={level}
-                type="button"
-                className={`flashcard-rating-button flashcard-rating-${level} ${
-                  progress?.level === level ? "flashcard-rating-current" : ""
-                }`}
-                disabled={isSaving}
-                onClick={() => onRate(level)}
-              >
-                {levelLabels[level]}
-              </button>
-            ))}
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  className={`flashcard-choice ${stateClass}`}
+                  disabled={selectedIndex !== null}
+                  onClick={(event) => chooseOption(event, index)}
+                >
+                  <MathText>{option}</MathText>
+                </button>
+              );
+            })}
           </div>
+        )}
+      </div>
 
-          {progress?.previousLevel && (
-            <button type="button" className="flashcard-undo-button" disabled={isSaving} onClick={onUndo}>
-              Angre siste vurdering
-            </button>
-          )}
-        </div>
-      )}
-    </section>
+      <div className="flashcard-rating" role="group" aria-label="Hvor godt kan du dette?">
+        {levelOrder.map((level) => (
+          <button
+            key={level}
+            type="button"
+            aria-label={levelNames[level]}
+            aria-pressed={progress?.level === level}
+            className={`flashcard-rating-button flashcard-rating-${level} ${
+              progress?.level === level ? "flashcard-rating-current" : ""
+            }`}
+            disabled={isSaving}
+            onClick={() => onRate(level)}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
@@ -183,56 +174,39 @@ export const FlashcardPractice = ({
   const isFirstCard = currentIndex === 0;
   const isLastCard = currentIndex === flashcards.length - 1;
 
-  const counts = flashcards.reduce(
-    (result, flashcard) => {
-      const level = progress.get(flashcard.id)?.level;
-      if (level) result[level] += 1;
-      else result.unrated += 1;
-      return result;
-    },
-    { red: 0, yellow: 0, green: 0, unrated: 0 },
-  );
-
+  // Pressing the rating that is already chosen undoes that choice, back to the level before it.
   const rate = async (level: FlashcardLevel) => {
     if (!currentFlashcard) return;
 
-    const currentLevel = progress.get(currentFlashcard.id)?.level ?? null;
+    const entry = progress.get(currentFlashcard.id);
+    const currentLevel = entry?.level ?? null;
+
+    if (currentLevel === level && !entry?.previousLevel) return;
 
     setIsSaving(true);
     setErrorMessage("");
 
     try {
-      await setFlashcardLevel(currentFlashcard.id, level, currentLevel);
-      onProgressChange(currentFlashcard.id, {
-        level,
-        previousLevel: currentLevel ?? "none",
-      });
+      if (currentLevel === level && entry?.previousLevel) {
+        const previous = entry.previousLevel;
+
+        await undoFlashcardLevel(currentFlashcard.id, previous);
+
+        onProgressChange(
+          currentFlashcard.id,
+          previous === "none" ? null : { level: previous, previousLevel: null },
+        );
+      } else {
+        await setFlashcardLevel(currentFlashcard.id, level, currentLevel);
+
+        onProgressChange(currentFlashcard.id, {
+          level,
+          previousLevel: currentLevel ?? "none",
+        });
+      }
     } catch (error) {
       console.error("Kunne ikke lagre vurderingen:", error);
-      setErrorMessage("Kunne ikke lagre vurderingen. Prøv igjen.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const undo = async () => {
-    if (!currentFlashcard) return;
-
-    const entry = progress.get(currentFlashcard.id);
-    if (!entry?.previousLevel) return;
-
-    setIsSaving(true);
-    setErrorMessage("");
-
-    try {
-      await undoFlashcardLevel(currentFlashcard.id, entry.previousLevel);
-      onProgressChange(
-        currentFlashcard.id,
-        entry.previousLevel === "none" ? null : { level: entry.previousLevel, previousLevel: null },
-      );
-    } catch (error) {
-      console.error("Kunne ikke angre vurderingen:", error);
-      setErrorMessage("Kunne ikke angre vurderingen. Prøv igjen.");
+      setErrorMessage("Kunne ikke lagre. Prøv igjen.");
     } finally {
       setIsSaving(false);
     }
@@ -260,12 +234,6 @@ export const FlashcardPractice = ({
         </span>
       </div>
 
-      <p className="flashcard-level-summary">
-        <span className="flashcard-count-red">{counts.red} røde</span> ·{" "}
-        <span className="flashcard-count-yellow">{counts.yellow} gule</span> ·{" "}
-        <span className="flashcard-count-green">{counts.green} grønne</span> · {counts.unrated} ikke vurdert
-      </p>
-
       <div className="flashcard-progress-track">
         <div
           className="flashcard-progress-bar"
@@ -281,7 +249,6 @@ export const FlashcardPractice = ({
         progress={progress.get(currentFlashcard.id)}
         isSaving={isSaving}
         onRate={rate}
-        onUndo={undo}
       />
 
       <div className="flashcard-practice-navigation">
