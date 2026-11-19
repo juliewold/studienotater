@@ -29,6 +29,20 @@ function shuffle<T>(items: T[]): T[] {
   return shuffled;
 }
 
+/** Options that start with three backticks are code. They keep their line breaks and indentation. */
+const renderChoice = (option: string) => {
+  if (!option.trimStart().startsWith("```")) {
+    return <MathText>{option}</MathText>;
+  }
+
+  const code = option
+    .trim()
+    .replace(/^```[^\n]*\n?/, "")
+    .replace(/\n?```$/, "");
+
+  return <pre className="flashcard-choice-code"><code>{code}</code></pre>;
+};
+
 /** Figure on one side of a card. Loaded through the private storage hook, so only signed-in users see it. */
 export const FlashcardFigure = ({ path }: { path: string }) => {
   const image = usePrivateStorageUrl("note-images", path);
@@ -122,7 +136,7 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
                   disabled={selectedIndex !== null}
                   onClick={(event) => chooseOption(event, index)}
                 >
-                  <MathText>{option}</MathText>
+                  {renderChoice(option)}
                 </button>
               );
             })}
