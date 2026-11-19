@@ -7,6 +7,7 @@ import { usePrivateStorageUrl } from "../../../hooks/usePrivateStorageUrl";
 import type { FlashcardLevel, FlashcardProgress } from "../../../services/study/flashcardProgressService";
 import type { DatabaseFlashcard } from "../../../services/study/flashcardsService";
 import { MathText } from "../../common/MathText/MathText";
+import { FlashcardExplanation } from "../FlashcardExplanation/FlashcardExplanation";
 
 const levelOrder: FlashcardLevel[] = ["red", "yellow", "green"];
 
@@ -135,7 +136,7 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
 
           {flashcard.explanation && (
             <div className="flashcard-feedback-explanation">
-              <MathText>{flashcard.explanation}</MathText>
+              <FlashcardExplanation text={flashcard.explanation} />
             </div>
           )}
         </div>
@@ -143,7 +144,7 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
 
       {showExplanation && (
         <div className="flashcard-explanation">
-          <MathText>{flashcard.explanation ?? ""}</MathText>
+          <FlashcardExplanation text={flashcard.explanation ?? ""} />
         </div>
       )}
 
