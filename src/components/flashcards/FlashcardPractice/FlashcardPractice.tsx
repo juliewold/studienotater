@@ -33,7 +33,7 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 /** Figure on one side of a card. Loaded through the private storage hook, so only signed-in users see it. */
-const FlashcardFigure = ({ path }: { path: string }) => {
+export const FlashcardFigure = ({ path }: { path: string }) => {
   const image = usePrivateStorageUrl("note-images", path);
 
   if (image.url) {

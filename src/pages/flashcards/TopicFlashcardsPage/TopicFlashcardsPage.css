@@ -1,32 +1,56 @@
 .flashcard-tema-cards {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.75rem;
   margin-top: 1.5rem;
   min-width: 0;
 }
 
 .flashcard-tema-group h3 {
-  margin: 0 0 0.6rem;
+  margin: 0 0 0.75rem;
   font-size: 1rem;
   color: var(--theme-muted, #746d79);
 }
 
-.flashcard-tema-card {
+.flashcard-tile-grid {
   display: grid;
-  gap: 0.5rem;
-  padding: 1rem 1.2rem;
-  margin-bottom: 0.6rem;
-  border-radius: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 1rem;
+}
+
+.flashcard-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 180px;
+  padding: 1.25rem 1.3rem;
+  border-radius: 22px;
+  border: 1px solid rgba(139, 92, 246, 0.1);
   background: var(--theme-surface, #ffffff);
-  border: 1px solid rgba(124, 110, 230, 0.12);
+  box-shadow: 0 10px 28px rgba(65, 42, 115, 0.08);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
   min-width: 0;
   overflow-x: auto;
 }
 
-.flashcard-tema-question {
-  font-weight: 650;
+.flashcard-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(65, 42, 115, 0.12);
 }
 
-.flashcard-tema-answer {
-  color: var(--theme-text, #24202a);
+.flashcard-tile .flashcard-label {
+  margin: 0 0 0.6rem;
+}
+
+.flashcard-tile h2 {
+  margin: auto 0;
+  font-size: 1.1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.flashcard-tile .flashcard-figure {
+  margin-top: 0.6rem;
+  max-height: 180px;
 }

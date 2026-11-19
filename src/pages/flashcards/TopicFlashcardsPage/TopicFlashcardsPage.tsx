@@ -1,19 +1,18 @@
 import "../FlashcardsPage/FlashcardsPage.css";
 import "../FlashcardsPage/FlashcardFigure.css";
+import "./TopicFlashcardsPage.css";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { FlashcardPractice } from "../../../components/flashcards/FlashcardPractice/FlashcardPractice";
+import { FlashcardFigure } from "../../../components/flashcards/FlashcardPractice/FlashcardPractice";
 import { FlashcardProgressBar } from "../../../components/flashcards/FlashcardProgressBar/FlashcardProgressBar";
 import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import { MathText } from "../../../components/common/MathText/MathText";
-import "./TopicFlashcardsPage.css";
 import {
   getFlashcardProgress,
   type FlashcardProgress,
 } from "../../../services/study/flashcardProgressService";
-import { orderFlashcardsForPractice } from "../../../services/study/flashcardPracticeOrder";
 import { countFlashcardLevels } from "../../../services/study/flashcardProgressStats";
 import {
   getFlashcardsBySubject,
@@ -21,9 +20,39 @@ import {
 } from "../../../services/study/flashcardsService";
 import { getTopicsBySubject } from "../../../services/subjects/subjectStructureService";
 
-type PracticeSession = {
-  title: string;
-  flashcards: DatabaseFlashcard[];
+/** A flashcard that turns over when you tap it, like in practice. */
+const FlashcardTile = ({ flashcard }: { flashcard: DatabaseFlashcard }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  const flip = () => setIsFlipped((current) => !current);
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      flip();
+    }
+  };
+
+  const shownFigure = isFlipped ? flashcard.answerImagePath : flashcard.questionImagePath;
+
+  return (
+    <div
+      className="flashcard-tile"
+      role="button"
+      tabIndex={0}
+      aria-pressed={isFlipped}
+      onClick={flip}
+      onKeyDown={handleKeyDown}
+    >
+      <p className="flashcard-label">{isFlipped ? "Svar" : "Spørsmål"}</p>
+
+      <h2>
+        <MathText>{isFlipped ? flashcard.answer : flashcard.question}</MathText>
+      </h2>
+
+      {shownFigure && <FlashcardFigure key={shownFigure} path={shownFigure} />}
+    </div>
+  );
 };
 
 export const TopicFlashcardsPage = () => {
@@ -34,7 +63,6 @@ export const TopicFlashcardsPage = () => {
   const [progress, setProgress] = useState<Map<string, FlashcardProgress>>(() => new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const [practiceSession, setPracticeSession] = useState<PracticeSession | null>(null);
 
   useEffect(() => {
     let isCurrent = true;
@@ -90,7 +118,7 @@ export const TopicFlashcardsPage = () => {
     };
   }, []);
 
-  // Subtopics inside this tema, in alphabetical order, with their cards in the same order.
+  // Subtopics inside this tema, in alphabetical order.
   const subtopics = useMemo(() => {
     const groups = new Map<string, { id: string; name: string; flashcards: DatabaseFlashcard[] }>();
 
@@ -108,43 +136,6 @@ export const TopicFlashcardsPage = () => {
 
     return Array.from(groups.values()).sort((first, second) => first.name.localeCompare(second.name, "nb"));
   }, [flashcards]);
-
-  const handleProgressChange = (flashcardId: string, next: FlashcardProgress | null) => {
-    setProgress((currentProgress) => {
-      const updatedProgress = new Map(currentProgress);
-
-      if (next) {
-        updatedProgress.set(flashcardId, next);
-      } else {
-        updatedProgress.delete(flashcardId);
-      }
-
-      return updatedProgress;
-    });
-  };
-
-  const startPractice = (title: string, selectedFlashcards: DatabaseFlashcard[]) => {
-    if (selectedFlashcards.length === 0) return;
-
-    setPracticeSession({
-      title,
-      flashcards: orderFlashcardsForPractice(selectedFlashcards, progress),
-    });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  if (practiceSession) {
-    return (
-      <FlashcardPractice
-        title={practiceSession.title}
-        flashcards={practiceSession.flashcards}
-        progress={progress}
-        onProgressChange={handleProgressChange}
-        onExit={() => setPracticeSession(null)}
-      />
-    );
-  }
 
   const counts = countFlashcardLevels(flashcards, progress);
 
@@ -174,40 +165,16 @@ export const TopicFlashcardsPage = () => {
             </p>
           </section>
 
-          <section className="flashcard-all-practice-card">
-            <div>
-              <p className="flashcard-topic-label">Hele tema</p>
-
-              <h2>Øv på alle kort i {topicName}</h2>
-
-              <p>{flashcards.length} kort</p>
-            </div>
-
-            <button
-              type="button"
-              className="flashcard-primary-button"
-              onClick={() => startPractice(topicName, flashcards)}
-            >
-              Start øving
-            </button>
-          </section>
-
           <div className="flashcard-tema-cards">
             {subtopics.map((subtopic) => (
               <section key={subtopic.id} className="flashcard-tema-group">
                 <h3>{subtopic.name}</h3>
 
-                {subtopic.flashcards.map((flashcard) => (
-                  <article key={flashcard.id} className="flashcard-tema-card">
-                    <div className="flashcard-tema-question">
-                      <MathText>{flashcard.question}</MathText>
-                    </div>
-
-                    <div className="flashcard-tema-answer">
-                      <MathText>{flashcard.answer}</MathText>
-                    </div>
-                  </article>
-                ))}
+                <div className="flashcard-tile-grid">
+                  {subtopic.flashcards.map((flashcard) => (
+                    <FlashcardTile key={flashcard.id} flashcard={flashcard} />
+                  ))}
+                </div>
               </section>
             ))}
           </div>
