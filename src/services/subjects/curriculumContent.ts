@@ -75,12 +75,19 @@ export function currentNotesForUnit(unit: CurriculumUnit, notes: NoteMetadata[],
 const numberPattern = (prefix: string, number: string) =>
   new RegExp(`(?:^|[^\\p{L}])${prefix}[\\s_.-]*0?${number.replace(/^0+(?=\d)/, "")}(?![\\p{L}\\p{N}])`, "iu");
 
-/** Existing lecture PDFs: placed in the unit, or titled with its lecture number. */
+/** The lecture number a title declares: "forelesn01_kort" → "1", "Forelesning 10 …" → "10". */
+const lectureNumberInTitle = (title: string) =>
+  title.match(/forelesn(?:ing(?:er)?)?[\s_.-]*0*(\d+[ab]?)(?![\p{L}\p{N}])/iu)?.[1].toLowerCase();
+
+/** Existing lecture PDFs. A declared lecture number decides the unit; the subtopic only places PDFs that declare none. */
 export function lectureNotesForUnit(unit: CurriculumUnit, pdfs: DatabasePdf[]) {
   const ids = new Set(unit.subtopicIds);
-  const pattern = unit.resourceNumber ? numberPattern("forelesn(?:ing(?:er)?)?", unit.resourceNumber) : undefined;
-  return pdfs.filter(pdf => !numberPattern("øving", "\\w+").test(pdf.title) &&
-    ((pdf.subtopicId && ids.has(pdf.subtopicId)) || (pattern?.test(pdf.title) ?? false)));
+  return pdfs.filter(pdf => {
+    if (numberPattern("øving", "\\w+").test(pdf.title)) return false;
+    const declared = lectureNumberInTitle(pdf.title);
+    if (declared) return declared === unit.resourceNumber?.toLowerCase();
+    return !!pdf.subtopicId && ids.has(pdf.subtopicId);
+  });
 }
 
 /** Forelesningsnotater in pensum order, each with its unit. Other categories, exercises and the unplaced group are left out. */

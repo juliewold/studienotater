@@ -60,6 +60,8 @@ const pdf = (id: string, title: string, subtopicId: string | null = null) => ({ 
 const pdfs = [pdf("p1", "forelesn01_kort"), pdf("p10", "Forelesning 10"), pdf("p3", "Øving 1"), pdf("px", "Lysark", "merge")];
 check(lectureNotesForUnit(unit("01"), pdfs).map(item => item.id).join() === "p1", "Forelesning 1 matcher ikke forelesning 10 eller øvinger");
 check(lectureNotesForUnit(unit("03"), pdfs).map(item => item.id).join() === "px", "Forelesningsnotat via undertema");
+const misplaced = [pdf("m5", "Forelesning 5", "ins"), pdf("m1", "Forelesning 1 (notat)", "ins"), pdf("m2", "Lysark", "ins")];
+check(lectureNotesForUnit(unit("01"), misplaced).map(item => item.id).join() === "m1,m2", "Forelesningsnummer i tittelen går foran undertemaet");
 const lecturePdfs = [pdf("l10", "Forelesning 10"), pdf("lo", "Øving 1"), pdf("l1", "forelesn01_kort"), pdf("lx", "Lysark", "merge"),
   { ...pdf("lp", "Forelesning 4"), category: "presentasjoner" } as DatabasePdf];
 const sequence = lectureSequence(units, lecturePdfs);
