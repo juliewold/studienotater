@@ -1,5 +1,6 @@
 import "./HomeProgress.css";
 import { Link } from "react-router-dom";
+import { RatingStars } from "../../common/RatingStars/RatingStars";
 import type { useHomeProgress } from "../../../hooks/useHomeProgress";
 
 export const HomeProgress = ({ progressSubjects, isLoading, resourcesError }: ReturnType<typeof useHomeProgress>) => {
@@ -71,7 +72,7 @@ export const HomeProgress = ({ progressSubjects, isLoading, resourcesError }: Re
 
             {subject.averageRating > 0 && (
               <p className="home-progress-rating">
-                Forståelse: {"★".repeat(subject.averageRating)}
+                Forståelse: <RatingStars value={subject.averageRating} />
               </p>
             )}
           </Link>

@@ -42,46 +42,55 @@
 }
 
 .stars button {
+  display: flex;
   padding: 0;
 
   border: none;
 
   background: transparent;
-  color: #d1d5db;
+  color: var(--rating-empty);
 
   font-size: 2rem;
   line-height: 1;
 
   cursor: pointer;
 
-  transition:
-    color 0.2s ease,
-    transform 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
+.stars button svg {
+  width: 1em;
+  height: 1em;
+
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+/* Scale only, so the star keeps its colour on hover. */
 .stars button:hover {
-  color: #b38bf3;
-  transform: translateY(-1px);
+  transform: scale(1.12);
 }
 
 .stars button.star-1 {
-  color: #ef4444;
+  color: var(--rating-1);
 }
 
 .stars button.star-2 {
-  color: #f97316;
+  color: var(--rating-2);
 }
 
 .stars button.star-3 {
-  color: #eab308;
+  color: var(--rating-3);
 }
 
 .stars button.star-4 {
-  color: #84cc16;
+  color: var(--rating-4);
 }
 
 .stars button.star-5 {
-  color: #22c55e;
+  color: var(--rating-5);
 }
 
 /* Flytende variant for notater */

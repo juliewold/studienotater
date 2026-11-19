@@ -8,6 +8,7 @@ import { lectureNumberLabel, pdfTitleAddsToTopic } from "../../../services/subje
 import { loadLectureSequence } from "../../../services/subjects/lectureSequenceService";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useProgress } from "../../../hooks/useProgress";
+import { RatingStars } from "../../../components/common/RatingStars/RatingStars";
 
 const categories = [
   {
@@ -166,9 +167,7 @@ export const PdfsPage = () => {
                           <div className="pdf-progress-preview">
                             <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
 
-                            <span className={`pdf-rating rating-${rating}`}>
-                              {"★".repeat(rating)}
-                            </span>
+                            <RatingStars value={rating} className="pdf-rating" />
                           </div>
                         </div>
                       </Link>

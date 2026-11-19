@@ -52,10 +52,14 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+/* Same lift as the subject cards. */
 .topic-tile:hover {
+  transform: translateY(-4px);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
 }
 
@@ -107,10 +111,13 @@
   text-align: left;
   color: inherit;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .video-card:hover {
+  transform: translateY(-4px);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
 }
 
