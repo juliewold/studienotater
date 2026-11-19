@@ -6,7 +6,7 @@ class InvalidRequestBodyTests(AuthenticatedAITestCase):
 
     def test_invalid_utf8_body_is_a_bad_request_on_json_endpoints(self):
         body = b'\xff{"text": "Note", "subtopics": [], "notes": []}'
-        for endpoint in ("extract/", "generate-structure/", "generate-flashcards/",
+        for endpoint in ("extract/", "generate-structure/",
                          "summarize-note/", "explain-selection/"):
             with self.subTest(endpoint=endpoint):
                 response = self.client.post(

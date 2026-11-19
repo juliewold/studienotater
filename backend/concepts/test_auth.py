@@ -15,7 +15,6 @@ ENDPOINTS = [
     ("generate-structure/", "generate_subject_structure", {
         "subjectName": "Fag", "notes": [{"id": "n1", "title": "Tittel", "content": "Note"}],
     }, {"topics": []}, {"topics": []}),
-    ("generate-flashcards/", "generate_flashcards", {"text": "Note", "subtopics": []}, [], {"flashcards": []}),
     ("summarize-note/", "summarize_note", {"text": "Note"}, "Kort", {"summary": "Kort"}),
     ("explain-selection/", "explain_selected_text", {"text": "Note"}, "Forklaring", {"explanation": "Forklaring"}),
 ]

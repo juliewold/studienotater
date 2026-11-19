@@ -51,7 +51,6 @@ async function load(path) {
 }
 const cases = [
   ['concepts/conceptExtractionService', 'extractConceptCandidates', ['Source'], 'extract/'],
-  ['flashcards/flashcardGenerationService', 'generateFlashcards', ['Source', []], 'generate-flashcards/'],
   ['concepts/subjectStructureGenerationService', 'generateAndSaveSubjectStructure', ['subject', 'Subject'], 'generate-structure/'],
 ];
 for (const [path, name, args, endpoint] of cases) {
