@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { getPdfsBySubject, type DatabasePdf } from "../../../services/media/pdfsService";
-import { lectureNumberLabel, lectureSequence, type CurriculumUnit } from "../../../services/subjects/curriculumContent";
-import { loadCurriculumWorkspace } from "../../../services/subjects/curriculumWorkspaceService";
+import { lectureNumberLabel } from "../../../services/subjects/curriculumContent";
+import { loadLectureSequence } from "../../../services/subjects/lectureSequenceService";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useProgress } from "../../../hooks/useProgress";
 
@@ -34,8 +34,8 @@ export const PdfsPage = () => {
   const [pdfs, setPdfs] = useState<DatabasePdf[]>([]);
   const [isLoadingPdfs, setIsLoadingPdfs] = useState(true);
   const [pdfError, setPdfError] = useState("");
-  // Lecture PDFs by id, with their pensum unit and place in the lecture order.
-  const [lectures, setLectures] = useState<Map<string, { index: number; unit: CurriculumUnit }>>(new Map());
+  // Lecture PDFs by id, with their number, topic and place in the lecture order.
+  const [lectures, setLectures] = useState<Map<string, { index: number; number: string; title: string }>>(new Map());
 
   const { isFavorite, toggleFavorite, isLoadingFavorites } = useFavorites();
 
@@ -71,14 +71,14 @@ export const PdfsPage = () => {
 
     let cancelled = false;
 
-    // Titles and order come from the pensum; without it the cards keep their PDF titles.
-    loadCurriculumWorkspace(subjectId)
-      .then((workspace) => {
+    // Titles and order come from the subject's lectures; without them the cards keep their PDF titles.
+    loadLectureSequence(subjectId)
+      .then((sequence) => {
         if (cancelled) return;
 
         setLectures(
           new Map(
-            lectureSequence(workspace.units, workspace.pdfs).map(({ pdf, unit }, index) => [pdf.id, { index, unit }]),
+            sequence.map(({ pdf, number, title }, index) => [pdf.id, { index, number, title }]),
           ),
         );
       })
@@ -152,10 +152,10 @@ export const PdfsPage = () => {
                           {lecture ? (
                             <>
                               <span className="pdf-lecture-number">
-                                {lectureNumberLabel(lecture.unit)}
+                                {lectureNumberLabel(lecture.number)}
                               </span>
 
-                              <h3>{lecture.unit.title}</h3>
+                              <h3>{lecture.title}</h3>
 
                               <span className="pdf-card-file">{pdf.title}</span>
                             </>

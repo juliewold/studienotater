@@ -76,7 +76,7 @@ const numberPattern = (prefix: string, number: string) =>
   new RegExp(`(?:^|[^\\p{L}])${prefix}[\\s_.-]*0?${number.replace(/^0+(?=\d)/, "")}(?![\\p{L}\\p{N}])`, "iu");
 
 /** The lecture number a title declares: "forelesn01_kort" → "1", "Forelesning 10 …" → "10". */
-const lectureNumberInTitle = (title: string) =>
+export const lectureNumberInTitle = (title: string) =>
   title.match(/forelesn(?:ing(?:er)?)?[\s_.-]*0*(\d+[ab]?)(?![\p{L}\p{N}])/iu)?.[1].toLowerCase();
 
 /** Existing lecture PDFs. A declared lecture number decides the unit; the subtopic only places PDFs that declare none. */
@@ -101,8 +101,18 @@ export function lectureSequence(units: CurriculumUnit[], pdfs: DatabasePdf[]) {
     }));
 }
 
-/** "Forelesning 03", as the pensum names the lecture. */
-export const lectureNumberLabel = (unit: CurriculumUnit) => `Forelesning ${unit.number ?? ""}`.trim();
+/** Lecture PDFs whose titles declare a number that has a topic in `titles`, in lecture-number order. */
+export function titledLectureSequence(pdfs: DatabasePdf[], titles: Record<string, string>) {
+  return pdfs.filter(pdf => pdf.category === "forelesninger" && !numberPattern("øving", "\\w+").test(pdf.title))
+    .flatMap(pdf => {
+      const number = lectureNumberInTitle(pdf.title);
+      return number && titles[number] ? [{ pdf, number, title: titles[number] }] : [];
+    })
+    .sort((a, b) => Number(a.number) - Number(b.number));
+}
+
+/** "Forelesning 03", as the lecture is numbered. */
+export const lectureNumberLabel = (number?: string) => `Forelesning ${number ?? ""}`.trim();
 
 export function exercisesForUnit(unit: CurriculumUnit, pdfs: DatabasePdf[], notes: NoteMetadata[]) {
   if (!unit.resourceNumber) return [];

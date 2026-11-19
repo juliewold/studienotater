@@ -11,8 +11,8 @@ import {
   type DatabasePdf,
 } from "../../../services/media/pdfsService";
 
-import { lectureNumberLabel, lectureSequence, type CurriculumUnit } from "../../../services/subjects/curriculumContent";
-import { loadCurriculumWorkspace } from "../../../services/subjects/curriculumWorkspaceService";
+import { lectureNumberLabel } from "../../../services/subjects/curriculumContent";
+import { loadLectureSequence, type LectureItem } from "../../../services/subjects/lectureSequenceService";
 
 import {
   createNote,
@@ -33,14 +33,15 @@ type LectureLink = { id: string; title: string };
 /** Where a forelesningsnotat sits in the subject's pensum order. */
 type LectureSlot = {
   pdfId: string;
-  unit: CurriculumUnit;
+  number: string;
+  title: string;
   previous: LectureLink | null;
   next: LectureLink | null;
 };
 
-const lectureLink = (pdf: DatabasePdf, unit: CurriculumUnit): LectureLink => ({
-  id: pdf.id,
-  title: `${lectureNumberLabel(unit)}: ${unit.title}`,
+const lectureLink = (item: LectureItem): LectureLink => ({
+  id: item.pdf.id,
+  title: `${lectureNumberLabel(item.number)}: ${item.title}`,
 });
 
 const isAppleMobileDevice = () => {
@@ -125,11 +126,10 @@ export const PdfViewerPage = () => {
     let cancelled = false;
 
     // Lecture order comes from the pensum; without it the page still works, just without the lecture heading and navigation.
-    loadCurriculumWorkspace(subjectId)
-      .then((workspace) => {
+    loadLectureSequence(subjectId)
+      .then((sequence) => {
         if (cancelled) return;
 
-        const sequence = lectureSequence(workspace.units, workspace.pdfs);
         const index = sequence.findIndex((item) => item.pdf.id === currentId);
 
         setLectureSlot(
@@ -137,9 +137,10 @@ export const PdfViewerPage = () => {
             ? null
             : {
                 pdfId: currentId,
-                unit: sequence[index].unit,
-                previous: index > 0 ? lectureLink(sequence[index - 1].pdf, sequence[index - 1].unit) : null,
-                next: index < sequence.length - 1 ? lectureLink(sequence[index + 1].pdf, sequence[index + 1].unit) : null,
+                number: sequence[index].number,
+                title: sequence[index].title,
+                previous: index > 0 ? lectureLink(sequence[index - 1]) : null,
+                next: index < sequence.length - 1 ? lectureLink(sequence[index + 1]) : null,
               },
         );
       })
@@ -247,9 +248,9 @@ export const PdfViewerPage = () => {
 
       {lecture ? (
         <>
-          <p className="page-label">{lectureNumberLabel(lecture.unit)}</p>
+          <p className="page-label">{lectureNumberLabel(lecture.number)}</p>
 
-          <h1>{lecture.unit.title}</h1>
+          <h1>{lecture.title}</h1>
 
           <p className="pdf-lecture-file">{pdf.title}</p>
         </>
