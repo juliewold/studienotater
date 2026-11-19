@@ -8,6 +8,7 @@ import type { FlashcardLevel, FlashcardProgress } from "../../../services/study/
 import type { DatabaseFlashcard } from "../../../services/study/flashcardsService";
 import { MathText } from "../../common/MathText/MathText";
 import { FlashcardExplanation } from "../FlashcardExplanation/FlashcardExplanation";
+import { FlashcardPlot } from "../FlashcardPlot/FlashcardPlot";
 
 const levelOrder: FlashcardLevel[] = ["red", "yellow", "green"];
 
@@ -41,6 +42,23 @@ const renderChoice = (option: string) => {
     .replace(/\n?```$/, "");
 
   return <pre className="flashcard-choice-code"><code>{code}</code></pre>;
+};
+
+/** Card text is a formula line, or contains code between three backticks. Code keeps its line breaks. */
+const renderCardText = (text: string) => {
+  if (text.includes("```")) {
+    return (
+      <div className="flashcard-card-title">
+        <FlashcardExplanation text={text} />
+      </div>
+    );
+  }
+
+  return (
+    <h2>
+      <MathText>{text}</MathText>
+    </h2>
+  );
 };
 
 /** Figure on one side of a card. Loaded through the private storage hook, so only signed-in users see it. */
@@ -110,9 +128,9 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
       >
         <p className="flashcard-label">{isFlipped ? "Svar" : "Spørsmål"}</p>
 
-        <h2>
-          <MathText>{isFlipped ? flashcard.answer : flashcard.question}</MathText>
-        </h2>
+        {renderCardText(isFlipped ? flashcard.answer : flashcard.question)}
+
+        <FlashcardPlot figureKey={flashcard.figureKey} />
 
         {shownFigure && <FlashcardFigure key={shownFigure} path={shownFigure} />}
 
