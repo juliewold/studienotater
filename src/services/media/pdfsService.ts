@@ -153,6 +153,17 @@ export async function updatePdfSubtopic(
   }
 }
 
+export async function updatePdfTitle(pdfId: string, title: string) {
+  const { error } = await supabase
+    .from("pdfs")
+    .update({ title })
+    .eq("id", pdfId);
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function deletePdf(pdfId: string, filePath: string) {
   const { error: storageError } = await supabase.storage
     .from("pdfs")
