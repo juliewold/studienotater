@@ -44,7 +44,6 @@ class LLMClientTests(SimpleTestCase):
     @patch.dict("os.environ", {"NTNU_LLM_API_KEY": "test-key"}, clear=True)
     def test_services_use_shared_client_and_keep_response_contracts(self):
         from concepts.concept_extraction_service import extract_concept_candidates
-        from concepts.flashcard_generation_service import generate_flashcards
         from concepts.note_summary_service import summarize_note
         from concepts.selected_text_service import explain_selected_text
         from concepts.subject_structure_service import generate_subject_structure
@@ -54,7 +53,6 @@ class LLMClientTests(SimpleTestCase):
             (summarize_note, ("Kildetekst",), {"summary": "Kort oppsummering"}, "Kort oppsummering"),
             (explain_selected_text, ("Utdrag",), {"explanation": "Enkel forklaring"}, "Enkel forklaring"),
             (extract_concept_candidates, ("Kildetekst",), {"candidates": []}, []),
-            (generate_flashcards, ("<p>Kildetekst</p>", []), {"flashcards": []}, []),
             (generate_subject_structure, ("Fag", []), {"topics": []}, {"topics": []}),
         ]
         for function, args, output, expected in cases:

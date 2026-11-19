@@ -10,7 +10,6 @@ from django.views.decorators.http import require_POST
 from .auth import require_ai_admin
 from .concept_extraction_service import extract_concept_candidates
 logger = logging.getLogger(__name__)
-from .flashcard_generation_service import generate_flashcards
 from .note_summary_service import summarize_note
 from .selected_text_service import explain_selected_text
 from .subject_structure_service import generate_subject_structure
@@ -205,84 +204,6 @@ def generate_structure(request):
 
     return JsonResponse(structure)
 
-
-@csrf_exempt
-@require_POST
-@require_ai_admin
-def generate_flashcard_suggestions(request):
-    try:
-        body = json.loads(request.body)
-    except (json.JSONDecodeError, UnicodeDecodeError):
-        return JsonResponse({"error": "Invalid JSON."}, status=400)
-
-    if not isinstance(body, dict):
-        return JsonResponse({"error": "Body must be an object."}, status=400)
-
-    text = body.get("text")
-    subtopics = body.get("subtopics")
-
-    if not isinstance(text, str) or not text.strip():
-        return JsonResponse(
-            {"error": "Text is required."},
-            status=400,
-        )
-
-    if not isinstance(subtopics, list):
-        return JsonResponse(
-            {"error": "Subtopics must be a list."},
-            status=400,
-        )
-
-    if any(
-        not isinstance(item, dict)
-        or not isinstance(item.get("id"), str)
-        or not item["id"].strip()
-        or not isinstance(item.get("name"), str)
-        or not item["name"].strip()
-        for item in subtopics
-    ):
-        return JsonResponse(
-            {"error": "Invalid subtopics."},
-            status=400,
-        )
-
-    try:
-        flashcards = generate_flashcards(
-            text.strip(),
-            subtopics,
-        )
-    except APIConnectionError:
-        return JsonResponse(
-            {"error": "Kunne ikke nå AI-tjenesten. Prøv igjen senere."},
-            status=503,
-        )
-    except APIStatusError:
-        return JsonResponse(
-            {
-                "error": (
-                    "AI-tjenesten avviste forespørselen. "
-                    "Prøv igjen senere."
-                )
-            },
-            status=502,
-        )
-    except ValueError:
-        return JsonResponse(
-            {
-                "error": (
-                    "AI-tjenesten returnerte ugyldige flashcards "
-                    "etter to forsøk."
-                ),
-                "code": "invalid_ai_response",
-            },
-            status=502,
-        )
-
-    return JsonResponse(
-        {
-            "flashcards": flashcards,
-        }
-    )
 
 @csrf_exempt
 @require_POST

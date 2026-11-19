@@ -16,9 +16,4 @@ urlpatterns = [
         views.generate_structure,
         name="generate-structure",
     ),
-    path(
-        "generate-flashcards/",
-        views.generate_flashcard_suggestions,
-        name="generate-flashcards",
-    ),
 ]
