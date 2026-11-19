@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { getPdfsBySubject, type DatabasePdf } from "../../../services/media/pdfsService";
+import { lectureNumberLabel, lectureSequence, type CurriculumUnit } from "../../../services/subjects/curriculumContent";
+import { loadCurriculumWorkspace } from "../../../services/subjects/curriculumWorkspaceService";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useProgress } from "../../../hooks/useProgress";
 
@@ -32,6 +34,8 @@ export const PdfsPage = () => {
   const [pdfs, setPdfs] = useState<DatabasePdf[]>([]);
   const [isLoadingPdfs, setIsLoadingPdfs] = useState(true);
   const [pdfError, setPdfError] = useState("");
+  // Lecture PDFs by id, with their pensum unit and place in the lecture order.
+  const [lectures, setLectures] = useState<Map<string, { index: number; unit: CurriculumUnit }>>(new Map());
 
   const { isFavorite, toggleFavorite, isLoadingFavorites } = useFavorites();
 
@@ -62,6 +66,31 @@ export const PdfsPage = () => {
     loadPdfs();
   }, [subjectId]);
 
+  useEffect(() => {
+    if (!subjectId) return;
+
+    let cancelled = false;
+
+    // Titles and order come from the pensum; without it the cards keep their PDF titles.
+    loadCurriculumWorkspace(subjectId)
+      .then((workspace) => {
+        if (cancelled) return;
+
+        setLectures(
+          new Map(
+            lectureSequence(workspace.units, workspace.pdfs).map(({ pdf, unit }, index) => [pdf.id, { index, unit }]),
+          ),
+        );
+      })
+      .catch((error) => {
+        console.error("Kunne ikke hente forelesningene:", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [subjectId]);
+
   return (
     <main className="page-container">
       <Link to={`/fag/${subjectId}`} className="back-link">
@@ -83,9 +112,11 @@ export const PdfsPage = () => {
       {!isLoadingPdfs &&
         !pdfError &&
         categories.map((category) => {
-          const categoryPdfs = pdfs.filter(
-            (pdf) => pdf.category === category.id,
-          );
+          // Lectures follow the pensum; PDFs outside it keep their upload order after them.
+          const position = (pdf: DatabasePdf) => lectures.get(pdf.id)?.index ?? Number.MAX_SAFE_INTEGER;
+          const categoryPdfs = pdfs
+            .filter((pdf) => pdf.category === category.id)
+            .sort((a, b) => position(a) - position(b));
 
           if (categoryPdfs.length === 0) {
             return null;
@@ -110,13 +141,27 @@ export const PdfsPage = () => {
 
                   const favorite = isFavorite(favoriteId, "pdf");
 
+                  const lecture = lectures.get(pdf.id);
+
                   return (
                     <article className="pdf-card-wrapper" key={pdf.id}>
                       <Link to={pdfUrl} className="pdf-card">
                         <span className="pdf-icon">📄</span>
 
                         <div className="pdf-card-content">
-                          <h3>{pdf.title}</h3>
+                          {lecture ? (
+                            <>
+                              <span className="pdf-lecture-number">
+                                {lectureNumberLabel(lecture.unit)}
+                              </span>
+
+                              <h3>{lecture.unit.title}</h3>
+
+                              <span className="pdf-card-file">{pdf.title}</span>
+                            </>
+                          ) : (
+                            <h3>{pdf.title}</h3>
+                          )}
 
                           <div className="pdf-progress-preview">
                             <span>{completed ? "✓ Lest" : "Ikke lest"}</span>
