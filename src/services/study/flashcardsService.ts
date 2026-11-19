@@ -21,6 +21,8 @@ export type DatabaseFlashcard = {
   answerImagePath: string | null;
   /** Worked solution shown under the answer. Optional. */
   explanation: string | null;
+  /** Key of a built-in figure shown with the card, for example "normal". Null when there is none. */
+  figureKey: string | null;
   /** Shown as four answer choices in practice when true. */
   multipleChoice: boolean;
   /** Three wrong answers. Only set for multiple-choice cards. */
@@ -65,6 +67,7 @@ type FlashcardRow = {
   question_image_path: string | null;
   answer_image_path: string | null;
   explanation: string | null;
+  figure_key?: string | null;
   multiple_choice: boolean;
   distractors: string[] | null;
   created_at: string;
@@ -94,6 +97,7 @@ function toDatabaseFlashcard(flashcard: FlashcardRow): DatabaseFlashcard {
     questionImagePath: flashcard.question_image_path ?? null,
     answerImagePath: flashcard.answer_image_path ?? null,
     explanation: flashcard.explanation ?? null,
+    figureKey: flashcard.figure_key ?? null,
     multipleChoice: flashcard.multiple_choice === true,
     distractors: flashcard.distractors ?? [],
     createdAt: flashcard.created_at,

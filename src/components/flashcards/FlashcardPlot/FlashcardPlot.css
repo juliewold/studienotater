@@ -1,0 +1,11 @@
+/* A figure shown on a flashcard. The figure keeps its own viewBox and scales to the card width. */
+.flashcard-plot {
+  margin: 0.75rem auto 0;
+  max-width: 640px;
+}
+
+.flashcard-plot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

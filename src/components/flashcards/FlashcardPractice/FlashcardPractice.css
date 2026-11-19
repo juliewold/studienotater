@@ -84,6 +84,14 @@
   cursor: pointer;
 }
 
+/* Question or answer that contains code. Same size as the heading, but it may hold a code block. */
+.flashcard-card-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+}
+
 /* Code options keep their line breaks and indentation. */
 .flashcard-choice-code {
   margin: 0;
