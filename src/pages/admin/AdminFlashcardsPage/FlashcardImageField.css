@@ -1,0 +1,36 @@
+.admin-flashcard-image-field {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.admin-flashcard-image-field input[type="file"] {
+  max-width: 100%;
+}
+
+.admin-flashcard-image-current {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.admin-flashcard-image-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 240px;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--theme-border, #e4dfeb);
+  background: var(--theme-surface, #ffffff);
+}
+
+.admin-flashcard-image-current button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--theme-border, #e4dfeb);
+  background: var(--theme-surface, #ffffff);
+  color: var(--theme-text, #24202a);
+  cursor: pointer;
+}

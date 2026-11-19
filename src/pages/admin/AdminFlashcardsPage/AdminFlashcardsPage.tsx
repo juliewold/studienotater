@@ -2,6 +2,7 @@ import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholde
 import "./AdminFlashcardsPage.css";
 import { subjects } from "../../../data/subjects";
 import { useAdminFlashcards } from "../../../hooks/admin/useAdminFlashcards";
+import { FlashcardImageField } from "./FlashcardImageField";
 
 export const AdminFlashcardsPage = () => {
   const {
@@ -25,6 +26,19 @@ export const AdminFlashcardsPage = () => {
 
     answer,
     setAnswer,
+
+    examTask,
+    setExamTask,
+    examTaskOptions,
+
+    questionImagePath,
+    answerImagePath,
+    setQuestionImagePath,
+    setAnswerImagePath,
+    questionImageFile,
+    setQuestionImageFile,
+    answerImageFile,
+    setAnswerImageFile,
 
     editingFlashcard,
 
@@ -149,6 +163,48 @@ export const AdminFlashcardsPage = () => {
               required
             />
 
+            <label htmlFor="flashcard-exam-task">Eksamensoppgave (valgfri)</label>
+
+            <input
+              id="flashcard-exam-task"
+              type="text"
+              list="flashcard-exam-task-options"
+              value={examTask}
+              onChange={(event) => setExamTask(event.target.value)}
+              placeholder="Eksamen aug 2026 · 5a"
+              maxLength={80}
+            />
+
+            <datalist id="flashcard-exam-task-options">
+              {examTaskOptions.map((option) => (
+                <option key={option} value={option} />
+              ))}
+            </datalist>
+
+            <FlashcardImageField
+              id="flashcard-question-image"
+              label="Bilde til spørsmålet (valgfritt)"
+              savedPath={questionImagePath}
+              pendingFile={questionImageFile}
+              onFileChange={setQuestionImageFile}
+              onClear={() => {
+                setQuestionImagePath(null);
+                setQuestionImageFile(null);
+              }}
+            />
+
+            <FlashcardImageField
+              id="flashcard-answer-image"
+              label="Bilde til svaret (valgfritt)"
+              savedPath={answerImagePath}
+              pendingFile={answerImageFile}
+              onFileChange={setAnswerImageFile}
+              onClear={() => {
+                setAnswerImagePath(null);
+                setAnswerImageFile(null);
+              }}
+            />
+
             {errorMessage && (
               <p className="admin-flashcard-message admin-flashcard-error">
                 {errorMessage}
@@ -218,6 +274,8 @@ export const AdminFlashcardsPage = () => {
                   <span>{flashcard.topicName}</span>
 
                   <span>{flashcard.subtopicName}</span>
+
+                  {flashcard.examTask && <span>{flashcard.examTask}</span>}
                 </div>
 
                 <div className="uploaded-flashcard-actions">

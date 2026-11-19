@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
 
 import { subjects } from "../../data/subjects";
 
+import { storeNoteImage } from "../../components/notes/NoteEditor/noteImport";
 import {
   createFlashcard,
   deleteFlashcard,
@@ -36,6 +37,14 @@ export const useAdminFlashcards = () => {
 
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+
+  const [examTask, setExamTask] = useState("");
+
+  // Existing image path on the card, plus a newly chosen file that is uploaded on save.
+  const [questionImagePath, setQuestionImagePath] = useState<string | null>(null);
+  const [answerImagePath, setAnswerImagePath] = useState<string | null>(null);
+  const [questionImageFile, setQuestionImageFile] = useState<File | null>(null);
+  const [answerImageFile, setAnswerImageFile] = useState<File | null>(null);
 
   const [editingFlashcard, setEditingFlashcard] =
     useState<DatabaseFlashcard | null>(null);
@@ -75,6 +84,12 @@ export const useAdminFlashcards = () => {
 
     setQuestion("");
     setAnswer("");
+
+    setExamTask("");
+    setQuestionImagePath(null);
+    setAnswerImagePath(null);
+    setQuestionImageFile(null);
+    setAnswerImageFile(null);
 
     setEditingFlashcard(null);
   };
@@ -221,13 +236,22 @@ export const useAdminFlashcards = () => {
     setIsSaving(true);
 
     try {
+      // Images are uploaded only when a new file was chosen; otherwise the existing path is kept.
+      const fields = {
+        subtopicId,
+        question: trimmedQuestion,
+        answer: trimmedAnswer,
+        examTask: examTask.trim() || null,
+        questionImagePath: questionImageFile
+          ? (await storeNoteImage(questionImageFile)).path
+          : questionImagePath,
+        answerImagePath: answerImageFile
+          ? (await storeNoteImage(answerImageFile)).path
+          : answerImagePath,
+      };
+
       if (editingFlashcard) {
-        await updateFlashcard(
-          editingFlashcard.id,
-          subtopicId,
-          trimmedQuestion,
-          trimmedAnswer,
-        );
+        await updateFlashcard(editingFlashcard.id, fields);
 
         resetForm();
         await refreshUploadedFlashcards();
@@ -245,13 +269,7 @@ export const useAdminFlashcards = () => {
         return;
       }
 
-      await createFlashcard(
-        subjectId,
-        subtopicId,
-        slug,
-        trimmedQuestion,
-        trimmedAnswer,
-      );
+      await createFlashcard({ subjectId, slug, ...fields });
 
       resetForm();
       await refreshUploadedFlashcards();
@@ -284,6 +302,12 @@ export const useAdminFlashcards = () => {
 
     setQuestion(flashcard.question);
     setAnswer(flashcard.answer);
+
+    setExamTask(flashcard.examTask ?? "");
+    setQuestionImagePath(flashcard.questionImagePath);
+    setAnswerImagePath(flashcard.answerImagePath);
+    setQuestionImageFile(null);
+    setAnswerImageFile(null);
 
     setErrorMessage("");
     setSuccessMessage("");
@@ -337,6 +361,15 @@ export const useAdminFlashcards = () => {
     }
   };
 
+  // Existing labels, so the same exam task is spelled the same way on every card.
+  const examTaskOptions = Array.from(
+    new Set(
+      uploadedFlashcards
+        .map((flashcard) => flashcard.examTask)
+        .filter((label): label is string => Boolean(label)),
+    ),
+  ).sort((first, second) => first.localeCompare(second, "nb"));
+
   return {
     subjectId,
     setSubjectId,
@@ -358,6 +391,19 @@ export const useAdminFlashcards = () => {
 
     answer,
     setAnswer,
+
+    examTask,
+    setExamTask,
+    examTaskOptions,
+
+    questionImagePath,
+    answerImagePath,
+    setQuestionImagePath,
+    setAnswerImagePath,
+    questionImageFile,
+    setQuestionImageFile,
+    answerImageFile,
+    setAnswerImageFile,
 
     editingFlashcard,
 
