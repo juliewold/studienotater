@@ -24,6 +24,7 @@ type FlashcardTopicSectionsProps = {
   subjectId: string;
   groups: FlashcardTopicGroup[];
   progress: Map<string, FlashcardProgress>;
+  onStartPractice: (title: string, flashcards: DatabaseFlashcard[]) => void;
 };
 
 const plural = (count: number, singular: string, pluralForm: string) =>
@@ -33,7 +34,7 @@ const plural = (count: number, singular: string, pluralForm: string) =>
  * One compact row per tema, in the order of the subject's topics. A row with cards opens
  * the tema page, where the subtopics and practice are. Flashcards are written in the admin editor.
  */
-export const FlashcardTopicSections = ({ subjectId, groups, progress }: FlashcardTopicSectionsProps) => {
+export const FlashcardTopicSections = ({ subjectId, groups, progress, onStartPractice }: FlashcardTopicSectionsProps) => {
   const [topics, setTopics] = useState<DatabaseTopic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -75,25 +76,37 @@ export const FlashcardTopicSections = ({ subjectId, groups, progress }: Flashcar
         const group = groups.find((item) => item.topicId === topic.id);
         const cards = group?.subtopics.flatMap((subtopic) => subtopic.flashcards) ?? [];
 
-        const content = (
-          <>
-            <div className="flashcard-topic-row-text">
-              <h2>{topic.name}</h2>
+        return (
+          <div key={topic.id} className={`flashcard-topic-row ${cards.length === 0 ? "flashcard-topic-row-empty" : ""}`}>
+            {cards.length > 0 ? (
+              <Link to={`/fag/${subjectId}/flashcards/${topic.id}`} className="flashcard-topic-open">
+                <div className="flashcard-topic-row-text">
+                  <h2>{topic.name}</h2>
 
-              <p>{cards.length === 0 ? "Flashcards kommer" : plural(cards.length, "kort", "kort")}</p>
-            </div>
+                  <p>{plural(cards.length, "kort", "kort")}</p>
+                </div>
 
-            {cards.length > 0 && <FlashcardProgressBar counts={countFlashcardLevels(cards, progress)} />}
-          </>
-        );
+                <FlashcardProgressBar counts={countFlashcardLevels(cards, progress)} />
+              </Link>
+            ) : (
+              <div className="flashcard-topic-open">
+                <div className="flashcard-topic-row-text">
+                  <h2>{topic.name}</h2>
 
-        return cards.length > 0 ? (
-          <Link key={topic.id} to={`/fag/${subjectId}/flashcards/${topic.id}`} className="flashcard-topic-row">
-            {content}
-          </Link>
-        ) : (
-          <div key={topic.id} className="flashcard-topic-row flashcard-topic-row-empty">
-            {content}
+                  <p>Flashcards kommer</p>
+                </div>
+              </div>
+            )}
+
+            {cards.length > 0 && (
+              <button
+                type="button"
+                className="flashcard-primary-button flashcard-topic-start"
+                onClick={() => onStartPractice(topic.name, cards)}
+              >
+                Start øving
+              </button>
+            )}
           </div>
         );
       })}

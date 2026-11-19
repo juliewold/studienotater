@@ -1,0 +1,32 @@
+.flashcard-tema-cards {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  min-width: 0;
+}
+
+.flashcard-tema-group h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  color: var(--theme-muted, #746d79);
+}
+
+.flashcard-tema-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.6rem;
+  border-radius: 14px;
+  background: var(--theme-surface, #ffffff);
+  border: 1px solid rgba(124, 110, 230, 0.12);
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.flashcard-tema-question {
+  font-weight: 650;
+}
+
+.flashcard-tema-answer {
+  color: var(--theme-text, #24202a);
+}

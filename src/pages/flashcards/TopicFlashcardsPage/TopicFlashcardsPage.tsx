@@ -7,6 +7,8 @@ import { Link, useParams } from "react-router-dom";
 import { FlashcardPractice } from "../../../components/flashcards/FlashcardPractice/FlashcardPractice";
 import { FlashcardProgressBar } from "../../../components/flashcards/FlashcardProgressBar/FlashcardProgressBar";
 import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
+import { MathText } from "../../../components/common/MathText/MathText";
+import "./TopicFlashcardsPage.css";
 import {
   getFlashcardProgress,
   type FlashcardProgress,
@@ -190,27 +192,23 @@ export const TopicFlashcardsPage = () => {
             </button>
           </section>
 
-          <div className="flashcard-subtopics">
+          <div className="flashcard-tema-cards">
             {subtopics.map((subtopic) => (
-              <article key={subtopic.id} className="flashcard-subtopic-card">
-                <div>
-                  <p className="flashcard-subtopic-label">Undertema</p>
+              <section key={subtopic.id} className="flashcard-tema-group">
+                <h3>{subtopic.name}</h3>
 
-                  <h3>{subtopic.name}</h3>
+                {subtopic.flashcards.map((flashcard) => (
+                  <article key={flashcard.id} className="flashcard-tema-card">
+                    <div className="flashcard-tema-question">
+                      <MathText>{flashcard.question}</MathText>
+                    </div>
 
-                  <span>{subtopic.flashcards.length} kort</span>
-
-                  <FlashcardProgressBar counts={countFlashcardLevels(subtopic.flashcards, progress)} />
-                </div>
-
-                <button
-                  type="button"
-                  className="flashcard-secondary-button"
-                  onClick={() => startPractice(subtopic.name, subtopic.flashcards)}
-                >
-                  Øv på undertema
-                </button>
-              </article>
+                    <div className="flashcard-tema-answer">
+                      <MathText>{flashcard.answer}</MathText>
+                    </div>
+                  </article>
+                ))}
+              </section>
             ))}
           </div>
         </>
