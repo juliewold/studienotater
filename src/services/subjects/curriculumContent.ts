@@ -101,14 +101,23 @@ export function lectureSequence(units: CurriculumUnit[], pdfs: DatabasePdf[]) {
     }));
 }
 
-/** Lecture PDFs whose titles declare a number that has a topic in `titles`, in lecture-number order. */
-export function titledLectureSequence(pdfs: DatabasePdf[], titles: Record<string, string>) {
+/** The topic a title names after its number, when written as "Forelesning 1 – Tema" or "Forelesning 1: Tema". */
+export const lectureTopicInTitle = (title: string) =>
+  title.match(/^\s*forelesn(?:ing(?:er)?)?[\s_.-]*0*\d+[ab]?\s*[-–—:|]\s*(.+?)\s*$/iu)?.[1];
+
+/** Lecture PDFs whose titles declare a lecture number, in lecture-number order. Works for any subject, without pensum units. */
+export function numberedLectureSequence(pdfs: DatabasePdf[]) {
+  const order = (number: string) => [parseInt(number, 10), number.replace(/^\d+/, "")] as const;
   return pdfs.filter(pdf => pdf.category === "forelesninger" && !numberPattern("øving", "\\w+").test(pdf.title))
     .flatMap(pdf => {
       const number = lectureNumberInTitle(pdf.title);
-      return number && titles[number] ? [{ pdf, number, title: titles[number] }] : [];
+      return number ? [{ pdf, number, title: lectureTopicInTitle(pdf.title) }] : [];
     })
-    .sort((a, b) => Number(a.number) - Number(b.number));
+    .sort((a, b) => {
+      const [aNumber, aSuffix] = order(a.number);
+      const [bNumber, bSuffix] = order(b.number);
+      return aNumber - bNumber || aSuffix.localeCompare(bSuffix);
+    });
 }
 
 /** "Forelesning 03", as the lecture is numbered. */

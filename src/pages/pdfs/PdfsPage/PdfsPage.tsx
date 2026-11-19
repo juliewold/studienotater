@@ -35,7 +35,7 @@ export const PdfsPage = () => {
   const [isLoadingPdfs, setIsLoadingPdfs] = useState(true);
   const [pdfError, setPdfError] = useState("");
   // Lecture PDFs by id, with their number, topic and place in the lecture order.
-  const [lectures, setLectures] = useState<Map<string, { index: number; number: string; title: string }>>(new Map());
+  const [lectures, setLectures] = useState<Map<string, { index: number; number: string; title?: string }>>(new Map());
 
   const { isFavorite, toggleFavorite, isLoadingFavorites } = useFavorites();
 
@@ -149,7 +149,7 @@ export const PdfsPage = () => {
                         <span className="pdf-icon">📄</span>
 
                         <div className="pdf-card-content">
-                          {lecture ? (
+                          {lecture?.title ? (
                             <>
                               <span className="pdf-lecture-number">
                                 {lectureNumberLabel(lecture.number)}

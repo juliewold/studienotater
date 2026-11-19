@@ -1,22 +1,25 @@
 import { getCurriculumConfig } from "../../data/curriculum";
-import { getLectureTitles } from "../../data/curriculum/lectureTitles";
 import { getPdfsBySubject, type DatabasePdf } from "../media/pdfsService";
-import { lectureSequence, titledLectureSequence } from "./curriculumContent";
+import { lectureSequence, numberedLectureSequence } from "./curriculumContent";
 import { loadCurriculumWorkspace } from "./curriculumWorkspaceService";
 
-/** A forelesningsnotat with the number and topic of its lecture. */
-export type LectureItem = { pdf: DatabasePdf; number: string; title: string };
+/** A forelesningsnotat with its lecture number and, when known, its topic. */
+export type LectureItem = { pdf: DatabasePdf; number: string; title?: string };
 
-/** Lecture PDFs of a subject in lecture order: from pensum units when the subject has them, else from numbered lecture titles. */
+/**
+ * Lecture PDFs of a subject in lecture order. Subjects with pensum units use the unit's
+ * number and topic; every other subject uses the number in the PDF title, and the topic
+ * when the title names one after the number.
+ */
 export async function loadLectureSequence(subjectId: string): Promise<LectureItem[]> {
-  const titles = getLectureTitles(subjectId);
-  if (titles) return titledLectureSequence(await getPdfsBySubject(subjectId), titles);
-  if (!getCurriculumConfig(subjectId)) return [];
+  if (getCurriculumConfig(subjectId)) {
+    const workspace = await loadCurriculumWorkspace(subjectId);
+    return lectureSequence(workspace.units, workspace.pdfs).map(({ pdf, unit }) => ({
+      pdf,
+      number: unit.number ?? "",
+      title: unit.title,
+    }));
+  }
 
-  const workspace = await loadCurriculumWorkspace(subjectId);
-  return lectureSequence(workspace.units, workspace.pdfs).map(({ pdf, unit }) => ({
-    pdf,
-    number: unit.number ?? "",
-    title: unit.title,
-  }));
+  return numberedLectureSequence(await getPdfsBySubject(subjectId));
 }

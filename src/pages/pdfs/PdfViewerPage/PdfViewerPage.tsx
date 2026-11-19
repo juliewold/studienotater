@@ -34,14 +34,14 @@ type LectureLink = { id: string; title: string };
 type LectureSlot = {
   pdfId: string;
   number: string;
-  title: string;
+  title?: string;
   previous: LectureLink | null;
   next: LectureLink | null;
 };
 
 const lectureLink = (item: LectureItem): LectureLink => ({
   id: item.pdf.id,
-  title: `${lectureNumberLabel(item.number)}: ${item.title}`,
+  title: item.title ? `${lectureNumberLabel(item.number)}: ${item.title}` : lectureNumberLabel(item.number),
 });
 
 const isAppleMobileDevice = () => {
@@ -250,9 +250,9 @@ export const PdfViewerPage = () => {
         <>
           <p className="page-label">{lectureNumberLabel(lecture.number)}</p>
 
-          <h1>{lecture.title}</h1>
+          <h1>{lecture.title ?? pdf.title}</h1>
 
-          <p className="pdf-lecture-file">{pdf.title}</p>
+          {lecture.title && <p className="pdf-lecture-file">{pdf.title}</p>}
         </>
       ) : (
         <>
