@@ -1,13 +1,14 @@
 import { LoadingPlaceholder } from "../../common/LoadingPlaceholder/LoadingPlaceholder";
 import { folderToneClass } from "../../../services/notes/noteFolderOrder";
 import "../FolderCard/folderColors.css";
-import { useContext, useEffect, useRef, useState, useSyncExternalStore, type MouseEvent } from "react";
+import { useContext, useEffect, useRef, useState, useSyncExternalStore, type MouseEvent, type ReactNode } from "react";
 import { Link, Outlet, useLocation, useMatch, useNavigate, useParams } from "react-router-dom";
 import { ChevronDown, FileText, Folder, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { subjects } from "../../../data/subjects";
 import { useSemesterSubjects } from "../../../hooks/useSemesterSubjects";
 import { getNoteFoldersBySubject } from "../../../services/notes/noteFoldersService";
-import { flattenFolderTree } from "../../../services/notes/folderTree";
+import { getChildFolders } from "../../../services/notes/folderTree";
+import type { NoteFolder } from "../../../services/notes/noteFoldersService";
 import { getNoteBySlug, getNoteMetadataBySubject } from "../../../services/notes/notesService";
 import { createNotesNavigationStore, createPendingNoteLoader } from "../../../services/notes/notesNavigationStore";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
@@ -83,21 +84,28 @@ const SubjectNotesLayout = ({ subjectId }: { subjectId: string }) => {
   };
   const noteLink = (note: NoteMetadata) => <Link key={note.id} to={`${base}/${encodeURIComponent(note.slug)}`} onClick={event => void go(event, `${base}/${encodeURIComponent(note.slug)}`, note.folderId)} className={`notes-outline-note${currentNote?.id === note.id ? " is-current" : ""}`} aria-current={currentNote?.id === note.id ? "page" : undefined}><FileText size={14} /><span>{note.title}</span></Link>;
   const unfiled = data.notes.filter(note => !note.folderId || !data.folders.some(folder => folder.id === note.folderId));
+  // A folder's subfolders and notes are drawn inside its own box, so the tree nests visually.
+  const renderFolder = (folder: NoteFolder): ReactNode => {
+    const notes = data.notes.filter(note => note.folderId === folder.id);
+    const children = getChildFolders(data.folders, folder.id);
+    const active = currentFolder === folder.id;
+    const open = expanded[folder.id] ?? active;
+    return <section key={folder.id} className={`notes-outline-folder ${folderToneClass(folder)}${active ? " is-current-folder" : ""}`}>
+      <div className="notes-outline-folder-heading"><button aria-label={`${open ? "Skjul" : "Vis"} notater i ${folder.name}`} aria-expanded={open} onClick={() => setExpanded(previous => ({ ...previous, [folder.id]: !open }))}><ChevronDown size={16} /></button><Link to={`${base}/mappe/${encodeURIComponent(folder.id)}`} onClick={event => void go(event, `${base}/mappe/${encodeURIComponent(folder.id)}`, folder.id)} aria-current={folderMatch?.params.folderId === folder.id ? "page" : undefined}><Folder size={16} /><span>{folder.name}</span><small>{notes.length}</small></Link></div>
+      {open && <div className="notes-outline-children">
+        {children.map(renderFolder)}
+        {notes.map(noteLink)}
+        {notes.length === 0 && children.length === 0 && <p className="notes-outline-status">Ingen notater i mappen.</p>}
+      </div>}
+    </section>;
+  };
   const outline = <>
     <header className="notes-outline-header"><div><span>{code}</span><h2>{name}</h2></div></header>
     <Link className="notes-outline-all" to={base} onClick={event => void go(event, base)} aria-current={pathname === base ? "page" : undefined}>Alle notater</Link>
     {loading && <LoadingPlaceholder label="Laster mapper og notater…" />}
     {error && <div className="notes-outline-status" role="alert">{error} <button onClick={() => void store.refresh()}>Prøv igjen</button></div>}
     <nav aria-label={`Mapper og notater i ${code}`}>
-      {flattenFolderTree(data.folders).map(({ folder, depth }) => {
-        const notes = data.notes.filter(note => note.folderId === folder.id);
-        const active = currentFolder === folder.id;
-        const open = expanded[folder.id] ?? active;
-        return <section key={folder.id} style={{ marginLeft: depth * 12 }} className={`notes-outline-folder ${folderToneClass(folder)}${active ? " is-current-folder" : ""}`}>
-          <div className="notes-outline-folder-heading"><button aria-label={`${open ? "Skjul" : "Vis"} notater i ${folder.name}`} aria-expanded={open} onClick={() => setExpanded(previous => ({ ...previous, [folder.id]: !open }))}><ChevronDown size={16} /></button><Link to={`${base}/mappe/${encodeURIComponent(folder.id)}`} onClick={event => void go(event, `${base}/mappe/${encodeURIComponent(folder.id)}`, folder.id)} aria-current={folderMatch?.params.folderId === folder.id ? "page" : undefined}><Folder size={16} /><span>{folder.name}</span><small>{notes.length}</small></Link></div>
-          {open && <div className="notes-outline-children">{notes.length ? notes.map(noteLink) : <p className="notes-outline-status">Ingen notater i mappen.</p>}</div>}
-        </section>;
-      })}
+      {getChildFolders(data.folders, null).map(renderFolder)}
       {unfiled.length > 0 && <section className="notes-outline-unfiled"><h3>Uten mappe</h3>{unfiled.map(noteLink)}</section>}
       {!loading && !error && !data.folders.length && !data.notes.length && <p className="notes-outline-status">Ingen mapper eller notater ennå.</p>}
     </nav>
