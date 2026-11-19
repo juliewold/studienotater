@@ -1,0 +1,31 @@
+.flashcard-figure {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  height: auto;
+  margin: 0.75rem auto 0;
+  border-radius: 8px;
+}
+
+.flashcard-exam-tasks {
+  margin: 1.5rem 0;
+  min-width: 0;
+}
+
+.flashcard-exam-tasks .flashcard-subtopics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 0.85rem;
+}
+
+.flashcard-exam-tasks .flashcard-subtopic-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.flashcard-exam-tasks .flashcard-subtopic-card button {
+  width: 100%;
+}

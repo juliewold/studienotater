@@ -1,14 +1,42 @@
 import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
 import "./FlashcardsPage.css";
+import "./FlashcardFigure.css";
 import { MathText } from "../../../components/common/MathText/MathText";
 import { FlashcardTopicSections } from "../../../components/flashcards/FlashcardTopicSections/FlashcardTopicSections";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { usePrivateStorageUrl } from "../../../hooks/usePrivateStorageUrl";
 import {
   getFlashcardsBySubject,
   type DatabaseFlashcard,
 } from "../../../services/study/flashcardsService";
+
+const shuffleFlashcards = (flashcards: DatabaseFlashcard[]) => {
+  const shuffled = [...flashcards];
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+
+  return shuffled;
+};
+
+/** Figure on a flashcard side. Loaded through the private storage hook, so only signed-in users see it. */
+const FlashcardFigure = ({ path }: { path: string }) => {
+  const image = usePrivateStorageUrl("note-images", path);
+
+  if (image.url) {
+    return <img className="flashcard-figure" src={image.url} alt="" />;
+  }
+
+  if (image.error) {
+    return <span className="flashcard-hint">Kunne ikke vise figuren.</span>;
+  }
+
+  return <span className="flashcard-hint">Laster figur …</span>;
+};
 
 type GroupedSubtopic = {
   subtopicId: string;
@@ -69,6 +97,21 @@ export const FlashcardsPage = () => {
 
     loadFlashcards();
   }, [subjectId]);
+
+  // Exam sub-tasks, so practice can follow an exam task instead of the curriculum structure.
+  const examTaskGroups = useMemo(() => {
+    const groups = new Map<string, DatabaseFlashcard[]>();
+
+    flashcards.forEach((flashcard) => {
+      if (!flashcard.examTask) return;
+
+      groups.set(flashcard.examTask, [...(groups.get(flashcard.examTask) ?? []), flashcard]);
+    });
+
+    return Array.from(groups.entries())
+      .map(([label, cards]) => ({ label, flashcards: cards }))
+      .sort((first, second) => first.label.localeCompare(second.label, "nb"));
+  }, [flashcards]);
 
   const groupedFlashcards = useMemo<GroupedTopic[]>(() => {
     const topics = new Map<
@@ -246,6 +289,13 @@ export const FlashcardsPage = () => {
             </MathText>
           </h2>
 
+          {(isFlipped ? currentFlashcard.answerImagePath : currentFlashcard.questionImagePath) && (
+            <FlashcardFigure
+              key={isFlipped ? currentFlashcard.answerImagePath : currentFlashcard.questionImagePath}
+              path={(isFlipped ? currentFlashcard.answerImagePath : currentFlashcard.questionImagePath) as string}
+            />
+          )}
+
           <span className="flashcard-hint">
             {isFlipped
               ? "Trykk for å vise spørsmålet"
@@ -333,6 +383,38 @@ export const FlashcardsPage = () => {
           </section>
 
         </>
+      )}
+
+      {!isLoadingFlashcards && !errorMessage && examTaskGroups.length > 0 && (
+        <section className="flashcard-exam-tasks">
+          <p className="flashcard-topic-label">Eksamensoppgaver</p>
+
+          <h2>Øv på en eksamensoppgave</h2>
+
+          <p className="page-description">Kortene i rekkefølge tilfeldig, slik at du må huske svaret.</p>
+
+          <div className="flashcard-subtopics">
+            {examTaskGroups.map((group) => (
+              <article key={group.label} className="flashcard-subtopic-card">
+                <div>
+                  <p className="flashcard-subtopic-label">Oppgave</p>
+
+                  <h3>{group.label}</h3>
+
+                  <span>{group.flashcards.length} kort</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="flashcard-secondary-button"
+                  onClick={() => startPractice(group.label, shuffleFlashcards(group.flashcards))}
+                >
+                  Øv på oppgaven
+                </button>
+              </article>
+            ))}
+          </div>
+        </section>
       )}
 
       {subjectId && (
