@@ -83,6 +83,17 @@ export function lectureNotesForUnit(unit: CurriculumUnit, pdfs: DatabasePdf[]) {
     ((pdf.subtopicId && ids.has(pdf.subtopicId)) || (pattern?.test(pdf.title) ?? false)));
 }
 
+/** Forelesningsnotater in pensum order, each with its unit. Other categories, exercises and the unplaced group are left out. */
+export function lectureSequence(units: CurriculumUnit[], pdfs: DatabasePdf[]) {
+  const lectures = pdfs.filter(pdf => pdf.category === "forelesninger");
+  const placed = new Set<string>();
+  return units.filter(unit => unit.id !== OTHER_UNIT_ID).flatMap(unit =>
+    lectureNotesForUnit(unit, lectures).filter(pdf => !placed.has(pdf.id)).map(pdf => {
+      placed.add(pdf.id);
+      return { pdf, unit };
+    }));
+}
+
 export function exercisesForUnit(unit: CurriculumUnit, pdfs: DatabasePdf[], notes: NoteMetadata[]) {
   if (!unit.resourceNumber) return [];
   const pattern = numberPattern("øving", unit.resourceNumber);

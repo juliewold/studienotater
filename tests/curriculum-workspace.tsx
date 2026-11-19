@@ -12,7 +12,7 @@ import { ConceptGlossaryPage } from "../src/pages/subjects/curriculum/ConceptGlo
 import { tdt4120Curriculum } from "../src/data/curriculum/tdt4120";
 import {
   buildCurriculumUnits, currentNotesForUnit, declaredNumber, exercisesForUnit, extractFormulas, findSymbols, lectureNotesForUnit,
-  matchesSearch, notesForUnit, OTHER_UNIT_ID, type CurriculumTopic,
+  lectureSequence, matchesSearch, notesForUnit, OTHER_UNIT_ID, type CurriculumTopic,
 } from "../src/services/subjects/curriculumContent";
 import { loadCurriculumWorkspace, loadNoteSources } from "../src/services/subjects/curriculumWorkspaceService";
 import type { DatabasePdf } from "../src/services/media/pdfsService";
@@ -60,6 +60,10 @@ const pdf = (id: string, title: string, subtopicId: string | null = null) => ({ 
 const pdfs = [pdf("p1", "forelesn01_kort"), pdf("p10", "Forelesning 10"), pdf("p3", "Øving 1"), pdf("px", "Lysark", "merge")];
 check(lectureNotesForUnit(unit("01"), pdfs).map(item => item.id).join() === "p1", "Forelesning 1 matcher ikke forelesning 10 eller øvinger");
 check(lectureNotesForUnit(unit("03"), pdfs).map(item => item.id).join() === "px", "Forelesningsnotat via undertema");
+const lecturePdfs = [pdf("l10", "Forelesning 10"), pdf("lo", "Øving 1"), pdf("l1", "forelesn01_kort"), pdf("lx", "Lysark", "merge"),
+  { ...pdf("lp", "Forelesning 4"), category: "presentasjoner" } as DatabasePdf];
+const sequence = lectureSequence(units, lecturePdfs);
+check(sequence.map(item => item.pdf.id).join() === "l1,lx,l10" && sequence[1].unit.id === "03", "Forelesningsnotater følger pensumrekkefølgen, uten øvinger og presentasjoner");
 check(exercisesForUnit(unit("01"), pdfs, notes).map(item => item.id).join() === "p3" && exercisesForUnit(unit("03"), pdfs, notes)[0]?.id === "n3", "Øvinger fra PDF-er og notater");
 
 // --- Content -----------------------------------------------------------------
