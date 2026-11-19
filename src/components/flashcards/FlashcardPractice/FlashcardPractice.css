@@ -17,6 +17,19 @@
   font-size: 1.05rem;
 }
 
+/* Worked solution under the answer. Line breaks from the admin editor are kept. */
+.flashcard-explanation {
+  width: 100%;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(36, 32, 42, 0.12);
+  text-align: left;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-x: auto;
+}
+
 .flashcard-choices {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));

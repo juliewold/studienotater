@@ -94,6 +94,12 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
 
         {shownFigure && <FlashcardFigure key={shownFigure} path={shownFigure} />}
 
+        {isFlipped && flashcard.explanation && (
+          <div className="flashcard-explanation">
+            <MathText>{flashcard.explanation}</MathText>
+          </div>
+        )}
+
         {!isFlipped && flashcard.multipleChoice && (
           <div className="flashcard-choices" role="group" aria-label="Svaralternativer">
             {options.map((option, index) => {
