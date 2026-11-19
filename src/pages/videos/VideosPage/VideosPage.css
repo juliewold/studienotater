@@ -1,7 +1,7 @@
 .video-topics {
   display: grid;
-  gap: 56px;
-  margin-top: 40px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .video-topic-section {
@@ -15,44 +15,102 @@
   color: var(--theme-text, #17142a);
 }
 
-.video-subtopics {
-  display: grid;
-  gap: 40px;
-}
-
-.video-subtopic-section {
-  display: grid;
-  gap: 18px;
-}
-
-.video-subtopic-section > h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  color: var(--theme-text, #39344f);
-}
-
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
+}
+
+.video-subtopic-label {
+  margin: 0;
+  padding: 10px 12px 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--theme-text-muted, #6b6680);
+}
+
+.topic-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.topic-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 150px;
+  padding: 22px 20px;
+  border: 1px solid color-mix(in srgb, var(--tile-text, #7c3aed) 35%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--tile-text, #7c3aed) 12%, #fff);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  color: var(--theme-text, #17142a);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.topic-tile:hover {
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+}
+
+.topic-tile-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.topic-tile-count {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--theme-text, #17142a);
+}
+
+/* Dark theme: tint the app's dark surface with the bright accent for each colour. */
+[data-theme="dark"] .topic-tile {
+  background: color-mix(in srgb, var(--tile-dark, #c4a0ff) 16%, var(--app-surface, #231e2e));
+  border-color: color-mix(in srgb, var(--tile-dark, #c4a0ff) 40%, transparent);
+  color: var(--app-text, #eee9f5);
+}
+
+[data-theme="dark"] .topic-tile-count {
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--tile-dark, #c4a0ff);
+}
+
+.topic-back {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
 }
 
 .video-card {
   background: var(--theme-surface, white);
   border: none;
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 0;
   overflow: hidden;
   text-align: left;
   color: inherit;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
 }
 
 .video-card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
 }
 
@@ -110,24 +168,24 @@
 
 .video-card h4 {
   margin: 0;
-  padding: 18px 20px 12px;
+  padding: 14px 18px 10px;
   font-size: 1rem;
   line-height: 1.45;
   color: var(--theme-text, #17142a);
 }
 
 .video-card .resource-progress {
-  padding: 0 20px 22px;
+  padding: 0 18px 18px;
 }
 
 @media (max-width: 700px) {
   .video-topics {
-    gap: 32px;
-    margin-top: 24px;
+    gap: 12px;
+    margin-top: 12px;
   }
 
   .video-topic-section {
-    gap: 20px;
+    gap: 16px;
   }
 
   .video-topic-section > h2 {
@@ -135,29 +193,29 @@
     line-height: 1.3;
   }
 
-  .video-subtopics {
-    gap: 24px;
-  }
-
-  .video-subtopic-section {
-    gap: 14px;
-  }
-
-  .video-subtopic-section > h3 {
-    font-size: 1.05rem;
-  }
-
   .video-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  .video-card {
-    border-radius: 20px;
+  .video-subtopic-label {
+    padding: 10px 14px 0;
+    font-size: 0.75rem;
   }
 
-  .video-card:hover {
-    transform: none;
+  .topic-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .topic-tile {
+    min-height: 130px;
+    padding: 16px 14px;
+  }
+
+  .video-card {
+    border-radius: 14px;
   }
 
   .play-button {
@@ -168,14 +226,14 @@
   }
 
   .video-card h4 {
-    padding: 14px 16px 10px;
+    padding: 12px 14px 8px;
 
     font-size: 0.95rem;
     line-height: 1.4;
   }
 
   .video-card .resource-progress {
-    padding: 0 16px 18px;
+    padding: 0 14px 14px;
   }
 }
 
