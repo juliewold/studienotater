@@ -18,7 +18,7 @@ Lærebok: Walpole, Myers, Myers & Ye, 9. utgave. Pensum er definert for denne ut
 | 6 | 6.1–6.7 | |
 | 7 | 7.1, 7.2, 7.3 | **Teorem 7.2 og 7.4 og tilhørende eksempler er ikke pensum** |
 | 8 | 8.1–8.6, 8.8 | |
-| 9 | 9.1–9.6, 9.8, 9.10, 9.12, 9.14 | **9.8 bare til «Variances Unknown but Equal»** (to-utvalg med felles varians er ikke pensum) |
+| 9 | 9.1–9.6, 9.8, 9.10, 9.12, 9.14 | **9.8 bare fram til avsnittet «Variances Unknown but Equal»**. Alt fra dette avsnittet og ut er ikke pensum, altså to-utvalg-t med felles varians og Welch-testen |
 | 10 | 10.1–10.4, 10.5, 10.6, 10.7, 10.8, 10.10 | **10.5 bare til «Unknown But Equal Variances»**; **10.7 bare til «Annotted Computer Printout for Two-Sample t-Test»**; **10.10 bare til «Example 10.13»** |
 | 11 | 11.1–11.6, 11.10 | **11.10 fra «Diagnostic Plots of Residuals»** |
 | 16 | 16.1 | Bare til eksempel 16.2 (fortegnstesten) |

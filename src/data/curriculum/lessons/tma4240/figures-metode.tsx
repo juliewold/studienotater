@@ -49,10 +49,9 @@ export function IntervalChoiceFigure() {
     { ask: "Gjennomsnitt, σ ukjent", use: "t(n − 1): x̄ ± t·s/√n" },
     { ask: "Varians σ²", use: "χ²(n − 1)" },
     { ask: "Andel p, stor n", use: "z: p̂ ± z·√(p̂(1 − p̂)/n)" },
-    { ask: "μ₁ − μ₂, ulik varians", use: "t, Welch-frihetsgrader" },
     { ask: "Ny observasjon", use: "Bredere: t·s·√(1 + 1/n)" },
   ];
-  const width = 640, height = 270, top = 14, rowH = 36;
+  const width = 640, height = 234, top = 14, rowH = 36;
   const spineTop = top + 16, spineBottom = top + (rows.length - 1) * rowH + 16;
   return <Svg label="Valg av konfidensintervall ut fra hva parameteren er og hva som er kjent" width={width} height={height}>
     <Box x={6} y={spineTop + (spineBottom - spineTop) / 2 - 22} w={150} h={44} title="Hva vil du anslå?" accent />
