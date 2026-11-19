@@ -57,10 +57,15 @@
   margin-top: 0.75rem;
 }
 
+/* Soft pastel colours. The chosen rating also colours the whole card. */
 .flashcard-rating-button {
-  min-height: 44px;
-  border-radius: 10px;
-  border: 3px solid transparent;
+  min-height: 48px;
+  padding: 0.5rem 0.6rem;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
   cursor: pointer;
 }
 
@@ -70,17 +75,47 @@
 }
 
 .flashcard-rating-red {
-  background: #c9473f;
+  background: #f8cfca;
+  color: #7a2e28;
 }
 
 .flashcard-rating-yellow {
-  background: #d99a0b;
+  background: #fbeab0;
+  color: #6e5300;
 }
 
 .flashcard-rating-green {
-  background: #2e9e5b;
+  background: #c8ecd5;
+  color: #1f5f3b;
 }
 
 .flashcard-rating-current {
-  border-color: var(--theme-text, #24202a);
+  border-color: rgba(36, 32, 42, 0.45);
+}
+
+.flashcard-practice-card.flashcard-card-red {
+  background: #fde7e4;
+}
+
+.flashcard-practice-card.flashcard-card-yellow {
+  background: #fdf4d3;
+}
+
+.flashcard-practice-card.flashcard-card-green {
+  background: #dff5e7;
+}
+
+.flashcard-practice-card.flashcard-card-red,
+.flashcard-practice-card.flashcard-card-yellow,
+.flashcard-practice-card.flashcard-card-green {
+  color: #24202a;
+}
+
+.flashcard-practice-card.flashcard-card-red h2,
+.flashcard-practice-card.flashcard-card-yellow h2,
+.flashcard-practice-card.flashcard-card-green h2,
+.flashcard-practice-card.flashcard-card-red .flashcard-label,
+.flashcard-practice-card.flashcard-card-yellow .flashcard-label,
+.flashcard-practice-card.flashcard-card-green .flashcard-label {
+  color: #24202a;
 }

@@ -14,10 +14,11 @@ import { MathText } from "../../common/MathText/MathText";
 
 const levelOrder: FlashcardLevel[] = ["red", "yellow", "green"];
 
-const levelNames: Record<FlashcardLevel, string> = {
-  red: "Rød",
-  yellow: "Gul",
-  green: "Grønn",
+// What each rating means for the learner. Shown inside the buttons.
+const levelButtonLabels: Record<FlashcardLevel, string> = {
+  red: "Kan dårlig",
+  yellow: "Usikker",
+  green: "Kan godt",
 };
 
 function shuffle<T>(items: T[]): T[] {
@@ -82,7 +83,7 @@ const PracticeCard = ({ flashcard, progress, isSaving, onRate }: PracticeCardPro
   return (
     <>
       <div
-        className="flashcard-practice-card"
+        className={`flashcard-practice-card ${progress ? `flashcard-card-${progress.level}` : ""}`}
         role="button"
         tabIndex={0}
         aria-pressed={isFlipped}
@@ -91,15 +92,9 @@ const PracticeCard = ({ flashcard, progress, isSaving, onRate }: PracticeCardPro
       >
         <p className="flashcard-label">{isFlipped ? "Svar" : "Spørsmål"}</p>
 
-        {isFlipped ? (
-          <div className="flashcard-answer-text">
-            <MathText>{flashcard.answer}</MathText>
-          </div>
-        ) : (
-          <h2>
-            <MathText>{flashcard.question}</MathText>
-          </h2>
-        )}
+        <h2>
+          <MathText>{isFlipped ? flashcard.answer : flashcard.question}</MathText>
+        </h2>
 
         {shownFigure && <FlashcardFigure key={shownFigure} path={shownFigure} />}
 
@@ -136,14 +131,15 @@ const PracticeCard = ({ flashcard, progress, isSaving, onRate }: PracticeCardPro
           <button
             key={level}
             type="button"
-            aria-label={levelNames[level]}
             aria-pressed={progress?.level === level}
             className={`flashcard-rating-button flashcard-rating-${level} ${
               progress?.level === level ? "flashcard-rating-current" : ""
             }`}
             disabled={isSaving}
             onClick={() => onRate(level)}
-          />
+          >
+            {levelButtonLabels[level]}
+          </button>
         ))}
       </div>
     </>
