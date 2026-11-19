@@ -4,7 +4,12 @@ import "./FlashcardFigure.css";
 import { FlashcardTopicSections } from "../../../components/flashcards/FlashcardTopicSections/FlashcardTopicSections";
 import { FlashcardPractice } from "../../../components/flashcards/FlashcardPractice/FlashcardPractice";
 import { FlashcardProgressBar } from "../../../components/flashcards/FlashcardProgressBar/FlashcardProgressBar";
-import { countFlashcardLevels } from "../../../services/study/flashcardProgressStats";
+import { FlashcardStatusFilter as StatusFilterChips } from "../../../components/flashcards/FlashcardStatusFilter/FlashcardStatusFilter";
+import {
+  countFlashcardLevels,
+  filterFlashcardsByStatus,
+  type FlashcardStatusFilter,
+} from "../../../services/study/flashcardProgressStats";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -50,6 +55,9 @@ export const FlashcardsPage = () => {
 
   const [practiceSession, setPracticeSession] =
     useState<PracticeSession | null>(null);
+
+  // Which cards the learner wants to practise: all, not rated, red, yellow, green or needing practice.
+  const [statusFilter, setStatusFilter] = useState<FlashcardStatusFilter>("all");
 
   useEffect(() => {
     const loadFlashcards = async () => {
@@ -112,11 +120,17 @@ export const FlashcardsPage = () => {
     });
   };
 
+  // The cards that match the status filter. Practice and exam tasks use only these.
+  const visibleFlashcards = useMemo(
+    () => filterFlashcardsByStatus(flashcards, progress, statusFilter),
+    [flashcards, progress, statusFilter],
+  );
+
   // Exam sub-tasks, so practice can follow an exam task instead of the curriculum structure.
   const examTaskGroups = useMemo(() => {
     const groups = new Map<string, DatabaseFlashcard[]>();
 
-    flashcards.forEach((flashcard) => {
+    visibleFlashcards.forEach((flashcard) => {
       if (!flashcard.examTask) return;
 
       groups.set(flashcard.examTask, [...(groups.get(flashcard.examTask) ?? []), flashcard]);
@@ -125,7 +139,7 @@ export const FlashcardsPage = () => {
     return Array.from(groups.entries())
       .map(([label, cards]) => ({ label, flashcards: cards }))
       .sort((first, second) => first.label.localeCompare(second.label, "nb"));
-  }, [flashcards]);
+  }, [visibleFlashcards]);
 
   const groupedFlashcards = useMemo<GroupedTopic[]>(() => {
     const topics = new Map<
@@ -266,28 +280,38 @@ export const FlashcardsPage = () => {
 
       {!isLoadingFlashcards && !errorMessage && flashcards.length > 0 && (
         <>
+          <StatusFilterChips
+            flashcards={flashcards}
+            progress={progress}
+            value={statusFilter}
+            onChange={setStatusFilter}
+          />
+
           <section className="flashcard-all-practice-card">
             <div>
               <p className="flashcard-topic-label">Hele faget</p>
 
-              <h2>Øv på alle flashcards i {subjectId?.toUpperCase()}</h2>
+              <h2>Øv på {statusFilter === "all" ? "alle flashcards" : "valgte flashcards"} i {subjectId?.toUpperCase()}</h2>
 
               <p>
-                {flashcards.length} {flashcards.length === 1 ? "kort" : "kort"}
+                {statusFilter === "all"
+                  ? `${flashcards.length} kort`
+                  : `${visibleFlashcards.length} av ${flashcards.length} kort`}
               </p>
             </div>
 
             <button
               type="button"
               className="flashcard-primary-button"
+              disabled={visibleFlashcards.length === 0}
               onClick={() =>
                 startPractice(
                   subjectId?.toUpperCase() ?? "Hele faget",
-                  flashcards,
+                  visibleFlashcards,
                 )
               }
             >
-              Start øving
+              {visibleFlashcards.length === 0 ? "Ingen kort her" : "Start øving"}
             </button>
           </section>
 
@@ -331,6 +355,7 @@ export const FlashcardsPage = () => {
           subjectId={subjectId}
           groups={groupedFlashcards}
           progress={progress}
+          statusFilter={statusFilter}
           onStartPractice={startPractice}
         />
       )}

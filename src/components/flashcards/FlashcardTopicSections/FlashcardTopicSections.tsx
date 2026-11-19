@@ -6,7 +6,11 @@ import { Link } from "react-router-dom";
 
 import { getTopicsBySubject, type DatabaseTopic } from "../../../services/subjects/subjectStructureService";
 import type { FlashcardProgress } from "../../../services/study/flashcardProgressService";
-import { countFlashcardLevels } from "../../../services/study/flashcardProgressStats";
+import {
+  countFlashcardLevels,
+  filterFlashcardsByStatus,
+  type FlashcardStatusFilter,
+} from "../../../services/study/flashcardProgressStats";
 import type { DatabaseFlashcard } from "../../../services/study/flashcardsService";
 import { FlashcardProgressBar } from "../FlashcardProgressBar/FlashcardProgressBar";
 
@@ -24,6 +28,7 @@ type FlashcardTopicSectionsProps = {
   subjectId: string;
   groups: FlashcardTopicGroup[];
   progress: Map<string, FlashcardProgress>;
+  statusFilter: FlashcardStatusFilter;
   onStartPractice: (title: string, flashcards: DatabaseFlashcard[]) => void;
 };
 
@@ -33,8 +38,9 @@ const plural = (count: number, singular: string, pluralForm: string) =>
 /**
  * One compact row per tema, in the order of the subject's topics. A row with cards opens
  * the tema page, where the subtopics and practice are. Flashcards are written in the admin editor.
+ * The status filter decides which cards the row counts and practises.
  */
-export const FlashcardTopicSections = ({ subjectId, groups, progress, onStartPractice }: FlashcardTopicSectionsProps) => {
+export const FlashcardTopicSections = ({ subjectId, groups, progress, statusFilter, onStartPractice }: FlashcardTopicSectionsProps) => {
   const [topics, setTopics] = useState<DatabaseTopic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -74,19 +80,25 @@ export const FlashcardTopicSections = ({ subjectId, groups, progress, onStartPra
 
       {topics.map((topic) => {
         const group = groups.find((item) => item.topicId === topic.id);
-        const cards = group?.subtopics.flatMap((subtopic) => subtopic.flashcards) ?? [];
+        const allCards = group?.subtopics.flatMap((subtopic) => subtopic.flashcards) ?? [];
+        const cards = filterFlashcardsByStatus(allCards, progress, statusFilter);
+        const isFiltered = statusFilter !== "all";
 
         return (
-          <div key={topic.id} className={`flashcard-topic-row ${cards.length === 0 ? "flashcard-topic-row-empty" : ""}`}>
-            {cards.length > 0 ? (
+          <div key={topic.id} className={`flashcard-topic-row ${allCards.length === 0 ? "flashcard-topic-row-empty" : ""}`}>
+            {allCards.length > 0 ? (
               <Link to={`/fag/${subjectId}/flashcards/${topic.id}`} className="flashcard-topic-open">
                 <div className="flashcard-topic-row-text">
                   <h2>{topic.name}</h2>
 
-                  <p>{plural(cards.length, "kort", "kort")}</p>
+                  <p>
+                    {isFiltered
+                      ? `${cards.length} av ${allCards.length} kort`
+                      : plural(allCards.length, "kort", "kort")}
+                  </p>
                 </div>
 
-                <FlashcardProgressBar counts={countFlashcardLevels(cards, progress)} />
+                <FlashcardProgressBar counts={countFlashcardLevels(allCards, progress)} />
               </Link>
             ) : (
               <div className="flashcard-topic-open">
@@ -98,13 +110,14 @@ export const FlashcardTopicSections = ({ subjectId, groups, progress, onStartPra
               </div>
             )}
 
-            {cards.length > 0 && (
+            {allCards.length > 0 && (
               <button
                 type="button"
                 className="flashcard-primary-button flashcard-topic-start"
+                disabled={cards.length === 0}
                 onClick={() => onStartPractice(topic.name, cards)}
               >
-                Start øving
+                {cards.length === 0 ? "Ingen kort her" : "Start øving"}
               </button>
             )}
           </div>

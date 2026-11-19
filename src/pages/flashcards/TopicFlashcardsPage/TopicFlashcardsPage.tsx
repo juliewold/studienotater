@@ -13,7 +13,12 @@ import {
   getFlashcardProgress,
   type FlashcardProgress,
 } from "../../../services/study/flashcardProgressService";
-import { countFlashcardLevels } from "../../../services/study/flashcardProgressStats";
+import { FlashcardStatusFilter as StatusFilterChips } from "../../../components/flashcards/FlashcardStatusFilter/FlashcardStatusFilter";
+import {
+  countFlashcardLevels,
+  filterFlashcardsByStatus,
+  type FlashcardStatusFilter,
+} from "../../../services/study/flashcardProgressStats";
 import {
   getFlashcardsBySubject,
   type DatabaseFlashcard,
@@ -28,6 +33,7 @@ export const TopicFlashcardsPage = () => {
   const [progress, setProgress] = useState<Map<string, FlashcardProgress>>(() => new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [statusFilter, setStatusFilter] = useState<FlashcardStatusFilter>("all");
 
   useEffect(() => {
     let isCurrent = true;
@@ -99,11 +105,17 @@ export const TopicFlashcardsPage = () => {
 
   const { rate, isSaving, errorMessage: ratingError } = useFlashcardRating(progress, handleProgressChange);
 
+  // The cards that match the status filter. Subtopics without matching cards are left out.
+  const visibleFlashcards = useMemo(
+    () => filterFlashcardsByStatus(flashcards, progress, statusFilter),
+    [flashcards, progress, statusFilter],
+  );
+
   // Subtopics inside this tema, in alphabetical order.
   const subtopics = useMemo(() => {
     const groups = new Map<string, { id: string; name: string; flashcards: DatabaseFlashcard[] }>();
 
-    flashcards.forEach((flashcard) => {
+    visibleFlashcards.forEach((flashcard) => {
       const id = flashcard.subtopicId || "without-subtopic";
       const group = groups.get(id) ?? {
         id,
@@ -116,7 +128,7 @@ export const TopicFlashcardsPage = () => {
     });
 
     return Array.from(groups.values()).sort((first, second) => first.name.localeCompare(second.name, "nb"));
-  }, [flashcards]);
+  }, [visibleFlashcards]);
 
   const counts = countFlashcardLevels(flashcards, progress);
 
@@ -147,6 +159,15 @@ export const TopicFlashcardsPage = () => {
           </section>
 
           {ratingError && <p className="flashcards-error">{ratingError}</p>}
+
+          <StatusFilterChips
+            flashcards={flashcards}
+            progress={progress}
+            value={statusFilter}
+            onChange={setStatusFilter}
+          />
+
+          {visibleFlashcards.length === 0 && <p>Ingen kort i dette filteret.</p>}
 
           <div className="flashcard-tema-cards">
             {subtopics.map((subtopic) => (
