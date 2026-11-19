@@ -2,13 +2,13 @@ import "../FlashcardsPage/FlashcardsPage.css";
 import "../FlashcardsPage/FlashcardFigure.css";
 import "./TopicFlashcardsPage.css";
 
-import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { FlashcardFigure } from "../../../components/flashcards/FlashcardPractice/FlashcardPractice";
+import { PracticeCard } from "../../../components/flashcards/FlashcardPractice/FlashcardPractice";
 import { FlashcardProgressBar } from "../../../components/flashcards/FlashcardProgressBar/FlashcardProgressBar";
 import { LoadingPlaceholder } from "../../../components/common/LoadingPlaceholder/LoadingPlaceholder";
-import { MathText } from "../../../components/common/MathText/MathText";
+import { useFlashcardRating } from "../../../hooks/useFlashcardRating";
 import {
   getFlashcardProgress,
   type FlashcardProgress,
@@ -19,41 +19,6 @@ import {
   type DatabaseFlashcard,
 } from "../../../services/study/flashcardsService";
 import { getTopicsBySubject } from "../../../services/subjects/subjectStructureService";
-
-/** A flashcard that turns over when you tap it, like in practice. */
-const FlashcardTile = ({ flashcard }: { flashcard: DatabaseFlashcard }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
-
-  const flip = () => setIsFlipped((current) => !current);
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      flip();
-    }
-  };
-
-  const shownFigure = isFlipped ? flashcard.answerImagePath : flashcard.questionImagePath;
-
-  return (
-    <div
-      className="flashcard-tile"
-      role="button"
-      tabIndex={0}
-      aria-pressed={isFlipped}
-      onClick={flip}
-      onKeyDown={handleKeyDown}
-    >
-      <p className="flashcard-label">{isFlipped ? "Svar" : "Spørsmål"}</p>
-
-      <h2>
-        <MathText>{isFlipped ? flashcard.answer : flashcard.question}</MathText>
-      </h2>
-
-      {shownFigure && <FlashcardFigure key={shownFigure} path={shownFigure} />}
-    </div>
-  );
-};
 
 export const TopicFlashcardsPage = () => {
   const { subjectId, topicId } = useParams();
@@ -118,6 +83,22 @@ export const TopicFlashcardsPage = () => {
     };
   }, []);
 
+  const handleProgressChange = (flashcardId: string, next: FlashcardProgress | null) => {
+    setProgress((currentProgress) => {
+      const updatedProgress = new Map(currentProgress);
+
+      if (next) {
+        updatedProgress.set(flashcardId, next);
+      } else {
+        updatedProgress.delete(flashcardId);
+      }
+
+      return updatedProgress;
+    });
+  };
+
+  const { rate, isSaving, errorMessage: ratingError } = useFlashcardRating(progress, handleProgressChange);
+
   // Subtopics inside this tema, in alphabetical order.
   const subtopics = useMemo(() => {
     const groups = new Map<string, { id: string; name: string; flashcards: DatabaseFlashcard[] }>();
@@ -165,16 +146,23 @@ export const TopicFlashcardsPage = () => {
             </p>
           </section>
 
+          {ratingError && <p className="flashcards-error">{ratingError}</p>}
+
           <div className="flashcard-tema-cards">
             {subtopics.map((subtopic) => (
               <section key={subtopic.id} className="flashcard-tema-group">
                 <h3>{subtopic.name}</h3>
 
-                <div className="flashcard-tile-grid">
-                  {subtopic.flashcards.map((flashcard) => (
-                    <FlashcardTile key={flashcard.id} flashcard={flashcard} />
-                  ))}
-                </div>
+                {subtopic.flashcards.map((flashcard) => (
+                  <div key={flashcard.id} className="flashcard-tema-item">
+                    <PracticeCard
+                      flashcard={flashcard}
+                      progress={progress.get(flashcard.id)}
+                      isSaving={isSaving}
+                      onRate={(level) => rate(flashcard.id, level)}
+                    />
+                  </div>
+                ))}
               </section>
             ))}
           </div>

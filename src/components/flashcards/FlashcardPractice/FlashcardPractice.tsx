@@ -2,13 +2,9 @@ import "./FlashcardPractice.css";
 
 import { useState, type KeyboardEvent, type MouseEvent } from "react";
 
+import { useFlashcardRating } from "../../../hooks/useFlashcardRating";
 import { usePrivateStorageUrl } from "../../../hooks/usePrivateStorageUrl";
-import {
-  clearFlashcardLevel,
-  setFlashcardLevel,
-  type FlashcardLevel,
-  type FlashcardProgress,
-} from "../../../services/study/flashcardProgressService";
+import type { FlashcardLevel, FlashcardProgress } from "../../../services/study/flashcardProgressService";
 import type { DatabaseFlashcard } from "../../../services/study/flashcardsService";
 import { MathText } from "../../common/MathText/MathText";
 
@@ -51,7 +47,7 @@ type PracticeCardProps = {
 };
 
 /** One card. Its state (side, chosen option) resets because the parent gives each card its own key. */
-const PracticeCard = ({ flashcard, progress, isSaving, onRate }: PracticeCardProps) => {
+export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: PracticeCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [options] = useState(() =>
@@ -163,42 +159,11 @@ export const FlashcardPractice = ({
   onExit,
 }: FlashcardPracticeProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const { rate, isSaving, errorMessage } = useFlashcardRating(progress, onProgressChange);
 
   const currentFlashcard = flashcards[currentIndex];
   const isFirstCard = currentIndex === 0;
   const isLastCard = currentIndex === flashcards.length - 1;
-
-  // Pressing the chosen rating again removes the choice, so the card is not rated.
-  const rate = async (level: FlashcardLevel) => {
-    if (!currentFlashcard) return;
-
-    const currentLevel = progress.get(currentFlashcard.id)?.level ?? null;
-
-    setIsSaving(true);
-    setErrorMessage("");
-
-    try {
-      if (currentLevel === level) {
-        await clearFlashcardLevel(currentFlashcard.id);
-
-        onProgressChange(currentFlashcard.id, null);
-      } else {
-        await setFlashcardLevel(currentFlashcard.id, level, currentLevel);
-
-        onProgressChange(currentFlashcard.id, {
-          level,
-          previousLevel: currentLevel ?? "none",
-        });
-      }
-    } catch (error) {
-      console.error("Kunne ikke lagre vurderingen:", error);
-      setErrorMessage("Kunne ikke lagre. Prøv igjen.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   if (!currentFlashcard) {
     return null;
@@ -236,7 +201,7 @@ export const FlashcardPractice = ({
         flashcard={currentFlashcard}
         progress={progress.get(currentFlashcard.id)}
         isSaving={isSaving}
-        onRate={rate}
+        onRate={(level) => rate(currentFlashcard.id, level)}
       />
 
       <div className="flashcard-practice-navigation">
