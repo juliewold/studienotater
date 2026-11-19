@@ -1,12 +1,3 @@
-.flashcard-figure {
-  display: block;
-  max-width: 100%;
-  max-height: 320px;
-  height: auto;
-  margin: 0.75rem auto 0;
-  border-radius: 8px;
-}
-
 .flashcard-exam-tasks {
   margin: 1.5rem 0;
   min-width: 0;
