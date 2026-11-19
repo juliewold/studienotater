@@ -4,7 +4,10 @@ import "./FlashcardTopicSections.css";
 import { useEffect, useState } from "react";
 
 import { getTopicsBySubject, type DatabaseTopic } from "../../../services/subjects/subjectStructureService";
+import type { FlashcardProgress } from "../../../services/study/flashcardProgressService";
+import { countFlashcardLevels } from "../../../services/study/flashcardProgressStats";
 import type { DatabaseFlashcard } from "../../../services/study/flashcardsService";
+import { FlashcardProgressBar } from "../FlashcardProgressBar/FlashcardProgressBar";
 
 export type FlashcardTopicGroup = {
   topicId: string;
@@ -19,6 +22,7 @@ export type FlashcardTopicGroup = {
 type FlashcardTopicSectionsProps = {
   subjectId: string;
   groups: FlashcardTopicGroup[];
+  progress: Map<string, FlashcardProgress>;
   onStartPractice: (title: string, flashcards: DatabaseFlashcard[]) => void;
 };
 
@@ -29,7 +33,7 @@ const plural = (count: number, singular: string, pluralForm: string) =>
  * One section per tema, in the order of the subject's topics. Flashcards are written
  * by hand in the admin editor, so this view only reads them.
  */
-export const FlashcardTopicSections = ({ subjectId, groups, onStartPractice }: FlashcardTopicSectionsProps) => {
+export const FlashcardTopicSections = ({ subjectId, groups, progress, onStartPractice }: FlashcardTopicSectionsProps) => {
   const [topics, setTopics] = useState<DatabaseTopic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -80,6 +84,8 @@ export const FlashcardTopicSections = ({ subjectId, groups, onStartPractice }: F
                 <h2>{topic.name}</h2>
 
                 <p>{cards.length === 0 ? "Flashcards kommer" : plural(cards.length, "kort", "kort")}</p>
+
+                {cards.length > 0 && <FlashcardProgressBar counts={countFlashcardLevels(cards, progress)} />}
               </div>
 
               {cards.length > 0 && (

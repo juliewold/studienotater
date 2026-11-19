@@ -3,6 +3,8 @@ import "./FlashcardsPage.css";
 import "./FlashcardFigure.css";
 import { FlashcardTopicSections } from "../../../components/flashcards/FlashcardTopicSections/FlashcardTopicSections";
 import { FlashcardPractice } from "../../../components/flashcards/FlashcardPractice/FlashcardPractice";
+import { FlashcardProgressBar } from "../../../components/flashcards/FlashcardProgressBar/FlashcardProgressBar";
+import { countFlashcardLevels } from "../../../services/study/flashcardProgressStats";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -253,6 +255,16 @@ export const FlashcardsPage = () => {
       )}
 
       {!isLoadingFlashcards && !errorMessage && flashcards.length > 0 && (
+        <section className="flashcard-subject-progress" aria-label="Fremdrift">
+          <FlashcardProgressBar counts={countFlashcardLevels(flashcards, progress)} />
+
+          <p>
+            {countFlashcardLevels(flashcards, progress).green} av {flashcards.length} kan godt
+          </p>
+        </section>
+      )}
+
+      {!isLoadingFlashcards && !errorMessage && flashcards.length > 0 && (
         <>
           <section className="flashcard-all-practice-card">
             <div>
@@ -318,6 +330,7 @@ export const FlashcardsPage = () => {
         <FlashcardTopicSections
           subjectId={subjectId}
           groups={groupedFlashcards}
+          progress={progress}
           onStartPractice={startPractice}
         />
       )}
