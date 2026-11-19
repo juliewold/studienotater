@@ -14,6 +14,7 @@ import {
   deletePdf,
   getAllPdfs,
   updatePdfSubtopic,
+  updatePdfTitle,
   type DatabasePdf,
 } from "../../services/media/pdfsService";
 
@@ -50,6 +51,9 @@ export const useAdminPdfs = () => {
   const [deletingPdfId, setDeletingPdfId] = useState<string | null>(null);
 
   const [updatingPdfId, setUpdatingPdfId] = useState<string | null>(null);
+
+  const [editingPdfId, setEditingPdfId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -273,6 +277,54 @@ export const useAdminPdfs = () => {
     }
   };
 
+  const startTitleEdit = (pdf: DatabasePdf) => {
+    setEditingPdfId(pdf.id);
+    setEditingTitle(pdf.title);
+    setErrorMessage("");
+    setSuccessMessage("");
+  };
+
+  const cancelTitleEdit = () => {
+    setEditingPdfId(null);
+    setEditingTitle("");
+  };
+
+  const handleTitleSave = async (pdf: DatabasePdf) => {
+    const nextTitle = editingTitle.trim();
+
+    if (!nextTitle) {
+      setErrorMessage("Tittelen kan ikke være tom.");
+
+      return;
+    }
+
+    if (nextTitle === pdf.title) {
+      cancelTitleEdit();
+
+      return;
+    }
+
+    setUpdatingPdfId(pdf.id);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      await updatePdfTitle(pdf.id, nextTitle);
+
+      cancelTitleEdit();
+
+      await refreshUploadedPdfs();
+
+      setSuccessMessage("Tittelen ble oppdatert.");
+    } catch (error) {
+      console.error("Kunne ikke oppdatere PDF-ens tittel:", error);
+
+      setErrorMessage("Kunne ikke oppdatere tittelen.");
+    } finally {
+      setUpdatingPdfId(null);
+    }
+  };
+
   return {
     fileInputRef,
 
@@ -312,5 +364,12 @@ export const useAdminPdfs = () => {
     handleSubmit,
     handlePdfSubtopicChange,
     handleDelete,
+
+    editingPdfId,
+    editingTitle,
+    setEditingTitle,
+    startTitleEdit,
+    cancelTitleEdit,
+    handleTitleSave,
   };
 };

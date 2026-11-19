@@ -11,6 +11,9 @@ import {
   type DatabasePdf,
 } from "../../../services/media/pdfsService";
 
+import { lectureNumberLabel, pdfTitleAddsToTopic } from "../../../services/subjects/curriculumContent";
+import { loadLectureSequence, type LectureItem } from "../../../services/subjects/lectureSequenceService";
+
 import {
   createNote,
   getNoteById,
@@ -24,6 +27,22 @@ import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import { ResourceProgress } from "../../../components/progress/ResourceProgress/ResourceProgress";
 import { EditableNote } from "../../../components/notes/EditableNote/EditableNote";
 import { PdfSummaryModal } from "../../../components/media/PdfSummaryModal/PdfSummaryModal";
+
+type LectureLink = { id: string; title: string };
+
+/** Where a forelesningsnotat sits in the subject's pensum order. */
+type LectureSlot = {
+  pdfId: string;
+  number: string;
+  title?: string;
+  previous: LectureLink | null;
+  next: LectureLink | null;
+};
+
+const lectureLink = (item: LectureItem): LectureLink => ({
+  id: item.pdf.id,
+  title: item.title ? `${lectureNumberLabel(item.number)}: ${item.title}` : lectureNumberLabel(item.number),
+});
 
 const isAppleMobileDevice = () => {
   const userAgent = navigator.userAgent;
@@ -48,6 +67,7 @@ export const PdfViewerPage = () => {
   const [isCreatingSummary, setIsCreatingSummary] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [lectureSlot, setLectureSlot] = useState<LectureSlot | null>(null);
 
   const subject = subjects.find(
     (currentSubject) => currentSubject.id === subjectId,
@@ -98,6 +118,40 @@ export const PdfViewerPage = () => {
 
     loadPdf();
   }, [pdfId, subjectId]);
+
+  useEffect(() => {
+    if (!subjectId || !pdf || pdf.category !== "forelesninger") return;
+
+    const currentId = pdf.id;
+    let cancelled = false;
+
+    // Lecture order comes from the pensum; without it the page still works, just without the lecture heading and navigation.
+    loadLectureSequence(subjectId)
+      .then((sequence) => {
+        if (cancelled) return;
+
+        const index = sequence.findIndex((item) => item.pdf.id === currentId);
+
+        setLectureSlot(
+          index < 0
+            ? null
+            : {
+                pdfId: currentId,
+                number: sequence[index].number,
+                title: sequence[index].title,
+                previous: index > 0 ? lectureLink(sequence[index - 1]) : null,
+                next: index < sequence.length - 1 ? lectureLink(sequence[index + 1]) : null,
+              },
+        );
+      })
+      .catch((error) => {
+        console.error("Kunne ikke hente forelesningene:", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [subjectId, pdf]);
 
   const handleCreateSummary = async () => {
     if (!pdf || !subjectId) {
@@ -159,15 +213,54 @@ export const PdfViewerPage = () => {
 
   const resourceId = `pdf-${subjectId}-database-${pdf.id}`;
 
+  // A slot loaded for another PDF must never show here.
+  const lecture = lectureSlot?.pdfId === pdf.id ? lectureSlot : null;
+
   return (
     <main className="page-container">
       <Link to={`/fag/${subjectId}/pdfs`} className="back-link">
         ← Tilbake til PDF-er
       </Link>
 
-      <p className="page-label">PDF</p>
+      {lecture && (lecture.previous || lecture.next) && (
+        <nav className="pdf-lecture-navigation" aria-label="Navigasjon mellom forelesninger">
+          {lecture.previous && (
+            <Link
+              to={`/fag/${subjectId}/pdfs/${lecture.previous.id}`}
+              className="pdf-lecture-navigation-button"
+              title={lecture.previous.title}
+            >
+              ← Forrige
+            </Link>
+          )}
 
-      <h1>{pdf.title}</h1>
+          {lecture.next && (
+            <Link
+              to={`/fag/${subjectId}/pdfs/${lecture.next.id}`}
+              className="pdf-lecture-navigation-button pdf-lecture-navigation-next"
+              title={lecture.next.title}
+            >
+              Neste →
+            </Link>
+          )}
+        </nav>
+      )}
+
+      {lecture ? (
+        <>
+          <p className="page-label">{lectureNumberLabel(lecture.number)}</p>
+
+          <h1>{lecture.title ?? pdf.title}</h1>
+
+          {lecture.title && pdfTitleAddsToTopic(pdf.title, lecture.title) && <p className="pdf-lecture-file">{pdf.title}</p>}
+        </>
+      ) : (
+        <>
+          <p className="page-label">PDF</p>
+
+          <h1>{pdf.title}</h1>
+        </>
+      )}
 
       <div className="pdf-learning-panel">
         <ResourceProgress resourceId={resourceId} />

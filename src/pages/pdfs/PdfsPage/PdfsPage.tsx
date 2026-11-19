@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { getPdfsBySubject, type DatabasePdf } from "../../../services/media/pdfsService";
+import { lectureNumberLabel, pdfTitleAddsToTopic } from "../../../services/subjects/curriculumContent";
+import { loadLectureSequence } from "../../../services/subjects/lectureSequenceService";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useProgress } from "../../../hooks/useProgress";
 
@@ -32,6 +34,8 @@ export const PdfsPage = () => {
   const [pdfs, setPdfs] = useState<DatabasePdf[]>([]);
   const [isLoadingPdfs, setIsLoadingPdfs] = useState(true);
   const [pdfError, setPdfError] = useState("");
+  // Lecture PDFs by id, with their number, topic and place in the lecture order.
+  const [lectures, setLectures] = useState<Map<string, { index: number; number: string; title?: string }>>(new Map());
 
   const { isFavorite, toggleFavorite, isLoadingFavorites } = useFavorites();
 
@@ -62,6 +66,31 @@ export const PdfsPage = () => {
     loadPdfs();
   }, [subjectId]);
 
+  useEffect(() => {
+    if (!subjectId) return;
+
+    let cancelled = false;
+
+    // Titles and order come from the subject's lectures; without them the cards keep their PDF titles.
+    loadLectureSequence(subjectId)
+      .then((sequence) => {
+        if (cancelled) return;
+
+        setLectures(
+          new Map(
+            sequence.map(({ pdf, number, title }, index) => [pdf.id, { index, number, title }]),
+          ),
+        );
+      })
+      .catch((error) => {
+        console.error("Kunne ikke hente forelesningene:", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [subjectId]);
+
   return (
     <main className="page-container">
       <Link to={`/fag/${subjectId}`} className="back-link">
@@ -83,9 +112,11 @@ export const PdfsPage = () => {
       {!isLoadingPdfs &&
         !pdfError &&
         categories.map((category) => {
-          const categoryPdfs = pdfs.filter(
-            (pdf) => pdf.category === category.id,
-          );
+          // Lectures follow the pensum; PDFs outside it keep their upload order after them.
+          const position = (pdf: DatabasePdf) => lectures.get(pdf.id)?.index ?? Number.MAX_SAFE_INTEGER;
+          const categoryPdfs = pdfs
+            .filter((pdf) => pdf.category === category.id)
+            .sort((a, b) => position(a) - position(b));
 
           if (categoryPdfs.length === 0) {
             return null;
@@ -110,13 +141,27 @@ export const PdfsPage = () => {
 
                   const favorite = isFavorite(favoriteId, "pdf");
 
+                  const lecture = lectures.get(pdf.id);
+
                   return (
                     <article className="pdf-card-wrapper" key={pdf.id}>
                       <Link to={pdfUrl} className="pdf-card">
                         <span className="pdf-icon">📄</span>
 
                         <div className="pdf-card-content">
-                          <h3>{pdf.title}</h3>
+                          {lecture?.title ? (
+                            <>
+                              <span className="pdf-lecture-number">
+                                {lectureNumberLabel(lecture.number)}
+                              </span>
+
+                              <h3>{lecture.title}</h3>
+
+                              {pdfTitleAddsToTopic(pdf.title, lecture.title) && <span className="pdf-card-file">{pdf.title}</span>}
+                            </>
+                          ) : (
+                            <h3>{pdf.title}</h3>
+                          )}
 
                           <div className="pdf-progress-preview">
                             <span>{completed ? "✓ Lest" : "Ikke lest"}</span>

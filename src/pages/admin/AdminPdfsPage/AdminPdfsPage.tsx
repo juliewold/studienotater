@@ -64,6 +64,13 @@ export const AdminPdfsPage = () => {
     handleSubmit,
     handlePdfSubtopicChange,
     handleDelete,
+
+    editingPdfId,
+    editingTitle,
+    setEditingTitle,
+    startTitleEdit,
+    cancelTitleEdit,
+    handleTitleSave,
   } = useAdminPdfs();
 
   const getCategoryLabel = (pdfCategory: string) => {
@@ -265,7 +272,48 @@ export const AdminPdfsPage = () => {
                         <div className="uploaded-pdf-information">
                           <div className="uploaded-pdf-heading">
                             <div className="uploaded-pdf-title-group">
-                              <h3>{pdf.title}</h3>
+                              {editingPdfId === pdf.id ? (
+                                <form
+                                  className="uploaded-pdf-title-edit"
+                                  onSubmit={(event) => {
+                                    event.preventDefault();
+                                    handleTitleSave(pdf);
+                                  }}
+                                >
+                                  <input
+                                    aria-label="Ny tittel"
+                                    value={editingTitle}
+                                    disabled={updatingPdfId === pdf.id}
+                                    onChange={(event) => setEditingTitle(event.target.value)}
+                                    autoFocus
+                                  />
+
+                                  <button type="submit" disabled={updatingPdfId === pdf.id}>
+                                    {updatingPdfId === pdf.id ? "Lagrer..." : "Lagre"}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    disabled={updatingPdfId === pdf.id}
+                                    onClick={cancelTitleEdit}
+                                  >
+                                    Avbryt
+                                  </button>
+                                </form>
+                              ) : (
+                                <div className="uploaded-pdf-title-edit">
+                                  <h3>{pdf.title}</h3>
+
+                                  <button
+                                    type="button"
+                                    className="uploaded-pdf-title-button"
+                                    disabled={updatingPdfId !== null}
+                                    onClick={() => startTitleEdit(pdf)}
+                                  >
+                                    Rediger tittel
+                                  </button>
+                                </div>
+                              )}
                             </div>
 
                             <span className="uploaded-pdf-category">
