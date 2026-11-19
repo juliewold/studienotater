@@ -80,7 +80,8 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
   const isMultipleChoice = flashcard.multipleChoice;
   const hasChosen = selectedIndex !== null;
   const wasCorrect = hasChosen && selectedIndex === correctIndex;
-  const showExplanation = Boolean(flashcard.explanation) && (isMultipleChoice ? hasChosen : isFlipped);
+  // Multiple-choice explanations are shown inside the feedback box instead.
+  const showExplanation = !isMultipleChoice && isFlipped && Boolean(flashcard.explanation);
 
   return (
     <>
@@ -132,9 +133,9 @@ export const PracticeCard = ({ flashcard, progress, isSaving, onRate }: Practice
         <div className={`flashcard-feedback ${wasCorrect ? "flashcard-feedback-correct" : "flashcard-feedback-wrong"}`}>
           <div className="flashcard-feedback-title">{wasCorrect ? "Riktig!" : "Ikke helt riktig"}</div>
 
-          {!wasCorrect && (
-            <div className="flashcard-feedback-answer">
-              Riktig svar: <MathText>{flashcard.answer}</MathText>
+          {flashcard.explanation && (
+            <div className="flashcard-feedback-explanation">
+              <MathText>{flashcard.explanation}</MathText>
             </div>
           )}
         </div>

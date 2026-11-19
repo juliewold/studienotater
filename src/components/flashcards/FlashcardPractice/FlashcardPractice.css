@@ -42,8 +42,13 @@
   font-size: 1.05rem;
 }
 
-.flashcard-feedback-answer {
-  margin-top: 0.5rem;
+/* Worked solution inside the feedback box. Line breaks from the admin editor are kept. */
+.flashcard-feedback-explanation {
+  margin-top: 0.6rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-x: auto;
 }
 
 /* Worked solution below the card, in its own box. Line breaks from the admin editor are kept. */
