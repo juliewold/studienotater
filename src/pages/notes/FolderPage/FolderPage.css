@@ -21,6 +21,10 @@
   font-size: 0.92rem;
 }
 
+.folder-page-progress {
+  margin-top: 14px;
+}
+
 .folder-page-actions {
   display: flex;
   flex-wrap: wrap;

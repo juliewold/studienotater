@@ -1,0 +1,41 @@
+.folder-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 360px;
+  color: var(--theme-muted, #6b6275);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.folder-progress-bar {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--theme-surface-raised, #ebe5f2);
+}
+
+.folder-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--folder-tone, #8564a8);
+  transition: width 0.3s ease;
+}
+
+.folder-progress-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.folder-progress-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}

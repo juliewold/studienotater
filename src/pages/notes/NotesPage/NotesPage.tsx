@@ -6,7 +6,7 @@ import { sortNoteFolders } from "../../../services/notes/noteFolderOrder";
 import { SortableFolders } from "../../../components/notes/SortableFolders/SortableFolders";
 import "./NotesPage.css";
 import { StructuredNotes } from "./StructuredNotes";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Heart, Plus, Sparkles, X } from "lucide-react";
 
@@ -25,6 +25,7 @@ import {
   type NoteFolder,
 } from "../../../services/notes/noteFoldersService";
 
+import { getFolderProgressById } from "../../../services/notes/folderProgress";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useProgress } from "../../../hooks/useProgress";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
@@ -102,7 +103,16 @@ export const NotesPage = () => {
 
   const { isFavorite, toggleFavorite, isLoadingFavorites } = useFavorites();
 
-  const { getProgress, isLoadingProgress } = useProgress();
+  const { getProgress, isLoadingProgress, progressItems } = useProgress();
+
+  // Folder totals include subfolders. Hidden until progress has loaded, so the bars do not flash.
+  const folderProgressById = useMemo(
+    () =>
+      isLoadingProgress || !subjectId
+        ? null
+        : getFolderProgressById(folders, notes, progressItems, subjectId),
+    [folders, notes, progressItems, isLoadingProgress, subjectId],
+  );
 
   // Only top-level folders are shown as cards here. Subfolders appear inside their parent folder.
   const sortedFolders = sortNoteFolders(
@@ -595,6 +605,7 @@ export const NotesPage = () => {
               folder={folder}
               subjectId={subject.id}
               noteCount={folderNoteCounts[folder.id] ?? 0}
+              progress={folderProgressById?.[folder.id]}
               allFolders={folders}
               onFolderCreated={(createdFolder) => {
                 setFolders((currentFolders) => [...currentFolders, createdFolder]);

@@ -24,18 +24,29 @@ import {
   createNote,
   getNoteCountsByFolder,
   getNoteMetadataByFolder,
+  getNoteMetadataBySubject,
   type NoteMetadata,
 } from "../../../services/notes/notesService";
+
+import {
+  getFolderProgressById,
+  type FolderProgress,
+} from "../../../services/notes/folderProgress";
 
 import {
   getSubtopicsByTopic,
   type DatabaseSubtopic,
 } from "../../../services/subjects/subjectStructureService";
 
-import { getAllProgress, type Progress } from "../../../services/progress/progressService";
+import {
+  getAllProgress,
+  type Progress,
+  type ProgressItem,
+} from "../../../services/progress/progressService";
 
 import { FolderNoteCard } from "../../../components/notes/FolderNoteCard/FolderNoteCard";
 import { FolderCard } from "../../../components/notes/FolderCard/FolderCard";
+import { FolderProgressSummary } from "../../../components/notes/FolderProgressSummary/FolderProgressSummary";
 import { FolderNameModal } from "../../../components/notes/FolderCard/FolderNameModal";
 import { FolderBreadcrumbs } from "../../../components/notes/FolderBreadcrumbs/FolderBreadcrumbs";
 
@@ -57,6 +68,11 @@ export const FolderPage = () => {
 
   const [progressByNoteId, setProgressByNoteId] = useState<
     Record<string, Progress>
+  >({});
+
+  // Progress for this folder and every folder below it, keyed by folder id.
+  const [folderProgressById, setFolderProgressById] = useState<
+    Record<string, FolderProgress>
   >({});
 
   const [subtopics, setSubtopics] = useState<DatabaseSubtopic[]>([]);
@@ -115,10 +131,11 @@ export const FolderPage = () => {
       }
 
       try {
-        const [loadedFolders, loadedNotes, loadedCounts] = await Promise.all([
+        const [loadedFolders, loadedNotes, loadedCounts, loadedSubjectNotes] = await Promise.all([
           getNoteFoldersBySubject(subjectId),
           getNoteMetadataByFolder(subjectId, folderId),
           getNoteCountsByFolder(subjectId),
+          getNoteMetadataBySubject(subjectId),
         ]);
 
         const loadedFolder = loadedFolders.find(
@@ -139,8 +156,10 @@ export const FolderPage = () => {
 
         const loadedProgressByNoteId: Record<string, Progress> = {};
 
+        let allProgress: ProgressItem[] = [];
+
         if (userId) {
-          const allProgress = await getAllProgress(userId);
+          allProgress = await getAllProgress(userId);
 
           for (const note of loadedNotes) {
             const resourceId = `note-${subjectId}-database-${note.slug}`;
@@ -165,6 +184,9 @@ export const FolderPage = () => {
         setNotes(loadedNotes);
         setSubtopics(loadedSubtopics);
         setProgressByNoteId(loadedProgressByNoteId);
+        setFolderProgressById(
+          getFolderProgressById(loadedFolders, loadedSubjectNotes, allProgress, subjectId),
+        );
       } catch (error) {
         console.error("Kunne ikke hente mappen:", error);
 
@@ -310,6 +332,12 @@ export const FolderPage = () => {
           {folder.topicName && (
             <p className="folder-topic-name">Tema: {folder.topicName}</p>
           )}
+
+          {folderProgressById[folder.id] && (
+            <div className="folder-page-progress">
+              <FolderProgressSummary progress={folderProgressById[folder.id]} />
+            </div>
+          )}
         </div>
 
         {isAdmin && (
@@ -350,6 +378,7 @@ export const FolderPage = () => {
                 folder={childFolder}
                 subjectId={subjectId!}
                 noteCount={folderNoteCounts[childFolder.id] ?? 0}
+                progress={folderProgressById[childFolder.id]}
                 allFolders={allFolders}
                 onFolderCreated={(createdFolder) => {
                   setAllFolders((currentFolders) => [...currentFolders, createdFolder]);

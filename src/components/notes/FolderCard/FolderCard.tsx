@@ -14,6 +14,8 @@ import {
   type NoteFolder,
 } from "../../../services/notes/noteFoldersService";
 import { getChildFolders } from "../../../services/notes/folderTree";
+import type { FolderProgress } from "../../../services/notes/folderProgress";
+import { FolderProgressSummary } from "../FolderProgressSummary/FolderProgressSummary";
 import { FolderNameModal } from "./FolderNameModal";
 import { FolderMoveModal } from "./FolderMoveModal";
 
@@ -21,6 +23,8 @@ type FolderCardProps = {
   folder: NoteFolder;
   subjectId: string;
   noteCount: number;
+  // Reading progress including subfolders. Omitted while progress is still loading.
+  progress?: FolderProgress;
   // All folders of the subject, used for the move picker and the delete summary.
   allFolders: NoteFolder[];
   onFolderCreated: (createdFolder: NoteFolder) => void;
@@ -34,6 +38,7 @@ export const FolderCard = ({
   folder,
   subjectId,
   noteCount,
+  progress,
   allFolders,
   onFolderCreated,
   onFolderUpdated,
@@ -184,6 +189,8 @@ export const FolderCard = ({
             <span className="folder-card-count">
               {noteCount === 1 ? "1 notat" : `${noteCount} notater`}
             </span>
+
+            {progress && <FolderProgressSummary progress={progress} />}
           </span>
         </Link>
 
